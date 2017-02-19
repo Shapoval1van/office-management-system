@@ -3,21 +3,30 @@ package com.netcracker.model.entity;
 
 import com.netcracker.repository.common.Persistable;
 
-public class Role implements Persistable<Long> {
+public class Role implements Persistable<Integer> {
 
-    private static final String TABLE_NAME = "ROLE";
-    private static final String ID_COLUMN = "role_id";
+    public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
 
-    private Long id;
+    public static final String TABLE_NAME = "ROLE";
+    public static final String ID_COLUMN = "role_id";
+
+    private Integer id;
     private String name;
 
+    public Role() {
+    }
+
+    public Role(Integer id) {
+        this.id = id;
+    }
+
     @Override
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -5,8 +5,8 @@ import com.netcracker.repository.common.Persistable;
 
 public class Person implements Persistable<Long> {
 
-    private static final String TABLE_NAME = "PERSON";
-    private static final String ID_COLUMN = "person_id";
+    public static final String TABLE_NAME = "PERSON";
+    public static final String ID_COLUMN = "person_id";
 
     private Long id;
     private String firstName;
