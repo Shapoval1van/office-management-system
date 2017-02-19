@@ -1,4 +1,4 @@
-package com.netcracker.common.repository;
+package com.netcracker.repository.common;
 
 /**
  * Interface is used to mark entity.

@@ -1,4 +1,4 @@
-package com.netcracker.common.repository;
+package com.netcracker.repository.common;
 
 
 import java.util.List;
