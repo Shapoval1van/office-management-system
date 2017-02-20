@@ -1,0 +1,117 @@
+CREATE TABLE CHANGE_GROUP
+(
+  change_group_id BIGSERIAL                NOT NULL PRIMARY KEY ,
+  created         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+  author_id       BIGINT                   NOT NULL,
+  request_id      BIGINT                   NOT NULL
+);
+
+CREATE TABLE CHANGE_ITEM
+(
+  change_item_id  BIGSERIAL NOT NULL PRIMARY KEY ,
+  old_value       TEXT,
+  new_value       TEXT,
+  change_group_id BIGINT    NOT NULL,
+  field_id        INT       NOT NULL
+);
+
+CREATE TABLE FIELD
+(
+  field_id SERIAL      NOT NULL PRIMARY KEY ,
+  name     VARCHAR(20) NOT NULL
+);
+
+ALTER TABLE FIELD
+  ADD CONSTRAINT FIELD_UN UNIQUE (name);
+
+CREATE TABLE REQUEST_GROUP
+(
+  request_group_id SERIAL NOT NULL PRIMARY KEY,
+  name             VARCHAR(20)
+);
+
+CREATE TABLE PRIORITY
+(
+  priority_id SERIAL NOT NULL PRIMARY KEY,
+  name        VARCHAR(20)
+);
+
+ALTER TABLE PRIORITY
+  ADD CONSTRAINT PRIORITY_UN UNIQUE (name);
+
+CREATE TABLE REQUEST
+(
+  request_id       BIGSERIAL                NOT NULL PRIMARY KEY,
+  name             VARCHAR(50)              NOT NULL,
+  description      TEXT,
+  creation_time    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+  estimate         TIMESTAMP WITH TIME ZONE,
+  status_id        INT                      NOT NULL,
+  employee_id      BIGINT                   NOT NULL,
+  manager_id       BIGINT,
+  parent_id        BIGINT,
+  priority_id      INT                      NOT NULL,
+  request_group_id BIGINT
+);
+
+CREATE TABLE ROLE
+(
+  role_id SERIAL NOT NULL PRIMARY KEY,
+  name    VARCHAR(20)
+);
+
+ALTER TABLE ROLE
+  ADD CONSTRAINT ROLE_UN UNIQUE (name);
+
+CREATE TABLE STATUS
+(
+  status_id SERIAL NOT NULL PRIMARY KEY,
+  name      VARCHAR(20)
+);
+
+CREATE TABLE PERSON
+(
+  person_id  BIGSERIAL   NOT NULL PRIMARY KEY,
+  first_name VARCHAR(50),
+  last_name  VARCHAR(50),
+  email      VARCHAR(50) NOT NULL,
+  password   VARCHAR(50) NOT NULL,
+  role_id    INT         NOT NULL,
+  enabled    BOOLEAN     NOT NULL DEFAULT FALSE
+);
+
+ALTER TABLE PERSON
+  ADD CONSTRAINT PERSON_UN UNIQUE (email);
+
+ALTER TABLE CHANGE_GROUP
+  ADD CONSTRAINT AUTHOR_FK FOREIGN KEY (author_id) REFERENCES PERSON (person_id) ON DELETE CASCADE;
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT EMPLOYEE_FK FOREIGN KEY (employee_id) REFERENCES PERSON (person_id) ON DELETE CASCADE;
+
+ALTER TABLE CHANGE_ITEM
+  ADD CONSTRAINT FIELD_FK FOREIGN KEY (field_id) REFERENCES FIELD (field_id) ON DELETE CASCADE;
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT GROUP_FK FOREIGN KEY (request_group_id) REFERENCES REQUEST_GROUP (request_group_id) ON DELETE SET NULL;
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT MANAGER_FK FOREIGN KEY (manager_id) REFERENCES PERSON (person_id) ON DELETE SET NULL;
+
+ALTER TABLE CHANGE_GROUP
+  ADD CONSTRAINT REQUEST_FK FOREIGN KEY (request_id) REFERENCES REQUEST (request_id) ON DELETE CASCADE;
+
+ALTER TABLE PERSON
+  ADD CONSTRAINT ROLE_FK FOREIGN KEY (role_id) REFERENCES ROLE (role_id);
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT STATUS_FK FOREIGN KEY (status_id) REFERENCES STATUS (status_id);
+
+ALTER TABLE CHANGE_ITEM
+  ADD CONSTRAINT group_fkv2 FOREIGN KEY (change_group_id) REFERENCES CHANGE_GROUP (change_group_id) ON DELETE CASCADE;
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT parent_request_fk FOREIGN KEY (parent_id) REFERENCES REQUEST (request_id) ON DELETE CASCADE;
+
+ALTER TABLE REQUEST
+  ADD CONSTRAINT priority_FK FOREIGN KEY (priority_id) REFERENCES PRIORITY (priority_id);
