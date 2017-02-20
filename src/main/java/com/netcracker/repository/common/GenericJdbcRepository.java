@@ -2,6 +2,7 @@ package com.netcracker.repository.common;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -45,8 +46,12 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
 
     @Override
     public Optional<T> findOne(ID id) {
-        T object = this.jdbcTemplate.queryForObject(this.buildFindOneQuery(), new Object[]{id}, this.mapRow());
-        return Optional.ofNullable(object);
+        try {
+            T object = this.jdbcTemplate.queryForObject(this.buildFindOneQuery(), new Object[]{id}, this.mapRow());
+            return Optional.ofNullable(object);
+        } catch (EmptyResultDataAccessException e){
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -84,8 +89,12 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
 
     @Override
     public Optional<T> queryForObject(String sql, Object... args) {
-        T object = this.jdbcTemplate.queryForObject(sql, args, this.mapRow());
-        return Optional.ofNullable(object);
+        try {
+            T object = this.jdbcTemplate.queryForObject(sql, args, this.mapRow());
+            return Optional.ofNullable(object);
+        } catch (EmptyResultDataAccessException e){
+            return Optional.empty();
+        }
     }
 
     @Override
