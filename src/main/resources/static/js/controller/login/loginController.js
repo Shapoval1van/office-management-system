@@ -1,6 +1,3 @@
-/**
- * Created by Max on 21.02.2017.
- */
 (function () {
     angular.module("OfficeManagementSystem")
         .controller("LoginController", ["$scope", "$http",
@@ -14,8 +11,10 @@
                     $http.post("/some_url/", $scope.personCredentials)
                         .then(function (callback) {
                             //    Success
+                            console.log("Login Success!")
                         }, function (callback) {
                             //    Failure
+                            console.log("Login Failure!")
                         })
                 };
 
@@ -24,8 +23,10 @@
                     $http.put("/some_url/", $scope.recoverEmail)
                         .then(function (callback) {
                             //    Success
+                            console.log("Login Success!")
                         }, function (callback) {
                             //    Failure
+                            console.log("Login Failure!")
                         })
                 }
             }])
