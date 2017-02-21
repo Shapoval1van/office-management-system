@@ -29,16 +29,14 @@ import static org.junit.Assert.*;
 public class RegistrationServiceImplTest {
 
     @Autowired
-    RegistrationService service;
+    private RegistrationService service;
     @Autowired
-    PersonRepository personRepository;
-    @Autowired
-    RoleRepository roleRepository;
-    final Integer ROLE_ID = 100;
-    final String TEST_TOKEN = "TEST_TOKEN";
-    final String NEW_EMPLOYEE_PASSWORD = "Password1";
-    final String ENABLED_EMPLOYEE_EMAIL = "enabled@mail.com";
-    final String DISABLED_EMPLOYEE_EMAIL = "a.p.syvenko@gmail.com";
+    private final Integer ROLE_ID = 100;
+    private final String TEST_TOKEN = "TEST_TOKEN";
+    private final String NEW_EMPLOYEE_PASSWORD = "Password1";
+    private final String ENABLED_EMPLOYEE_EMAIL = "enabled@mail.com";
+    private final String DISABLED_EMPLOYEE_EMAIL = "a.p.syvenko@gmail.com";
+    private final String REQUEST_LINK = "site.com";
 
     @Test
     public void mustAddNewNonEnabledPersonAndReturnToken() throws Exception {
@@ -50,7 +48,7 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        VerificationToken verificationToken = service.registerPerson(person);
+        VerificationToken verificationToken = service.registerPerson(person, REQUEST_LINK);
 
         assertNotNull(verificationToken);
         assertNotNull(verificationToken.getId());
@@ -69,7 +67,7 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        VerificationToken verificationToken = service.registerPerson(person);
+        VerificationToken verificationToken = service.registerPerson(person, REQUEST_LINK);
 
         assertTrue(Calendar.getInstance().getTime().before(verificationToken.getDateExpired()));
     }
@@ -78,7 +76,7 @@ public class RegistrationServiceImplTest {
     public void ifEmployeeAlreadyRegisteredAndEnabledThenThrowException() throws Exception {
         Person person = new Person();
         person.setEmail(ENABLED_EMPLOYEE_EMAIL);
-        service.registerPerson(person);
+        service.registerPerson(person, REQUEST_LINK);
     }
 
     @Test

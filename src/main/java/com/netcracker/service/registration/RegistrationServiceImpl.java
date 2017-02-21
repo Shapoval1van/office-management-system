@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,34 +27,34 @@ public class RegistrationServiceImpl implements RegistrationService {
     static final int EXPIRATION = 60 * 24;
 
     @Autowired
-    PersonRepository personRepository;
+    private PersonRepository personRepository;
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
     @Autowired
-    VerificationTokenRepository verificationTokenRepository;
+    private VerificationTokenRepository verificationTokenRepository;
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
-    public VerificationToken registerPerson(Person person) throws Exception {
+    public VerificationToken registerPerson(Person person, String requestLink) throws Exception {
 
         Optional<Person> savedOptional = this.personRepository.findPersonByEmail(person.getEmail());
 
-        if (savedOptional.isPresent()){
-            if (savedOptional.get().isEnabled()){
+        if (savedOptional.isPresent()) {
+            if (savedOptional.get().isEnabled()) {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
             } else {
-                Optional<VerificationToken> vTokenOptional = this.verificationTokenRepository.findVerificationTokenByPerson(savedOptional.get().getId());
-                vTokenOptional.ifPresent(verificationToken -> {
-                            verificationToken.setDateExpired(this.calculateDateExpired());
-                            this.verificationTokenRepository.save(verificationToken);
+                Optional<VerificationToken> oldTokenOptional = this.verificationTokenRepository.findVerificationTokenByPerson(savedOptional.get().getId());
+                oldTokenOptional.ifPresent(verificationToken -> {
+                    verificationToken.setDateExpired(this.calculateDateExpired());
+                    this.publishOnRegistrationCompleteEvent(this.verificationTokenRepository.save(verificationToken), requestLink);
                 });
-                if (!vTokenOptional.isPresent()){
+                if (!oldTokenOptional.isPresent()) {
                     VerificationToken verificationToken = this.createVerificationToken(savedOptional.get());
                     return this.verificationTokenRepository.save(verificationToken).orElse(null);
                 }
-                return vTokenOptional.get();
+                return oldTokenOptional.get();
             }
         }
 
@@ -62,9 +63,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
         Optional<Person> personOptional = this.personRepository.save(person);
 
-        if (personOptional.isPresent()){
-            VerificationToken verificationToken = this.createVerificationToken(person);
-            return this.verificationTokenRepository.save(verificationToken).orElse(null);
+        if (personOptional.isPresent()) {
+            Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.save(this.createVerificationToken(person));
+            this.publishOnRegistrationCompleteEvent(verificationTokenOptional, requestLink);
+            return verificationTokenOptional.orElse(null);
         } else return null;
     }
 
@@ -105,5 +107,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private String generateToken(){
         return UUID.randomUUID().toString();
+    }
+
+    private void publishOnRegistrationCompleteEvent(Optional<VerificationToken> verificationToken, String requestLink){
+
     }
 }

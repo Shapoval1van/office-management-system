@@ -74,7 +74,7 @@ public class VerificationTokenRepositoryImpl extends GenericJdbcRepository<Verif
                 .append(" WHERE ")
                 .append(TOKEN_COLUMN)
                 .append(" = ? ")
-                .append(" AND date_expired <= now() ")
+                .append(" AND date_expired >= now() ")
                 .toString();
     }
 
