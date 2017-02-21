@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> implements PersonRepository{
@@ -31,7 +32,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         Map<String, Object> columns = new HashMap<>();
         columns.put(PERSON_ID_COLUMN, entity.getId());
         columns.put(FIRST_NAME_COLUMN, entity.getFirstName());
-        columns.put(LAST_NAME_COLUMN, entity.getPassword());
+        columns.put(LAST_NAME_COLUMN, entity.getLastName());
         columns.put(EMAIL_COLUMN, entity.getEmail());
         columns.put(PASSWORD_COLUMN, entity.getPassword());
         columns.put(ROLE_ID_COLUMN, entity.getRole().getId());
@@ -55,5 +56,18 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
                 return person;
             }
         };
+    }
+
+    @Override
+    public Optional<Person> findPersonByEmail(String email) {
+        return queryForObject(this.buildFindEmployeeByEmailQuery(), email);
+    }
+
+    private String buildFindEmployeeByEmailQuery(){
+        return new StringBuilder("SELECT * FROM ")
+                .append(this.TABLE_NAME)
+                .append(" WHERE ")
+                .append(EMAIL_COLUMN)
+                .append(" = ?").toString();
     }
 }
