@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.model.view.View;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDTO {
@@ -16,14 +19,20 @@ public class PersonDTO {
     @JsonView(View.Public.class)
     private Long id;
     @JsonView(View.Public.class)
+    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String firstName;
     @JsonView(View.Public.class)
+    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String lastName;
     @JsonView(View.Public.class)
+    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     @NotNull(groups = CreateValidatorGroup.class)
+    @Pattern(regexp = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String email;
     @JsonView(View.Internal.class)
+    @Size(max = 70, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     @NotNull(groups = CreateValidatorGroup.class)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String password;
     @JsonView(View.Public.class)
     private Integer role;
@@ -34,15 +43,17 @@ public class PersonDTO {
     }
 
     public PersonDTO(Person person) {
-        this.id = person.getId();
-        this.firstName = person.getFirstName();
-        this.lastName = person.getLastName();
-        this.email = person.getEmail();
-        this.password = person.getPassword();
-        if (person.getRole()!=null){
-            this.role = person.getRole().getId();
+        if (person!=null){
+            this.id = person.getId();
+            this.firstName = person.getFirstName();
+            this.lastName = person.getLastName();
+            this.email = person.getEmail();
+            this.password = person.getPassword();
+            if (person.getRole()!=null){
+                this.role = person.getRole().getId();
+            }
+            this.enabled = person.isEnabled();
         }
-        this.enabled = person.isEnabled();
     }
 
     public Person toPerson(){

@@ -20,7 +20,7 @@ public class RegistrationMessageDTO {
     public RegistrationMessageDTO(String email, Date expiration) {
         this.email = email;
         Format formatter = new SimpleDateFormat(DATE_PATTERN);
-        this.expiration = formatter.format(expiration);
+        this.expiration = expiration!=null?formatter.format(expiration):null;
     }
 
     public String getEmail() {
