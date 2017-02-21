@@ -1,3 +1,4 @@
+SET DATABASE SQL SYNTAX PGS TRUE;
 DELETE FROM VERIFICATION_TOKEN;
 DELETE FROM PERSON;
 DELETE FROM ROLE;
@@ -16,4 +17,4 @@ INSERT INTO public.person(
 
 INSERT INTO public.verification_token(
             verification_token_id, token, employee_id, date_expired)
-    VALUES (100, 'TEST_TOKEN', 100, now());
+    VALUES (100, 'TEST_TOKEN', 100, now() + INTERVAL '1' DAY );
