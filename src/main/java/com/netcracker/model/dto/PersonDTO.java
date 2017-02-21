@@ -2,23 +2,32 @@ package com.netcracker.model.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.view.View;
 
 import javax.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDTO {
 
+    @JsonView(View.Public.class)
     private Long id;
+    @JsonView(View.Public.class)
     private String firstName;
+    @JsonView(View.Public.class)
     private String lastName;
+    @JsonView(View.Public.class)
     @NotNull(groups = CreateValidatorGroup.class)
     private String email;
+    @JsonView(View.Internal.class)
     @NotNull(groups = CreateValidatorGroup.class)
     private String password;
+    @JsonView(View.Public.class)
     private Integer role;
+    @JsonView(View.Public.class)
     private boolean enabled;
 
     public PersonDTO() {

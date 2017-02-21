@@ -1,5 +1,6 @@
 package com.netcracker.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.BadEmployeeException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.PersonDTO;
@@ -7,6 +8,7 @@ import com.netcracker.model.dto.RegistrationMessageDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.VerificationToken;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.view.View;
 import com.netcracker.service.registration.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,7 @@ public class RegistrationController {
         return new RegistrationMessageDTO(person.getEmail(), verificationToken.getDateExpired());
     }
 
+    @JsonView(View.Public.class)
     @GetMapping(value = "/{verificationToken}", produces = JSON_MEDIA_TYPE)
     @ResponseStatus(HttpStatus.OK)
     public PersonDTO confirmEmail(@PathVariable String verificationToken) throws BadEmployeeException, ResourceNotFoundException {
