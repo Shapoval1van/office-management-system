@@ -30,7 +30,6 @@ public class RegistrationServiceImplTest {
 
     @Autowired
     private RegistrationService service;
-    @Autowired
     private final Integer ROLE_ID = 100;
     private final String TEST_TOKEN = "TEST_TOKEN";
     private final String NEW_EMPLOYEE_PASSWORD = "Password1";
