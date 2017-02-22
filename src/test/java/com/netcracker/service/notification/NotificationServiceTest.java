@@ -28,7 +28,7 @@ public class NotificationServiceTest {
 
     @Test
     public void testSuccessSendPasswordReminderNotification(){
-        assertThat(notificationService.sendPasswordReminder(person , "link"), is(true));
+        assertThat(notificationService.sendPasswordReminder(person, "link"), is(true));
     }
 
     @Test
@@ -38,6 +38,6 @@ public class NotificationServiceTest {
 
     @Test
     public void testSuccessSendRegistrationNotification(){
-        assertThat(notificationService.sendRegistrationCompletedNotification(person), is(true));
+        assertThat(notificationService.sendRegistrationCompletedNotification(person, "our_site"), is(true));
     }
 }
