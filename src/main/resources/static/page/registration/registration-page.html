@@ -2,59 +2,46 @@
 <section class="main-form" ng-cloak="">
     <div class="container">
         <div class="row">
-            <form name="registrationForm" ng-cloak="">
+            <form name="registrationForm">
                 <div id="login-input-container" ng-controller="RegistrationController">
                     <div class="col-md-offset-3 col-md-6">
-                        <div class="input-group login-input">
+                        <div id="first-name-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon3"><i class="fa fa-user"></i></span>
-                            <input type="text" class="form-control" placeholder="First Name"
-                                   ng-model="personCredentials.firstName"
-                                   required>
+                            <input type="text" class="form-control" placeholder="First Name" ng-model="personCredentials.firstName" ng-blur="firstNameCheck()" required>
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
-                        <div class="input-group login-input">
+                        <div id="last-name-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon4"><i class="fa fa-user"></i></span>
-                            <input type="text" class="form-control" placeholder="Last Name"
-                                   ng-model="personCredentials.lastName"
-                                   required>
+                            <input type="text" class="form-control" placeholder="Last Name" ng-model="personCredentials.lastName" ng-blur="lastNameCheck()" required>
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
-                        <div class="input-group login-input">
+                        <div id="email-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope-o"></i></span>
-                            <input type="email" class="form-control " placeholder="Email"
-                                   ng-model="personCredentials.email"
-                                   required>
+                            <input type="email" class="form-control " placeholder="Email" ng-model="personCredentials.email" required>
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
-                        <div class="input-group login-input">
+                        <div id="password-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon2"><i class="fa fa-key"></i></span>
-                            <input type="password" class="form-control" placeholder="Password"
-                                   ng-model="personCredentials.password"
-                                   ng-change="confirmPassCheck()" required>
+                            <input type="password" class="form-control" placeholder="Password" ng-model="personCredentials.password" ng-change="passCheck()" ng-blur="confirmPassCheck()" required>
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
-                        <div class="input-group login-input">
+                        <div id="password-check-input-group" class="input-group login-input">
                             <span class="input-group-addon"><i class="fa fa-key"></i></span>
                             <div class="pass-wrapper">
-                                <input type="password" id="form-check-pass" class="form-control"
-                                       placeholder="Confirm Password"
-                                       ng-model="personCredentials.confirmPassword" ng-change="confirmPassCheck()"
-                                       required>
+                                <input type="password" id="form-check-pass" class="form-control" placeholder="Confirm Password" ng-model="personCredentials.confirmPassword" ng-change="confirmPassCheck()" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-offset-3 col-md-6">
-                        <input type="submit" id="reg-form-submit" class="btn btn-default login-btn"
-                               ng-disabled="submitStatus"
-                               ng-click="sendPersonCredentials()" value="Register">
+                        <input type="submit" id="reg-form-submit" class="btn btn-default login-btn" ng-disabled="submitStatus" ng-click="sendPersonCredentials()" value="Register"></input>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
-                        <a ng-href="/login"  class="btn btn-default login-btn">Back to Login</a>
+                        <a href="/" type="button" class="btn btn-default login-btn">Back to Login</a>
                     </div>
                 </div>
             </form>
