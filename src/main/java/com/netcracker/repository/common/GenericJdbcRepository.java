@@ -102,6 +102,10 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
         return this.jdbcTemplate.query(sql, args, this.mapRow());
     }
 
+    public JdbcTemplate getJdbcTemplate(){
+        return jdbcTemplate;
+    }
+
     private String buildFindOneQuery(){
         if (findOneQuery == null){
             findOneQuery = new StringBuilder("SELECT * FROM ")

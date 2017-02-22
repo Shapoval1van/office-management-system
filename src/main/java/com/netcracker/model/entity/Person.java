@@ -16,6 +16,13 @@ public class Person implements Persistable<Long> {
     private Role role;
     private boolean enabled;
 
+    public Person() {
+    }
+
+    public Person(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Long getId() {
         return id;
