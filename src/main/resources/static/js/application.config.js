@@ -5,7 +5,7 @@
                 $routeProvider
                 // home page:
                     .when("/", {
-                        templateUrl: "/static/page/login/login-page.html"
+                        redirectTo: "/login"
                     })
                     // login page:
                     .when("/login", {
