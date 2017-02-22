@@ -36,7 +36,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         Map<String, Object> columns = new HashMap<>();
         columns.put(PERSON_ID_COLUMN, entity.getId());
         columns.put(FIRST_NAME_COLUMN, entity.getFirstName());
-        columns.put(LAST_NAME_COLUMN, entity.getPassword());
+        columns.put(LAST_NAME_COLUMN, entity.getLastName());
         columns.put(EMAIL_COLUMN, entity.getEmail());
         columns.put(PASSWORD_COLUMN, entity.getPassword());
         columns.put(ROLE_ID_COLUMN, entity.getRole().getId());

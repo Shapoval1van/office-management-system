@@ -1,12 +1,13 @@
 package com.netcracker.service.resetPassword;
 
 
+import com.netcracker.exception.OutdatedTokenException;
 import com.netcracker.model.entity.PasswordResetToken;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.data.PasswordResetTokenRepository;
 import com.netcracker.repository.data.PersonRepository;
-import com.netcracker.service.mail.interfaces.MailSending;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private PersonRepository personRepository;
 
     @Autowired
-    private MailSending mailSending;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -36,6 +37,23 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             PasswordResetToken newPasswordResetToken = new PasswordResetToken(token, person.get());
             resetTokenRepository.save(newPasswordResetToken);
             return  newPasswordResetToken;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Person updatePasswordForPersonByEmail(String password, String token) throws OutdatedTokenException {
+        Optional<PasswordResetToken> passwordResetToken = resetTokenRepository.findOne(token);
+        if(passwordResetToken.isPresent()){
+            if(passwordResetToken.get().getExpiryDate().getTime()<System.currentTimeMillis()){
+                throw new OutdatedTokenException("Token was expired");
+            }
+            Optional<Person> person = personRepository.findOne(passwordResetToken.get().getPerson().getId());
+            person.get().setPassword(passwordEncoder.encode(password));
+            resetTokenRepository.delete(passwordResetToken.get().getId());
+            personRepository.save(person.get());
+            return  person.get();
         }
         return null;
     }

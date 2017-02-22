@@ -1,8 +1,10 @@
 package com.netcracker.controller;
 
+import com.netcracker.exception.OutdatedTokenException;
 import com.netcracker.model.DTO.MessageDTO;
 import com.netcracker.model.entity.PasswordResetToken;
-import com.netcracker.service.mail.interfaces.MailSending;
+import com.netcracker.model.entity.Person;
+import com.netcracker.service.notification.interfaces.NotificationSender;
 import com.netcracker.service.resetPassword.PasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ public class PasswordResetController {
     private PasswordResetService passwordResetService;
 
     @Autowired
-    private MailSending mailSending;
+    private NotificationSender notificationSender;
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
@@ -28,17 +30,24 @@ public class PasswordResetController {
         if(passwordResetToken==null){
             return new ResponseEntity<>(new MessageDTO("user with email :" +userEmail+ "not exist"), HttpStatus.BAD_REQUEST);
         }
-        mailSending.send(userEmail, "Reset Password", buildMailBody(buildLink(request, passwordResetToken.getToken())));
+        notificationSender.sendPasswordReminder(passwordResetToken.getPerson(),buildLink(request, passwordResetToken.getToken()));
         return new ResponseEntity<>(passwordResetToken, HttpStatus.OK);
     }
 
-
-
-    private String buildMailBody(String link){
-        StringBuilder body = new StringBuilder("Link for password recover \n");
-        body.append(link);
-        body.append("\nBest Regards \nOfficeManagement team");
-        return body.toString();
+    @RequestMapping(value = "/{token}", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<?> updatePassword(HttpServletRequest request, @PathVariable(required = true, name = "token") String token,
+                                            @RequestPart("password") String password){
+        try {
+            Person person = passwordResetService.updatePasswordForPersonByEmail(password, token);
+            if (person == null){
+                return new ResponseEntity<>(new MessageDTO("Token not found"), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(person, HttpStatus.OK);
+        } catch (OutdatedTokenException outdatedTokenException) {
+            outdatedTokenException.printStackTrace();
+            return new ResponseEntity<>(new MessageDTO("Token expired"), HttpStatus.BAD_REQUEST);
+        }
     }
 
     private String buildLink(HttpServletRequest request, String token){

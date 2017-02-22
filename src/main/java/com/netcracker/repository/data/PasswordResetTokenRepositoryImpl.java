@@ -20,6 +20,8 @@ public class PasswordResetTokenRepositoryImpl extends GenericJdbcRepository<Pass
 
     private final String FIND_TOKEN_PERSON_BY_ID = "SELECT pass_reset_token_id, token, person_id, date_expired FROM PASS_RESET_TOKEN " +
             "WHERE person_id = ?";
+    private final String FIND_TOKEN = "SELECT pass_reset_token_id, token, person_id, date_expired FROM PASS_RESET_TOKEN " +
+            "WHERE token = ?";
     public PasswordResetTokenRepositoryImpl() {
         super(PasswordResetToken.TABLE_NAME, PasswordResetToken.ID_COLUMN);
     }
@@ -53,6 +55,11 @@ public class PasswordResetTokenRepositoryImpl extends GenericJdbcRepository<Pass
     @Override
     public Optional<PasswordResetToken> findTokenByPersonId(Long id) {
         return queryForObject(FIND_TOKEN_PERSON_BY_ID, id);
+    }
+
+    @Override
+    public Optional<PasswordResetToken> findOne(String token){
+        return queryForObject(FIND_TOKEN, token);
     }
 }
 

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JdbcRepository<PasswordResetToken, Long> {
     public Optional<PasswordResetToken> findTokenByPersonId(Long id);
+    public Optional<PasswordResetToken> findOne(String token);
 }
