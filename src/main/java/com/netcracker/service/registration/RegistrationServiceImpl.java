@@ -9,6 +9,7 @@ import com.netcracker.model.entity.VerificationToken;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.RoleRepository;
 import com.netcracker.repository.data.VerificationTokenRepository;
+import com.netcracker.service.notification.impls.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private VerificationTokenRepository verificationTokenRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     @Override
@@ -111,6 +114,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void publishOnRegistrationCompleteEvent(Person person, Optional<VerificationToken> verificationToken, String requestLink){
-
+        String SITE_LINK = "https://management-office.herokuapp.com"; // TODO link to site
+        notificationService.sendRegistrationCompletedNotification(person,
+                SITE_LINK.concat("/").concat(verificationToken.get().getToken()));
     }
 }
