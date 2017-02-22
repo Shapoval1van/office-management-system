@@ -1,4 +1,4 @@
-package com.netcracker.model.DTO;
+package com.netcracker.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

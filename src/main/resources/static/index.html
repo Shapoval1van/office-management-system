@@ -1,10 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ua" ng-app="OfficeManagementSystem">
 <head>
     <meta charset="UTF-8">
-    <title>Home page</title>
+    <title>Office Management System</title>
+    <base href="/"/>
+    <!--STYLES-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--FONT AWESOME-->
+    <script src="https://use.fontawesome.com/58465b10c8.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/style/index.css">
+    <link rel="stylesheet" href="/static/style/login/login.css">
+    <link rel="stylesheet" href="/static/style/registration/registration.css">
+    <!--/STYLES-->
+
 </head>
-<body>
-    <h1>Hi!</h1>
+<body ng-controller="MainController">
+<ng-view>
+
+</ng-view>
+
+
+<footer class="footer">
+    <h3 class="footer__copyright">&#169; Office Management System, 2017. All rights reserved </h3>
+</footer>
+
+<!--SCRIPT-->
+<!--JQUERY-->
+<script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+<!--BOOTSTRAP-->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+<!--ANGULAR-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-route.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-animate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-touch.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.6.1/angular-resource.min.js"></script>
+<script src="/static/js/ui-bootstrap/ui-bootstrap-tpls-2.5.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.9/ngStorage.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-cookies.min.js"></script>
+<script src="/static/js/oauth/oauth-ng.js"></script>
+
+<script src="/static/js/application.js"></script>
+<script src="/static/js/application.config.js"></script>
+<script src="/static/js/index.js"></script>
+
+<script src="/static/js/controller/mainController.js"></script>
+<script src="/static/js/controller/login/loginController.js"></script>
+<script src="/static/js/controller/register/registrationController.js"></script>
+
+<script src="/static/js/directive/welcomeHeader.js"></script>
+<!--/SCRIPT-->
 </body>
 </html>
