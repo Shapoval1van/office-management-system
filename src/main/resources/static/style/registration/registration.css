@@ -1,0 +1,14 @@
+.pass-wrapper{
+	position: relative;
+}
+.form-check-pass-error::after{
+	content: "Does not matches with the password!";
+	color: #ff6464;
+	font-size: 15px;
+	position: absolute;
+	top: 40px;
+	left: 0;
+}
+.form-control_offset{
+	margin-top: 20px!important;
+}
