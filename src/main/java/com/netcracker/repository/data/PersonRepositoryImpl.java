@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> implements PersonRepository{
@@ -22,6 +23,10 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String ROLE_ID_COLUMN = "role_id";
     public static final String ENABLED_COLUMN = "enabled";
 
+    private final String FIND_PERSON_BY_EMAIL = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
+            " FROM " + TABLE_NAME + " WHERE email = ?";
+    private final String UPDATE_PERSON_PASSWORD = "UPDATE " + TABLE_NAME + " SET password = ? WHERE email = ?";
+
     public PersonRepositoryImpl() {
         super(Person.TABLE_NAME, Person.ID_COLUMN);
     }
@@ -31,7 +36,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         Map<String, Object> columns = new HashMap<>();
         columns.put(PERSON_ID_COLUMN, entity.getId());
         columns.put(FIRST_NAME_COLUMN, entity.getFirstName());
-        columns.put(LAST_NAME_COLUMN, entity.getPassword());
+        columns.put(LAST_NAME_COLUMN, entity.getLastName());
         columns.put(EMAIL_COLUMN, entity.getEmail());
         columns.put(PASSWORD_COLUMN, entity.getPassword());
         columns.put(ROLE_ID_COLUMN, entity.getRole().getId());
@@ -55,5 +60,24 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
                 return person;
             }
         };
+    }
+
+    @Override
+    public Optional<Person> findPersonByEmail(String email) {
+        return super.queryForObject(FIND_PERSON_BY_EMAIL, email);
+    }
+
+    @Override
+    public Optional<Person> updatePersonPassword(Person person) {
+        if (person.getId() != null) {
+            return super.save(person);
+        }else{
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public int updatePersonPassword(String newPassword, String email) {
+        return getJdbcTemplate().update(UPDATE_PERSON_PASSWORD, newPassword, email);
     }
 }

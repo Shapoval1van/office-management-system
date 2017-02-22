@@ -33,6 +33,7 @@ public class NotificationService implements NotificationSender {
                 .setNotificationLink(link)
                 .build()
                 .toString());
+
     }
 
     public boolean sendInformationNotification(Person person) {
