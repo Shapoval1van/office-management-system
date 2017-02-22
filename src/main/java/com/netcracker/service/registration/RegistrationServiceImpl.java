@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,11 +47,13 @@ public class RegistrationServiceImpl implements RegistrationService {
                 Optional<VerificationToken> oldTokenOptional = this.verificationTokenRepository.findVerificationTokenByPerson(savedOptional.get().getId());
                 oldTokenOptional.ifPresent(verificationToken -> {
                     verificationToken.setDateExpired(this.calculateDateExpired());
-                    this.publishOnRegistrationCompleteEvent(this.verificationTokenRepository.save(verificationToken), requestLink);
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,this.verificationTokenRepository.save(verificationToken), requestLink);
                 });
                 if (!oldTokenOptional.isPresent()) {
                     VerificationToken verificationToken = this.createVerificationToken(savedOptional.get());
-                    return this.verificationTokenRepository.save(verificationToken).orElse(null);
+                    Optional<VerificationToken> newTokenOptional = this.verificationTokenRepository.save(verificationToken);
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,newTokenOptional, requestLink);
+                    return newTokenOptional.orElse(null);
                 }
                 return oldTokenOptional.get();
             }
@@ -65,7 +66,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (personOptional.isPresent()) {
             Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.save(this.createVerificationToken(person));
-            this.publishOnRegistrationCompleteEvent(verificationTokenOptional, requestLink);
+            this.publishOnRegistrationCompleteEvent(personOptional.get(), verificationTokenOptional, requestLink);
             return verificationTokenOptional.orElse(null);
         } else return null;
     }
@@ -109,7 +110,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return UUID.randomUUID().toString();
     }
 
-    private void publishOnRegistrationCompleteEvent(Optional<VerificationToken> verificationToken, String requestLink){
+    private void publishOnRegistrationCompleteEvent(Person person, Optional<VerificationToken> verificationToken, String requestLink){
 
     }
 }
