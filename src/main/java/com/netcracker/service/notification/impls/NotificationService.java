@@ -43,11 +43,11 @@ public class NotificationService implements NotificationSender {
                 .toString());
     }
 
-    public boolean sendRegistrationCompletedNotification(Person person) {
+    public boolean sendRegistrationCompletedNotification(Person person, String link) {
         return mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
                 .setNotificationText(REGISTRATION_MESSAGE)
-                .setNotificationLink("SOME LINK") // TODO link for registered user
+                .setNotificationLink(link)
                 .build()
                 .toString());
     }
