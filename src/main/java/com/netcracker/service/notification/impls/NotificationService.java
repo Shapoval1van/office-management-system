@@ -26,11 +26,11 @@ public class NotificationService implements NotificationSender {
     @Autowired
     private MailService mailService;
 
-    public boolean sendPasswordReminder(Person person) {
+    public boolean sendPasswordReminder(Person person, String link) {
         return mailService.send(person.getEmail(), PASSWORD_REMINDER_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
                 .setNotificationText(PASSWORD_REMINDER_TEXT)
-                .setNotificationLink("SOME LINK") // TODO insert generator link
+                .setNotificationLink(link)
                 .build()
                 .toString());
     }
@@ -43,11 +43,11 @@ public class NotificationService implements NotificationSender {
                 .toString());
     }
 
-    public boolean sendRegistrationCompletedNotification(Person person) {
+    public boolean sendRegistrationCompletedNotification(Person person, String link) {
         return mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
                 .setNotificationText(REGISTRATION_MESSAGE)
-                .setNotificationLink("SOME LINK") // TODO link for registered user
+                .setNotificationLink(link)
                 .build()
                 .toString());
     }
