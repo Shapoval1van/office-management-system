@@ -1,8 +1,19 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource",
-            function ($scope, $http, $cookies, $resource) {
+        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams",
+            function ($scope, $http, $cookies, $resource, $routeParams) {
                 $scope.personCredentials = {};
+
+                var registrationToken = $routeParams.registrationToken;
+
+                if (!!registrationToken) {
+                    $http.get("/api/v1/registration/" + registrationToken)
+                        .then(function (callback) {
+                            $scope.personCredentials.email = callback.data.email;
+                        }, function () {
+                            console.log("Registration error")
+                        })
+                }
 
                 $scope.recoverEmail = "";
 

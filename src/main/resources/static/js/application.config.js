@@ -12,6 +12,10 @@
                         templateUrl: "/static/page/login/login-page.html",
                         controller: "LoginController"
                     })
+                    .when("/login/:registrationToken/", {
+                        templateUrl: "/static/page/login/login-page.html",
+                        controller: "LoginController"
+                    })
                     // registration page:
                     .when("/registration", {
                         templateUrl: "/static/page/registration/registration-page.html",
