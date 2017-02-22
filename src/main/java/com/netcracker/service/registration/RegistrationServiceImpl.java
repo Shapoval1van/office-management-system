@@ -114,7 +114,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void publishOnRegistrationCompleteEvent(Person person, Optional<VerificationToken> verificationToken, String requestLink){
-        String SITE_LINK = "https://management-office.herokuapp.com"; // TODO link to site
+        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
         notificationService.sendRegistrationCompletedNotification(person,
                 SITE_LINK.concat("/").concat(verificationToken.get().getToken()));
     }
