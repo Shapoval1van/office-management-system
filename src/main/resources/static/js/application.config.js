@@ -17,10 +17,16 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
+                    .when("/test/auth", {
+                        template: "<h1>Token in cookies</h1>"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
 
-                $locationProvider.html5Mode(true);
+                $locationProvider.html5Mode({
+                    enabled: true,
+                    requireBase: false
+                }).hashPrefix("!");
             }]);
 })();
