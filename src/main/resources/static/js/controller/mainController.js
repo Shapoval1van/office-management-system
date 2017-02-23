@@ -13,7 +13,7 @@
 
                 if (isLoginPage()) {
                     if ($cookies.get("access_token")) {
-                        window.location.href = "/secured";
+                        window.location.href = "/demo";
                     }
                 } else {
                     if ($cookies.get("access_token")) {
