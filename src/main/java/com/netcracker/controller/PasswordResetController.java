@@ -58,9 +58,8 @@ public class PasswordResetController {
     }
 
     private String buildLink(HttpServletRequest request, String token){
-        StringBuilder link = new StringBuilder(request.getScheme().concat("://").concat(request.getServerName()).concat(request.getContextPath()));
-        link.append("/resetPassword")
-                .append("/"+token);
-        return link.toString();
+        //TODO add link
+        String SITE_LINK = "https://management-office.herokuapp.com";
+        return SITE_LINK.concat("/resetPassword").concat("/"+token);
     }
 }
