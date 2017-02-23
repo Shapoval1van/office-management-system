@@ -1,11 +1,10 @@
 INSERT INTO role (name) VALUES
-  ('ADMINISTRATOR'),
-  ('OFFICE MANAGER'),
-  ('EMPLOYEE');
+  ('ROLE_ADMINISTRATOR'),
+  ('ROLE_OFFICE MANAGER'),
+  ('ROLE_EMPLOYEE');
 
 INSERT INTO status (name) VALUES
   ('FREE'),
-  ('JOINED'),
   ('IN PROGRESS'),
   ('CLOSED'),
   ('REOPEN');
