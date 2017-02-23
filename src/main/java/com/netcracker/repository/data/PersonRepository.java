@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface PersonRepository extends JdbcRepository<Person, Long> {
     Optional<Person> findPersonByEmail(String email);
+    Optional<Person> updatePersonPassword(Person person);
+    int updatePersonPassword(String newPassword, String email);
 }
