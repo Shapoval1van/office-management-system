@@ -1,8 +1,14 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams",
-            function ($scope, $http, $cookies, $resource, $routeParams) {
-                $scope.personCredentials = {};
+        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer",
+            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer) {
+                $scope.personCredentials = {
+                    grant_type: "password",
+                    username: "",
+                    password: "",
+                    client_id: "client",
+                    scope: "read write"
+                };
 
                 var registrationToken = $routeParams.registrationToken;
 
@@ -17,18 +23,13 @@
 
                 $scope.recoverEmail = "";
 
-                $scope.personCredentials = {
-                    grant_type: "password",
-                    username: "",
-                    password: "",
-                    client_id: "clientIdPassword"
-                };
-                $scope.encoded = btoa("clientIdPassword:secret");
+
+                $scope.encoded = btoa("client:secret");
 
                 $scope.sendPersonCredentials = function () {
                     var req = {
                         method: 'POST',
-                        url: "http://localhost:8080/spring-security-oauth-server/oauth/token",
+                        url: "http://localhost:8080/oauth/token",
                         headers: {
                             "Authorization": "Basic " + $scope.encoded,
                             "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
