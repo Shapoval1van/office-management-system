@@ -8,7 +8,7 @@
 
 
                 var isLoginPage = function () {
-                    return ~window.location.href.indexOf("login");
+                    return ~window.location.href.indexOf("login") || ~window.location.href.indexOf("reset");
                 };
 
                 if (isLoginPage()) {

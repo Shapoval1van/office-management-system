@@ -10,6 +10,8 @@
                     scope: "read write"
                 };
 
+                $scope.showRecoverInput = false;
+
                 var registrationToken = $routeParams.registrationToken;
 
                 if (!!registrationToken) {
@@ -59,17 +61,5 @@
                 //     $scope.foo = $scope.foos.get({fooId: $scope.foo.id});
                 // };
 
-
-                //FIXME: Change url, object and event on success and failure
-                $scope.sendRecoverRequest = function () {
-                    $http.put("/some_url/", $scope.recoverEmail)
-                        .then(function (callback) {
-                            //    Success
-                            console.log("Login Success!")
-                        }, function (callback) {
-                            //    Failure
-                            console.log("Login Failure!")
-                        })
-                }
             }])
 })();

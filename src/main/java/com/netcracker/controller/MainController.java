@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainController {
 
-    @GetMapping(value = {"/*", "/login/*"}, produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = {"/*", "/login/*", "/resetPassword/*"}, produces = MediaType.TEXT_HTML_VALUE)
     public String goIndex() {
         return "/static/index.html";
     }

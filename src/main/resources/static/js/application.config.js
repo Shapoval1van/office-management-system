@@ -21,6 +21,14 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
+                    .when("/recover", {
+                        templateUrl: "/static/page/recover/recover-page.html",
+                        controller: "RecoverPasswordController"
+                    })
+                    .when("/resetPassword/:token", {
+                        templateUrl: "/static/page/recover/new-password-page.html",
+                        controller: "RecoverPasswordController"
+                    })
                     .when("/demo", {
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
