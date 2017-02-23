@@ -21,8 +21,9 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
-                    .when("/test/auth", {
-                        template: "<h1>Token in cookies</h1>"
+                    .when("/demo", {
+                        templateUrl: "/static/page/demo/secured.html",
+                        controller: "DemoController"
                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
