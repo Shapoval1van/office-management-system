@@ -52,6 +52,7 @@ public class RoleRepositoryImpl extends GenericJdbcRepository<Role, Integer> imp
                 .append(this.TABLE_NAME)
                 .append(" WHERE ")
                 .append(NAME_COLUMN)
-                .append(" = ?").toString();
+                .append(" = ?")
+                .toString();
     }
 }
