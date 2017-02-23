@@ -15,7 +15,7 @@
                 if (!!registrationToken) {
                     $http.get("/api/v1/registration/" + registrationToken)
                         .then(function (callback) {
-                            $scope.personCredentials.email = callback.data.email;
+                            $scope.personCredentials.username = callback.data.email;
                         }, function () {
                             console.log("Registration error")
                         })
