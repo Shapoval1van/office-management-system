@@ -1,6 +1,7 @@
 package com.netcracker.controller;
 
 
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +17,13 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 @RestController
 public class GlobalExceptionHandlerController {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO resourceNotFoundExceptionHandler(HttpServletRequest request, ResourceNotFoundException ex){
+        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.NOT_FOUND.value(),request.getRequestURL().toString(),ex.getMessage(),ex.getDescription());
+        return errorDTO;
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
