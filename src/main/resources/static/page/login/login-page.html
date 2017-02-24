@@ -1,10 +1,4 @@
 <welcome-header ng-cloak=""></welcome-header>
-<oauth
-        site="http://localhost:8080/spring-security-oauth-server"
-        client-id="clientId"
-        redirect-uri="http://localhost:8080/spring-security-oauth-ui-implicit/index"
-        scope="read">
-</oauth>
 <section class="main-form" ng-cloak="">
     <div class="container">
         <div class="row">
@@ -15,7 +9,7 @@
                             <span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope-o"></i></span>
                             <input type="email" class="form-control " placeholder="Email"
                                    aria-describedby="basic-addon1"
-                                   ng-model="personCredentials.email" required>
+                                   ng-model="personCredentials.username" required>
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
@@ -40,11 +34,11 @@
                             </div>
 
                             <div class="col-md-6">
-                                <a ng-href="#" type="button" class="btn btn-default login-btn">Recover password</a>
+                                <a type="button" class="btn btn-default login-btn" ng-href="/recover">Recover password</a>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
             </form>
         </div>

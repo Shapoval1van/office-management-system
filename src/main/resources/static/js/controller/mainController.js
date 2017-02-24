@@ -8,12 +8,12 @@
 
 
                 var isLoginPage = function () {
-                    return ~window.location.href.indexOf("login");
+                    return ~window.location.href.indexOf("login") || ~window.location.href.indexOf("reset");
                 };
 
                 if (isLoginPage()) {
                     if ($cookies.get("access_token")) {
-                        window.location.href = "/test/auth";
+                        window.location.href = "/secured";
                     }
                 } else {
                     if ($cookies.get("access_token")) {
@@ -24,5 +24,9 @@
                     }
                 }
 
+                $scope.logout = function () {
+                    $cookies.remove("access_token");
+                    window.location.reload();
+                }
             }])
 })();
