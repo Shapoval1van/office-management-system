@@ -5,7 +5,6 @@
         "ngCookies",
         "ngAnimate",
         "ngTouch",
-        "ui.bootstrap",
-        "oauth"
+        "ui.bootstrap"
     ])
 })();
