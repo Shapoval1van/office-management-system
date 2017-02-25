@@ -6,11 +6,13 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.entity.VerificationToken;
+import com.netcracker.model.event.PersonRegistrationEvent;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.RoleRepository;
 import com.netcracker.repository.data.VerificationTokenRepository;
 import com.netcracker.service.notification.impls.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private NotificationService notificationService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -114,8 +116,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void publishOnRegistrationCompleteEvent(Person person, Optional<VerificationToken> verificationToken, String requestLink){
-        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
-        notificationService.sendRegistrationCompletedNotification(person,
-                SITE_LINK.concat("/").concat(verificationToken.get().getToken()));
+        verificationToken.ifPresent((token) -> {
+            PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
+            eventPublisher.publishEvent(event);
+        });
+
     }
 }
