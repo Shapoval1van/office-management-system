@@ -10,11 +10,7 @@
 
                 $scope.token = 'Bearer ' + $cookies.get("access_token");
 
-                $http.get("/secured", {
-                    headers: {
-                        "Authorization": $scope.token
-                    }
-                })
+                $http.get("/secured")
                     .then(function (callback) {
                         console.log("Success");
                         $scope.message = callback.data.message;
