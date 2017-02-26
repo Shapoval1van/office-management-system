@@ -19,10 +19,14 @@ public class PersonDTO {
     @JsonView(View.Public.class)
     private Long id;
     @JsonView(View.Public.class)
-    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Pattern(regexp = "^[A-Z][a-zA-Z\\d]{2,50}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @NotNull(groups = CreateValidatorGroup.class)
     private String firstName;
     @JsonView(View.Public.class)
-    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Pattern(regexp = "^[A-Z][a-zA-Z\\d]{2,50}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @NotNull(groups = CreateValidatorGroup.class)
     private String lastName;
     @JsonView(View.Public.class)
     @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
@@ -35,8 +39,10 @@ public class PersonDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String password;
     @JsonView(View.Public.class)
+    @NotNull(groups = CreateValidatorGroup.class)
     private Integer role;
     @JsonView(View.Public.class)
+    @NotNull(groups = CreateValidatorGroup.class)
     private boolean enabled;
 
     public PersonDTO() {

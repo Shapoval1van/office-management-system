@@ -7,7 +7,8 @@ INSERT INTO status (status_id, name) VALUES
   (1, 'FREE'),
   (2, 'IN PROGRESS'),
   (3, 'CLOSED'),
-  (4, 'REOPEN');
+  (4, 'REOPEN'),
+  (5, 'CANCELED');
 
 INSERT INTO priority (priority_id, name) VALUES
   (1, 'HIGH'),
@@ -43,10 +44,44 @@ INSERT INTO request_group (request_group_id, name) VALUES( 1, 'Request group   1
 INSERT INTO request (request_id, name, description, creation_time, status_id, employee_id, priority_id) VALUES
 (
     1,
-  'Request    1',
-  'I want    1 cup of coffee',
+  'Request 1',
+  'I want 1 cup of coffee',
   TIMESTAMP  '2017-02-24 00:59:02.184181',
   2,
   2,
   2
+);
+
+INSERT INTO request (request_id, name, description, creation_time, status_id, employee_id, priority_id) VALUES
+(
+    2,
+  'Request 2 (closed)',
+  'Request 2 description',
+  TIMESTAMP  '2017-02-24 00:59:02.184181',
+  3,
+  2,
+  2
+);
+
+INSERT INTO request (request_id, name, description, creation_time, status_id, employee_id, priority_id) VALUES
+(
+    3,
+  'Request test',
+  'Request test description',
+  TIMESTAMP  '2017-02-24 00:59:02.184181',
+  1,
+  2,
+  2
+);
+
+INSERT INTO request (request_id, name, description, creation_time, status_id, employee_id, priority_id, parent_id) VALUES
+(
+    4,
+  'Sub request',
+  'Sub request test description',
+  TIMESTAMP  '2017-02-24 00:59:02.184181',
+  1,
+  2,
+  2,
+  3
 );

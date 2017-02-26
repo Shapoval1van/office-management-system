@@ -1,5 +1,6 @@
 package com.netcracker.repository;
 
+import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.data.RequestRepository;
@@ -25,7 +26,6 @@ public class RequestRepositoryTest {
 
     @Autowired
     private RequestRepository requestRepository;
-
     private Request request;
 
     @Before
@@ -40,8 +40,8 @@ public class RequestRepositoryTest {
         priority.setId(2);
         Request requestObject = new Request();
         requestObject.setId(1L);
-        requestObject.setName("Request    1");
-        requestObject.setDescription("I want    1 cup of coffee");
+        requestObject.setName("Request 1");
+        requestObject.setDescription("I want 1 cup of coffee");
         requestObject.setPriority(priority);
         requestObject.setEmployee(person);
         requestObject.setCreationTime(Timestamp.valueOf("2017-02-24 00:59:02.184181"));
@@ -66,5 +66,41 @@ public class RequestRepositoryTest {
         request = requestRepository.save(request).get();
         Request request2 = requestRepository.findOne(request.getId()).get();
         Assert.assertEquals(request, request2);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void  changeRequestStatusTest(){
+        request.setId(null);
+        Status status= new Status(5);
+        request = requestRepository.getRequestById(3L).get();
+        requestRepository.changeRequestStatus(request, status);
+        request = requestRepository.getRequestById(3L).get();
+        Assert.assertEquals(request.getStatus().getId(), new Integer(5));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void deleteRequestTest() throws CannotDeleteRequestException {
+        request.setId(null);
+        request = requestRepository.getRequestById(4L).get();
+        Assert.assertEquals(request.getName(), "Sub request");
+        requestRepository.delete(request.getId());
+        Assert.assertTrue(!requestRepository.getRequestById(4L).isPresent());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void updateRequestTest(){
+        request.setId(null);
+        request = requestRepository.getRequestById(3L).get();
+        request.setName("Hello");
+        Request updatedRequest = requestRepository.updateRequest(request).get();
+        Assert.assertEquals(updatedRequest.getName(), "Hello");
+        Assert.assertEquals(updatedRequest.getDescription(), "Request test description");
+
     }
 }
