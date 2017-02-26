@@ -3,9 +3,8 @@ package com.netcracker.controller;
 import com.netcracker.exception.OutdatedTokenException;
 import com.netcracker.model.dto.MessageDTO;
 import com.netcracker.model.dto.PersonDTO;
-import com.netcracker.model.entity.PasswordResetToken;
 import com.netcracker.model.entity.Person;
-import com.netcracker.service.notification.interfaces.NotificationSender;
+import com.netcracker.model.entity.Token;
 import com.netcracker.service.resetPassword.PasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,19 +23,16 @@ public class PasswordResetController {
     @Autowired
     private PasswordResetService passwordResetService;
 
-    @Autowired
-    private NotificationSender notificationSender;
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<?> resetPassword(HttpServletRequest request,
                                            @Pattern(regexp = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")
                                            @RequestParam("email") String userEmail){
-        PasswordResetToken passwordResetToken = passwordResetService.resetPassword(userEmail);
+        Token passwordResetToken = passwordResetService.resetPassword(userEmail, buildLink(request));
         if(passwordResetToken==null){
-            return new ResponseEntity<>(new MessageDTO("user with email :" +userEmail+ "not exist"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MessageDTO("user with email: " +userEmail+ " not exist"), HttpStatus.BAD_REQUEST);
         }
-        notificationSender.sendPasswordReminder(passwordResetToken.getPerson(),buildLink(request, passwordResetToken.getToken()));
         return new ResponseEntity<>(passwordResetToken, HttpStatus.OK);
     }
 
@@ -57,9 +53,9 @@ public class PasswordResetController {
         }
     }
 
-    private String buildLink(HttpServletRequest request, String token){
-        //TODO add link
+    private String buildLink(HttpServletRequest request){
         String SITE_LINK = "https://management-office.herokuapp.com";
-        return SITE_LINK.concat("/resetPassword").concat("/"+token);
+        //TODO add link
+        return SITE_LINK;
     }
 }

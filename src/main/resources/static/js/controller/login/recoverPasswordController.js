@@ -8,6 +8,7 @@
                 $scope.submitStatusArray = [true, true, true, true];
                 $scope.password = "";
                 $scope.confirmPassword = "";
+                $scope.recoverEmail = "";
 
                 $scope.sendRecoverRequest = function () {
                     $http({
