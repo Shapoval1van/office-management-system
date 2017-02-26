@@ -5,11 +5,7 @@ import com.netcracker.exception.ResourceAlreadyExistsException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
-import com.netcracker.model.entity.VerificationToken;
-import com.netcracker.repository.data.PersonRepository;
-import com.netcracker.repository.data.RoleRepository;
-import org.junit.After;
-import org.junit.Before;
+import com.netcracker.model.entity.Token;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +43,13 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        VerificationToken verificationToken = service.registerPerson(person, REQUEST_LINK);
+        Token token = service.registerPerson(person, REQUEST_LINK);
 
-        assertNotNull(verificationToken);
-        assertNotNull(verificationToken.getId());
-        assertNotNull(verificationToken.getPerson());
-        assertNotNull(verificationToken.getToken());
-        assertTrue(Calendar.getInstance().getTime().before(verificationToken.getDateExpired()));
+        assertNotNull(token);
+        assertNotNull(token.getId());
+        assertNotNull(token.getPerson());
+        assertNotNull(token.getTokenValue());
+        assertTrue(Calendar.getInstance().getTime().before(token.getDateExpired()));
     }
 
     @Test
@@ -66,9 +62,9 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        VerificationToken verificationToken = service.registerPerson(person, REQUEST_LINK);
+        Token token = service.registerPerson(person, REQUEST_LINK);
 
-        assertTrue(Calendar.getInstance().getTime().before(verificationToken.getDateExpired()));
+        assertTrue(Calendar.getInstance().getTime().before(token.getDateExpired()));
     }
 
     @Test(expected = ResourceAlreadyExistsException.class)
