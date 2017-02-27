@@ -6,6 +6,7 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.entity.Token;
+import com.netcracker.model.entity.TokenType;
 import com.netcracker.model.event.PersonRegistrationEvent;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.RoleRepository;
@@ -48,11 +49,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             if (savedOptional.get().isEnabled()) {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
             } else {
-                Optional<Token> oldTokenOptional = this.tokenRepository.findTokenByPerson(savedOptional.get().getId());
-                oldTokenOptional.ifPresent(verificationToken -> {
-                    verificationToken.setDateExpired(this.calculateDateExpired());
-                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,this.tokenRepository.save(verificationToken), requestLink);
-                });
+                Optional<Token> oldTokenOptional = this.tokenRepository.findRegistrationTokenByPerson(savedOptional.get().getId());
+                if(oldTokenOptional.isPresent()){
+                    oldTokenOptional.get().setDateExpired(this.calculateDateExpired());
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,this.tokenRepository.save(oldTokenOptional.get()), requestLink);
+                }
                 if (!oldTokenOptional.isPresent()) {
                     Token token = this.createVerificationToken(savedOptional.get());
                     Optional<Token> newTokenOptional = this.tokenRepository.save(token);
@@ -99,6 +100,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Token token = new Token();
         token.setTokenValue(this.generateToken());
         token.setDateExpired(this.calculateDateExpired());
+        token.setTokenType(TokenType.REGISTRATION);
         token.setPerson(person);
         return token;
     }

@@ -16,5 +16,5 @@ INSERT INTO public.person(
     VALUES (101, 'Enabled', 'Person', 'enabled@mail.com', 'password', 100, TRUE );
 
 INSERT INTO public.token(
-            token_id, token, person_id, date_expired)
-    VALUES (100, 'TEST_TOKEN', 100, now() + INTERVAL '1' DAY );
+            token_id, token, person_id, token_type, date_expired)
+    VALUES (100, 'TEST_TOKEN', 100, 1, now() + INTERVAL '1' DAY );

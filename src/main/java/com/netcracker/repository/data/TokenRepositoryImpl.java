@@ -2,6 +2,7 @@ package com.netcracker.repository.data;
 
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Token;
+import com.netcracker.model.entity.TokenType;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -19,9 +20,17 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
     public static final String TOKEN_COLUMN = "token";
     public static final String PERSON_ID_COLUMN = "person_id";
     public static final String DATE_EXPIRED_COLUMN = "date_expired";
+    public static final String TOKEN_TYPE_COLUM = "token_type";
 
-    private final String FIND_TOKEN = "SELECT token_id, token, person_id, date_expired FROM TOKEN " +
+    private final String FIND_TOKEN = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
             "WHERE token = ?";
+
+    private final String FIND_REGISTRATION_TOKEN_BY_PERSONE = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
+            "WHERE person_id = ? AND token_type = 1";
+
+    private final String FIND_RESET_PASS_TOKEN_BY_PERSONE = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
+            "WHERE person_id = ? AND token_type = 2";
+
 
     public TokenRepositoryImpl() {
         super(Token.TABLE_NAME, Token.ID_COLUMN);
@@ -33,6 +42,7 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
         columns.put(TOKEN_ID_COLUMN, entity.getId());
         columns.put(TOKEN_COLUMN, entity.getTokenValue());
         columns.put(PERSON_ID_COLUMN, entity.getPerson().getId());
+        columns.put(TOKEN_TYPE_COLUM, entity.getTokenType().ordinal()+1);
         columns.put(DATE_EXPIRED_COLUMN, entity.getDateExpired());
         return columns;
     }
@@ -47,14 +57,20 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
                 token.setTokenValue(resultSet.getString(TOKEN_COLUMN));
                 token.setPerson(new Person(resultSet.getLong(PERSON_ID_COLUMN)));
                 token.setDateExpired(resultSet.getDate(DATE_EXPIRED_COLUMN));
+                token.setTokenType(TokenType.values()[resultSet.getInt(TOKEN_TYPE_COLUM)-1]);
                 return token;
             }
         };
     }
 
     @Override
-    public Optional<Token> findTokenByPerson(Long personId) {
-        return queryForObject(this.buildFindTokenByPersonQuery(), personId);
+    public Optional<Token> findRegistrationTokenByPerson(Long personId) {
+        return this.queryForObject(FIND_REGISTRATION_TOKEN_BY_PERSONE, personId);
+    }
+
+    @Override
+    public Optional<Token> findResetPassTokenByPerson(Long personId) {
+        return this.queryForObject(FIND_RESET_PASS_TOKEN_BY_PERSONE, personId);
     }
 
     @Override
@@ -67,14 +83,6 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
         return queryForObject(FIND_TOKEN, token);
     }
 
-    private String buildFindTokenByPersonQuery(){
-        return new StringBuilder("SELECT * FROM ")
-                .append(this.TABLE_NAME)
-                .append(" WHERE ")
-                .append(PERSON_ID_COLUMN)
-                .append(" = ? ")
-                .toString();
-    }
 
     private String buildFindTokenByValue(){
         return new StringBuilder("SELECT * FROM ")

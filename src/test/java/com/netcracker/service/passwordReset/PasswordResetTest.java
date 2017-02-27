@@ -3,6 +3,7 @@ package com.netcracker.service.passwordReset;
 import com.netcracker.exception.OutdatedTokenException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Token;
+import com.netcracker.model.entity.TokenType;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.TokenRepository;
 import com.netcracker.service.resetPassword.PasswordResetServiceImpl;
@@ -63,14 +64,14 @@ public class PasswordResetTest {
         person.setLastName("test");
         person.setFirstName("test");
 
-        passwordResetToken = new Token(token, person);
+        passwordResetToken = new Token(token, person, TokenType.RESET_PASSWORD);
 
     }
 
     @Test
     public void resetPasswordValidEmailTest() {
         when(personRepository.findPersonByEmail(email)).thenReturn(Optional.ofNullable(this.person));
-        when(passwordResetTokenRepository.findTokenByPerson(person.getId())).thenReturn(Optional.empty());
+        when(passwordResetTokenRepository.findResetPassTokenByPerson( person.getId())).thenReturn(Optional.empty());
         when(passwordResetTokenRepository.save(anyObject())).thenReturn(Optional.ofNullable(any()));
         Token passwordResetToken = passwordResetService.resetPassword(email, "someSite");
         assertEquals(email, passwordResetToken.getPerson().getEmail());
