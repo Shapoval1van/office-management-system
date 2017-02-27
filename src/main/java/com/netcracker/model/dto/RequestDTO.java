@@ -1,6 +1,5 @@
 package com.netcracker.model.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -10,7 +9,6 @@ import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.model.view.View;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
@@ -19,33 +17,39 @@ public class RequestDTO {
 
     @JsonView(View.Public.class)
     private Long id;
+
     @JsonView(View.Public.class)
     @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
-    @NotNull(groups = CreateValidatorGroup.class)
+    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String name;
+
     @JsonView(View.Public.class)
     @Size(max = 500, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String description;
+
     @JsonView(View.Internal.class)
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?: [AP]M)?(?: [+-]\\d{4})?$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
-    @NotNull(groups = CreateValidatorGroup.class)
     private Timestamp creationTime;
+
     @JsonView(View.Internal.class)
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?: [AP]M)?(?: [+-]\\d{4})?$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private Timestamp estimate;
+
     @JsonView(View.Public.class)
-    @NotNull(groups = CreateValidatorGroup.class)
     private Integer status;
+
     @JsonView(View.Public.class)
-    @NotNull(groups = CreateValidatorGroup.class)
+    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private Long employee;
+
     @JsonView(View.Public.class)
     private Long manager;
+
     @JsonView(View.Public.class)
     private Long parent;
+
     @JsonView(View.Public.class)
-    @NotNull(groups = CreateValidatorGroup.class)
+    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private Integer priority;
+
     @JsonView(View.Public.class)
     private Integer requestGroup;
 
@@ -53,20 +57,22 @@ public class RequestDTO {
     }
 
     public RequestDTO(Request request) {
-        if (request!=null){
+        if (request != null) {
             this.id = request.getId();
             this.name = request.getName();
             this.description = request.getDescription();
             this.creationTime = request.getCreationTime();
             this.estimate = request.getEstimate();
-            this.status = request.getStatus().getId();
+            if (request.getStatus() != null) {
+                this.status = request.getStatus().getId();
+            }
             this.employee = request.getEmployee().getId();
-            if (request.getEmployee()!=null)
+            if (request.getManager() != null)
                 this.manager = request.getManager().getId();
-            if (request.getParent()!=null)
+            if (request.getParent() != null)
                 this.parent = request.getParent().getId();
             this.priority = request.getPriority().getId();
-            if (request.getRequestGroup()!=null)
+            if (request.getRequestGroup() != null)
                 this.requestGroup = request.getRequestGroup().getId();
         }
     }
@@ -78,14 +84,21 @@ public class RequestDTO {
         request.setDescription(this.description);
         request.setCreationTime(this.creationTime);
         request.setEstimate(this.estimate);
-        request.setStatus(new Status(this.status));
+        if(this.status != null) {
+            request.setStatus(new Status(this.status));
+        }
         request.setEmployee(new Person(this.employee));
-        request.setManager(new Person(this.manager));
-        request.setParent(new Request(this.parent));
+        if(this.manager != null) {
+            request.setManager(new Person(this.manager));
+        }
+        if(this.parent != null) {
+            request.setParent(new Request(this.parent));
+        }
         request.setPriority(new Priority(this.priority));
-        request.setRequestGroup(new RequestGroup(this.requestGroup));
+        if(this.requestGroup != null) {
+            request.setRequestGroup(new RequestGroup(this.requestGroup));
+        }
         return request;
-
     }
 
     public Long getId() {
