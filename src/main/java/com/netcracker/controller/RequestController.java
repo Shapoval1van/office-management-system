@@ -2,6 +2,7 @@ package com.netcracker.controller;
 
 import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
+import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
@@ -53,5 +54,28 @@ public class RequestController {
         }
 
         return ResponseEntity.ok("Added");
+    }
+
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/updateRequest/{requestId}")
+    public ResponseEntity<?> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
+        try {
+            Request request = requestService.getRequestById(requestId).get();
+            requestService.updateRequest(request);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Request updated");
+    }
+
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/deleteRequest/{requestId}")
+    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
+        try {
+            requestService.deleteRequestById(requestId);
+        } catch (CannotDeleteRequestException e) {
+            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Request deleted");
     }
 }

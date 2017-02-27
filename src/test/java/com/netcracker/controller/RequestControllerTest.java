@@ -117,4 +117,27 @@ public class RequestControllerTest {
                 o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();
     }
+
+    @Test
+    public void updateRequest() throws Exception {
+        mockMvc.perform(post("/api/request/updateRequest/2")
+                .content(this.json(requestDTO))
+                .contentType(contentType))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void tryDeleteClosedRequest() throws Exception {
+        mockMvc.perform(post("/api/request/deleteRequest/2")
+                .contentType(contentType))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void deleteRequest() throws Exception {
+        mockMvc.perform(post("/api/request/deleteRequest/3")
+                .contentType(contentType))
+                .andExpect(status().isOk());
+    }
+
 }

@@ -19,7 +19,7 @@ public class RequestDTO {
     private Long id;
 
     @JsonView(View.Public.class)
-    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String name;
 
