@@ -5,6 +5,9 @@ import com.netcracker.repository.common.Pageable;
 
 public class SimplePageable implements Pageable {
 
+    public final static int DEFAULT_PAGE_SIZE = 25;
+    public final static int DEFAULT_PAGE_NUMBER = 1;
+
     private int pageSize;
     private int pageNumber;
 

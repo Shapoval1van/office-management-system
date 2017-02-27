@@ -197,6 +197,7 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
     }
 
     private String buildPageableQuery(String sql, Pageable pageable){
+        Objects.requireNonNull(pageable);
         StringBuilder query = new StringBuilder(sql);
         if (!sql.toLowerCase().contains("order by")){
             query.append(" ORDER BY ").append(ID_COLUMN);
