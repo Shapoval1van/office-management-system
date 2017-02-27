@@ -36,11 +36,14 @@
                     <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
                         <div class = "input-group"><label>Priority:</label></div>
                         <div class="btn-group input-group login-input">
-                            <label id="low-priority" class="btn btn-info" ng-model="lowPriority"
-                                   uib-btn-radio="'Low'" uncheckable>Low</label>
-                            <label id="high-priority" class="btn btn-info" ng-model="highPriority" uib-btn-radio="'High'"
-                                   uncheckable>High</label>
-                            <label id="mandatory-priority" class="btn btn-info" ng-model="mandatoryPriority" uib-btn-radio="'Mandatory'"
+                            <label id="low-priority" class="btn" ng-model="radioModel"
+                                   ng-class = "{ 'btn-success': radioModel == 'Low', 'btn-info': radioModel != 'Low'}"
+                                   uib-btn-radio="'Low'" uib-uncheckable="uncheckable">Low</label>
+                            <label id="high-priority" class="btn btn-info" ng-model="radioModel" uib-btn-radio="'High'"
+                                   ng-class = "{ 'btn-warning': radioModel == 'High', 'btn-info': radioModel != 'High'}"
+                                   uib-uncheckable="uncheckable">High</label>
+                            <label id="mandatory-priority" class="btn btn-info" ng-model="radioModel" uib-btn-radio="'Mandatory'"
+                                   ng-class = "{ 'btn-danger': radioModel == 'Mandatory', 'btn-info': radioModel != 'Mandatory'}"
                                    uib-uncheckable="uncheckable">Mandatory</label>
                         </div>
                     </div>

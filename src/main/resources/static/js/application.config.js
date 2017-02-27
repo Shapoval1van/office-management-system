@@ -33,7 +33,7 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
-                    .when("/new_request", {
+                    .when("/newRequest", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
