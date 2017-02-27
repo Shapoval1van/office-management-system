@@ -1,12 +1,10 @@
 package com.netcracker.repository.data;
 
-import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -104,26 +102,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.findOne(id);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    @Override
-    public Optional<Request> saveSubRequest(Request subRequest, Request parentRequest) throws CannotCreateSubRequestException{
-        if (parentRequest.getId()!=null && subRequest!=null){
-            if (parentRequest.getParent()==null){
-                subRequest.setParent(parentRequest);
-                subRequest.setEmployee(parentRequest.getEmployee());
-                subRequest.setManager(parentRequest.getManager());
-                subRequest.setEstimate(parentRequest.getEstimate());
-                subRequest.setStatus(new Status(2));
-                subRequest.setPriority(parentRequest.getPriority());
-                subRequest.setRequestGroup(parentRequest.getRequestGroup());
-                return super.save(subRequest);
-            }
-            else throw new CannotCreateSubRequestException("You cannot create request to sub request!");
-        }
-        else return Optional.empty();
-    }
-
-    @Transactional
+    //@Transactional
     @Override
     public int changeRequestStatus(Request request, Status status) {
         return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
@@ -135,7 +114,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentRequest.getId().intValue());
     }
 
-    @Transactional
+    //@Transactional
     @Override
     public Optional<Request> updateRequest(Request request) {
         if (request.getId() != null) {

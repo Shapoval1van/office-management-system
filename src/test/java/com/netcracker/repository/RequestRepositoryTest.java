@@ -1,6 +1,5 @@
 package com.netcracker.repository;
 
-import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.data.RequestRepository;
@@ -83,7 +82,7 @@ public class RequestRepositoryTest {
     @Test
     @Transactional
     @Rollback
-    public void deleteRequestTest() throws CannotDeleteRequestException {
+    public void deleteRequestTest(){
         request.setId(null);
         request = requestRepository.getRequestById(4L).get();
         Assert.assertEquals(request.getName(), "Sub request");
@@ -98,6 +97,7 @@ public class RequestRepositoryTest {
         request.setId(null);
         request = requestRepository.getRequestById(3L).get();
         request.setName("Hello");
+        request.setEstimate(Timestamp.valueOf("2017-02-29 00:59:02.184181"));
         Request updatedRequest = requestRepository.updateRequest(request).get();
         Assert.assertEquals(updatedRequest.getName(), "Hello");
         Assert.assertEquals(updatedRequest.getDescription(), "Request test description");

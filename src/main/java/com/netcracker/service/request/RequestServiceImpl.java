@@ -8,6 +8,7 @@ import com.netcracker.model.entity.Status;
 import com.netcracker.repository.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,9 +25,22 @@ public class RequestServiceImpl implements RequestService{
         return requestRepository.getRequestById(id);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Optional<Request> saveSubRequest(Request subRequest, Request parentRequest) throws CannotCreateSubRequestException{
-        return this.requestRepository.saveSubRequest(subRequest, parentRequest);
+        if (parentRequest.getId()!=null && subRequest!=null){
+            if (parentRequest.getParent()==null){
+                subRequest.setParent(parentRequest);
+                subRequest.setEmployee(parentRequest.getEmployee());
+                subRequest.setManager(parentRequest.getManager());
+                subRequest.setStatus(new Status(2));
+                subRequest.setPriority(parentRequest.getPriority());
+                subRequest.setRequestGroup(parentRequest.getRequestGroup());
+                return requestRepository.save(subRequest);
+            }
+            else throw new CannotCreateSubRequestException("You cannot create request to sub request!");
+        }
+        else return Optional.empty();
     }
 
     @Override

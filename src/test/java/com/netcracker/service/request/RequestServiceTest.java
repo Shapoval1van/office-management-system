@@ -34,14 +34,14 @@ public class RequestServiceTest {
         request = requestService.getRequestById(3L).get();
 
         Request subRequest = new Request();
-        subRequest.setId(6L);
         subRequest.setName("Test Sub Request");
         subRequest.setDescription("Test Description of sub request");
-        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+        subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
+        subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
 
         Request saveSubRequest = requestService.saveSubRequest(subRequest, request).get();
 
-        Assert.assertEquals(saveSubRequest.getId(), new Long(6));
+        Assert.assertEquals(saveSubRequest.getId(), new Long(5));
         Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
         Assert.assertEquals(saveSubRequest.getStatus().getId(), new Integer(2));
         Assert.assertEquals(saveSubRequest.getParent(), request);
