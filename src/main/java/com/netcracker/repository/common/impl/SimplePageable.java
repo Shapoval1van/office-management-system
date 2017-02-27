@@ -13,7 +13,7 @@ public class SimplePageable implements Pageable {
 
     public SimplePageable(int pageSize, int pageNumber) {
         this.pageSize = pageSize;
-        this.pageNumber = pageNumber;
+        this.pageNumber = pageNumber - 1;
     }
 
     public void setPageSize(int pageSize) {
@@ -21,7 +21,7 @@ public class SimplePageable implements Pageable {
     }
 
     public void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
+        this.pageNumber = pageNumber - 1;
     }
 
     @Override
