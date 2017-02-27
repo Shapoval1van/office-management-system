@@ -4,6 +4,7 @@ package com.netcracker.service.resetPassword;
 import com.netcracker.exception.OutdatedTokenException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Token;
+import com.netcracker.model.entity.TokenType;
 import com.netcracker.model.event.ResetPasswordEvent;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.TokenRepository;
@@ -36,10 +37,10 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     public Token resetPassword(String email, String siteLink) {
         Optional<Person> person = personRepository.findPersonByEmail(email);
         if (person.isPresent() && person.get().isEnabled()) {
-            Optional<Token> oldResetPassToken = tokenRepository.findTokenByPerson(person.get().getId());
+            Optional<Token> oldResetPassToken = tokenRepository.findResetPassTokenByPerson(person.get().getId());
             String token = UUID.randomUUID().toString();
             oldResetPassToken.ifPresent((resetToken) -> tokenRepository.delete(resetToken.getId()));
-            Token newPasswordResetToken = new Token(token, person.get());
+            Token newPasswordResetToken = new Token(token, person.get(), TokenType.RESET_PASSWORD);
             tokenRepository.save(newPasswordResetToken);
             eventPublisher.publishEvent(new ResetPasswordEvent(siteLink, person.get(), newPasswordResetToken));
             return newPasswordResetToken;

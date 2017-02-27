@@ -17,17 +17,25 @@ public class Token implements Persistable<Long> {
     private String tokenValue;
     private Person person;
     private Date dateExpired;
+    private TokenType tokenType;
 
     public Token() {
         this.dateExpired = calculateExpiryDate(EXPIRATION);
     }
 
-    public Token(Long id) {
+    public Token(TokenType tokenType) {
+        this.tokenType = tokenType;
+        this.dateExpired = calculateExpiryDate(EXPIRATION);
+    }
+
+    public Token(Long id, TokenType tokenType) {
+        this.tokenType = tokenType;
         this.id = id;
         this.dateExpired = calculateExpiryDate(EXPIRATION);
     }
 
-    public Token(String token, Person person) {
+    public Token(String token, Person person, TokenType tokenType) {
+        this.tokenType = tokenType;
         this.tokenValue = token;
         this.person = person;
         this.dateExpired = calculateExpiryDate(EXPIRATION);
@@ -65,6 +73,14 @@ public class Token implements Persistable<Long> {
 
     public void setDateExpired(Date dateExpired) {
         this.dateExpired = dateExpired;
+    }
+
+    public TokenType getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(TokenType tokenType) {
+        this.tokenType = tokenType;
     }
 
     private Date calculateExpiryDate(final int expiryTimeInMinutes) {
