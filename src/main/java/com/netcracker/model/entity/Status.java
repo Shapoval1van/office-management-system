@@ -1,22 +1,18 @@
 package com.netcracker.model.entity;
 
-
 import com.netcracker.repository.common.Persistable;
 
-public class Role implements Persistable<Integer> {
-
-    public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
-
-    public static final String TABLE_NAME = "ROLE";
-    public static final String ID_COLUMN = "role_id";
+public class Status implements Persistable<Integer> {
+    public static final String TABLE_NAME = "STATUS";
+    public static final String ID_COLUMN = "status_id";
 
     private Integer id;
     private String name;
 
-    public Role() {
+    public Status(){
     }
 
-    public Role(Integer id) {
+    public Status(int id) {
         this.id = id;
     }
 
@@ -43,10 +39,10 @@ public class Role implements Persistable<Integer> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Role role = (Role) o;
+        Status status = (Status) o;
 
-        if (id != null ? !id.equals(role.id) : role.id != null) return false;
-        return name != null ? name.equals(role.name) : role.name == null;
+        if (id != null ? !id.equals(status.id) : status.id != null) return false;
+        return name != null ? name.equals(status.name) : status.name == null;
     }
 
     @Override
@@ -55,5 +51,4 @@ public class Role implements Persistable<Integer> {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
-
 }
