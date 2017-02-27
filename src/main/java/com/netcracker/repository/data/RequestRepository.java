@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestRepository extends JdbcRepository<Request, Long> {
-    Optional<Request> getRequestById(Long id);
     int changeRequestStatus(Request request, Status status);
     List<Request> getAllSubRequest(Request request);
     Optional<Request> updateRequest(Request request);

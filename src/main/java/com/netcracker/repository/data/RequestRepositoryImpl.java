@@ -97,11 +97,6 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         };
     }
 
-    @Override
-    public Optional<Request> getRequestById(Long id) {
-        return super.findOne(id);
-    }
-
     //@Transactional
     @Override
     public int changeRequestStatus(Request request, Status status) {
@@ -119,7 +114,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public Optional<Request> updateRequest(Request request) {
         if (request.getId() != null) {
             return super.save(request);
-        } else return Optional.empty();
+        } else {
+            return Optional.empty();
+        }
     }
-
 }

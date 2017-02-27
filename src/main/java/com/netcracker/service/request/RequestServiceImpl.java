@@ -15,32 +15,43 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RequestServiceImpl implements RequestService{
+public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private RequestRepository requestRepository;
 
+    @Autowired
+    private StatusRepository statusRepository;
+
     @Override
     public Optional<Request> getRequestById(Long id) {
-        return requestRepository.getRequestById(id);
+        return requestRepository.findOne(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public Optional<Request> saveSubRequest(Request subRequest, Request parentRequest) throws CannotCreateSubRequestException{
-        if (parentRequest.getId()!=null && subRequest!=null){
-            if (parentRequest.getParent()==null){
-                subRequest.setParent(parentRequest);
-                subRequest.setEmployee(parentRequest.getEmployee());
-                subRequest.setManager(parentRequest.getManager());
-                subRequest.setStatus(new Status(2));
-                subRequest.setPriority(parentRequest.getPriority());
-                subRequest.setRequestGroup(parentRequest.getRequestGroup());
-                return requestRepository.save(subRequest);
+    public Optional<Request> saveSubRequest(Request subRequest) throws CannotCreateSubRequestException {
+        if (subRequest.getParent() != null) {
+            Request parentRequest = requestRepository.findOne(subRequest.getParent().getId()).orElseThrow(() ->
+                    new CannotCreateSubRequestException("No parent request with id " + subRequest.getParent().getId()));
+
+            if (parentRequest.getParent() != null) {
+                throw new CannotCreateSubRequestException("Parent request is sub request");
             }
-            else throw new CannotCreateSubRequestException("You cannot create request to sub request!");
+
+            String parentStatus = parentRequest.getStatus().getName();
+            if ("CANCELED".equals(parentStatus) || "CLOSED".equals(parentStatus)) {
+                throw new CannotCreateSubRequestException("Parent request is closed or canceled");
+            }
+
+            subRequest.setEmployee(parentRequest.getEmployee());
+            subRequest.setPriority(parentRequest.getPriority());
+            subRequest.setStatus(statusRepository.findStatusByName("IN PROGRESS").orElseThrow(() ->
+                    new CannotCreateSubRequestException("No status 'IN PROGRESS'")));
+            return requestRepository.save(subRequest);
+        } else {
+            throw new CannotCreateSubRequestException("No parent request");
         }
-        else return Optional.empty();
     }
 
     @Override
@@ -51,7 +62,6 @@ public class RequestServiceImpl implements RequestService{
     @Override
     public Optional<Request> updateRequest(Request request) {
         return this.requestRepository.updateRequest(request);
-
     }
 
     @Override
@@ -74,7 +84,9 @@ public class RequestServiceImpl implements RequestService{
                         this.requestRepository.delete(r.getId());
                     }
                 }
-            } else throw new CannotDeleteRequestException("You cannot delete closed request");
+            } else {
+                throw new CannotDeleteRequestException("You cannot delete closed request");
+            }
         }
     }
 

@@ -73,9 +73,9 @@ public class RequestRepositoryTest {
     public void  changeRequestStatusTest(){
         request.setId(null);
         Status status= new Status(5);
-        request = requestRepository.getRequestById(3L).get();
+        request = requestRepository.findOne(3L).get();
         requestRepository.changeRequestStatus(request, status);
-        request = requestRepository.getRequestById(3L).get();
+        request = requestRepository.findOne(3L).get();
         Assert.assertEquals(request.getStatus().getId(), new Integer(5));
     }
 
@@ -84,10 +84,10 @@ public class RequestRepositoryTest {
     @Rollback
     public void deleteRequestTest(){
         request.setId(null);
-        request = requestRepository.getRequestById(4L).get();
+        request = requestRepository.findOne(4L).get();
         Assert.assertEquals(request.getName(), "Sub request");
         requestRepository.delete(request.getId());
-        Assert.assertTrue(!requestRepository.getRequestById(4L).isPresent());
+        Assert.assertTrue(!requestRepository.findOne(4L).isPresent());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RequestRepositoryTest {
     @Rollback
     public void updateRequestTest(){
         request.setId(null);
-        request = requestRepository.getRequestById(3L).get();
+        request = requestRepository.findOne(3L).get();
         request.setName("Hello");
         request.setEstimate(Timestamp.valueOf("2017-02-29 00:59:02.184181"));
         Request updatedRequest = requestRepository.updateRequest(request).get();

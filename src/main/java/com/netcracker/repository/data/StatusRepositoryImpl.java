@@ -7,12 +7,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class StatusRepositoryImpl extends GenericJdbcRepository<Status, Integer> implements StatusRepository {
 
     public static final String STATUS_ID_COLUMN = "status_id";
     public static final String NAME_COLUMN = "name";
+
 
     public StatusRepositoryImpl() {
         super(Status.TABLE_NAME, Status.ID_COLUMN);
@@ -34,5 +36,20 @@ public class StatusRepositoryImpl extends GenericJdbcRepository<Status, Integer>
             status.setName(resultSet.getString(NAME_COLUMN));
             return status;
         };
+    }
+
+
+    @Override
+    public Optional<Status> findStatusByName(String name) {
+        return queryForObject(this.buildFindByNameQuery(), name);
+    }
+
+    private String buildFindByNameQuery(){
+        return new StringBuilder("SELECT * FROM ")
+                .append(this.TABLE_NAME)
+                .append(" WHERE ")
+                .append(NAME_COLUMN)
+                .append(" = ?")
+                .toString();
     }
 }

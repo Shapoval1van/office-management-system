@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
-    Optional<Request> saveSubRequest(Request subRequest, Request parentRequest) throws CannotCreateSubRequestException;
+    Optional<Request> saveSubRequest(Request subRequest) throws CannotCreateSubRequestException;
     Optional<Request> saveRequest(Request request);
     Optional<Request> updateRequest(Request request);
     List<Request> getAllSubRequest(Request parentRequest);

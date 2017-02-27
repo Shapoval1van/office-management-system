@@ -34,12 +34,13 @@ public class RequestServiceTest {
         request = requestService.getRequestById(3L).get();
 
         Request subRequest = new Request();
+        subRequest.setParent(request);
         subRequest.setName("Test Sub Request");
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
         subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
 
-        Request saveSubRequest = requestService.saveSubRequest(subRequest, request).get();
+        Request saveSubRequest = requestService.saveSubRequest(subRequest).get();
 
         Assert.assertEquals(saveSubRequest.getId(), new Long(5));
         Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
@@ -53,14 +54,30 @@ public class RequestServiceTest {
     public void trySaveRequestToSubRequest() throws CannotCreateSubRequestException {
         request = requestService.getRequestById(4L).get();
 
+
+        Request subRequest = new Request();
+        subRequest.setParent(request);
+        subRequest.setId(6L);
+        subRequest.setName("Test Sub Request");
+        subRequest.setDescription("Test Description of sub request");
+        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+
+        requestService.saveSubRequest(subRequest).get();
+    }
+
+    @Test(expected = CannotCreateSubRequestException.class)
+    @Transactional
+    @Rollback
+    public void trySaveSubRequestWithoutParent() throws CannotCreateSubRequestException {
+        request = requestService.getRequestById(4L).get();
+
         Request subRequest = new Request();
         subRequest.setId(6L);
         subRequest.setName("Test Sub Request");
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
 
-        requestService.saveSubRequest(subRequest, request).get();
-
+        requestService.saveSubRequest(subRequest).get();
     }
 
     @Test
