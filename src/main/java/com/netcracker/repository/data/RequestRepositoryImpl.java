@@ -2,12 +2,15 @@ package com.netcracker.repository.data;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> implements RequestRepository {
@@ -23,6 +26,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String PARENT_ID_COLUMN = "parent_id";
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String REQUEST_GROUP_ID_COLUMN = "request_group_id";
+
+    private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
+
+    private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
+            "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id" + " FROM " +
+            TABLE_NAME + " WHERE parent_id = ?";
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -42,17 +51,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
         // table can contain null manager, parent and request group object
         Person manager = entity.getManager();
-        if(manager != null) {
+        if (manager != null) {
             columns.put(MANAGER_ID_COLUMN, entity.getManager().getId());
         }
 
         Request parent = entity.getParent();
-        if(parent != null) {
+        if (parent != null) {
             columns.put(PARENT_ID_COLUMN, entity.getParent().getId());
         }
 
         RequestGroup requestGroup = entity.getRequestGroup();
-        if(requestGroup != null) {
+        if (requestGroup != null) {
             columns.put(REQUEST_GROUP_ID_COLUMN, entity.getRequestGroup().getId());
         }
         return columns;
@@ -73,20 +82,40 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
             // table can contain null manager, parent and request group object
             Object managerId = resultSet.getObject(MANAGER_ID_COLUMN);
-            if(managerId != null) {
-                request.setManager(new Person((Long)managerId));
+            if (managerId != null) {
+                request.setManager(new Person((Long) managerId));
             }
-
             Object parentId = resultSet.getObject(PARENT_ID_COLUMN);
-            if(parentId != null) {
+            if (parentId != null) {
                 request.setParent(new Request((Long) parentId));
             }
-
             Object requestGroupId = resultSet.getObject(REQUEST_GROUP_ID_COLUMN);
-            if(requestGroupId != null) {
+            if (requestGroupId != null) {
                 request.setRequestGroup(new RequestGroup((Integer) requestGroupId));
             }
             return request;
         };
+    }
+
+    //@Transactional
+    @Override
+    public int changeRequestStatus(Request request, Status status) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
+    }
+
+
+    @Override
+    public List<Request> getAllSubRequest(Request parentRequest) {
+        return super.queryForList(FIND_ALL_SUB_REQUEST, parentRequest.getId().intValue());
+    }
+
+    //@Transactional
+    @Override
+    public Optional<Request> updateRequest(Request request) {
+        if (request.getId() != null) {
+            return super.save(request);
+        } else {
+            return Optional.empty();
+        }
     }
 }

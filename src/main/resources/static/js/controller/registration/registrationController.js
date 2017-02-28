@@ -72,7 +72,7 @@
 
                 $scope.firstNameCheck = function(){
                     var nameValue = $scope.personCredentials.firstName,
-                        regExp = /^[A-Z][a-zA-Z\d]{3,50}$/;
+                        regExp = /^[A-Z][a-zA-Z\d]{2,50}$/;
 
                     if(nameValue){
                         var lookFor = nameValue.search(regExp);
@@ -94,7 +94,7 @@
 
                 $scope.lastNameCheck = function(){
                     var nameValue = $scope.personCredentials.lastName,
-                        regExp = /^[A-Z][a-zA-Z\d]{3,50}$/;
+                        regExp = /^[A-Z][a-zA-Z\d]{2,50}$/;
 
                     if(nameValue){
                         var lookFor = nameValue.search(regExp);
