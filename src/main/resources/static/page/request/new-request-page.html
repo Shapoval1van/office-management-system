@@ -16,35 +16,25 @@
                         </div>
                     </div>
                     <div class="col-md-offset-3 col-md-6" ng-controller="DatepickerPopupCtrl">
-                        <div class="input-group login-input">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" ng-click="open1()">
-                                        <i class="glyphicon glyphicon-calendar"></i>
-                                    </button>
-                                </span>
-                            <input id="calendar" type="text" class="form-control" uib-datepicker-popup="{{format}}"
-                                   ng-model="dt" is-open="popup1.opened" datepicker-options="dateOptions"
-                                   close-text="Close" ng-model="requestCredentials.calendarDay" alt-input-formats="altInputFormats"/>
-                            <div ng-controller="TimepickerCtrl">
-                                <div uib-timepicker ng-model="mytime" ng-change="changed()"
-                                     hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" show-spinners="isspinner"
-                                     ng-model="requestCredentials.estimateTime">
-                                </div>
-                            </div>
+                        <div class="input-group login-input date" id='datetimepicker1'>
+                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                            <input type='text' class="form-control" ng-model="requestCredentials.estimate"/>
                         </div>
                     </div>
                     <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
                         <div class = "input-group"><label>Priority:</label></div>
                         <div class="btn-group input-group login-input">
-                            <label id="low-priority" class="btn" ng-model="radioModel"
-                                   ng-class = "{ 'btn-success': radioModel == 'Low', 'btn-info': radioModel != 'Low'}"
+                            <label id="low-priority" class="btn" ng-model="requestCredentials.priority"
+                                   ng-class = "{ 'btn-success': requestCredentials.priority == 'Low', 'btn-info': requestCredentials.priority != 'Low'}"
                                    uib-btn-radio="'Low'" uib-uncheckable="uncheckable">Low</label>
-                            <label id="high-priority" class="btn btn-info" ng-model="radioModel" uib-btn-radio="'High'"
-                                   ng-class = "{ 'btn-warning': radioModel == 'High', 'btn-info': radioModel != 'High'}"
+                            <label id="normal-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'Normal'"
+                                   ng-class = "{ 'btn-warning': requestCredentials.priority == 'Normal', 'btn-info': requestCredentials.priority != 'Normal'}"
+                                   uib-uncheckable="uncheckable">Normal</label>
+                            <label id="high-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'High'"
+                                   ng-class = "{ 'btn-danger': requestCredentials.priority == 'High', 'btn-info': requestCredentials.priority != 'High'}"
                                    uib-uncheckable="uncheckable">High</label>
-                            <label id="mandatory-priority" class="btn btn-info" ng-model="radioModel" uib-btn-radio="'Mandatory'"
-                                   ng-class = "{ 'btn-danger': radioModel == 'Mandatory', 'btn-info': radioModel != 'Mandatory'}"
-                                   uib-uncheckable="uncheckable">Mandatory</label>
                         </div>
                     </div>
 
