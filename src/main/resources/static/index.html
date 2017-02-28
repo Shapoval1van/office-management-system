@@ -12,9 +12,10 @@
     <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/style/index.css">
+    <!--<link rel="stylesheet" href="/static/style/index.css">-->
     <link rel="stylesheet" href="/static/style/login/login.css">
     <link rel="stylesheet" href="/static/style/registration/registration.css">
+    <link rel="stylesheet" href="/static/style/test/comments.css">
     <!--/STYLES-->
 
 </head>
@@ -48,6 +49,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.9/ngStorage.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-cookies.min.js"></script>
 
+<!--WebSocket-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+<!--/WebSocket-->
+
 <script src="/static/js/application.js"></script>
 <script src="/static/js/application.config.js"></script>
 
@@ -57,6 +64,9 @@
 <script src="/static/js/controller/welcome-header/welcomeHeaderController.js"></script>
 <script src="/static/js/controller/login/recoverPasswordController.js"></script>
 <script src="/static/js/controller/demo/demoController.js"></script>
+<script src="/static/js/controller/test/commentController.js"></script>
+
+<script src="/static/js/service/commentService.js"></script>
 
 <script src="/static/js/directive/welcomeHeader.js"></script>
 <!--/SCRIPT-->

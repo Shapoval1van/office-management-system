@@ -16,16 +16,16 @@
                     });
                 };
 
-                if (isCurrentPageAnonymOnly()) {
-                    if ($cookies.get("access_token"))
-                        window.location.href = redirectIfTokenExist;
-                } else {
-                    if ($cookies.get("access_token"))
-                        $http.defaults.headers.common.Authorization =
-                            'Bearer ' + $cookies.get("access_token");
-                    else
-                        window.location = loginPageUrl;
-                }
+                // if (isCurrentPageAnonymOnly()) {
+                //     if ($cookies.get("access_token"))
+                //         window.location.href = redirectIfTokenExist;
+                // } else {
+                //     if ($cookies.get("access_token"))
+                //         $http.defaults.headers.common.Authorization =
+                //             'Bearer ' + $cookies.get("access_token");
+                //     else
+                //         window.location = loginPageUrl;
+                // }
 
                 $scope.logout = function () {
                     $cookies.remove("access_token");

@@ -33,6 +33,10 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
+                    .when("/comment/:requestId", {
+                        templateUrl: "/static/page/test/test-comment.html",
+                        controller: "CommentController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
