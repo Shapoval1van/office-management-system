@@ -6,6 +6,7 @@ import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,9 @@ public class RequestController {
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addRequest")
     public ResponseEntity<?> addRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO) {
         try {
-            requestService.saveRequest(requestDTO.toRequest());
+            Request request = requestDTO.toRequest();
+            //request.setEmployee(currentEmployeeId); TODO
+            requestService.saveRequest(request);
         } catch (CannotCreateRequestException e) {
             return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
         }

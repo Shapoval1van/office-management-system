@@ -20,20 +20,20 @@
                                 <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
-                            <input type='text' class="form-control" ng-model="requestCredentials.estimate"/>
+                            <input type='text' class="form-control"/>
                         </div>
                     </div>
                     <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
                         <div class = "input-group"><label>Priority:</label></div>
                         <div class="btn-group input-group login-input">
                             <label id="low-priority" class="btn" ng-model="requestCredentials.priority"
-                                   ng-class = "{ 'btn-success': requestCredentials.priority == 'Low', 'btn-info': requestCredentials.priority != 'Low'}"
-                                   uib-btn-radio="'Low'" uib-uncheckable="uncheckable">Low</label>
-                            <label id="normal-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'Normal'"
-                                   ng-class = "{ 'btn-warning': requestCredentials.priority == 'Normal', 'btn-info': requestCredentials.priority != 'Normal'}"
+                                   ng-class = "{ 'btn-success': requestCredentials.priority == '3', 'btn-info': requestCredentials.priority != '3'}"
+                                   uib-btn-radio="'3'" uib-uncheckable="uncheckable">Low</label>
+                            <label id="normal-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'2'"
+                                   ng-class = "{ 'btn-warning': requestCredentials.priority == '2', 'btn-info': requestCredentials.priority != '2'}"
                                    uib-uncheckable="uncheckable">Normal</label>
-                            <label id="high-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'High'"
-                                   ng-class = "{ 'btn-danger': requestCredentials.priority == 'High', 'btn-info': requestCredentials.priority != 'High'}"
+                            <label id="high-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'1'"
+                                   ng-class = "{ 'btn-danger': requestCredentials.priority == '1', 'btn-info': requestCredentials.priority != '1'}"
                                    uib-uncheckable="uncheckable">High</label>
                         </div>
                     </div>

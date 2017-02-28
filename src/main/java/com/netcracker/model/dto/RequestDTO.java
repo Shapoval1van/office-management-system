@@ -37,7 +37,6 @@ public class RequestDTO {
     private Integer status;
 
     @JsonView(View.Public.class)
-    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private Long employee;
 
     @JsonView(View.Public.class)
