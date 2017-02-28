@@ -21,17 +21,21 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
-                    .when("/recover", {
-                        templateUrl: "/static/page/recover/recover-page.html",
+                    .when("/reset", {
+                        templateUrl: "/static/page/reset/recover-page.html",
                         controller: "RecoverPasswordController"
                     })
                     .when("/resetPassword/:token", {
-                        templateUrl: "/static/page/recover/new-password-page.html",
+                        templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
                     .when("/demo", {
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
+                    })
+                    .when("/newRequest", {
+                        templateUrl: "/static/page/request/new-request-page.html",
+                        controller: "NewRequestController"
                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"

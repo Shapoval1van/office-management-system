@@ -6,7 +6,7 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.dto.RegistrationMessageDTO;
 import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.VerificationToken;
+import com.netcracker.model.entity.Token;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.service.registration.RegistrationService;
@@ -32,8 +32,8 @@ public class RegistrationController {
     public RegistrationMessageDTO registerPerson(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
                                                  HttpServletRequest request) throws Exception {
         Person person = personDTO.toPerson();
-        VerificationToken verificationToken = registrationService.registerPerson(person, this.buildRequestLink(request));
-        return new RegistrationMessageDTO(person.getEmail(), verificationToken.getDateExpired());
+        Token token = registrationService.registerPerson(person, this.buildRequestLink(request));
+        return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }
 
     @JsonView(View.Public.class)
