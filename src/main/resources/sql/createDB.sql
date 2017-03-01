@@ -134,10 +134,11 @@ ALTER TABLE PERSON
 
 CREATE TABLE TOKEN
 (
-  token_id BIGSERIAL NOT NULL PRIMARY KEY,
-  token                 VARCHAR(36),
-  person_id           INT       NOT NULL,
-  date_expired          TIMESTAMP WITH TIME ZONE
+  token_id     BIGSERIAL NOT NULL PRIMARY KEY,
+  token        VARCHAR(36),
+  person_id    INT       NOT NULL,
+  token_type   INT       NOT NULL,
+  date_expired TIMESTAMP WITH TIME ZONE
 );
 
 ALTER TABLE TOKEN
