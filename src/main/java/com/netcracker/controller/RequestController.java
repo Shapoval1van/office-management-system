@@ -148,7 +148,7 @@ public class RequestController {
             if (request==null)
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             requestService.deleteRequestById(requestId);
-        } catch (CannotDeleteRequestException e) {
+        } catch (CannotDeleteRequestException | ResourceNotFoundException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
