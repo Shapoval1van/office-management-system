@@ -2,8 +2,9 @@ package com.netcracker.model.entity;
 
 
 import com.netcracker.repository.common.Persistable;
+import org.springframework.security.core.GrantedAuthority;
 
-public class Role implements Persistable<Integer> {
+public class Role implements Persistable<Integer>, GrantedAuthority {
 
     public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
 
@@ -36,5 +37,10 @@ public class Role implements Persistable<Integer> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getAuthority() {
+        return name;
     }
 }
