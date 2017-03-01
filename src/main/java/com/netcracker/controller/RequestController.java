@@ -4,6 +4,7 @@ import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.model.dto.RequestDTO;
+import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.repository.data.PersonRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -23,7 +25,10 @@ public class RequestController {
     @Autowired
     private RequestService requestService;
 
-    public static final String JSON_MEDIA_TYPE = "application/json;";
+    @Autowired
+    PersonRepository personRepository;
+
+    private static final String JSON_MEDIA_TYPE = "application/json;";
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> getRequest(@PathVariable Long requestId) {
@@ -36,10 +41,17 @@ public class RequestController {
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addRequest")
-    public ResponseEntity<?> addRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO) {
+    public ResponseEntity<?> addRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
+                                        Principal principal) {
         try {
             Request request = requestDTO.toRequest();
-            //request.setEmployee(currentEmployeeId); TODO
+            Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
+            if(person.isPresent()) {
+                request.setEmployee(person.get());
+            } else {
+                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
+                // TODO log
+            }
             requestService.saveRequest(request);
         } catch (CannotCreateRequestException e) {
             return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
@@ -49,8 +61,17 @@ public class RequestController {
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addSubRequest")
-    public ResponseEntity<?> addSubRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO) {
+    public ResponseEntity<?> addSubRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
+                                           Principal principal) {
         try {
+            Request subRequest = requestDTO.toRequest();
+            Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
+            if(person.isPresent()) {
+                subRequest.setManager(person.get());
+            } else {
+                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
+                // TODO log
+            }
             requestService.saveSubRequest(requestDTO.toRequest());
         } catch (CannotCreateSubRequestException e) {
             return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);

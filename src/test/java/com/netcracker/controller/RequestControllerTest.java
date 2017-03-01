@@ -5,6 +5,7 @@ import com.netcracker.repository.data.RequestRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.Principal;
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.*;
@@ -46,6 +48,8 @@ public class RequestControllerTest {
 
     private RequestDTO requestDTO;
 
+    private Principal principal = Mockito.mock(Principal.class);
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -67,10 +71,11 @@ public class RequestControllerTest {
     @Before
     public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
+        Mockito.when(principal.getName()).thenReturn("test2@test.com");
     }
 
     @Test
-    public void addRequestEmployeeNotPresent() throws Exception {
+    public void addRequestNameNotPresent() throws Exception {
         requestDTO = new RequestDTO();
         requestDTO.setName(null);
         requestDTO.setDescription(null);
@@ -93,8 +98,8 @@ public class RequestControllerTest {
 
         int size = requestRepository.findAll().size();
 
-        requestDTO.setEmployee(2L);
         mockMvc.perform(post("/api/request/addRequest/")
+                .principal(principal)
                 .content(this.json(requestDTO))
                 .contentType(contentType))
                 .andExpect(status().isOk());

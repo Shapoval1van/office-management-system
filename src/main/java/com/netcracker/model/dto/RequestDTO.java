@@ -65,7 +65,9 @@ public class RequestDTO {
             if (request.getStatus() != null) {
                 this.status = request.getStatus().getId();
             }
-            this.employee = request.getEmployee().getId();
+            if(request.getEmployee() != null) {
+                this.employee = request.getEmployee().getId();
+            }
             if (request.getManager() != null)
                 this.manager = request.getManager().getId();
             if (request.getParent() != null)
@@ -86,7 +88,9 @@ public class RequestDTO {
         if(this.status != null) {
             request.setStatus(new Status(this.status));
         }
-        request.setEmployee(new Person(this.employee));
+        if(this.employee != null) {
+            request.setEmployee(new Person(this.employee));
+        }
         if(this.manager != null) {
             request.setManager(new Person(this.manager));
         }
