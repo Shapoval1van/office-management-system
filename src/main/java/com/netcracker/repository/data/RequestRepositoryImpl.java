@@ -2,10 +2,8 @@ package com.netcracker.repository.data;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
-
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +30,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
             "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id FROM " +
             TABLE_NAME + " WHERE parent_id = ?";
+
+    private final String ASSIGN_REQUEST_TO_PERSON = "UPDATE " + TABLE_NAME + " SET manager_id = ?, status_id = ? " +
+            "WHERE request_id = ?";
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -117,5 +118,10 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public int assignRequest(Long id, Person person, Status status) {
+        return getJdbcTemplate().update(ASSIGN_REQUEST_TO_PERSON, person.getId(), status.getId(), id);
     }
 }

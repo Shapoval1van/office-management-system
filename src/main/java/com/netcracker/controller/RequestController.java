@@ -1,10 +1,7 @@
 package com.netcracker.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.exception.CannotCreateRequestException;
-import com.netcracker.exception.CannotCreateSubRequestException;
-import com.netcracker.exception.CannotDeleteRequestException;
-import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.*;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
@@ -124,4 +121,41 @@ public class RequestController {
 
         return ResponseEntity.ok("Request deleted");
     }
+
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest/{requestId}")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
+                                           Principal principal){
+        try{
+            Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
+            if (person.isPresent()){
+                requestService.assignRequest(requestId, person.get());
+            } else {
+                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
+                // TODO log
+            }
+        } catch (CannotAssignRequestException e){
+            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Assigned");
+    }
+
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest/{requestId}/to/{personId}")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
+                                           @PathVariable Long personId){
+        try{
+            Optional<Person> person = personRepository.findOne(personId);
+            if (person.isPresent()){
+                requestService.assignRequest(requestId, person.get());
+            } else {
+                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
+                // TODO log
+            }
+        } catch (CannotAssignRequestException e){
+            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Assigned");
+    }
+
 }

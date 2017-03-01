@@ -145,4 +145,19 @@ public class RequestControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void successRequestAssign() throws Exception {
+        mockMvc.perform(post("/api/request/assignRequest/4")
+                .principal(principal)
+                .contentType(contentType))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void successRequestAssignToPerson() throws Exception {
+        mockMvc.perform(post("/api/request/assignRequest/4/to/2")
+                .contentType(contentType))
+                .andExpect(status().isOk());
+    }
+
 }

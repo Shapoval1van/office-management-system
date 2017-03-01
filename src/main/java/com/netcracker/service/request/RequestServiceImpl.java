@@ -1,9 +1,6 @@
 package com.netcracker.service.request;
 
-import com.netcracker.exception.CannotCreateRequestException;
-import com.netcracker.exception.CannotCreateSubRequestException;
-import com.netcracker.exception.CannotDeleteRequestException;
-import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.*;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -116,6 +113,17 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public int changeRequestStatus(Request request, Status status) {
         return requestRepository.changeRequestStatus(request, status);
+    }
+
+    @Override
+    public boolean assignRequest(Long id, Person person) throws CannotAssignRequestException {
+        Request request = getRequestById(id).get();
+        if (request.getStatus().getId() != 1){
+            throw new CannotAssignRequestException("Request is already assigned");
+        }
+        requestRepository.assignRequest(id, person, new Status(2));
+
+        return true;
     }
 
     private void fillRequest(Request request) {
