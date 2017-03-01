@@ -1,30 +1,20 @@
 package com.netcracker.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonView;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.*;
-import com.netcracker.model.validation.CreateValidatorGroup;
-import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.model.view.View;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class RequestDTO {
-
+public class FullRequestDTO {
     @JsonView(View.Public.class)
     private Long id;
 
     @JsonView(View.Public.class)
-    @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
-    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String name;
 
     @JsonView(View.Public.class)
-    @Size(max = 500, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String description;
 
     @JsonView(View.Public.class)
@@ -34,28 +24,24 @@ public class RequestDTO {
     private Timestamp estimate;
 
     @JsonView(View.Public.class)
-    private Integer status;
+    private StatusDTO status;
 
     @JsonView(View.Public.class)
-    private Long employee;
+    private PersonDTO employee;
 
     @JsonView(View.Public.class)
-    private Long manager;
+    private PersonDTO manager;
 
     @JsonView(View.Public.class)
-    private Long parent;
+    private FullRequestDTO parent;
 
     @JsonView(View.Public.class)
-    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
-    private Integer priority;
+    private PriorityDTO priority;
 
     @JsonView(View.Public.class)
-    private Integer requestGroup;
+    private RequestGroupDTO requestGroup;
 
-    public RequestDTO() {
-    }
-
-    public RequestDTO(Request request) {
+    public FullRequestDTO(Request request) {
         if (request != null) {
             this.id = request.getId();
             this.name = request.getName();
@@ -63,18 +49,18 @@ public class RequestDTO {
             this.creationTime = request.getCreationTime();
             this.estimate = request.getEstimate();
             if (request.getStatus() != null) {
-                this.status = request.getStatus().getId();
+                this.status = new StatusDTO(request.getStatus());
             }
             if(request.getEmployee() != null) {
-                this.employee = request.getEmployee().getId();
+                this.employee = new PersonDTO(request.getEmployee());
             }
             if (request.getManager() != null)
-                this.manager = request.getManager().getId();
+                this.manager = new PersonDTO(request.getManager());
             if (request.getParent() != null)
-                this.parent = request.getParent().getId();
-            this.priority = request.getPriority().getId();
+                this.parent = new FullRequestDTO(request.getParent());
+            this.priority = new PriorityDTO(request.getPriority());
             if (request.getRequestGroup() != null)
-                this.requestGroup = request.getRequestGroup().getId();
+                this.requestGroup = new RequestGroupDTO(request.getRequestGroup());
         }
     }
 
@@ -86,23 +72,24 @@ public class RequestDTO {
         request.setCreationTime(this.creationTime);
         request.setEstimate(this.estimate);
         if(this.status != null) {
-            request.setStatus(new Status(this.status));
+            request.setStatus(this.status.toStatus());
         }
         if(this.employee != null) {
-            request.setEmployee(new Person(this.employee));
+            request.setEmployee(this.employee.toPerson());
         }
         if(this.manager != null) {
-            request.setManager(new Person(this.manager));
+            request.setManager(this.manager.toPerson());
         }
         if(this.parent != null) {
-            request.setParent(new Request(this.parent));
+            request.setParent(this.parent.toRequest());
         }
-        request.setPriority(new Priority(this.priority));
+        request.setPriority(this.priority.toPriority());
         if(this.requestGroup != null) {
-            request.setRequestGroup(new RequestGroup(this.requestGroup));
+            request.setRequestGroup(this.requestGroup.toRequestGroup());
         }
         return request;
     }
+
 
     public Long getId() {
         return id;
@@ -144,51 +131,51 @@ public class RequestDTO {
         this.estimate = estimate;
     }
 
-    public Integer getStatus() {
+    public StatusDTO getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(StatusDTO status) {
         this.status = status;
     }
 
-    public Long getEmployee() {
+    public PersonDTO getEmployee() {
         return employee;
     }
 
-    public void setEmployee(Long employee) {
+    public void setEmployee(PersonDTO employee) {
         this.employee = employee;
     }
 
-    public Long getManager() {
+    public PersonDTO getManager() {
         return manager;
     }
 
-    public void setManager(Long manager) {
+    public void setManager(PersonDTO manager) {
         this.manager = manager;
     }
 
-    public Long getParent() {
+    public FullRequestDTO getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
+    public void setParent(FullRequestDTO parent) {
         this.parent = parent;
     }
 
-    public Integer getPriority() {
+    public PriorityDTO getPriority() {
         return priority;
     }
 
-    public void setPriority(Integer priority) {
+    public void setPriority(PriorityDTO priority) {
         this.priority = priority;
     }
 
-    public Integer getRequestGroup() {
+    public RequestGroupDTO getRequestGroup() {
         return requestGroup;
     }
 
-    public void setRequestGroup(Integer requestGroup) {
+    public void setRequestGroup(RequestGroupDTO requestGroup) {
         this.requestGroup = requestGroup;
     }
 }

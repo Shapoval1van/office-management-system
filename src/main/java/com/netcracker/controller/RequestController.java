@@ -1,12 +1,15 @@
 package com.netcracker.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
+import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.view.View;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +33,12 @@ public class RequestController {
 
     private static final String JSON_MEDIA_TYPE = "application/json;";
 
+    @JsonView(View.Public.class)
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> getRequest(@PathVariable Long requestId) {
         Optional<Request> request = requestService.getRequestById(requestId);
         if(request.isPresent()) {
-            return ResponseEntity.ok(request.get());
+            return ResponseEntity.ok(new FullRequestDTO(request.get()));
         } else {
             return new ResponseEntity<>("No such id", HttpStatus.BAD_REQUEST);
         }
