@@ -33,6 +33,10 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
+                    .when("/requestDetails",{
+                        templateUrl: "static/page/request/details.html",
+                        controller: "RequestDetailsController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

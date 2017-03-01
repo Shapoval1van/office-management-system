@@ -1,0 +1,132 @@
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Request Details</h1>
+</nav>
+
+<section class="main-form" ng-cloak="">
+    <div class="container" ng-controller="RequestDetailsController">
+        <div class="row">
+            <h1 class="title-text center">{{requestName}}</h1>
+            <div class="col-md-offset-1 col-md-7" id="accordion">
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseDetails">
+                            Details
+                        </a>
+                    </h4>
+                    <div id="collapseDetails" class="collapse in">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <ul class="ul-decoration">
+                                    <li>Author: {{authorName}}</li>
+                                    <li>Created: {{dateCreated}}</li>
+                                    <li>Priority: {{priority}}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-offset-1 col-md-4 border">
+                                <ul class="ul-decoration">
+                                    <li>Manager: {{manager}}</li>
+                                    <li>Status: {{status}}</li>
+                                    <li>Estimate: {{estimate}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseDescription">
+                            Description
+                        </a>
+                    </h4>
+                    <div id="collapseDescription" class="collapse in">
+                        {{description}}
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseSubtasks">
+                            Subtasks
+                        </a>
+                    </h4>
+                    <div id="collapseSubtasks" class="collapse in">
+                        <div class="list-group col-md-5">
+                            <!--<a href="{{id}}" class="list-group-item" ng-repeat="subtask in subtasks">{{subtaskName}}</a>-->
+                            <a href="{{test}}" class="list-group-item">Cras justo odio</a>
+                            <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                            <a href="#" class="list-group-item">Morbi leo risus</a>
+                            <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                            <a href="#" class="list-group-item">Vestibulum at eros</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseHistory">
+                            History
+                        </a>
+                    </h4>
+                    <div id="collapseHistory" class="collapse in">
+                        <table class="table">
+                            <thead class="thead-inverse">
+                            <tr>
+                                <th>#</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Username</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@fat</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>Larry</td>
+                                <td>the Bird</td>
+                                <td>@twitter</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 additional-padding" id="accordion1">
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapsePerson">
+                            Details
+                        </a>
+                    </h4>
+                    <div id="collapsePerson" class="collapse in">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="ul-decoration">
+                                    <li>Author: {{authorName}}</li>
+                                    <li>Author: {{authorName}}</li>
+                                    <li>Created: {{dateCreation}}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 border">
+                                <ul class="ul-decoration">
+                                    <li>Author: {{authorName}}</li>
+                                    <li>Author: {{authorName}}</li>
+                                    <li>Created: {{dateCreation}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

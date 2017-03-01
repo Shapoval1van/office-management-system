@@ -6,7 +6,7 @@
         .controller("MainController", ["$scope", "$http", "$cookies",
             function ($scope, $http, $cookies) {
 
-                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
+                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset", "requestDetails"];
                 var redirectIfTokenExist = "/demo";
                 var loginPageUrl = "/login";
 
