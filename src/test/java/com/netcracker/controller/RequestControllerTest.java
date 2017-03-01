@@ -113,7 +113,7 @@ public class RequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(2)))
                 .andExpect(jsonPath("$.name", is("Request 2 (closed)")))
-                .andExpect(jsonPath("$.description", is("Request 2 description")));
+                .andExpect(jsonPath("$.description", is("Request 2 description"))).andReturn().getResponse().getContentAsString();
     }
 
     protected String json(Object o) throws IOException {

@@ -3,9 +3,12 @@ package com.netcracker.service.request;
 import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
+import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.data.*;
+import com.netcracker.service.person.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,11 +26,42 @@ public class RequestServiceImpl implements RequestService {
     private RequestRepository requestRepository;
 
     @Autowired
+    private PersonService personService;
+
+    @Autowired
     private StatusRepository statusRepository;
+
+    @Autowired
+    private PriorityRepository priorityRepository;
 
     @Override
     public Optional<Request> getRequestById(Long id) {
-        return requestRepository.findOne(id);
+        Optional<Request> request = requestRepository.findOne(id);
+        if(request.isPresent()) {
+            Person employee = request.get().getEmployee();
+            if(employee != null) {
+                employee = personService.getPersonById(employee.getId()).orElseGet(null);
+                request.get().setEmployee(employee);
+            }
+
+            Person manager = request.get().getManager();
+            if(manager != null) {
+                manager = personService.getPersonById(manager.getId()).orElseGet(null);
+                request.get().setManager(manager);
+            }
+
+            Priority priority = request.get().getPriority();
+            request.get().setPriority(priorityRepository.findOne(priority.getId()).orElseGet(null));
+
+            Status status = request.get().getStatus();
+            request.get().setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+
+            Request parent = request.get().getParent();
+            if(parent != null) {
+                request.get().setParent(this.getRequestById(parent.getId()).orElse(null));
+            }
+        }
+        return request;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
