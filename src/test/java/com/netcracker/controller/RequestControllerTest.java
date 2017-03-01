@@ -1,6 +1,7 @@
 package com.netcracker.controller;
 
 import com.netcracker.model.dto.RequestDTO;
+import com.netcracker.model.entity.Request;
 import com.netcracker.repository.data.RequestRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,8 @@ import java.util.Arrays;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -123,26 +126,19 @@ public class RequestControllerTest {
         return mockHttpOutputMessage.getBodyAsString();
     }
 
-    @Test
-    public void updateRequest() throws Exception {
-        mockMvc.perform(post("/api/request/updateRequest/2")
-                .content(this.json(requestDTO))
-                .contentType(contentType))
-                .andExpect(status().isOk());
-    }
 
-    @Test
-    public void tryDeleteClosedRequest() throws Exception {
-        mockMvc.perform(post("/api/request/deleteRequest/2")
-                .contentType(contentType))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void deleteRequest() throws Exception {
-        mockMvc.perform(post("/api/request/deleteRequest/3")
-                .contentType(contentType))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    public void tryDeleteClosedRequest() throws Exception {
+//        mockMvc.perform(post("/api/request/2/delete")
+//                .contentType(contentType))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    public void deleteRequest() throws Exception {
+//        mockMvc.perform(post("/api/request/3/delete")
+//                .contentType(contentType))
+//                .andExpect(status().isOk());
+//    }
 
 }
