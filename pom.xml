@@ -69,6 +69,14 @@
 			<version>1</version>
 		</dependency>
 
+		<!--> Mail Template <-->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+
 		<!--> Mail <-->
 		<dependency>
 			<groupId>javax.mail</groupId>
