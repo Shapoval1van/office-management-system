@@ -63,4 +63,34 @@ public class Comment implements Persistable<Long> {
     public void setRequest(Request request) {
         this.request = request;
     }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (body != null ? body.hashCode() : 0);
+        result = 31 * result + (publishDate != null ? publishDate.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (request != null ? request.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) return true;
+        if (obj == null || !(obj instanceof Comment)) return false;
+
+        Comment comment = (Comment) obj;
+
+        if (comment.hashCode() != this.hashCode())
+            return false;
+
+        if (id != null ? !id.equals(comment.id) : comment.id != null) return false;
+        if (body != null ? !body.equals(comment.body) : comment.body != null) return false;
+        if (publishDate != null ? !publishDate.equals(comment.publishDate) : comment.publishDate != null) return false;
+        if (author != null ? !author.equals(comment.author) : comment.author != null) return false;
+        if (request != null ? !request.equals(comment.request) : comment.request != null) return false;
+
+        return true;
+    }
 }

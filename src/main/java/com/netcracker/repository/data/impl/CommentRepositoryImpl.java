@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
                 comment.setBody(resultSet.getString(BODY));
                 comment.setAuthor(new Person(resultSet.getLong(AUTHOR_ID)));
                 comment.setRequest(new Request(resultSet.getLong(REQUEST_ID)));
-                comment.setPublishDate(resultSet.getDate(PUBLISH_DATE));
+                comment.setPublishDate(new Date(resultSet.getTimestamp(PUBLISH_DATE).getTime()));
                 return comment;
             }
         };
@@ -58,6 +59,7 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
 
     @Override
     public List<Comment> findCommentByRequestId(Long requestId) {
-        return super.queryForList(FIND_COMMENTS_BY_REQUEST_ID, requestId);
+        List<Comment> requestComments = super.queryForList(FIND_COMMENTS_BY_REQUEST_ID, requestId);
+        return requestComments;
     }
 }
