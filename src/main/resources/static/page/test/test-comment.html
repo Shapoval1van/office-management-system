@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <form>
+                        <div class="form-group">
+                            <label for="comment">Your comment:</label>
+                            <textarea placeholder="Write comment here" ng-model="comment" id="comment"
+                                      class="form-control" ng-keypress="sendOnEnterKey($event)"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12" ng-repeat="comment in comments | orderBy: comment.publishDate: true">
+            <div class="row">
+                <div class="col-md-3">
+                    <p><b>{{comment.publishDate | date: "d-MM-yyyy HH:mm"}}</b></p>
+                </div>
+                <div class="col-md-6">
+                    <!--TODO Write user name and surname here-->
+                    <p>
+                        <b>{{comment.author.id}}</b>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p>
+                        {{comment.body}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

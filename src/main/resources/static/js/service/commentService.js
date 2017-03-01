@@ -8,7 +8,7 @@
                 var service = {}, listener = $q.defer(), socket = {
                     client: null,
                     stomp: null
-                }, messageIds = [];
+                };
 
                 service.RECONNECT_TIMEOUT = 30000;
                 service.SOCKET_URL = "/chat";
@@ -19,17 +19,6 @@
                     return listener.promise;
                 };
 
-                service.send = function (message) {
-                    var id = Math.floor(Math.random() * 1000000);
-                    socket.stomp.send(service.CHAT_BROKER, {
-                        priority: 9
-                    }, JSON.stringify({
-                        message: message,
-                        id: id
-                    }));
-                    messageIds.push(id);
-                };
-
                 var reconnect = function () {
                     $timeout(function () {
                         initialize();
@@ -37,14 +26,7 @@
                 };
 
                 var getMessage = function (data) {
-                    var message = JSON.parse(data), out = {};
-                    out.message = message.message;
-                    out.time = new Date(message.time);
-                    if (_.contains(messageIds, message.id)) {
-                        out.self = true;
-                        messageIds = _.remove(messageIds, message.id);
-                    }
-                    return out;
+                    return JSON.parse(data);
                 };
 
                 var startListener = function () {
