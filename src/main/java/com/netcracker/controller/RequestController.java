@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
@@ -19,7 +20,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/request")
@@ -42,6 +45,21 @@ public class RequestController {
         } else {
             return new ResponseEntity<>("No such id", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @JsonView(View.Public.class)
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/sub/{parentId}")
+    public ResponseEntity<?> getSubRequest(@PathVariable Long parentId) {
+        List<Request> request = null;
+        try {
+            request = requestService.getAllSubRequest(parentId);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>("No such parentId", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok((request
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList())));
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addRequest")
@@ -100,7 +118,7 @@ public class RequestController {
     public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
         try {
             requestService.deleteRequestById(requestId);
-        } catch (CannotDeleteRequestException e) {
+        } catch (CannotDeleteRequestException | ResourceNotFoundException e) {
             return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
         }
 

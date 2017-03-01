@@ -11,9 +11,9 @@ public class RequestGroupDTO {
     @JsonView(View.Public.class)
     private String name;
 
-    public RequestGroupDTO(RequestGroup status) {
-        this.id = status.getId();
-        this.name = status.getName();
+    public RequestGroupDTO(RequestGroup requestGroup) {
+        this.id = requestGroup.getId();
+        this.name = requestGroup.getName();
     }
 
     public RequestGroup toRequestGroup() {

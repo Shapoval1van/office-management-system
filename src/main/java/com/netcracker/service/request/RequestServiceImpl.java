@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -21,7 +22,6 @@ import java.util.Optional;
 
 @Service
 public class RequestServiceImpl implements RequestService {
-
     @Autowired
     private RequestRepository requestRepository;
 
@@ -37,30 +37,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Optional<Request> getRequestById(Long id) {
         Optional<Request> request = requestRepository.findOne(id);
-        if(request.isPresent()) {
-            Person employee = request.get().getEmployee();
-            if(employee != null) {
-                employee = personService.getPersonById(employee.getId()).orElseGet(null);
-                request.get().setEmployee(employee);
-            }
-
-            Person manager = request.get().getManager();
-            if(manager != null) {
-                manager = personService.getPersonById(manager.getId()).orElseGet(null);
-                request.get().setManager(manager);
-            }
-
-            Priority priority = request.get().getPriority();
-            request.get().setPriority(priorityRepository.findOne(priority.getId()).orElseGet(null));
-
-            Status status = request.get().getStatus();
-            request.get().setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
-
-            Request parent = request.get().getParent();
-            if(parent != null) {
-                request.get().setParent(this.getRequestById(parent.getId()).orElse(null));
-            }
-        }
+        request.ifPresent(this::fillRequest);
         return request;
     }
 
@@ -106,20 +83,25 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getAllSubRequest(Request parentRequest) {
-        return requestRepository.getAllSubRequest(parentRequest);
+    public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
+        Request parent = requestRepository.findOne(parentId).orElseThrow(() ->
+                new ResourceNotFoundException("No such parent request"));
+
+        List<Request> requests = requestRepository.getAllSubRequest(parentId);
+        requests.forEach(e -> fillRequest(e, parent));
+        return requests;
     }
 
     @Transactional
     @Override
-    public void deleteRequestById(Long id) throws CannotDeleteRequestException{
+    public void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException {
         Request request = getRequestById(id).get();
         if (request.getParent() != null) {
             this.requestRepository.delete(id);
         } else {
             if (!request.getStatus().getId().equals(3)) {  // if request not closed
                 changeRequestStatus(request, new Status(5));
-                List<Request> subRequestList = getAllSubRequest(request);
+                List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty()){
                     for (Request r : subRequestList){
                         this.requestRepository.delete(r.getId());
@@ -136,4 +118,37 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.changeRequestStatus(request, status);
     }
 
+    private void fillRequest(Request request) {
+        fill(request);
+
+        Request parent = request.getParent();
+        if(parent != null) {
+            request.setParent(this.getRequestById(parent.getId()).orElse(null));
+        }
+    }
+
+    private void fillRequest(Request request, Request parent) {
+        fill(request);
+        request.setParent(parent);
+    }
+
+    private void fill(Request request) {
+        Person employee = request.getEmployee();
+        if(employee != null) {
+            employee = personService.getPersonById(employee.getId()).orElseGet(null);
+            request.setEmployee(employee);
+        }
+
+        Person manager = request.getManager();
+        if(manager != null) {
+            manager = personService.getPersonById(manager.getId()).orElseGet(null);
+            request.setManager(manager);
+        }
+
+        Priority priority = request.getPriority();
+        request.setPriority(priorityRepository.findOne(priority.getId()).orElseGet(null));
+
+        Status status = request.getStatus();
+        request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+    }
 }

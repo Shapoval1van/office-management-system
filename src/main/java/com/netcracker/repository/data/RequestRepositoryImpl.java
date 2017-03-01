@@ -30,7 +30,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
     private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
-            "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id" + " FROM " +
+            "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id FROM " +
             TABLE_NAME + " WHERE parent_id = ?";
 
     public RequestRepositoryImpl() {
@@ -105,8 +105,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
 
     @Override
-    public List<Request> getAllSubRequest(Request parentRequest) {
-        return super.queryForList(FIND_ALL_SUB_REQUEST, parentRequest.getId().intValue());
+    public List<Request> getAllSubRequest(Long parentId) {
+        return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
 
     //@Transactional

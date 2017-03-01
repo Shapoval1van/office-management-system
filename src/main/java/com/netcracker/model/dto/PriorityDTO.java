@@ -11,9 +11,9 @@ public class PriorityDTO {
     @JsonView(View.Public.class)
     private String name;
 
-    public PriorityDTO(Priority status) {
-        this.id = status.getId();
-        this.name = status.getName();
+    public PriorityDTO(Priority priority) {
+        this.id = priority.getId();
+        this.name = priority.getName();
     }
 
     public Priority toPriority() {
