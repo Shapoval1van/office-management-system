@@ -33,6 +33,10 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
+                    .when("/newRequest", {
+                        templateUrl: "/static/page/request/new-request-page.html",
+                        controller: "NewRequestController"
+                    })
                     .when("/requestDetails",{
                         templateUrl: "static/page/request/details.html",
                         controller: "RequestDetailsController"

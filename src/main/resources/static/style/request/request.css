@@ -1,0 +1,29 @@
+#description{
+    width: 100%;
+}
+
+#calendar{
+    width: 60%;
+}
+
+#timepicker{
+    width: 40%;
+    float: left;
+}
+
+.form-control_offset{
+    margin-top: 20px!important;
+}
+
+.request-name-incorrect{
+    position: relative;
+}
+
+.request-name-incorrect::after{
+    content: "Request name must contain at least 3 letters and start with capital letter!";
+    color: #ff6464;
+    font-size: 15px;
+    position: absolute;
+    top: 40px;
+    left: 0;
+}

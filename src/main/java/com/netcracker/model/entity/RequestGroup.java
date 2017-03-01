@@ -1,31 +1,25 @@
 package com.netcracker.model.entity;
 
-
 import com.netcracker.repository.common.Persistable;
 
-public class Role implements Persistable<Integer> {
-
-    public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
-
-    public static final String TABLE_NAME = "ROLE";
-    public static final String ID_COLUMN = "role_id";
+public class RequestGroup implements Persistable<Integer> {
+    public static final String TABLE_NAME = "REQUEST_GROUP";
+    public static final String ID_COLUMN = "request_group_id";
 
     private Integer id;
     private String name;
 
-    public Role() {
+    public RequestGroup(){
     }
 
-    public Role(Integer id) {
+    public RequestGroup(Integer id) {
         this.id = id;
     }
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }
@@ -43,10 +37,10 @@ public class Role implements Persistable<Integer> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Role role = (Role) o;
+        RequestGroup that = (RequestGroup) o;
 
-        if (id != null ? !id.equals(role.id) : role.id != null) return false;
-        return name != null ? name.equals(role.name) : role.name == null;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override
@@ -55,5 +49,4 @@ public class Role implements Persistable<Integer> {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
-
 }
