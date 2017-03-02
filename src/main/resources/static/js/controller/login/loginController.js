@@ -47,11 +47,10 @@
                         $cookies.put("access_token", callback.data.access_token, {
                             expires: cookiesExpirationDate
                         });
-
                         window.location.reload();
                     }, function (callback) {
                         console.log("Error");
-                        console.log(callback);
+                        window.alert(callback.data.error_description)
                     });
                 };
 

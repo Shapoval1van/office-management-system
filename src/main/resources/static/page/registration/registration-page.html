@@ -2,43 +2,62 @@
 <section class="main-form" ng-cloak="">
     <div class="container">
         <div class="row">
-            <form name="registrationForm">
-                <div id="login-input-container" ng-controller="RegistrationController">
+            <form name="registrationForm" ng-controller="RegistrationController" novalidate>
+                <div id="login-input-container">
                     <div class="col-md-offset-3 col-md-6">
                         <div id="first-name-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon3"><i class="fa fa-user"></i></span>
-                            <input type="text" class="form-control" placeholder="First Name" ng-model="personCredentials.firstName" ng-blur="firstNameCheck()" required>
+                            <input type="text" name="firstName" class="form-control" placeholder="First Name" ng-model="personCredentials.firstName" ng-pattern="nameRegExp" required>
                         </div>
+                        <span class="incorrect" ng-show="registrationForm.firstName.$dirty && registrationForm.firstName.$invalid">
+                            <span ng-show="registrationForm.firstName.$error.pattern">First Name must contain at least 3 letters and start with capital letter!.</span>
+                        </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
                         <div id="last-name-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon4"><i class="fa fa-user"></i></span>
-                            <input type="text" class="form-control" placeholder="Last Name" ng-model="personCredentials.lastName" ng-blur="lastNameCheck()" required>
+                            <input type="text" name="lastName" class="form-control" placeholder="Last Name" ng-model="personCredentials.lastName" ng-pattern="nameRegExp" required>
                         </div>
+                        <span class="incorrect" ng-show="registrationForm.lastName.$dirty && registrationForm.lastName.$invalid">
+                            <span ng-show="registrationForm.lastName.$error.pattern">Last Name must contain at least 3 letters and start with capital letter!.</span>
+                        </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
                         <div id="email-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope-o"></i></span>
-                            <input type="email" class="form-control " placeholder="Email" ng-model="personCredentials.email" required>
+                            <input type="email" name="email" class="form-control " placeholder="Email" ng-model="personCredentials.email" required>
                         </div>
+                        <span class="incorrect" ng-show="registrationForm.email.$dirty && registrationForm.email.$invalid">
+                            <span ng-show="registrationForm.email.$error.email">Invalid email address.</span>
+                        </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
                         <div id="password-input-group" class="input-group login-input">
                             <span class="input-group-addon" id="basic-addon2"><i class="fa fa-key"></i></span>
-                            <input type="password" class="form-control" placeholder="Password" ng-model="personCredentials.password" ng-change="passCheck()" ng-blur="confirmPassCheck()" required>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Password" ng-model="personCredentials.password" ng-pattern="passRegExp" ng-required>
                         </div>
+                        <span class="incorrect" ng-show="registrationForm.password.$dirty && registrationForm.password.$invalid">
+                            <span ng-show="registrationForm.password.$error.pattern">The password must contain at least 8 characters, 1 capital letter and 1 number!</span>
+                        </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
                         <div id="password-check-input-group" class="input-group login-input">
                             <span class="input-group-addon"><i class="fa fa-key"></i></span>
                             <div class="pass-wrapper">
-                                <input type="password" id="form-check-pass" class="form-control" placeholder="Confirm Password" ng-model="personCredentials.confirmPassword" ng-change="confirmPassCheck()" required>
+                                <input type="password" name="confirmPassword" id="form-check-pass" class="form-control" placeholder="Confirm Password" ng-model="personCredentials.confirmPassword" ng-required pw-check="password">
                             </div>
                         </div>
+                        <span class="incorrect" ng-show="registrationForm.confirmPassword.$invalid">
+                            <span ng-show="registrationForm.confirmPassword.$error.pwmatch">Does not matches with the password!</span>
+                        </span>
                     </div>
-
                     <div class="col-md-offset-3 col-md-6">
-                        <input type="submit" id="reg-form-submit" class="btn btn-default login-btn" ng-disabled="submitStatus" ng-click="sendPersonCredentials()" value="Register"></input>
+                        <input type="submit" id="reg-form-submit" class="btn btn-default login-btn"  ng-click="sendPersonCredentials()" value="Register"
+                        ng-disabled="registrationForm.firstName.$invalid||
+                        registrationForm.lastName.$invalid||
+                        registrationForm.email.$invalid||
+                        registrationForm.password.$invalid||
+                        registrationForm.confirmPassword.$invalid" />
                     </div>
                     <div class="col-md-offset-3 col-md-6">
                         <a ng-href="/login" type="button" class="btn btn-default login-btn">Back to Login</a>
