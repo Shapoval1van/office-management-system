@@ -1,0 +1,108 @@
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Request Details</h1>
+</nav>
+
+<section class="main-form section-padding" ng-cloak="">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-1">
+                <h1 class="title-text">{{request.name}}</h1>
+            </div>
+            <div class="col-md-offset-1 col-md-7" id="accordion">
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseDetails">
+                            Details
+                        </a>
+                    </h4>
+                    <div id="collapseDetails" class="collapse in">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <ul class="ul-decoration">
+                                    <li><span class="bold">Author:</span> <a ng-ref="#">{{request.employee.firstName +
+                                        data.employee.lastName}}</a></li>
+                                    <li><span class="bold">Created:</span> {{creationTime}}</li>
+                                    <li><span class="bold">Priority:</span> {{request.priority.name}}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-offset-1 col-md-4 border">
+                                <ul class="ul-decoration">
+                                    <li><span class="bold">Status:</span> {{request.status.name}}</li>
+                                    <li><span class="bold">Estimate:</span> {{request.estimate}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseDescription">
+                            Description
+                        </a>
+                    </h4>
+                    <div id="collapseDescription" class="collapse in">
+                        {{request.description}}
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseSubtasks">
+                            Subtasks
+                        </a>
+                    </h4>
+                    <div id="collapseSubtasks" class="collapse in">
+                        <div class="list-group col-md-5">
+                            <a ng-href="/request/{{subtask.id}}" class="list-group-item"
+                               ng-repeat="subtask in subRequest">{{subtask.name}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseHistory">
+                            History
+                        </a>
+                    </h4>
+                    <div id="collapseHistory" class="collapse in">
+                        <table class="table">
+                            <thead class="thead-inverse">
+                            <tr>
+                                <th>#</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Username</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 additional-padding" id="accordion1">
+                <div class="row toggle-border">
+                    <h4 class="title-text hr-sect">
+                        <a data-toggle="collapse" data-parent="#accordion" data-target="#collapsePerson">
+                            Responsible Manager
+                        </a>
+                    </h4>
+                    <div id="collapsePerson" class="collapse in">
+                        <div ng-if="request.manager!=null">
+                            <ul class="ul-decoration">
+                                <li><span class="bold">Manager:</span> <a ng-ref="#">{{request.manager.firstName +
+                                    data.manager.lastName}}</a>
+                                </li>
+                                <li><span class="bold">Email:</span> {{request.manager.email}}</li>
+                            </ul>
+                        </div>
+                        <div ng-if="request.manager==null">
+                            Managers don't work on this task
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
