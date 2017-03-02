@@ -4,6 +4,9 @@
         .controller("RecoverPasswordController", ["$scope", "$http", "$routeParams",
             function ($scope, $http, $routeParams) {
 
+                $scope.passErrorMessage="The password must contain at least 8 characters, 1 capital letter and 1 number!";
+                $scope.confirmPassErrorMessage="Does not matches with the password!"
+
                 $scope.password = "";
                 $scope.confirmPassword = "";
                 $scope.recoverEmail = "";

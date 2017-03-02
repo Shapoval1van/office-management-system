@@ -5,6 +5,10 @@
                 $scope.personCredentials = {};
                 $scope.nameRegExp = /^[A-Z][a-zA-Z\d]{2,50}$/;
                 $scope.passRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+                $scope.nameErrorMessage = "Name must contain at least 3 letters and start with capital letter!.";
+                $scope.emailErrorMessage="Invalid email address.";
+                $scope.passErrorMessage="The password must contain at least 8 characters, 1 capital letter and 1 number!";
+                $scope.confirmPassErrorMessage="Does not matches with the password!"
 
                 $scope.responseEmail = "";
                 $scope.expiration = "";

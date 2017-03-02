@@ -10,7 +10,7 @@
                             <input type="text" name="firstName" class="form-control" placeholder="First Name" ng-model="personCredentials.firstName" ng-pattern="nameRegExp" required>
                         </div>
                         <span class="incorrect" ng-show="registrationForm.firstName.$dirty && registrationForm.firstName.$invalid">
-                            <span ng-show="registrationForm.firstName.$error.pattern">First Name must contain at least 3 letters and start with capital letter!.</span>
+                            <span ng-show="registrationForm.firstName.$error.pattern">{{nameErrorMessage}}</span>
                         </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
@@ -19,7 +19,7 @@
                             <input type="text" name="lastName" class="form-control" placeholder="Last Name" ng-model="personCredentials.lastName" ng-pattern="nameRegExp" required>
                         </div>
                         <span class="incorrect" ng-show="registrationForm.lastName.$dirty && registrationForm.lastName.$invalid">
-                            <span ng-show="registrationForm.lastName.$error.pattern">Last Name must contain at least 3 letters and start with capital letter!.</span>
+                            <span ng-show="registrationForm.lastName.$error.pattern">{{nameErrorMessage}}</span>
                         </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
@@ -28,7 +28,7 @@
                             <input type="email" name="email" class="form-control " placeholder="Email" ng-model="personCredentials.email" required>
                         </div>
                         <span class="incorrect" ng-show="registrationForm.email.$dirty && registrationForm.email.$invalid">
-                            <span ng-show="registrationForm.email.$error.email">Invalid email address.</span>
+                            <span ng-show="registrationForm.email.$error.email">{{emailErrorMessage}}</span>
                         </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
@@ -37,7 +37,7 @@
                             <input type="password" name="password" id="password" class="form-control" placeholder="Password" ng-model="personCredentials.password" ng-pattern="passRegExp" ng-required>
                         </div>
                         <span class="incorrect" ng-show="registrationForm.password.$dirty && registrationForm.password.$invalid">
-                            <span ng-show="registrationForm.password.$error.pattern">The password must contain at least 8 characters, 1 capital letter and 1 number!</span>
+                            <span ng-show="registrationForm.password.$error.pattern">{{passErrorMessage}}</span>
                         </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
@@ -48,7 +48,7 @@
                             </div>
                         </div>
                         <span class="incorrect" ng-show="registrationForm.confirmPassword.$invalid">
-                            <span ng-show="registrationForm.confirmPassword.$error.pwmatch">Does not matches with the password!</span>
+                            <span ng-show="registrationForm.confirmPassword.$error.pwmatch">{{confirmPassErrorMessage}}</span>
                         </span>
                     </div>
                     <div class="col-md-offset-3 col-md-6">
