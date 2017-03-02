@@ -33,7 +33,10 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
     public GenericJdbcRepository(@NotNull String TABLE_NAME,@NotNull String ID_COLUMN) {
         this.TABLE_NAME = Objects.requireNonNull(TABLE_NAME);
         this.ID_COLUMN = Objects.requireNonNull(ID_COLUMN);
+    }
 
+    public String getIdColumnName(){
+        return this.ID_COLUMN;
     }
 
     @Autowired
@@ -100,6 +103,24 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
     @Override
     public List<T> queryForList(String sql, Object... args) {
         return this.jdbcTemplate.query(sql, args, this.mapRow());
+    }
+
+    @Override
+    public List<T> findAll(Pageable pageable) {
+        if (pageable!=null){
+            return this.jdbcTemplate.query(this.buildPageableQuery(this.buildFindAllQuery(), pageable), this.mapRow());
+        } else {
+            return this.findAll();
+        }
+    }
+
+    @Override
+    public List<T> queryForList(String sql, Pageable pageable, Object... args) {
+        if (pageable!=null){
+            return this.jdbcTemplate.query(this.buildPageableQuery(sql, pageable), args, this.mapRow());
+        } else {
+            return this.queryForList(sql, args);
+        }
     }
 
     public JdbcTemplate getJdbcTemplate(){
@@ -173,6 +194,18 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
         columns.keySet().stream().forEachOrdered(key -> values.add(columns.get(key)));
         values.add(entity.getId());
         return values.toArray();
+    }
+
+    protected String buildPageableQuery(String sql, Pageable pageable){
+        Objects.requireNonNull(pageable);
+        StringBuilder query = new StringBuilder(sql);
+        if (!sql.toLowerCase().contains("order by")){
+            query.append(" ORDER BY ").append(ID_COLUMN);
+        }
+        return query.append(" LIMIT ")
+                .append(pageable.getPageSize())
+                .append(" OFFSET ")
+                .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
     }
 
     public abstract  Map<String, Object> mapColumns(T entity);

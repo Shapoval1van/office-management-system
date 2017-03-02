@@ -7,5 +7,7 @@ public interface NotificationSender {
 
     boolean sendInformationNotification(Person person);
 
+    boolean sendCustomInformationNotification(Person person);
+
     boolean sendRegistrationCompletedNotification(Person person, String link);
 }
