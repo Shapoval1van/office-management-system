@@ -94,3 +94,37 @@ INSERT INTO public.request (request_id, name, description, creation_time, status
   2,
   3
 );
+
+INSERT INTO public.change_group (change_group_id, created, author_id, request_id) VALUES
+(
+  2,
+  TIMESTAMP  '2017-02-24 00:59:02.184181',
+  2,
+  3
+);
+
+INSERT INTO public.change_group (change_group_id, created, author_id, request_id) VALUES
+(
+  3,
+  TIMESTAMP  '2017-02-24 00:59:02.184181',
+  2,
+  3
+);
+
+INSERT INTO public.change_item (change_item_id, old_value, new_value, change_group_id, field_id) VALUES
+(
+  1,
+  'old1',
+  'new1',
+  2,
+  3
+);
+
+INSERT INTO public.change_item (change_item_id, old_value, new_value, change_group_id, field_id) VALUES
+(
+  2,
+  'old2',
+  'new2',
+  2,
+  4
+);

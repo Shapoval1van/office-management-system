@@ -1,11 +1,10 @@
-package com.netcracker.repository.data;
+package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
-
+import com.netcracker.repository.data.RequestRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;

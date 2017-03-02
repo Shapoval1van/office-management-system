@@ -1,8 +1,9 @@
-package com.netcracker.repository.data;
+package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.data.PersonRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> implements PersonRepository{
+public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> implements PersonRepository {
 
     public static final String PERSON_ID_COLUMN = "person_id";
     public static final String FIRST_NAME_COLUMN = "first_name";
