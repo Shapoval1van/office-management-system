@@ -37,10 +37,10 @@
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
-                    .when("/requestDetails",{
-                        templateUrl: "static/page/request/details.html",
-                        controller: "RequestDetailsController"
-                    })
+                     .when("/request/:requestId/",{
+                         templateUrl: "/static/page/request/details.html",
+                         controller: "RequestDetailsController"
+                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

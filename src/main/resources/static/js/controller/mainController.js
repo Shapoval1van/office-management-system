@@ -6,7 +6,7 @@
         .controller("MainController", ["$scope", "$http", "$cookies",
             function ($scope, $http, $cookies) {
 
-                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset", "requestDetails"];
+                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
                 var redirectIfTokenExist = "/demo";
                 var loginPageUrl = "/login";
 
@@ -14,6 +14,7 @@
                     return anonymOnlyPages.some(function (anonymOnlyPage) {
                         return (~window.location.href.indexOf(anonymOnlyPage))
                     });
+                    return true;
                 };
 
                 if (isCurrentPageAnonymOnly()) {

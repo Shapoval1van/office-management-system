@@ -20,6 +20,10 @@
      margin: 8px 0px;
 }
 
+.hr-sect a:hover{
+    cursor:pointer;
+}
+
 .hr-sect::after {
      content: "";
      flex-grow: 1;
@@ -28,11 +32,6 @@
      font-size: 0px;
      line-height: 0px;
      margin: 0px 8px;
-}
-
-
-.center{
-     text-align:center;
 }
 
 .toggle-tittle{
@@ -45,4 +44,12 @@
 
 .additional-padding{
      padding-left: 30px;
+}
+
+.section-padding{
+    padding-top: 40px;
+}
+
+.bold{
+    font-weight: bold;
 }
