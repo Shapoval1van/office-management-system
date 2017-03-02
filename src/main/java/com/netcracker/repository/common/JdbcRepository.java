@@ -12,10 +12,12 @@ import java.util.Optional;
 public interface JdbcRepository<T extends Persistable<ID>, ID extends Number> {
     Optional<T> findOne(ID id);
     List<T> findAll();
+    List<T> findAll(Pageable pageable);
     Optional<T> save(T entity);
     void delete(ID id);
     void deleteAll();
     long count();
     Optional<T> queryForObject(String sql, Object... args);
     List<T> queryForList(String sql, Object... args);
+    List<T> queryForList(String sql, Pageable pageable, Object... args);
 }

@@ -2,8 +2,13 @@ package com.netcracker.model.entity;
 
 
 import com.netcracker.repository.common.Persistable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-public class Person implements Persistable<Long> {
+import java.util.Collection;
+import java.util.Collections;
+
+public class Person implements Persistable<Long>, UserDetails {
 
     public static final String TABLE_NAME = "PERSON";
     public static final String ID_COLUMN = "person_id";
@@ -57,8 +62,33 @@ public class Person implements Persistable<Long> {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(role);
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     public void setPassword(String password) {
@@ -73,11 +103,40 @@ public class Person implements Persistable<Long> {
         this.role = role;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Person person = (Person) o;
+
+        if (enabled != person.enabled) return false;
+        if (id != null ? !id.equals(person.id) : person.id != null) return false;
+        if (firstName != null ? !firstName.equals(person.firstName) : person.firstName != null) return false;
+        if (lastName != null ? !lastName.equals(person.lastName) : person.lastName != null) return false;
+        if (email != null ? !email.equals(person.email) : person.email != null) return false;
+        if (password != null ? !password.equals(person.password) : person.password != null) return false;
+        return role != null ? role.equals(person.role) : person.role == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (role != null ? role.hashCode() : 0);
+        result = 31 * result + (enabled ? 1 : 0);
+        return result;
     }
 }

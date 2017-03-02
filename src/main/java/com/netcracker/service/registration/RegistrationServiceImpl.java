@@ -5,12 +5,15 @@ import com.netcracker.exception.ResourceAlreadyExistsException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
-import com.netcracker.model.entity.VerificationToken;
+import com.netcracker.model.entity.Token;
+import com.netcracker.model.entity.TokenType;
+import com.netcracker.model.event.NewPasswordEvent;
+import com.netcracker.model.event.PersonRegistrationEvent;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.RoleRepository;
-import com.netcracker.repository.data.VerificationTokenRepository;
-import com.netcracker.service.notification.impls.NotificationService;
+import com.netcracker.repository.data.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +34,15 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
-    private VerificationTokenRepository verificationTokenRepository;
+    private TokenRepository tokenRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private NotificationService notificationService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
-    public VerificationToken registerPerson(Person person, String requestLink) throws Exception {
+    public Token registerPerson(Person person, String requestLink, String roleName) throws Exception {
 
         Optional<Person> savedOptional = this.personRepository.findPersonByEmail(person.getEmail());
 
@@ -47,15 +50,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             if (savedOptional.get().isEnabled()) {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
             } else {
-                Optional<VerificationToken> oldTokenOptional = this.verificationTokenRepository.findVerificationTokenByPerson(savedOptional.get().getId());
-                oldTokenOptional.ifPresent(verificationToken -> {
-                    verificationToken.setDateExpired(this.calculateDateExpired());
-                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,this.verificationTokenRepository.save(verificationToken), requestLink);
-                });
+                Optional<Token> oldTokenOptional = this.tokenRepository.findRegistrationTokenByPerson(savedOptional.get().getId());
+                if (oldTokenOptional.isPresent()) {
+                    oldTokenOptional.get().setDateExpired(this.calculateDateExpired());
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get(), this.tokenRepository.save(oldTokenOptional.get()), requestLink);
+                }
                 if (!oldTokenOptional.isPresent()) {
-                    VerificationToken verificationToken = this.createVerificationToken(savedOptional.get());
-                    Optional<VerificationToken> newTokenOptional = this.verificationTokenRepository.save(verificationToken);
-                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,newTokenOptional, requestLink);
+                    Token token = this.createVerificationToken(savedOptional.get());
+                    Optional<Token> newTokenOptional = this.tokenRepository.save(token);
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get(), newTokenOptional, requestLink);
                     return newTokenOptional.orElse(null);
                 }
                 return oldTokenOptional.get();
@@ -63,12 +66,17 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         person.setEnabled(false);
-        person.setRole(this.loadEmployeeRole());
+        person.setRole(this.loadRoleByName(roleName));
+        if (person.getRole() != null && (person.getRole().getId() == 2 || person.getRole().getName() == "ROLE_OFFICE MANAGER")) {
+            NewPasswordEvent newPasswordEvent = new NewPasswordEvent(person);
+            eventPublisher.publishEvent(newPasswordEvent);
+        }
         person.setPassword(passwordEncoder.encode(person.getPassword()));
+
         Optional<Person> personOptional = this.personRepository.save(person);
 
         if (personOptional.isPresent()) {
-            Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.save(this.createVerificationToken(person));
+            Optional<Token> verificationTokenOptional = this.tokenRepository.save(this.createVerificationToken(person));
             this.publishOnRegistrationCompleteEvent(personOptional.get(), verificationTokenOptional, requestLink);
             return verificationTokenOptional.orElse(null);
         } else return null;
@@ -78,7 +86,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public Person confirmEmail(String token) throws BadEmployeeException, ResourceNotFoundException {
 
-        VerificationToken verificationToken = this.verificationTokenRepository.findVerificationTokenByValueAndExpiredDate(token)
+        Token verificationToken = this.tokenRepository.findTokenByValueAndExpiredDate(token)
                 .orElseThrow(() -> new BadEmployeeException(token));
 
         Person person = personRepository.findOne(verificationToken.getPerson().getId())
@@ -89,17 +97,18 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
 
-    private Role loadEmployeeRole() throws ResourceNotFoundException {
-        return this.roleRepository.findRoleByName(Role.ROLE_EMPLOYEE)
+    private Role loadRoleByName(String roleName) throws ResourceNotFoundException {
+        return this.roleRepository.findRoleByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException(Role.TABLE_NAME));
     }
 
-    private VerificationToken createVerificationToken(Person person){
-        VerificationToken verificationToken = new VerificationToken();
-        verificationToken.setToken(this.generateToken());
-        verificationToken.setDateExpired(this.calculateDateExpired());
-        verificationToken.setPerson(person);
-        return verificationToken;
+    private Token createVerificationToken(Person person) {
+        Token token = new Token();
+        token.setTokenValue(this.generateToken());
+        token.setDateExpired(this.calculateDateExpired());
+        token.setTokenType(TokenType.REGISTRATION);
+        token.setPerson(person);
+        return token;
     }
 
     private Date calculateDateExpired() {
@@ -109,13 +118,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         return new Date(cal.getTime().getTime());
     }
 
-    private String generateToken(){
+    private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    private void publishOnRegistrationCompleteEvent(Person person, Optional<VerificationToken> verificationToken, String requestLink){
-        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
-        notificationService.sendRegistrationCompletedNotification(person,
-                SITE_LINK.concat("/").concat(verificationToken.get().getToken()));
+    private void publishOnRegistrationCompleteEvent(Person person, Optional<Token> verificationToken, String requestLink) {
+        verificationToken.ifPresent((token) -> {
+            PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
+            eventPublisher.publishEvent(event);
+        });
+
     }
 }

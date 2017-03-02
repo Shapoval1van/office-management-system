@@ -6,7 +6,8 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.dto.RegistrationMessageDTO;
 import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.VerificationToken;
+import com.netcracker.model.entity.Role;
+import com.netcracker.model.entity.Token;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.service.registration.RegistrationService;
@@ -29,11 +30,29 @@ public class RegistrationController {
 
     @PostMapping(produces = JSON_MEDIA_TYPE)
     @ResponseStatus(HttpStatus.OK)
-    public RegistrationMessageDTO registerPerson(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
-                                                 HttpServletRequest request) throws Exception {
+    public RegistrationMessageDTO registerEmployee(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
+                                                   HttpServletRequest request) throws Exception {
         Person person = personDTO.toPerson();
-        VerificationToken verificationToken = registrationService.registerPerson(person, this.buildRequestLink(request));
-        return new RegistrationMessageDTO(person.getEmail(), verificationToken.getDateExpired());
+        Token token = registrationService.registerPerson(person, this.buildRequestLink(request), Role.ROLE_EMPLOYEE);
+        return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
+    }
+
+    @PostMapping(value = "/create_administrator", produces = JSON_MEDIA_TYPE)
+    @ResponseStatus(HttpStatus.OK)
+    public RegistrationMessageDTO registerAdministrator(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
+                                                        HttpServletRequest request) throws Exception {
+        Person person = personDTO.toPerson();
+        Token token = registrationService.registerPerson(person, this.buildRequestLink(request), Role.ROLE_ADMINISTRATOR);
+        return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
+    }
+
+    @PostMapping(value = "/create_office_manager", produces = JSON_MEDIA_TYPE)
+    @ResponseStatus(HttpStatus.OK)
+    public RegistrationMessageDTO registerOfficeManager(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
+                                                        HttpServletRequest request) throws Exception {
+        Person person = personDTO.toPerson();
+        Token token = registrationService.registerPerson(person, this.buildRequestLink(request), Role.ROLE_OFFICE_MANAGER);
+        return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }
 
     @JsonView(View.Public.class)

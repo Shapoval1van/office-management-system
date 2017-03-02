@@ -1,0 +1,70 @@
+#description{
+    width: 100%;
+}
+
+#calendar{
+    width: 60%;
+}
+
+#timepicker{
+    width: 40%;
+    float: left;
+}
+
+.form-control_offset{
+    margin-top: 20px!important;
+}
+
+.request-name-incorrect{
+    position: relative;
+}
+
+.request-name-incorrect::after{
+    content: "Request name must contain at least 3 letters and start with capital letter!";
+    color: #ff6464;
+    font-size: 15px;
+    position: absolute;
+    top: 40px;
+    left: 0;
+}
+
+.status-group{
+    margin-bottom: 20px;
+}
+.status-text-wrapper{
+    display: block;
+    cursor: pointer;
+    margin: 10px 0;
+}
+.status-dropdown i{
+    margin-left: 10px;
+}
+.status-text-wrapper-outer{
+    display: none;
+}
+.status-text-wrapper-inner{
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: inline-block;
+    border: 1px solid #000;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2)
+}
+.status-text-wrapper{
+    color: #286090;
+}
+.status-text-wrapper input{
+    margin-right: 10px;
+}
+.status-text-wrapper_inprogress{
+    color: #00cc00;
+}
+.status-text-wrapper_closed{
+    color: #ef0000;
+}
+.status-text-wrapper_reopen{
+    color: #6255ff;
+}
+
+
+
+

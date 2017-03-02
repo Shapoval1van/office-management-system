@@ -14,14 +14,23 @@ import org.springframework.stereotype.Service;
 public class NotificationService implements NotificationSender {
     @Value("${password.reminder.subject}")
     private String PASSWORD_REMINDER_SUBJECT;
-    @Value("${password.reminder}")
-    private String PASSWORD_REMINDER_TEXT;
     @Value("${information.message.subject}")
     private String INFORMATION_MESSAGE_SUBJECT;
     @Value("${registration.message.subject}")
     private String REGISTRATION_MESSAGE_SUBJECT;
-    @Value("${registration.message.text}")
-    private String REGISTRATION_MESSAGE;
+    @Value("${custom.information.message.subject}")
+    private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
+
+    @Value("${password.reminder.message.src}")
+    private String PASSWORD_REMINDER_MESSAGE_SRC;
+    @Value("${information.message.src}")
+    private String INFORMATION_MESSAGE_SRC;
+    @Value("${custom.information.message.src}")
+    private String CUSTOM_INFORMATION_MESSAGE_SRC;
+    @Value("${registration.message.src}")
+    private String REGISTRATION_MESSAGE_SRC;
+
+
 
     @Autowired
     private MailService mailService;
@@ -29,7 +38,7 @@ public class NotificationService implements NotificationSender {
     public boolean sendPasswordReminder(Person person, String link) {
         return mailService.send(person.getEmail(), PASSWORD_REMINDER_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(PASSWORD_REMINDER_TEXT)
+                .setNotificationText(PASSWORD_REMINDER_MESSAGE_SRC)
                 .setNotificationLink(link)
                 .build()
                 .toString());
@@ -38,7 +47,15 @@ public class NotificationService implements NotificationSender {
     public boolean sendInformationNotification(Person person) {
         return mailService.send(person.getEmail(), INFORMATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText("SOME INFO TEXT") // TODO notify about request status changed
+                .setNotificationText(INFORMATION_MESSAGE_SRC)
+                .build()
+                .toString());
+    }
+
+    public boolean sendCustomInformationNotification(Person person) {
+        return mailService.send(person.getEmail(), CUSTOM_INFORMATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
+                .setNotificationRecipientName(person.getFirstName())
+                .setNotificationText(CUSTOM_INFORMATION_MESSAGE_SRC)
                 .build()
                 .toString());
     }
@@ -46,8 +63,17 @@ public class NotificationService implements NotificationSender {
     public boolean sendRegistrationCompletedNotification(Person person, String link) {
         return mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
                 .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(REGISTRATION_MESSAGE)
+                .setNotificationText(REGISTRATION_MESSAGE_SRC)
                 .setNotificationLink(link)
+                .build()
+                .toString());
+    }
+
+    @Override
+    public boolean sendPasswordForNewManager(Person person) {
+        return  mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
+                .setNotificationRecipientName(person.getFirstName())
+                .setNotificationText(", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword())
                 .build()
                 .toString());
     }
