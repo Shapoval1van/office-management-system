@@ -13,8 +13,9 @@
                         }, function (callback) {
                             console.log(callback)
                         })
-                }
+                };
 
+                $scope.getRequestCredential();
 
                 $scope.requestNameCheck = function () {
                     var nameValue = $scope.requestCredentials.name,
@@ -36,7 +37,10 @@
 
                 $scope.sendRequestCredentials = function () {
                     $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
-                    $http.post("/api/request/" + reguestId + "/update?/", $scope.requestCredentials)
+                    $scope.requestCredentials.status = $scope.requestCredentials.status.id;
+                    $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
+                    $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
+                    $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
                         }, function (callback) {
