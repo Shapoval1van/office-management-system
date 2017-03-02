@@ -19,7 +19,7 @@ public class PersonDTO {
     @JsonView(View.Public.class)
     private Long id;
     @JsonView(View.Public.class)
-    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String firstName;
     @JsonView(View.Public.class)
     @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})

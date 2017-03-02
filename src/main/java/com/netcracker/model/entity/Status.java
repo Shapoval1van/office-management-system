@@ -16,6 +16,11 @@ public class Status implements Persistable<Integer> {
         this.id = id;
     }
 
+    public Status(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     @Override
     public Integer getId() {
         return id;

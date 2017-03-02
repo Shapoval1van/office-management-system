@@ -1,0 +1,89 @@
+<section class = "main-form" ng-cloak="">
+    <div class = "container">
+        <div class = "row">
+            <form name = "updateRequestForm">
+                <div ng-controller = "UpdateRequestController">
+                    <div class = "col-md-offset-3 col-md-6">
+                        <div id = "request-name-input-group" class = "input-group login-input">
+                            <span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>
+                            <input type = "text" class = "form-control" placeholder = "Request name" ng-model="requestCredentials.name" ng-blur="requestNameCheck()" required>
+                        </div>
+                    </div>
+                    <div class = "col-md-offset-3 col-md-6">
+                        <div id="request-description-field" class = "input-group login-input">
+                            <span class = "input-group-addon"><i class = "fa fa-file-text-o" aria-hidden="true"></i></span>
+                            <textarea id = "description" class = "form-control" ng-model="requestCredentials.description" placeholder="Description"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-3 col-md-6" ng-controller="DatepickerPopupCtrl">
+                        <div class="input-group login-input date" id='datetimepicker1'>
+                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                            <input type='text' class="form-control"/>
+                        </div>
+                    </div>
+
+                    <div class = "col-md-offset-3 col-md-6">
+                        <div id = "request-manager-input-group" class = "input-group login-input">
+                            <span class = "input-group-addon"><i class = "fa fa-user" aria-hidden="true"></i></span>
+                            <input type = "text" class = "form-control" placeholder = "Manager name" ng-model="requestCredentials.manager.name">
+                        </div>
+                    </div>
+
+                    <div class = "col-md-offset-3 col-md-6">
+                        <div id = "request-group-input-group" class = "input-group login-input">
+                            <span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>
+                            <input type = "text" class = "form-control" placeholder = "Group name" ng-model="requestCredentials.group.name">
+                        </div>
+                    </div>
+
+                    <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
+                        <div class = "input-group"><label>Priority:</label></div>
+                        <div class="btn-group input-group login-input">
+                            <label id="low-priority" class="btn" ng-model="requestCredentials.priority"
+                                   ng-class = "{ 'btn-success': requestCredentials.priority == '3', 'btn-info': requestCredentials.priority != '3'}"
+                                   uib-btn-radio="'3'" uib-uncheckable="uncheckable">Low</label>
+                            <label id="normal-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'2'"
+                                   ng-class = "{ 'btn-warning': requestCredentials.priority == '2', 'btn-info': requestCredentials.priority != '2'}"
+                                   uib-uncheckable="uncheckable">Normal</label>
+                            <label id="high-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'1'"
+                                   ng-class = "{ 'btn-danger': requestCredentials.priority == '1', 'btn-info': requestCredentials.priority != '1'}"
+                                   uib-uncheckable="uncheckable">High</label>
+                        </div>
+                    </div>
+
+                <div class="col-md-offset-3 col-md-6">
+                    <div class="status-group">
+                        <span id="status-dropdown" class="status-dropdown btn btn-primary" ng-click="statusDropdown()">Status List<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                        <div class="status-text-wrapper-outer">
+                        <span class="status-text-wrapper-inner">
+                            <label class="status-text-wrapper status-text-wrapper_free">
+                                <input type="radio" name="status" value="free" checked>Free
+                            </label>
+                            <label class="status-text-wrapper status-text-wrapper_inprogress">
+                                <input type="radio" name="status" value="inprogress">In Progress
+                            </label>
+                            <label class="status-text-wrapper status-text-wrapper_closed">
+                                <input type="radio" name="status" value="closed">Closed
+                            </label>
+                            <label class="status-text-wrapper status-text-wrapper_reopen">
+                                <input type="radio" name="status" value="reopen">Reopen
+                            </label>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                    <div class = "col-md-offset-3 col-md-6">
+                        <input type = "submit" class = "btn btn-default login-btn" ng-click="sendRequestCredentials()" value="Update">
+                    </div>
+                    <div class = "col-md-offset-3 col-md-6">
+                        <a href = "/" type = "button" class = "btn btn-default login-btn">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
