@@ -3,6 +3,7 @@ package com.netcracker.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.*;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.RequestAssignDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
@@ -122,31 +123,15 @@ public class RequestController {
         return ResponseEntity.ok("Request deleted");
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest/{requestId}")
-    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestAssignDTO requestAssignDTO,
                                            Principal principal){
         try{
-            Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
-            if (person.isPresent()){
-                requestService.assignRequest(requestId, person.get());
-            } else {
-                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
-                // TODO log
-            }
-        } catch (CannotAssignRequestException e){
-            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
-        }
+            Optional<Person> person = Optional.ofNullable(personRepository.findOne(requestAssignDTO.getPersonId())
+                    .orElse((personRepository.findPersonByEmail(principal.getName()).get())));
 
-        return ResponseEntity.ok("Assigned");
-    }
-
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest/{requestId}/to/{personId}")
-    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
-                                           @PathVariable Long personId){
-        try{
-            Optional<Person> person = personRepository.findOne(personId);
             if (person.isPresent()){
-                requestService.assignRequest(requestId, person.get());
+                requestService.assignRequest(requestAssignDTO.getRequestId(), person.get());
             } else {
                 return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
                 // TODO log

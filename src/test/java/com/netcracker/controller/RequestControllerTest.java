@@ -1,5 +1,6 @@
 package com.netcracker.controller;
 
+import com.netcracker.model.dto.RequestAssignDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.repository.data.RequestRepository;
 import org.junit.Before;
@@ -147,15 +148,13 @@ public class RequestControllerTest {
 
     @Test
     public void successRequestAssign() throws Exception {
-        mockMvc.perform(post("/api/request/assignRequest/4")
-                .principal(principal)
-                .contentType(contentType))
-                .andExpect(status().isOk());
-    }
+        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
+        requestAssignDTO.setRequestId(4L);
+        requestAssignDTO.setPersonId(2L);
 
-    @Test
-    public void successRequestAssignToPerson() throws Exception {
-        mockMvc.perform(post("/api/request/assignRequest/4/to/2")
+        mockMvc.perform(post("/api/request/assignRequest")
+                .principal(principal)
+                .content(this.json(requestAssignDTO))
                 .contentType(contentType))
                 .andExpect(status().isOk());
     }
