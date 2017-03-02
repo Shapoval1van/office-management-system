@@ -42,6 +42,10 @@
                         controller: "UpdateRequestController"
                             ///request/:requestId/
                     })
+                     .when("/request/:requestId/",{
+                         templateUrl: "/static/page/request/details.html",
+                         controller: "RequestDetailsController"
+                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
