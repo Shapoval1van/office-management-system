@@ -9,6 +9,7 @@
                 $scope.comment = "";
 
                 var requestId = $routeParams.requestId;
+                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
                 CommentService.initialize(requestId);
 
@@ -31,7 +32,7 @@
                 $scope.sendComment = function () {
                     $http.post("/api/comment/", {
                         body: $scope.comment,
-                        author: 33,
+                        author: currentUser.id,
                         request: requestId
                     }).then(function () {
                         $scope.comment = "";

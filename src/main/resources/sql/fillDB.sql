@@ -60,7 +60,7 @@ BEGIN
         CONCAT('Request ', TO_CHAR(i, '999')),
         CONCAT('I want ', TO_CHAR(i, '999'), ' cup of coffee'),
         current_timestamp + INTERVAL '1 hour',
-        i % 5 + 1,
+        i % 4 + 1,
         i % 10 + 1,
         i % 3 + 1
       );
