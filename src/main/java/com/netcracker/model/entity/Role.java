@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 public class Role implements Persistable<Integer>, GrantedAuthority {
 
     public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
+    public static final String ROLE_ADMINISTRATOR = "ROLE_ADMINISTRATOR";
+    public static final String ROLE_OFFICE_MANAGER = "ROLE_OFFICE MANAGER";
 
     public static final String TABLE_NAME = "ROLE";
     public static final String ID_COLUMN = "role_id";

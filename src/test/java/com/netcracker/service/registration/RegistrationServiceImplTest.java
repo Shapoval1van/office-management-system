@@ -43,7 +43,7 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        Token token = service.registerPerson(person, REQUEST_LINK);
+        Token token = service.registerPerson(person, REQUEST_LINK , Role.ROLE_EMPLOYEE);
 
         assertNotNull(token);
         assertNotNull(token.getId());
@@ -62,7 +62,7 @@ public class RegistrationServiceImplTest {
         person.setRole(new Role(ROLE_ID));
         person.setEnabled(false);
 
-        Token token = service.registerPerson(person, REQUEST_LINK);
+        Token token = service.registerPerson(person, REQUEST_LINK, Role.ROLE_EMPLOYEE);
 
         assertTrue(Calendar.getInstance().getTime().before(token.getDateExpired()));
     }
@@ -71,7 +71,7 @@ public class RegistrationServiceImplTest {
     public void ifEmployeeAlreadyRegisteredAndEnabledThenThrowException() throws Exception {
         Person person = new Person();
         person.setEmail(ENABLED_EMPLOYEE_EMAIL);
-        service.registerPerson(person, REQUEST_LINK);
+        service.registerPerson(person, REQUEST_LINK, Role.ROLE_EMPLOYEE);
     }
 
     @Test

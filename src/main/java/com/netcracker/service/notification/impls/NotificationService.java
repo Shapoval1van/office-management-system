@@ -68,4 +68,13 @@ public class NotificationService implements NotificationSender {
                 .build()
                 .toString());
     }
+
+    @Override
+    public boolean sendPasswordForNewManager(Person person) {
+        return  mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
+                .setNotificationRecipientName(person.getFirstName())
+                .setNotificationText(", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword())
+                .build()
+                .toString());
+    }
 }

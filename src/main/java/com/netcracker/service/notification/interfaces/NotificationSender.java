@@ -10,4 +10,6 @@ public interface NotificationSender {
     boolean sendCustomInformationNotification(Person person);
 
     boolean sendRegistrationCompletedNotification(Person person, String link);
+
+    boolean sendPasswordForNewManager(Person person);
 }
