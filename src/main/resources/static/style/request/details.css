@@ -53,3 +53,7 @@
 .bold{
     font-weight: bold;
 }
+
+#comment-wrapper {
+     overflow: scroll;
+}

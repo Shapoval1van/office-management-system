@@ -8,7 +8,7 @@
             <div class="col-md-offset-1">
                 <h1 class="title-text">{{request.name}}</h1>
             </div>
-            <div class="col-md-offset-1 col-md-7" id="accordion">
+            <div class="col-md-offset-1 col-md-5" id="accordion">
                 <div class="row toggle-border">
                     <h4 class="title-text hr-sect">
                         <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseDetails">
@@ -19,7 +19,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <ul class="ul-decoration">
-                                    <li><span class="bold">Author:</span> <a ng-ref="#">{{request.employee.firstName +
+                                    <li><span class="bold">Author:</span> <a ng-href="#">{{request.employee.firstName +
                                         data.employee.lastName}}</a></li>
                                     <li><span class="bold">Created:</span> {{creationTime}}</li>
                                     <li><span class="bold">Priority:</span> {{request.priority.name}}</li>
@@ -28,7 +28,9 @@
                             <div class="col-md-offset-1 col-md-4 border">
                                 <ul class="ul-decoration">
                                     <li><span class="bold">Status:</span> {{request.status.name}}</li>
-                                    <li><span class="bold">Estimate:</span> {{request.estimate}}</li>
+                                    <li><span class="bold">Estimate:</span> {{request.estimate | date : "dd.MM.yyyy
+                                        HH:mm"}}
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -80,7 +82,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 additional-padding" id="accordion1">
+            <div class="col-md-6 additional-padding" id="accordion1">
                 <div class="row toggle-border">
                     <h4 class="title-text hr-sect">
                         <a data-toggle="collapse" data-parent="#accordion" data-target="#collapsePerson">
@@ -98,6 +100,44 @@
                         </div>
                         <div ng-if="request.manager==null">
                             Managers don't work on this task
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="col-md-6" id="comment-wrapper">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="comment">Your comment:</label>
+                                        <textarea placeholder="Write comment here" ng-model="comment" id="comment"
+                                                  class="form-control" ng-keypress="sendOnEnterKey($event)"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12" ng-repeat="comment in comments | orderBy: comment.publishDate: true">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><b>{{comment.publishDate | date: "d-MM-yyyy HH:mm"}}</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                <!--TODO Write user name and surname here-->
+                                <p>
+                                    <b>{{getUserName(comment.author.id)}}</b>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>
+                                    {{comment.body}}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

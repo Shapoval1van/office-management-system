@@ -34,7 +34,7 @@ public class CommentController {
         commentDTO.setPublishDate(new Date());
         Comment comment = commentDTO.toComment();
         commentRepository.save(comment);
-        simpMessagingTemplate.convertAndSend("/topic/request/" + commentDTO.getRequest(), commentDTO);
+        simpMessagingTemplate.convertAndSend("/topic/request/" + commentDTO.getRequest(), comment);
     }
 
     @GetMapping("/request/{requestId}")
