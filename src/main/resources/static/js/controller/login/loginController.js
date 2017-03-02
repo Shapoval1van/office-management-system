@@ -33,7 +33,7 @@
                 $scope.sendPersonCredentials = function () {
                     var req = {
                         method: 'POST',
-                        url: "https://management-office.herokuapp.com/:8080/oauth/token",
+                        url: "https://management-office.herokuapp.com/oauth/token",
                         headers: {
                             "Authorization": "Basic " + encoded,
                             "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
