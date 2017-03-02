@@ -3,7 +3,12 @@
         .controller("DatepickerPopupCtrl", ["$scope", "$http",
             function ($scope) {
 
-            $('#datetimepicker1').datetimepicker();
+            var nowDate = new Date();
+            var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0)
+
+            $('#datetimepicker1').datetimepicker({
+                minDate: new Date()
+            });
 
         }]);
 })();
