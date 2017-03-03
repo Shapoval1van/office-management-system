@@ -6,6 +6,7 @@ DELETE FROM REQUEST_GROUP;
 DELETE FROM ROLE;
 DELETE FROM STATUS;
 DELETE FROM PRIORITY;
+DELETE FROM COMMENT;
 
 INSERT INTO public.role (role_id, name) VALUES
   (1, 'ROLE_ADMINISTRATOR'),
@@ -96,5 +97,5 @@ INSERT INTO public.request (request_id, name, description, creation_time, status
 );
 
 
-INSERT INTO comment(comment_id, body, request_id, author_id, publish_date) VALUES
+INSERT INTO public.comment(comment_id, body, request_id, author_id, publish_date) VALUES
 (1, 'Body', 1, 2, '2017-01-01 00:00:00.000000');

@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -52,11 +53,20 @@ public class CommentRepositoryTest {
     @Test
     @Transactional
     @Rollback
-    public void saveTest() throws ResourceNotFoundException {
+    public void saveTest() {
         comment.setId(null);
         comment = commentRepository.save(comment).get();
         Comment comment = commentRepository.findOne(this.comment.getId()).get();
         Assert.assertEquals(comment, this.comment);
 
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getCommentsByRequestIdTest() {
+        List<Comment> comments = commentRepository.findCommentByRequestId(1L);
+        Comment comment = comments.get(0);
+        Assert.assertEquals(comment, this.comment);
     }
 }
