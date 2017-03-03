@@ -8,8 +8,12 @@
                     url:'/api/request/'+$routeParams.requestId
                 }).then(function successCallback(response) {
                     $scope.request = response.data;
-                    $scope.creationTime = new Date(response.data.creationTime).toLocaleDateString("nl",{year:"2-digit",month:"2-digit", day:"2-digit"});
-                },function errorCallback(response) {
+                    $scope.creationTime = new Date(response.data.creationTime).toLocaleDateString("nl", {
+                        year: "2-digit",
+                        month: "2-digit",
+                        day: "2-digit"
+                    });
+                }, function errorCallback(response) {
 
                 });
                 $http({

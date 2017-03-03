@@ -1,15 +1,32 @@
 package com.netcracker.model.notification;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+
+import java.io.StringWriter;
+
 public class Notification {
+
+    private  VelocityEngine engine = new VelocityEngine();
+    private  StringWriter writer = new StringWriter();
+    private Template template;
+    private VelocityContext context;
+
+    private String doneText;
     private String recipientName;
     private String text;
     private String link;
 
     private Notification() {
+        engine.init();
         recipientName = "";
         text = "";
         link = "";
+        context = new VelocityContext();
     }
+
+
 
     public static Builder newNotificationBuilder() {
         return new Notification().new Builder();
@@ -30,6 +47,7 @@ public class Notification {
             return this;
         }
 
+
         public Builder setNotificationLink(String link) {
             Notification.this.link = link;
             return this;
@@ -41,7 +59,15 @@ public class Notification {
 
     }
 
+    @Override
     public String toString() {
-        return recipientName + text + link;
+        template = engine.getTemplate(text);
+        context.put("name",recipientName);
+        if(!link.equals("")) {
+            context.put("link", link);
+        }
+        template.merge(context,writer);
+        doneText = writer.toString();
+        return doneText;
     }
 }

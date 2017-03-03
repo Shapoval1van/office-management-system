@@ -33,6 +33,10 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
+                    .when("/comment/:requestId", {
+                        templateUrl: "/static/page/test/test-comment.html",
+                        controller: "CommentController"
+                    })
                     .when("/newRequest", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"

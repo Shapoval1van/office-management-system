@@ -128,3 +128,6 @@ INSERT INTO public.change_item (change_item_id, old_value, new_value, change_gro
   2,
   4
 );
+
+INSERT INTO comment(comment_id, body, request_id, author_id, publish_date) VALUES
+(1, 'Body', 1, 2, '2017-01-01 00:00:00.000000');

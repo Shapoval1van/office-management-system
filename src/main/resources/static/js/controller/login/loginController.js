@@ -48,6 +48,16 @@
                             expires: cookiesExpirationDate
                         });
 
+                        var currentUser = {
+                            firstName: callback.data.firstName,
+                            lastName: callback.data.lastName,
+                            id: callback.data.id,
+                            role: callback.data.type,
+                            email: callback.data.email
+                        };
+
+                        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
                         window.location.reload();
                     }, function (callback) {
                         console.log("Error");
