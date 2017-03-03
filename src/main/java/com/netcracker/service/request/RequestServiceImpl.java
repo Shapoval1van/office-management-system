@@ -1,9 +1,6 @@
 package com.netcracker.service.request;
 
-import com.netcracker.exception.CannotCreateRequestException;
-import com.netcracker.exception.CannotCreateSubRequestException;
-import com.netcracker.exception.CannotDeleteRequestException;
-import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.*;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +31,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private PriorityRepository priorityRepository;
+
+    @Autowired
+    private PersonRepository personRepository;
 
     @Override
     public Optional<Request> getRequestById(Long id) {
@@ -116,6 +117,20 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public int changeRequestStatus(Request request, Status status) {
         return requestRepository.changeRequestStatus(request, status);
+    }
+
+    @Override
+    public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
+        Request request = getRequestById(requestId).get();
+        Optional<Person> person = Optional.ofNullable(personRepository.findOne(personId)
+                .orElse((personRepository.findPersonByEmail(principal.getName()).get())));
+
+        if (request.getManager() == null) {
+            requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            return true;
+        }
+
+        throw new CannotAssignRequestException("Request is already assigned");
     }
 
     private void fillRequest(Request request) {

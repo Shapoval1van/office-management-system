@@ -1,11 +1,9 @@
 package com.netcracker.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.exception.CannotCreateRequestException;
-import com.netcracker.exception.CannotCreateSubRequestException;
-import com.netcracker.exception.CannotDeleteRequestException;
-import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.*;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.RequestAssignDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
@@ -154,4 +152,17 @@ public class RequestController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestAssignDTO requestAssignDTO,
+                                           Principal principal){
+        try{
+                requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
+        } catch (CannotAssignRequestException e){
+            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Assigned");
+    }
+
 }

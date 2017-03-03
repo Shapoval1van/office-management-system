@@ -95,5 +95,6 @@ INSERT INTO public.request (request_id, name, description, creation_time, status
   3
 );
 
+
 INSERT INTO comment(comment_id, body, request_id, author_id, publish_date) VALUES
 (1, 'Body', 1, 2, '2017-01-01 00:00:00.000000');
