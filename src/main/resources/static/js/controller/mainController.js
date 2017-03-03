@@ -29,6 +29,7 @@
 
                 $scope.logout = function () {
                     $cookies.remove("access_token");
+                    localStorage.removeItem("currentUser");
                     window.location.reload();
                 }
             }])

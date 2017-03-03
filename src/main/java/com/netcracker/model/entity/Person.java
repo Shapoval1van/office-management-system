@@ -2,8 +2,13 @@ package com.netcracker.model.entity;
 
 
 import com.netcracker.repository.common.Persistable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-public class Person implements Persistable<Long> {
+import java.util.Collection;
+import java.util.Collections;
+
+public class Person implements Persistable<Long>, UserDetails {
 
     public static final String TABLE_NAME = "PERSON";
     public static final String ID_COLUMN = "person_id";
@@ -57,8 +62,33 @@ public class Person implements Persistable<Long> {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(role);
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     public void setPassword(String password) {
@@ -73,6 +103,7 @@ public class Person implements Persistable<Long> {
         this.role = role;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }

@@ -10,6 +10,9 @@ import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.data.PersonRepository;
+import com.netcracker.repository.data.PriorityRepository;
+import com.netcracker.repository.data.RequestGroupRepository;
+import com.netcracker.repository.data.StatusRepository;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,15 @@ public class RequestController {
 
     @Autowired
     PersonRepository personRepository;
+
+    @Autowired
+    PriorityRepository priorityRepository;
+
+    @Autowired
+    StatusRepository statusRepository;
+
+    @Autowired
+    RequestGroupRepository requestGroupRepository;
 
     private static final String JSON_MEDIA_TYPE = "application/json;";
 
@@ -100,27 +112,45 @@ public class RequestController {
         return ResponseEntity.ok("Added");
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/updateRequest/{requestId}")
-    public ResponseEntity<?> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
-        try {
-            Request request = requestService.getRequestById(requestId).get();
-            requestService.updateRequest(request);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
+    public ResponseEntity<Request> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
+                                           @RequestBody RequestDTO requestDTO) {
+        Request currentRequest = requestService.getRequestById(requestId).get();
+        if (currentRequest==null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.ok("Request updated");
+        currentRequest.setName(requestDTO.getName());
+        currentRequest.setDescription(requestDTO.getDescription());
+        currentRequest.setCreationTime(requestDTO.getCreationTime());
+        if (requestDTO.getEstimate()!=null)
+            currentRequest.setEstimate(requestDTO.getEstimate());
+        currentRequest.setEmployee(personRepository.findOne(requestDTO.getEmployee()).get());
+        if (requestDTO.getManager()!=null)
+            currentRequest.setManager(personRepository.findOne(requestDTO.getManager()).get());
+        currentRequest.setPriority(priorityRepository.findOne(requestDTO.getPriority()).get());
+        currentRequest.setStatus(statusRepository.findOne(requestDTO.getStatus()).get());
+        if (requestDTO.getRequestGroup()!=null)
+            currentRequest.setRequestGroup(requestGroupRepository.findOne(requestDTO.getRequestGroup()).get());
+        if (requestDTO.getParent()!=null)
+            currentRequest.setParent(requestService.getRequestById(requestDTO.getParent()).get());
+
+        requestService.updateRequest(currentRequest);
+
+        return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/deleteRequest/{requestId}")
-    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
+    @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/delete")
+    public ResponseEntity<Request> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
         try {
+            Request request = requestService.getRequestById(requestId).get();
+            if (request==null)
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             requestService.deleteRequestById(requestId);
         } catch (CannotDeleteRequestException | ResourceNotFoundException e) {
-            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok("Request deleted");
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")

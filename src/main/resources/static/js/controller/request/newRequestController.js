@@ -2,21 +2,23 @@
     angular.module("OfficeManagementSystem")
         .controller("NewRequestController", ["$scope", "$http",
             function ($scope, $http) {
-                $scope.requestCredentials = {};
+                $scope.requestCredentials = {
+                    priority:'2'
+                };
 
                 $scope.requestNameCheck = function () {
                     var nameValue = $scope.requestCredentials.name,
-                        regExp = /^[A-Z][a-zA-Z\d]{3,50}$/;
+                        regExp = /^[A-Z][a-zA-Z\d\s]{2,50}$/;
 
                     if (nameValue){
                         var lookFor = nameValue.search(regExp);
 
                         if (lookFor == -1){
                             $("#request-name-input-group").addClass("request-name-incorrect");
-                            $("#request-name-input-group").addClass("form-control_offset");
+                            $("#request-description-field").addClass("form-control_offset");
                         }else{
                             $("#request-name-input-group").removeClass("request-name-incorrect");
-                            $("#request-name-input-group").removeClass("form-control_offset");
+                            $("#request-description-field").removeClass("form-control_offset");
                         }
 
                     }

@@ -33,7 +33,7 @@
                 $scope.sendPersonCredentials = function () {
                     var req = {
                         method: 'POST',
-                        url: "https://management-office.herokuapp.com/oauth/token",
+                        url: "https://management-office.herokuapp.com/:8080/oauth/token",
                         headers: {
                             "Authorization": "Basic " + encoded,
                             "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
@@ -47,6 +47,16 @@
                         $cookies.put("access_token", callback.data.access_token, {
                             expires: cookiesExpirationDate
                         });
+
+                        var currentUser = {
+                            firstName: callback.data.firstName,
+                            lastName: callback.data.lastName,
+                            id: callback.data.id,
+                            role: callback.data.type,
+                            email: callback.data.email
+                        };
+
+                        localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
                         window.location.reload();
                     }, function (callback) {

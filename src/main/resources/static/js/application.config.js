@@ -33,10 +33,23 @@
                         templateUrl: "/static/page/demo/secured.html",
                         controller: "DemoController"
                     })
+                    .when("/comment/:requestId", {
+                        templateUrl: "/static/page/test/test-comment.html",
+                        controller: "CommentController"
+                    })
                     .when("/newRequest", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
+                    .when("/request/:requestId/update", {
+                        templateUrl: "/static/page/request/update-request-page.html",
+                        controller: "UpdateRequestController"
+                            ///request/:requestId/
+                    })
+                     .when("/request/:requestId/",{
+                         templateUrl: "/static/page/request/details.html",
+                         controller: "RequestDetailsController"
+                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

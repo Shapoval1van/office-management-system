@@ -7,6 +7,7 @@ import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.entity.Token;
 import com.netcracker.model.entity.TokenType;
+import com.netcracker.model.event.NewPasswordEvent;
 import com.netcracker.model.event.PersonRegistrationEvent;
 import com.netcracker.repository.data.PersonRepository;
 import com.netcracker.repository.data.RoleRepository;
@@ -41,7 +42,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     @Override
-    public Token registerPerson(Person person, String requestLink) throws Exception {
+    public Token registerPerson(Person person, String requestLink, String roleName) throws Exception {
 
         Optional<Person> savedOptional = this.personRepository.findPersonByEmail(person.getEmail());
 
@@ -50,14 +51,14 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
             } else {
                 Optional<Token> oldTokenOptional = this.tokenRepository.findRegistrationTokenByPerson(savedOptional.get().getId());
-                if(oldTokenOptional.isPresent()){
+                if (oldTokenOptional.isPresent()) {
                     oldTokenOptional.get().setDateExpired(this.calculateDateExpired());
-                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,this.tokenRepository.save(oldTokenOptional.get()), requestLink);
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get(), this.tokenRepository.save(oldTokenOptional.get()), requestLink);
                 }
                 if (!oldTokenOptional.isPresent()) {
                     Token token = this.createVerificationToken(savedOptional.get());
                     Optional<Token> newTokenOptional = this.tokenRepository.save(token);
-                    this.publishOnRegistrationCompleteEvent(savedOptional.get() ,newTokenOptional, requestLink);
+                    this.publishOnRegistrationCompleteEvent(savedOptional.get(), newTokenOptional, requestLink);
                     return newTokenOptional.orElse(null);
                 }
                 return oldTokenOptional.get();
@@ -65,8 +66,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         person.setEnabled(false);
-        person.setRole(this.loadEmployeeRole());
+        person.setRole(this.loadRoleByName(roleName));
+        if (person.getRole() != null && (person.getRole().getId() == 2 || person.getRole().getName() == "ROLE_OFFICE MANAGER")) {
+            NewPasswordEvent newPasswordEvent = new NewPasswordEvent(person);
+            eventPublisher.publishEvent(newPasswordEvent);
+        }
         person.setPassword(passwordEncoder.encode(person.getPassword()));
+
         Optional<Person> personOptional = this.personRepository.save(person);
 
         if (personOptional.isPresent()) {
@@ -91,12 +97,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
 
-    private Role loadEmployeeRole() throws ResourceNotFoundException {
-        return this.roleRepository.findRoleByName(Role.ROLE_EMPLOYEE)
+    private Role loadRoleByName(String roleName) throws ResourceNotFoundException {
+        return this.roleRepository.findRoleByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException(Role.TABLE_NAME));
     }
 
-    private Token createVerificationToken(Person person){
+    private Token createVerificationToken(Person person) {
         Token token = new Token();
         token.setTokenValue(this.generateToken());
         token.setDateExpired(this.calculateDateExpired());
@@ -112,11 +118,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         return new Date(cal.getTime().getTime());
     }
 
-    private String generateToken(){
+    private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    private void publishOnRegistrationCompleteEvent(Person person, Optional<Token> verificationToken, String requestLink){
+    private void publishOnRegistrationCompleteEvent(Person person, Optional<Token> verificationToken, String requestLink) {
         verificationToken.ifPresent((token) -> {
             PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
             eventPublisher.publishEvent(event);
