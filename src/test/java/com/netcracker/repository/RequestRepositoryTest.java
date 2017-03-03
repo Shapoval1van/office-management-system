@@ -2,7 +2,7 @@ package com.netcracker.repository;
 
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.*;
-import com.netcracker.repository.data.RequestRepository;
+import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

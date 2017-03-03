@@ -2,7 +2,7 @@ package com.netcracker.repository;
 
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Role;
-import com.netcracker.repository.data.RoleRepository;
+import com.netcracker.repository.data.interfaces.RoleRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

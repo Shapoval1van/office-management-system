@@ -2,7 +2,7 @@ package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import com.netcracker.repository.data.StatusRepository;
+import com.netcracker.repository.data.interfaces.StatusRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 

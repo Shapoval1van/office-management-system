@@ -2,7 +2,7 @@ package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import com.netcracker.repository.data.RoleRepository;
+import com.netcracker.repository.data.interfaces.RoleRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 

@@ -3,7 +3,7 @@ package com.netcracker.repository.data.impl;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import com.netcracker.repository.data.PersonRepository;
+import com.netcracker.repository.data.interfaces.PersonRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 

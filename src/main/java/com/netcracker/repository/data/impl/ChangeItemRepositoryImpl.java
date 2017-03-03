@@ -4,7 +4,7 @@ import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Field;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import com.netcracker.repository.data.ChangeItemRepository;
+import com.netcracker.repository.data.interfaces.ChangeItemRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 

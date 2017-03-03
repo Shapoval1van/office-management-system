@@ -3,7 +3,7 @@ package com.netcracker.repository;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
-import com.netcracker.repository.data.PersonRepository;
+import com.netcracker.repository.data.interfaces.PersonRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

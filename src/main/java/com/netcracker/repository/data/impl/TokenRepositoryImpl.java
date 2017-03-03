@@ -4,7 +4,7 @@ import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Token;
 import com.netcracker.model.entity.TokenType;
 import com.netcracker.repository.common.GenericJdbcRepository;
-import com.netcracker.repository.data.TokenRepository;
+import com.netcracker.repository.data.interfaces.TokenRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
