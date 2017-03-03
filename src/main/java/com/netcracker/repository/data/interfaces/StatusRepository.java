@@ -1,4 +1,4 @@
-package com.netcracker.repository.data;
+package com.netcracker.repository.data.interfaces;
 
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.entity.Status;
