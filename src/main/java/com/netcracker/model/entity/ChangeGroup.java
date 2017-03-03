@@ -3,6 +3,7 @@ package com.netcracker.model.entity;
 import com.netcracker.repository.common.Persistable;
 
 import java.util.Date;
+import java.util.Set;
 
 public class ChangeGroup implements Persistable<Long> {
     public static final String TABLE_NAME = "CHANGE_GROUP";
@@ -12,6 +13,7 @@ public class ChangeGroup implements Persistable<Long> {
     private Date createDate;
     private Request request;
     private Person author;
+    private Set<ChangeItem> changeItems;
 
     public ChangeGroup() {
     }
@@ -52,4 +54,11 @@ public class ChangeGroup implements Persistable<Long> {
         this.author = author;
     }
 
+    public Set<ChangeItem> getChangeItems() {
+        return changeItems;
+    }
+
+    public void setChangeItems(Set<ChangeItem> changeItems) {
+        this.changeItems = changeItems;
+    }
 }

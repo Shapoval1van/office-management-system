@@ -6,6 +6,7 @@ import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
@@ -22,13 +23,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Pattern;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/request")
+@Validated
 public class RequestController {
 
     @Autowired
@@ -46,7 +51,19 @@ public class RequestController {
     @Autowired
     RequestGroupRepository requestGroupRepository;
 
+
     private static final String JSON_MEDIA_TYPE = "application/json;";
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
+    public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
+                                              @RequestParam(name = "period", defaultValue = "day") String period,
+                                              @PathVariable(name = "requestId") Long id) {
+        Set<HistoryDTO> historySet = new HashSet<>();
+        requestService.getRequestHistory(id, period).forEach(changeGroup -> {
+            historySet.add(new HistoryDTO(changeGroup));
+        });
+        return new ResponseEntity<Set<HistoryDTO>>(historySet, HttpStatus.OK);
+    }
 
     @JsonView(View.Public.class)
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")

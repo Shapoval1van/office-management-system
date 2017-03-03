@@ -4,13 +4,8 @@ import com.netcracker.exception.CannotCreateRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.Priority;
-import com.netcracker.model.entity.Request;
-import com.netcracker.model.entity.Status;
-import com.netcracker.repository.data.interfaces.PriorityRepository;
-import com.netcracker.repository.data.interfaces.RequestRepository;
-import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.model.entity.*;
+import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.service.person.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +16,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -35,6 +31,12 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     private PriorityRepository priorityRepository;
+
+    @Autowired
+    private ChangeGroupRepository changeGroupRepository;
+
+    @Autowired
+    private FieldRepository fieldRepository;
 
     @Override
     public Optional<Request> getRequestById(Long id) {
@@ -120,6 +122,14 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.changeRequestStatus(request, status);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
+        Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
+        fill(changeGroups);
+        return changeGroups;
+    }
+
     private void fillRequest(Request request) {
         fill(request);
 
@@ -152,5 +162,11 @@ public class RequestServiceImpl implements RequestService {
 
         Status status = request.getStatus();
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+    }
+
+    private void fill(Set<ChangeGroup>  changeGroup){
+        changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
+                    ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
+                }));
     }
 }

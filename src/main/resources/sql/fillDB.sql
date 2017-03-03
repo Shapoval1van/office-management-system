@@ -16,12 +16,12 @@ INSERT INTO priority (name) VALUES
   ('LOW');
 
 INSERT INTO field (name) VALUES
-  ('name'),
-  ('description'),
-  ('status_id'),
-  ('manager_id'),
-  ('priority_id'),
-  ('group_id');
+  ('NAME'),
+  ('DESCRIPTION'),
+  ('STATUS'),
+  ('MANAGER'),
+  ('PRIORITY'),
+  ('GROUP');
 
 DO
 $$

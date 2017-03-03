@@ -32,11 +32,11 @@ public class Field implements Persistable<Integer> {
 
     @Override
     public Integer getId() {
-        return null;
+        return this.id;
     }
 
     @Override
-    public void setId(Integer integer) {
-
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

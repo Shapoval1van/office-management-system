@@ -54,7 +54,7 @@ public class ChangeItem implements Persistable<Long> {
 
     @Override
     public Long getId() {
-        return null;
+        return this.id;
     }
 
     @Override
