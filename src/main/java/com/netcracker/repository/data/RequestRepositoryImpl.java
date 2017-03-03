@@ -121,7 +121,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public int assignRequest(Long id, Person person, Status status) {
-        return getJdbcTemplate().update(ASSIGN_REQUEST_TO_PERSON, person.getId(), status.getId(), id);
+    public int assignRequest(Long requestId, Long personId, Status status) {
+        return getJdbcTemplate().update(ASSIGN_REQUEST_TO_PERSON, personId, status.getId(), requestId);
     }
 }

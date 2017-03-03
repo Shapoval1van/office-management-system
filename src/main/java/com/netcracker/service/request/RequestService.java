@@ -1,10 +1,10 @@
 package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
-import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +16,5 @@ public interface RequestService {
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
     void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException;
     int changeRequestStatus(Request request, Status status);
-    boolean assignRequest(Long id, Person person) throws CannotAssignRequestException;
+    boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 }

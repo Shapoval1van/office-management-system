@@ -147,10 +147,24 @@ public class RequestControllerTest {
     }
 
     @Test
-    public void successRequestAssign() throws Exception {
+    public void successRequestAssignToSmb() throws Exception {
         RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
         requestAssignDTO.setRequestId(4L);
         requestAssignDTO.setPersonId(2L);
+
+        mockMvc.perform(post("/api/request/assignRequest")
+                .principal(principal)
+                .content(this.json(requestAssignDTO))
+                .contentType(contentType))
+                .andExpect(status().isOk());
+
+        assertEquals(2L, (long)requestRepository.findOne(4L).get().getManager().getId());
+    }
+
+    @Test
+    public void successRequestAssignToMe() throws Exception {
+        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
+        requestAssignDTO.setRequestId(4L);
 
         mockMvc.perform(post("/api/request/assignRequest")
                 .principal(principal)

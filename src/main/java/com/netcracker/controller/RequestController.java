@@ -127,15 +127,7 @@ public class RequestController {
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestAssignDTO requestAssignDTO,
                                            Principal principal){
         try{
-            Optional<Person> person = Optional.ofNullable(personRepository.findOne(requestAssignDTO.getPersonId())
-                    .orElse((personRepository.findPersonByEmail(principal.getName()).get())));
-
-            if (person.isPresent()){
-                requestService.assignRequest(requestAssignDTO.getRequestId(), person.get());
-            } else {
-                return new ResponseEntity<>("No such person", HttpStatus.BAD_REQUEST);
-                // TODO log
-            }
+                requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
         } catch (CannotAssignRequestException e){
             return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
         }
