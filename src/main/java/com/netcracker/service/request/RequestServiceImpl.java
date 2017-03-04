@@ -142,10 +142,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-
-        return priority.isPresent() ? requestRepository.queryForList(
+        List<Request> requestList = priority.isPresent() ? requestRepository.queryForList(
                 RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
                 : requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS, pageable);
+
+        requestList.forEach(r -> fill(r));
+
+        return requestList;
 
     }
 
