@@ -1,8 +1,7 @@
 package com.netcracker.controller;
 
 
-import com.netcracker.exception.CurrentUserNotPresentException;
-import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.*;
 import com.netcracker.model.dto.ErrorDTO;
 import com.netcracker.model.dto.ErrorsDTO;
 import org.springframework.http.HttpStatus;
@@ -55,4 +54,11 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(errors);
     }
 
+    @ExceptionHandler({CannotCreateRequestException.class,
+            CannotDeleteRequestException.class, CannotCreateSubRequestException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO requestExceptionHandler(HttpServletRequest request, BaseException ex){
+        ErrorDTO error = new ErrorDTO(HttpStatus.NOT_FOUND.value(),request.getRequestURL().toString(),ex.getMessage(),ex.getDescription());
+        return new ErrorsDTO(Collections.singletonList(error));
+    }
 }

@@ -84,7 +84,9 @@ public class RequestDTO {
         request.setName(this.name);
         request.setDescription(this.description);
         request.setCreationTime(this.creationTime);
-        request.setEstimate(this.estimate);
+        if(this.estimate != null) {
+            request.setEstimate(this.estimate);
+        }
         if(this.status != null) {
             request.setStatus(new Status(this.status));
         }

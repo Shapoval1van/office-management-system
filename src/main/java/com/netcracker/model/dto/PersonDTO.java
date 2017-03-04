@@ -17,14 +17,18 @@ import javax.validation.constraints.Size;
 public class PersonDTO {
 
     @JsonView(View.Public.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
     @JsonView(View.Public.class)
     @Size(min = 3, max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String firstName;
     @JsonView(View.Public.class)
     @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String lastName;
     @JsonView(View.Public.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     @NotNull(groups = CreateValidatorGroup.class)
     @Pattern(regexp = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
@@ -32,11 +36,14 @@ public class PersonDTO {
     @JsonView(View.Internal.class)
     @Size(max = 70, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     @NotNull(groups = CreateValidatorGroup.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String password;
     @JsonView(View.Public.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer role;
     @JsonView(View.Public.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean enabled;
 
     public PersonDTO() {

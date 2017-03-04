@@ -123,7 +123,7 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
         }
     }
 
-    public JdbcTemplate getJdbcTemplate(){
+    protected JdbcTemplate getJdbcTemplate(){
         return jdbcTemplate;
     }
 
