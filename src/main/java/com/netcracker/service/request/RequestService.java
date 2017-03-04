@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
+import com.netcracker.repository.common.Pageable;
 
 import java.security.Principal;
 import java.util.List;
@@ -17,4 +18,5 @@ public interface RequestService {
     void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException;
     int changeRequestStatus(Request request, Status status);
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
+    List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) throws ResourceNotFoundException;
 }

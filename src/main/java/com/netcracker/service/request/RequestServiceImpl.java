@@ -5,6 +5,8 @@ import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
+import com.netcracker.repository.common.Pageable;
+import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.PriorityRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
@@ -23,6 +25,7 @@ import java.util.Optional;
 
 @Service
 public class RequestServiceImpl implements RequestService {
+
     @Autowired
     private RequestRepository requestRepository;
 
@@ -134,6 +137,16 @@ public class RequestServiceImpl implements RequestService {
         }
 
         throw new CannotAssignRequestException("Request is already assigned");
+    }
+
+    @Override
+    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) throws ResourceNotFoundException {
+        Optional<Priority > priority = priorityRepository.findOne(priorityId);
+        if (priority.isPresent()){
+            return requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId);
+        }
+
+        throw new ResourceNotFoundException("No such priority");
     }
 
     private void fillRequest(Request request) {

@@ -26,6 +26,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String REQUEST_GROUP_ID_COLUMN = "request_group_id";
 
+    public static final String GET_AVAILABLE_REQUESTS_BY_PRIORITY = "SELECT * FROM request WHERE priority_id = ? AND manager_id IS NULL";
+
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
     private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +

@@ -9,6 +9,7 @@ import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.PriorityRepository;
 import com.netcracker.repository.data.interfaces.RequestGroupRepository;
@@ -163,6 +164,22 @@ public class RequestController {
         }
 
         return ResponseEntity.ok("Assigned");
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
+    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable){
+
+        List<Request> requests = null;
+        try{
+            requests = requestService.getAvailableRequestList(priorityId, pageable);
+        }catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok((requests
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList())));
     }
 
 }
