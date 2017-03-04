@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -125,9 +122,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(readOnly = true)
     public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
-        Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
-        fill(changeGroups);
-        return changeGroups;
+        try {
+            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,Period.valueOf(period.toUpperCase()));
+            fill(changeGroups);
+            return changeGroups;
+        }catch (IllegalArgumentException e){
+            return new HashSet<ChangeGroup>();
+        }
     }
 
     private void fillRequest(Request request) {

@@ -25,10 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -58,11 +55,12 @@ public class RequestController {
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
                                               @RequestParam(name = "period", defaultValue = "day") String period,
                                               @PathVariable(name = "requestId") Long id) {
-        Set<HistoryDTO> historySet = new HashSet<>();
-        requestService.getRequestHistory(id, period).forEach(changeGroup -> {
-            historySet.add(new HistoryDTO(changeGroup));
-        });
-        return new ResponseEntity<Set<HistoryDTO>>(historySet, HttpStatus.OK);
+        Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2)->{
+            if(cg1.getId()>cg2.getId()) return 1;
+            else if(cg1.getId()<cg2.getId()) return -1;
+            else return 0;});
+        requestService.getRequestHistory(id, period).forEach(changeGroup -> historySet.add(new HistoryDTO(changeGroup)));
+        return new ResponseEntity<>(historySet, HttpStatus.OK);
     }
 
     @JsonView(View.Public.class)
