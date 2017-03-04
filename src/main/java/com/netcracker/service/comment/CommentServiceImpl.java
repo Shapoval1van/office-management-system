@@ -1,11 +1,14 @@
 package com.netcracker.service.comment;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.CommentDTO;
 import com.netcracker.model.entity.Comment;
 import com.netcracker.model.entity.Person;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.CommentRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
+import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +30,17 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private PersonRepository personRepository;
 
+    @Autowired
+    private RequestRepository requestRepository;
+
     @Override
     public List<Comment> getCommentByRequestId(Long requestId) {
         return commentRepository.findCommentByRequestId(requestId);
+    }
+
+    @Override
+    public List<Comment> getCommentByRequestId(Long requestId, Pageable pageable) {
+        return commentRepository.findCommentByRequestId(requestId, pageable);
     }
 
     @Override
@@ -38,12 +49,26 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Optional<Comment> saveComment(Comment comment) {
+    public Optional<Comment> saveComment(Comment comment) throws ResourceNotFoundException {
+
+        Long requestId = comment.getRequest().getId();
+        Long authorId = comment.getAuthor().getId();
+
+        if (!requestRepository.findOne(requestId).isPresent()) {
+            LOGGER.error("Can't find request with id {}", requestId);
+            throw new ResourceNotFoundException("Can't find request with id " + requestId);
+        }
+
+        if (!personRepository.findOne(authorId).isPresent()) {
+            LOGGER.error("Can't find person with id {}", authorId);
+            throw new ResourceNotFoundException("Can't find person with id " + authorId);
+        }
+
         return commentRepository.save(comment);
     }
 
     @Override
-    public Optional<Comment> saveComment(CommentDTO commentDTO, Principal principal) throws CurrentUserNotPresentException {
+    public Optional<Comment> saveComment(CommentDTO commentDTO, Principal principal) throws ResourceNotFoundException {
         LOGGER.debug("Convert comment dto to comment");
         Comment comment = commentDTO.toComment();
         LOGGER.debug("Set publish date and author");

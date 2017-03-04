@@ -53,7 +53,6 @@
                 $scope.sendComment = function () {
                     $http.post("/api/comment/", {
                         body: $scope.comment,
-                        author: currentUser.id,
                         request: requestId
                     }).then(function () {
                         $scope.comment = "";
