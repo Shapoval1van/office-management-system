@@ -46,9 +46,13 @@
                         controller: "UpdateRequestController"
                             ///request/:requestId/
                     })
-                     .when("/request/:requestId/",{
+                    .when("/request/:requestId/",{
                          templateUrl: "/static/page/request/details.html",
                          controller: "RequestDetailsController"
+                     })
+                    .when("/requestList",{
+                         templateUrl: "/static/page/request/list.html",
+                         controller: "RequestListController"
                      })
                     .otherwise({
                         templateUrl: "/static/error/404.html"

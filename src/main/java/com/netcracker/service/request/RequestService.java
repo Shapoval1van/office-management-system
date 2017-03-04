@@ -21,5 +21,6 @@ public interface RequestService {
     int changeRequestStatus(Request request, Status status);
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
     List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+    Long getCountFree(Integer priorityId);
     Set<ChangeGroup> getRequestHistory(Long requestId, String period);
 }

@@ -2,18 +2,11 @@ package com.netcracker.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.*;
-import com.netcracker.model.dto.FullRequestDTO;
-import com.netcracker.model.dto.RequestAssignDTO;
-import com.netcracker.model.dto.HistoryDTO;
-import com.netcracker.model.dto.RequestDTO;
+import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
-import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.PriorityRepository;
-import com.netcracker.repository.data.interfaces.RequestGroupRepository;
-import com.netcracker.repository.data.interfaces.StatusRepository;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,7 +51,7 @@ public class RequestController {
         if(request.isPresent()) {
             return ResponseEntity.ok(new FullRequestDTO(request.get()));
         } else {
-            return new ResponseEntity<>("No such id", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -77,7 +70,7 @@ public class RequestController {
                                         Principal principal) throws CannotCreateSubRequestException, CannotCreateRequestException {
         Request request = requestDTO.toRequest();
         requestService.saveRequest(request, principal.getName());
-        return ResponseEntity.ok("Added");
+        return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addSubRequest")
@@ -85,7 +78,7 @@ public class RequestController {
                                            Principal principal) throws CannotCreateSubRequestException {
         Request subRequest = requestDTO.toRequest();
         requestService.saveSubRequest(subRequest, principal.getName());
-        return ResponseEntity.ok("Added");
+        return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
@@ -113,14 +106,10 @@ public class RequestController {
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestAssignDTO requestAssignDTO,
-                                           Principal principal){
-        try{
-                requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
-        } catch (CannotAssignRequestException e){
-            return new ResponseEntity<>(e.getDescription(), HttpStatus.BAD_REQUEST);
-        }
+                                           Principal principal) throws CannotAssignRequestException {
+        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
 
-        return ResponseEntity.ok("Assigned");
+        return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
@@ -131,6 +120,12 @@ public class RequestController {
                 .stream()
                 .map(FullRequestDTO::new)
                 .collect(Collectors.toList())));
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
+    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
+        Long count = requestService.getCountFree(priorityId);
+        return ResponseEntity.ok(count);
     }
 
 }
