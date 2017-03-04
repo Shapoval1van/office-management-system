@@ -14,9 +14,9 @@ import java.util.Set;
 
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
-    Optional<Request> saveSubRequest(Request subRequest) throws CannotCreateSubRequestException;
-    Optional<Request> saveRequest(Request request) throws CannotCreateRequestException;
-    Optional<Request> updateRequest(Request request);
+    Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException;
+    Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
+    Optional<Request> updateRequest(Request request, Long requestId);
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
     void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException;
     int changeRequestStatus(Request request, Status status);
