@@ -8,14 +8,9 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.RequestDTO;
-import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
-import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.PriorityRepository;
-import com.netcracker.repository.data.interfaces.RequestGroupRepository;
-import com.netcracker.repository.data.interfaces.StatusRepository;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,12 +31,8 @@ import java.util.stream.Collectors;
 @Validated
 public class RequestController {
 
-    private final RequestService requestService;
-
     @Autowired
-    public RequestController(RequestService requestService) {
-        this.requestService = requestService;
-    }
+    private RequestService requestService;
 
     private static final String JSON_MEDIA_TYPE = "application/json;";
 
