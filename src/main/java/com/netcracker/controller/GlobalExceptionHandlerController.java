@@ -1,6 +1,7 @@
 package com.netcracker.controller;
 
 
+import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.ErrorDTO;
 import com.netcracker.model.dto.ErrorsDTO;
@@ -22,9 +23,21 @@ public class GlobalExceptionHandlerController {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorsDTO resourceNotFoundExceptionHandler(HttpServletRequest request, ResourceNotFoundException ex){
-        ErrorDTO error = new ErrorDTO(HttpStatus.NOT_FOUND.value(),request.getRequestURL().toString(),ex.getMessage(),ex.getDescription());
+    public ErrorsDTO resourceNotFoundExceptionHandler(HttpServletRequest request, ResourceNotFoundException ex) {
+        ErrorDTO error = new ErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURL().toString(), ex.getMessage(), ex.getDescription());
         return new ErrorsDTO(Collections.singletonList(error));
+    }
+
+    @ExceptionHandler(CurrentUserNotPresentException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorsDTO currentUserNotPresentExceptionHandler(HttpServletRequest request, CurrentUserNotPresentException e) {
+        int errorStatus = HttpStatus.NOT_FOUND.value();
+        String source = request.getRequestURL().toString();
+        String title = e.getMessage();
+        String description = e.getDescription();
+
+        ErrorDTO errorDTO = new ErrorDTO(errorStatus, source, title, description);
+        return new ErrorsDTO(Collections.singletonList(errorDTO));
     }
 
     @ExceptionHandler
