@@ -5,6 +5,7 @@ import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.*;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,12 @@ public class RequestServiceTest {
     @Autowired
     private RequestService requestService;
     private Request request;
+    private String managerEmail;
+
+    @Before
+    public void init() {
+        managerEmail = "test2@test.com";
+    }
 
     @Test
     @Transactional
@@ -40,7 +47,7 @@ public class RequestServiceTest {
         subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
         subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
 
-        Request saveSubRequest = requestService.saveSubRequest(subRequest).get();
+        Request saveSubRequest = requestService.saveSubRequest(subRequest, managerEmail).get();
 
         Assert.assertEquals(saveSubRequest.getId(), new Long(5));
         Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
@@ -62,7 +69,7 @@ public class RequestServiceTest {
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
 
-        requestService.saveSubRequest(subRequest).get();
+        requestService.saveSubRequest(subRequest, managerEmail).get();
     }
 
     @Test(expected = CannotCreateSubRequestException.class)
@@ -77,7 +84,7 @@ public class RequestServiceTest {
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
 
-        requestService.saveSubRequest(subRequest).get();
+        requestService.saveSubRequest(subRequest, managerEmail).get();
     }
 
     @Test
