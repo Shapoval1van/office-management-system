@@ -140,13 +140,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) throws ResourceNotFoundException {
-        Optional<Priority > priority = priorityRepository.findOne(priorityId);
-        if (priority.isPresent()){
-            return requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId);
-        }
+    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
+        Optional<Priority> priority = priorityRepository.findOne(priorityId);
 
-        throw new ResourceNotFoundException("No such priority");
+        return priority.isPresent() ? requestRepository.queryForList(
+                RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
+                : requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS, pageable);
+
     }
 
     private void fillRequest(Request request) {

@@ -168,13 +168,7 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
     public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable){
-
-        List<Request> requests = null;
-        try{
-            requests = requestService.getAvailableRequestList(priorityId, pageable);
-        }catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
 
         return ResponseEntity.ok((requests
                 .stream()
