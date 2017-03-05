@@ -46,7 +46,7 @@ INSERT INTO public.person (person_id, first_name, last_name, email, password, ro
   );
 
 
-INSERT INTO public.request_group (request_group_id, name) VALUES (1, 'Request group   1');
+INSERT INTO public.request_group (request_group_id, name, author_id) VALUES (1, 'Request group   1', 2);
 
 
 INSERT INTO public.request (request_id, name, description, creation_time, status_id, employee_id, priority_id) VALUES
