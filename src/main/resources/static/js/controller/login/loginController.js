@@ -1,9 +1,10 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer",
-            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer) {
-                if (!!$cookies.get("access_token")) {
-                    window.location.reload();
+        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService",
+            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService) {
+
+                if (SessionService.isUserLoggedIn()){
+                    window.location.reload()
                 }
 
                 $scope.personCredentials = {
@@ -44,23 +45,7 @@
                         data: $httpParamSerializer($scope.personCredentials)
                     };
                     $http(req).then(function (callback) {
-                        $http.defaults.headers.common.Authorization =
-                            'Bearer ' + callback.data.access_token;
-
-                        $cookies.put("access_token", callback.data.access_token, {
-                            expires: cookiesExpirationDate
-                        });
-
-                        var currentUser = {
-                            firstName: callback.data.firstName,
-                            lastName: callback.data.lastName,
-                            id: callback.data.id,
-                            role: callback.data.type,
-                            email: callback.data.email
-                        };
-
-                        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
+                        SessionService.createSession(callback);
                         window.location.reload();
                     }, function (callback) {
                         console.log("Error");
