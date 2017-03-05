@@ -12,4 +12,7 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> getAllSubRequest(Long parentId);
     Optional<Request> updateRequest(Request request);
     int assignRequest(Long requestId, Long personId, Status status);
+
+    Long countFree(Integer priorityId);
+
 }

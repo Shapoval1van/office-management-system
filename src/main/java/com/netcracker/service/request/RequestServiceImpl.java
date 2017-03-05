@@ -2,6 +2,8 @@ package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
 import com.netcracker.model.entity.*;
+import com.netcracker.repository.common.Pageable;
+import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class RequestServiceImpl implements RequestService {
     private final ChangeGroupRepository changeGroupRepository;
 
     private final FieldRepository fieldRepository;
+
 
     @Autowired
     public RequestServiceImpl(RequestRepository requestRepository,
@@ -169,6 +172,24 @@ public class RequestServiceImpl implements RequestService {
         }
 
         throw new CannotAssignRequestException("Request is already assigned");
+    }
+
+    @Override
+    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
+        Optional<Priority> priority = priorityRepository.findOne(priorityId);
+        List<Request> requestList = priority.isPresent() ? requestRepository.queryForList(
+                RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
+                : requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS, pageable);
+
+        requestList.forEach(this::fillRequest);
+
+        return requestList;
+
+    }
+
+    @Override
+    public Long getCountFree(Integer priorityId) {
+        return requestRepository.countFree(priorityId);
     }
 
     private void fillRequest(Request request) {

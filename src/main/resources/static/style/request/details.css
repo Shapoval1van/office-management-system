@@ -57,3 +57,13 @@
 #comment-wrapper {
      overflow: scroll;
 }
+
+.table-hover > tbody > tr:hover {
+     background-color: #D2D2D2;
+}
+
+.center {
+     float: none;
+     margin-left: auto;
+     margin-right: auto;
+}
