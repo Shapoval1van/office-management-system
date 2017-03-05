@@ -26,6 +26,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String REQUEST_GROUP_ID_COLUMN = "request_group_id";
 
+    public static final String GET_AVAILABLE_REQUESTS_BY_PRIORITY = "SELECT * FROM request WHERE priority_id = ? AND manager_id IS NULL";
+    public static final String GET_AVAILABLE_REQUESTS = "SELECT * FROM request WHERE manager_id IS NULL";
+
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
     private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
@@ -34,6 +37,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     private final String ASSIGN_REQUEST_TO_PERSON = "UPDATE " + TABLE_NAME + " SET manager_id = ?, status_id = ? " +
             "WHERE request_id = ?";
+
+    private final String COUNT_WITH_PRIORITY = "SELECT count(request_id) FROM " + TABLE_NAME +
+            " WHERE priority_id = ? AND manager_id IS NULL ";
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -124,6 +130,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public int assignRequest(Long requestId, Long personId, Status status) {
         return getJdbcTemplate().update(ASSIGN_REQUEST_TO_PERSON, personId, status.getId(), requestId);
+    }
+
+    @Override
+    public Long countFree(Integer priorityId) {
+        return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
     }
 
     @Override

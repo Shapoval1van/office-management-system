@@ -3,6 +3,7 @@ package com.netcracker.repository.data.impl;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +28,13 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     private final String FIND_PERSON_BY_EMAIL = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE email = ?";
+
+    private final String FIND_MANAGER_NAME_PATTERN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
+            " FROM " + TABLE_NAME + " WHERE (first_name like ? OR last_name like ?) AND role_id = 2";
+
+    private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
+            " FROM " + TABLE_NAME + " WHERE role_id = 2";
+
     private final String UPDATE_PERSON_PASSWORD = "UPDATE " + TABLE_NAME + " SET password = ? WHERE email = ?";
 
     public PersonRepositoryImpl() {
@@ -80,5 +89,15 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Override
     public int updatePersonPassword(String newPassword, String email) {
         return getJdbcTemplate().update(UPDATE_PERSON_PASSWORD, newPassword, email);
+    }
+
+    @Override
+    public List<Person> getManagers(Pageable pageable, String namePattern) {
+        return super.queryForList(FIND_MANAGER_NAME_PATTERN, pageable, namePattern, namePattern);
+    }
+
+    @Override
+    public List<Person> getManagers(Pageable pageable) {
+        return super.queryForList(FIND_MANAGER, pageable);
     }
 }
