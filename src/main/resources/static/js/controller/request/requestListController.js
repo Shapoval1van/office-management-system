@@ -2,6 +2,10 @@
     angular.module("OfficeManagementSystem")
         .controller("RequestListController", ["$scope", "$http", "$routeParams",
             function ($scope, $http, $routeParams) {
+
+                $scope.selectedManager = undefined;
+                $scope.managers = [];
+
                 var requestDetails = "/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.pageSize = 10;
@@ -15,6 +19,13 @@
                 $scope.currentPage = 1;
                 $scope.selectedPriority = {priorityId: 2, name: 'NORMAL'};
                 $scope.assignedMessage = '';
+                $scope.selectedRequest = -1;
+
+
+                $scope.isUndefined = function (thing) {
+                    return (typeof thing === "undefined");
+                };
+
 
                 $scope.getTotalPage = function() {
                     $http({
@@ -40,7 +51,7 @@
                 $scope.getTotalPage(); //
                 $scope.pageChanged(1); // get first page
 
-                $scope.selectRequest = function(requestId) {
+                $scope.requestDetails = function(requestId) {
                     window.location = requestDetails + requestId;
                 };
 
@@ -53,7 +64,7 @@
                     $scope.pageChanged(1); // get first page
                 };
 
-                $scope.assignedToMe = function(requestId) {
+                $scope.assignToMe = function(requestId) {
                     $http({
                         method: 'POST',
                         url: '/api/request/assignRequest',
@@ -68,6 +79,44 @@
                             .map(function(e) {return e.detail})
                             .join('. ');
                     });
-                }
+                };
+
+                $scope.assign = function() {
+                    $http({
+                        method: 'POST',
+                        url: '/api/request/assignRequest',
+                        data: {
+                            'requestId': $scope.selectedRequest,
+                            'personId': $scope.selectedManager.id
+                        }
+                    }).then(function successCallback(response) {
+                        $scope.assignedMessage = response.data.message;
+                    }, function errorCallback(response) {
+                        $scope.assignedMessage = response.data.errors
+                            .map(function(e) {return e.detail})
+                            .join('. ');
+                    });
+                };
+
+                $scope.update = function() {
+                    if($scope.selectedManager.length >= 3) {
+                        console.log($scope.selectedManager);
+
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/managers/' +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize,
+                            data: $scope.selectedManager
+                        }).then(function successCallback(response) {
+                            $scope.managers = response.data;
+                        }, function errorCallback(response) {
+                        });
+                    }
+                };
+
+                $scope.selectRequest = function(requestId) {
+                    $scope.selectedRequest = requestId;
+                };
+
             }])
 })();

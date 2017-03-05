@@ -5,7 +5,7 @@
 <section class="main-form section-padding" ng-cloak="" ng-controller="RequestListController">
     <div class="container">
         <div class="row content">
-            <!-- Modal content-->
+            <!-- Modal for messages-->
             <div class="modal fade" id="myModal" role="dialog">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
@@ -23,6 +23,31 @@
                 </div>
             </div>
 
+            <!-- Modal for search manager-->
+            <div class="modal fade" id="modalSearch" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Assignee</h4>
+                        </div>
+                        <div class="modal-body">
+                            Selected manager: <p ng-show="!isUndefined(selectedManager)">{{selectedManager.firstName + ' ' + selectedManager.lastName }}</p>
+                            <input ng-change="update()" type="text" ng-model="selectedManager"
+                                   uib-typeahead="manager as manager.firstName + ' ' +  manager.lastName for manager in managers"
+                                   class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                    data-toggle="modal"  ng-click="assign()"
+                                    data-target="#myModal">Assign</button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="col-sm-3 sidenav">
                 <h4>Filter</h4>
                 <ul class="nav nav-pills nav-stacked">
@@ -34,7 +59,7 @@
             <div class="col-sm-9">
                 <form class="form-inline">
                     <label>Priority
-                        <select ng-model="selectedPriority" ng-change="priorityChange(selectedPriority)"
+                        <select  ng-model="selectedPriority" ng-change="priorityChange(selectedPriority)"
                                 data-ng-options="priority as priority.name for priority in priorities"
                                 class="form-control">
                         </select>
@@ -56,15 +81,17 @@
                         <tbody>
                             <tr uib-tooltip="Click to see details"
                                     scope="row" ng-repeat="request in requests">
-                                <td ng-click="selectRequest(request.id)">{{ request.name }}</td>
-                                <td ng-click="selectRequest(request.id)">{{ request.description | limitTo: 50 }}</td>
-                                <td ng-click="selectRequest(request.id)">{{ request.employee.firstName + ' ' + request.employee.lastName }}</td>
-                                <td ng-click="selectRequest(request.id)">{{ request.estimate | date : 'yyyy-MM-dd HH:mm:ss' }}</td>
-                                <td ng-click="selectRequest(request.id)">{{ request.priority.name }}</td>
-                                <td ng-click="selectRequest(request.id)">{{ request.creationTime | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.name }}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.description | limitTo: 50 }}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.employee.firstName + ' ' + request.employee.lastName }}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.estimate | date : 'yyyy-MM-dd HH:mm:ss' }}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.priority.name }}</td>
+                                <td ng-click="requestDetails(request.id)">{{ request.creationTime | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
                                 <td>
                                     <button class="bnt" data-toggle="modal" data-target="#myModal"
-                                            ng-click="assignedToMe(request.id)">Assign to me</button>
+                                            ng-click="assignToMe(request.id)">Assign to me</button>
+                                    <button class="bnt" data-toggle="modal"
+                                            ng-click="selectRequest(request.id)" data-target="#modalSearch">Assign</button>
                                 </td>
                             </tr>
                         </tbody>
