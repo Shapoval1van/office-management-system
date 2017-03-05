@@ -5,7 +5,6 @@ import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.CommentDTO;
 import com.netcracker.model.entity.Comment;
 import com.netcracker.model.view.View;
-import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.common.impl.SimplePageable;
 import com.netcracker.service.comment.CommentService;
 import org.slf4j.Logger;
@@ -41,18 +40,28 @@ public class CommentController {
     }
 
 
-    @GetMapping({"/request/{requestId}", "/request/{requestId}/page/{pageNumber}"})
+    @GetMapping({"/request/{requestId}", "/request/{requestId}/page/{pageNumber}", "/request/{requestId}/page/{pageNumber}/size/{pageSize}"})
     @ResponseStatus(HttpStatus.OK)
     public List<Comment> getCommentsOfRequest(@PathVariable("requestId") Long requestId,
-                                              @PathVariable(value = "pageNumber", required = false) Integer pageNumber) {
+                                              @PathVariable(value = "pageNumber", required = false) Integer pageNumber,
+                                              @PathVariable(value = "pageSize", required = false) Integer pageSize) {
+        SimplePageable pageable =
+                new SimplePageable(SimplePageable.DEFAULT_PAGE_SIZE, SimplePageable.DEFAULT_PAGE_NUMBER);
 
         if (pageNumber != null) {
-            LOGGER.debug("Get {} page of comments of {} request", pageNumber, requestId);
-            Pageable pageable = new SimplePageable(10, pageNumber);
-            return commentService.getCommentByRequestId(requestId, pageable);
+            if (pageSize != null) {
+                pageable.setPageSize(pageSize);
+                pageable.setPageNumber(pageNumber);
+                LOGGER.debug("Get {} page of comments of {} request. Page size {}", pageNumber, requestId, pageSize);
+                return commentService.getCommentByRequestId(requestId, pageable);
+            } else {
+                pageable.setPageNumber(pageNumber);
+                LOGGER.debug("Get {} page of comments of {} request. Page size", pageNumber, requestId, pageable.getPageSize());
+                return commentService.getCommentByRequestId(requestId, pageable);
+            }
         } else {
-            LOGGER.debug("Get all comment of {} request", requestId);
-            return commentService.getCommentByRequestId(requestId);
+            LOGGER.debug("Get {} page of comment of {} request. Page size {}", pageable.getPageNumber(), requestId, pageable.getPageSize());
+            return commentService.getCommentByRequestId(requestId, pageable);
         }
     }
 }
