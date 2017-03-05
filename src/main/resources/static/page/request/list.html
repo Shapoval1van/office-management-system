@@ -90,7 +90,7 @@
                                 <td>
                                     <button class="bnt" data-toggle="modal" data-target="#myModal"
                                             ng-click="assignToMe(request.id)">Assign to me</button>
-                                    <button class="bnt" data-toggle="modal"
+                                    <button ng-show="isAdmin()" class="bnt" data-toggle="modal"
                                             ng-click="selectRequest(request.id)" data-target="#modalSearch">Assign</button>
                                 </td>
                             </tr>

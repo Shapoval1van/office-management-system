@@ -26,6 +26,10 @@
                     return (typeof thing === "undefined");
                 };
 
+                $scope.isAdmin = function (thing) {
+                    return currentUser.role === 'ADMINISTRATOR';
+                };
+
 
                 $scope.getTotalPage = function() {
                     $http({
