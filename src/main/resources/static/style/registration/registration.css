@@ -1,39 +1,13 @@
 .pass-wrapper{
 	position: relative;
 }
-.form-check-pass-error::after{
-	content: "Does not matches with the password!";
-	color: #ff6464;
-	font-size: 15px;
-	position: absolute;
-	top: 40px;
-	left: 0;
-}
 .form-control_offset{
 	margin-top: 20px!important;
 }
-
-.password-incorrect{
-	position: relative;
-}
-.password-incorrect::after{
-	content: "The password must contain at least 8 characters, 1 capital letter and 1 number!";
-	white-space: nowrap;
-	color: #ff6464;
+.incorrect{
+    position: relative;
+    color: #ff6464;
 	font-size: 15px;
-	position: absolute;
-	top: 40px;
 	left: 0;
-}
-
-.name-incorrect{
-	position: relative;
-}
-.name-incorrect::after{
-	content: "Name must contain at least 3 letters and start with capital letter!";
-	color: #ff6464;
-	font-size: 15px;
-	position: absolute;
-	top: 40px;
-	left: 0;
+	bottom: 10px;
 }

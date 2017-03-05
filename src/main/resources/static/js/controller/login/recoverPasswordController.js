@@ -1,11 +1,12 @@
-/**
- * Created by Max on 23.02.2017.
- */
+
 (function () {
     angular.module("OfficeManagementSystem")
         .controller("RecoverPasswordController", ["$scope", "$http", "$routeParams",
             function ($scope, $http, $routeParams) {
-                $scope.submitStatusArray = [true, true, true, true];
+
+                $scope.passErrorMessage="The password must contain at least 8 characters, 1 capital letter and 1 number!";
+                $scope.confirmPassErrorMessage="Does not matches with the password!"
+
                 $scope.password = "";
                 $scope.confirmPassword = "";
                 $scope.recoverEmail = "";
@@ -29,10 +30,12 @@
                     })
                         .then(function (callback) {
                             //    Success
-                            console.log("Login Success!")
+                            window.alert("Recover message sent to your email "+$scope.recoverEmail);
+                            console.log("Login Success!");
                         }, function (callback) {
                             //    Failure
-                            console.log("Login Failure!")
+                            window.alert("This email is not registered in our service");
+                            console.log("Login Failure!");
                         })
                 };
 
@@ -56,38 +59,20 @@
                         })
                 };
 
-
-                $scope.confirmPassCheck = function () {
-                    var pass = $scope.password,
-                        confirmPass = $scope.confirmPassword;
-                    if (pass != confirmPass) {
-                        $(".pass-wrapper").addClass("form-check-pass-error");
-                        $("#reg-form-submit").addClass("form-control_offset");
-                        $scope.submitStatusArray[3] = true;
-                    }
-                    else {
-                        $(".pass-wrapper").removeClass("form-check-pass-error");
-                        $("#reg-form-submit").removeClass("form-control_offset");
-                        $scope.submitStatusArray[3] = false;
-                    }
-                };
-
-                $scope.passCheck = function () {
-                    var passValue = $scope.password,
-                        regExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-                    if (passValue) {
-                        var lookFor = passValue.search(regExp);
-                        if (lookFor == -1) {
-                            $("#password-input-group").addClass("password-incorrect");
-                            $("#password-check-input-group").addClass("form-control_offset");
-                            $scope.submitStatusArray[2] = true;
-                        } else {
-                            $("#password-input-group").removeClass("password-incorrect");
-                            $("#password-check-input-group").removeClass("form-control_offset");
-                            $scope.submitStatusArray[2] = false;
-                        }
-                    }
-                };
-
             }])
+        .directive('pwCheck', [function () {
+                            return {
+                              require: 'ngModel',
+                              link: function (scope, elem, attrs, ctrl) {
+                                var firstPassword = '#' + attrs.pwCheck;
+                                elem.add(firstPassword).on('keyup', function () {
+                                  scope.$apply(function () {
+                                    var v = elem.val()===$(firstPassword).val();
+                                    ctrl.$setValidity('pwmatch', v);
+                                  });
+                                });
+                              }
+                            }
+                          }]);
+
 })();

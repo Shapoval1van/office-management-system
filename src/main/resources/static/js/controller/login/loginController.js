@@ -21,9 +21,6 @@
                 // Cookies expiration date
                 var cookiesExpirationDate = new Date(Number(new Date()) + cookiesLivingTime);
 
-                // var host = "https://management-office.herokuapp.com";
-                var host = "http://localhost:8080";
-
                 if (!!registrationToken) {
                     $http.get("/api/v1/registration/" + registrationToken)
                         .then(function (callback) {
@@ -36,7 +33,7 @@
                 $scope.sendPersonCredentials = function () {
                     var req = {
                         method: 'POST',
-                        url: host + "/oauth/token",
+                        url: "https://management-office.herokuapp.com/oauth/token",
                         headers: {
                             "Authorization": "Basic " + encoded,
                             "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
@@ -50,21 +47,10 @@
                         $cookies.put("access_token", callback.data.access_token, {
                             expires: cookiesExpirationDate
                         });
-
-                        var currentUser = {
-                            firstName: callback.data.firstName,
-                            lastName: callback.data.lastName,
-                            id: callback.data.id,
-                            role: callback.data.type,
-                            email: callback.data.email
-                        };
-
-                        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
                         window.location.reload();
                     }, function (callback) {
                         console.log("Error");
-                        console.log(callback);
+                        window.alert(callback.data.error_description)
                     });
                 };
 
