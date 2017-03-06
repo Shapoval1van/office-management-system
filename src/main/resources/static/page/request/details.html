@@ -66,20 +66,35 @@
                         </a>
                     </h4>
                     <div id="collapseHistory" class="collapse in">
-                        <table class="table">
-                            <thead class="thead-inverse">
-                            <tr>
-                                <th>Property</th>
-                                <th>New value</th>
-                                <th>Old value</th>
-                                <th>Author</th>
-                                <th>Time creation</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                        <select class="input-sm" ng-model="periodList.value" ng-options="x for x in periodList.values"
+                                ng-change="historyForPeriod(periodList.value)">
+                        </select>
+                        <div ng-if="historyList.length!=0">
+                            <table class="table">
+                                <thead class="thead-inverse">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>New value</th>
+                                    <th>Old value</th>
+                                    <th>Author</th>
+                                    <th>Time creation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr  class="animate-repeat" ng-repeat="history in historyList">
+                                    <th>{{history.property}}</th>
+                                    <td>{{history.newValue}}</td>
+                                    <td>{{history.oldValue}}</td>
+                                    <!--TODO author id-->
+                                    <td><a ng-href="#">{{history.author}}</a></td>
+                                    <td>{{history.createTime}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-if="historyList.length==0">
+                            No changes for this period
+                        </div>
                     </div>
                 </div>
             </div>

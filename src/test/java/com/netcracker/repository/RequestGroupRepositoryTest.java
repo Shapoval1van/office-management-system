@@ -31,6 +31,7 @@ public class RequestGroupRepositoryTest {
             requestGroup = new RequestGroup();
             requestGroup.setId(1);
             requestGroup.setName("Request group   1");
+            requestGroup.setAuthor(new Person(2L));
         }
 
         @Test
