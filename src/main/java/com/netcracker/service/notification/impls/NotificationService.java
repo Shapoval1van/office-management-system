@@ -1,7 +1,7 @@
 package com.netcracker.service.notification.impls;
 
 import com.netcracker.model.entity.Person;
-import com.netcracker.model.notification.Notification;
+import com.netcracker.model.entity.Notification;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
 import org.springframework.beans.factory.annotation.Autowired;

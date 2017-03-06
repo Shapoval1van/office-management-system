@@ -1,4 +1,4 @@
-package com.netcracker.model.notification;
+package com.netcracker.model.entity;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
