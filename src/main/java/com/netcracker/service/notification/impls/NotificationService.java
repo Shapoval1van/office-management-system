@@ -114,4 +114,10 @@ public class NotificationService implements NotificationSender {
         });
     }
 
+    @Override
+    @Transactional
+    public void saveFailedNotification(Notification notification) {
+        notificationRepository.save(notification);
+    }
+
 }

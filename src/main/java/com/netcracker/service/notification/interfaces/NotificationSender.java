@@ -1,5 +1,6 @@
 package com.netcracker.service.notification.interfaces;
 
+import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
 
 public interface NotificationSender {
@@ -14,4 +15,6 @@ public interface NotificationSender {
     void sendPasswordForNewManager(Person person);
 
     void resendNotification();
+
+    void saveFailedNotification(Notification notification);
 }
