@@ -2,13 +2,21 @@ package com.netcracker.service.notification.impls;
 
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Notification;
+import com.netcracker.repository.data.interfaces.NotificationRepository;
+import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
 import com.netcracker.util.NotificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @PropertySource("classpath:notification/templates/notificationTemplates.properties")
@@ -34,7 +42,16 @@ public class NotificationService implements NotificationSender {
 
     @Autowired
     private MailService mailService;
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private PersonRepository personRepository;
 
+    @Autowired
+    public void setNotificationRepository(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
+
+    @Override
     public void sendPasswordReminder(Person person, String link) {
         Notification notification = NotificationBuilder.build(person,
                 PASSWORD_REMINDER_SUBJECT,
@@ -44,6 +61,7 @@ public class NotificationService implements NotificationSender {
         mailService.send(notification);
     }
 
+    @Override
     public void sendInformationNotification(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 INFORMATION_MESSAGE_SUBJECT,
@@ -52,6 +70,7 @@ public class NotificationService implements NotificationSender {
         mailService.send(notification);
     }
 
+    @Override
     public void sendCustomInformationNotification(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 CUSTOM_INFORMATION_MESSAGE_SUBJECT,
@@ -60,6 +79,7 @@ public class NotificationService implements NotificationSender {
         mailService.send(notification);
     }
 
+    @Override
     public void sendRegistrationCompletedNotification(Person person, String link) {
         Notification notification = NotificationBuilder.build(person,
                 REGISTRATION_MESSAGE_SUBJECT,
@@ -74,7 +94,24 @@ public class NotificationService implements NotificationSender {
         Notification notification = NotificationBuilder.build(person,
                 REGISTRATION_MESSAGE_SUBJECT,
                 ", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword());
-
         mailService.send(notification);
     }
+
+    @Override
+    @Scheduled(fixedDelay = 1800000)
+    @Transactional
+    public void resendNotification() {
+        List<Notification> notifications = notificationRepository.findAll();
+        notifications.forEach(notification -> {
+            notificationRepository.delete(notification.getId());
+            Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
+            if (personOptional.isPresent()){
+                notification.setPerson(personOptional.get());
+                notification.setId(null);
+                mailService.send(notification);
+            }
+        });
+    }
+
+
 }

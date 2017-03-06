@@ -24,8 +24,12 @@ public class MailService implements MailSending {
     private MailSender mailSender;
     @Autowired
     private NotificationTextBuilder notificationTextBuilder;
-    @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    public void setNotificationRepository(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 
     /**
      * This method sends mail.

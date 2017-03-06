@@ -12,4 +12,6 @@ public interface NotificationSender {
     void sendRegistrationCompletedNotification(Person person, String link);
 
     void sendPasswordForNewManager(Person person);
+
+    void resendNotification();
 }

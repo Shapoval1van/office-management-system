@@ -168,7 +168,7 @@ CREATE TABLE NOTIFICATION (
   subject TEXT,
   notification_text TEXT,
   link TEXT,
-  created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+  created TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
 );
 
 ALTER TABLE NOTIFICATION
