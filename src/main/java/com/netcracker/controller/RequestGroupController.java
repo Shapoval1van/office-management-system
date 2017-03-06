@@ -1,5 +1,7 @@
 package com.netcracker.controller;
 
+import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.repository.common.impl.SimplePageable;
 import com.netcracker.service.requestGroup.RequestGroupService;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,4 +34,9 @@ public class RequestGroupController {
         return requestGroupService.getRequestGroupByNamePart(namePart, pageable);
     }
 
+    @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException {
+        requestGroupService.saveRequestGroup(requestGroupDTO, principal);
+    }
 }
