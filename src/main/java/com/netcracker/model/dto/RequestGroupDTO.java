@@ -18,6 +18,9 @@ public class RequestGroupDTO {
     @JsonView(View.Public.class)
     private Long author;
 
+    public RequestGroupDTO() {
+    }
+
     public RequestGroupDTO(RequestGroup requestGroup) {
         this.id = requestGroup.getId();
         this.name = requestGroup.getName();

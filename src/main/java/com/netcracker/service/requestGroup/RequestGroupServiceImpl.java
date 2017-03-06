@@ -1,6 +1,7 @@
 package com.netcracker.service.requestGroup;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.RequestGroup;
@@ -62,6 +63,27 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             requestGroup.setAuthor(currentUser.get());
 
 
+        return saveRequestGroup(requestGroup);
+    }
+
+    @Override
+    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO) throws ResourceNotFoundException {
+
+        LOGGER.debug("Get request group with id {} from database", requestGroupDTO.getId());
+        Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
+
+        if (!requestGroupOptional.isPresent()) {
+            LOGGER.error("Request group with id {} not exist", requestGroupDTO.getId());
+            throw new ResourceNotFoundException("Request group with id" + requestGroupDTO.getId() + " not exist");
+        }
+
+        RequestGroup requestGroup = requestGroupOptional.get();
+        if (requestGroupDTO.getName() != null) {
+            LOGGER.trace("Change request group name from {} to {}", requestGroup.getName(), requestGroupDTO.getName());
+            requestGroup.setName(requestGroupDTO.getName());
+        }
+
+        LOGGER.trace("Update request group");
         return saveRequestGroup(requestGroup);
     }
 
