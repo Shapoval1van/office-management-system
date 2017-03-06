@@ -1,7 +1,7 @@
 package com.netcracker.service.notification.impls;
 
-import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Notification;
+import com.netcracker.model.entity.Person;
 import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,8 @@ import java.util.Optional;
 @Service
 @PropertySource("classpath:notification/templates/notificationTemplates.properties")
 public class NotificationService implements NotificationSender {
+
+    private static final int RATE = 1800000;
 
     @Value("${password.reminder.subject}")
     private String PASSWORD_REMINDER_SUBJECT;
@@ -98,10 +99,10 @@ public class NotificationService implements NotificationSender {
     }
 
     @Override
-    @Scheduled(fixedDelay = 1800000)
+    @Scheduled(fixedRate = RATE)
     @Transactional
     public void resendNotification() {
-        List<Notification> notifications = notificationRepository.findAll();
+        List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
         notifications.forEach(notification -> {
             notificationRepository.delete(notification.getId());
             Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
@@ -112,6 +113,5 @@ public class NotificationService implements NotificationSender {
             }
         });
     }
-
 
 }

@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -19,6 +20,9 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
     public static final String TEXT_COLUMN = "notification_text";
     public static final String LINK_COLUMN = "link";
     public static final String CREATED_COLUMN = "created";
+
+    public static final String GET_ALL_NOTIFICATION_SORTED_BY_DATE = "select "+ID_COLUMN+", person_id, subject, notification_text, link, created " +
+            " from "+Notification.TABLE_NAME+" order by "+CREATED_COLUMN;
 
     public NotificationRepositoryImpl() {
         super(Notification.TABLE_NAME, Notification.ID_COLUMN);
@@ -49,4 +53,8 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
         });
     }
 
+    @Override
+    public List<Notification> findAllNotificationsSortedByDate() {
+        return this.queryForList(GET_ALL_NOTIFICATION_SORTED_BY_DATE);
+    }
 }
