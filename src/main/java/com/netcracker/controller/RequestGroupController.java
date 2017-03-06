@@ -52,4 +52,10 @@ public class RequestGroupController {
         requestGroupDTO.setId(requestGroupId);
         requestGroupService.updateRequestGroup(requestGroupDTO);
     }
+
+    @GetMapping("/count/author/{authorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getRequestGroupCountByAuthor(@PathVariable("authorId") Long authorId) {
+        return requestGroupService.getRequestGroupCountByAuthor(authorId);
+    }
 }

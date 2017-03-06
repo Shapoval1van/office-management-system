@@ -87,6 +87,12 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         return saveRequestGroup(requestGroup);
     }
 
+    @Override
+    public int getRequestGroupCountByAuthor(Long authorId) {
+        LOGGER.debug("Get request grout count by author. Author id: {}", authorId);
+        return requestGroupRepository.countRequestGroupByAuthor(authorId);
+    }
+
     private String generateRegexByNamePart(String namePart) {
         String regex = new StringBuilder()
                 .append(".*")

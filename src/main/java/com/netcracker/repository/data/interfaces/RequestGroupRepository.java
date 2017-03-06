@@ -10,4 +10,6 @@ public interface RequestGroupRepository extends JdbcRepository<RequestGroup, Int
     List<RequestGroup> findRequestGroupByAuthorId(Long authorId, Pageable pageable);
 
     List<RequestGroup> findRequestGroupByNameRegex(String regex, Pageable pageable);
+
+    int countRequestGroupByAuthor(Long authorId);
 }

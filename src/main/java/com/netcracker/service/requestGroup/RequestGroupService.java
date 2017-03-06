@@ -20,4 +20,6 @@ public interface RequestGroupService {
     Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException;
 
     Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO) throws ResourceNotFoundException;
+
+    int getRequestGroupCountByAuthor(Long authorId);
 }
