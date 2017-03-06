@@ -22,7 +22,11 @@
                                     <li><span class="bold">Author:</span> <a ng-href="#">{{request.employee.firstName +
                                         data.employee.lastName}}</a></li>
                                     <li><span class="bold">Created:</span> {{creationTime}}</li>
-                                    <li><span class="bold">Priority:</span> {{request.priority.name}}</li>
+                                    <li><span class="bold">Priority:</span>
+                                        <select class="input-sm" ng-model="priorityList.value" ng-options="x for x in priorityList.values"
+                                                ng-change="prioritySelect(priorityList.value)">
+                                        </select>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="col-md-offset-1 col-md-4 border">

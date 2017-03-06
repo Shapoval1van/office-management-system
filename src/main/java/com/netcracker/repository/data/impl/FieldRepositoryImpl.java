@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-public class FieldReposipotyImpl extends GenericJdbcRepository<Field, Integer> implements FieldRepository{
+public class FieldRepositoryImpl extends GenericJdbcRepository<Field, Integer> implements FieldRepository{
 
     public static final String ID_COLUMN = "field_id";
     public static final String NAME_COLUMN = "name";
 
-    public FieldReposipotyImpl() {
+    public FieldRepositoryImpl() {
         super(Field.TABLE_NAME, Field.ID_COLUMN);
     }
 

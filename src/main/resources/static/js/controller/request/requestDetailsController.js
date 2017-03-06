@@ -9,6 +9,7 @@
                     "value": "Day",
                     "values": [ "Day", "Month", "All"]
                 };
+
                 var requestId = $routeParams.requestId;
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -18,6 +19,10 @@
                     url: '/api/request/' + $routeParams.requestId
                 }).then(function successCallback(response) {
                     $scope.request = response.data;
+                    $scope.priorityList =  {  "type": "select",
+                        "value": response.data.priority.name.substr(0,1).toUpperCase()+response.data.priority.name.substr(1).toLocaleLowerCase(),
+                        "values": [ "High", "Normal", "Low"]
+                    };
                     $scope.creationTime = new Date(response.data.creationTime).toLocaleDateString("nl", {
                         year: "2-digit",
                         month: "2-digit",
@@ -45,6 +50,28 @@
                         $scope.historyList = buildHistoryList(response.data);
                     }, function errorCallback(response) {
 
+                    });
+                };
+
+                $scope.prioritySelect = function(item_selected1){
+                    var priority = item_selected1.toLowerCase();
+                    $http({
+                        method: 'POST',
+                        url: '/api/request/updatePriority/' + $routeParams.requestId,
+                        headers: {
+                            "Content-type": "application/x-www-form-urlencoded;"
+                        },
+                        transformRequest: function (obj) {
+                            var str = [];
+                            for (var p in obj)
+                                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                            return str.join("&");
+                        },
+                        data: {
+                            priority: priority
+                        }
+                    }).then(function successCallback(response) {
+                    }, function errorCallback(response) {
                     });
                 };
 
@@ -102,7 +129,6 @@
 
                     })
                 };
-
                 //FIXME
                 $scope.getUserName = function (userId) {
 

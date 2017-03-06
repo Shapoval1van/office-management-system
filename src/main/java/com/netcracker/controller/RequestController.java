@@ -34,14 +34,26 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
-                                              @RequestParam(name = "period", defaultValue = "day") String period,
-                                              @PathVariable(name = "requestId") Long id) {
+                                               @RequestParam(name = "period", defaultValue = "day") String period,
+                                               @PathVariable(name = "requestId") Long id) {
         Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2)->{
             if(cg1.getId()>cg2.getId()) return 1;
             else if(cg1.getId()<cg2.getId()) return -1;
             else return 0;});
         requestService.getRequestHistory(id, period).forEach(changeGroup -> historySet.add(new HistoryDTO(changeGroup)));
         return new ResponseEntity<>(historySet, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/updatePriority/{requestId}")
+    public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
+                                               @RequestParam(name = "priority") String priority,
+                                               @PathVariable(name = "requestId") Long id) {
+        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority);
+        if(!newRequest.isPresent()){
+            return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new MessageDTO("Request updated"), HttpStatus.OK);
     }
 
     @JsonView(View.Public.class)

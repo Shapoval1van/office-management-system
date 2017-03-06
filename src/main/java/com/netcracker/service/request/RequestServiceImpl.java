@@ -108,6 +108,17 @@ public class RequestServiceImpl implements RequestService {
         return this.requestRepository.updateRequest(request);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Optional<Request> updateRequestPriority(Long requestId, String priority) {
+        Optional<Request> oldRequest = requestRepository.findOne(requestId);
+        if(!oldRequest.isPresent()) return Optional.empty();
+        Optional<Priority> p = priorityRepository.findPriorityByName(priority);
+        if(!p.isPresent()) return Optional.empty();
+        oldRequest.get().setPriority(p.get());
+        return this.requestRepository.updateRequest(oldRequest.get());
+    }
+
     @Override
     public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
         Request parent = requestRepository.findOne(parentId).orElseThrow(() ->

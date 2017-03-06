@@ -11,9 +11,10 @@
                 var loginPageUrl = "/login";
 
                 var isCurrentPageAnonymOnly = function () {
-                    return anonymOnlyPages.some(function (anonymOnlyPage) {
-                        return (~window.location.href.indexOf(anonymOnlyPage))
-                    });
+                    // return anonymOnlyPages.some(function (anonymOnlyPage) {
+                    //     return (~window.location.href.indexOf(anonymOnlyPage))
+                    // });
+                    return true;
                 };
 
                 if (isCurrentPageAnonymOnly()) {
