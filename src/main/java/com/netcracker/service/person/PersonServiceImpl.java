@@ -35,7 +35,6 @@ public class PersonServiceImpl implements PersonService {
         if(namePattern == null) {
             return personRepository.getManagers(pageable);
         }
-        namePattern = "%" + namePattern + "%";
         return personRepository.getManagers(pageable, namePattern);
     }
 }
