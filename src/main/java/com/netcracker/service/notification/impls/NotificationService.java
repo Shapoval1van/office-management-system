@@ -5,7 +5,6 @@ import com.netcracker.model.entity.Notification;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
 import com.netcracker.util.NotificationBuilder;
-import com.netcracker.util.NotificationTextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -36,46 +35,46 @@ public class NotificationService implements NotificationSender {
     @Autowired
     private MailService mailService;
 
-    public boolean sendPasswordReminder(Person person, String link) {
+    public void sendPasswordReminder(Person person, String link) {
         Notification notification = NotificationBuilder.build(person,
                 PASSWORD_REMINDER_SUBJECT,
                 PASSWORD_REMINDER_MESSAGE_SRC,
                 link);
 
-        return mailService.send(notification);
+        mailService.send(notification);
     }
 
-    public boolean sendInformationNotification(Person person) {
+    public void sendInformationNotification(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 INFORMATION_MESSAGE_SUBJECT,
                 INFORMATION_MESSAGE_SRC);
 
-        return mailService.send(notification);
+        mailService.send(notification);
     }
 
-    public boolean sendCustomInformationNotification(Person person) {
+    public void sendCustomInformationNotification(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 CUSTOM_INFORMATION_MESSAGE_SUBJECT,
                 CUSTOM_INFORMATION_MESSAGE_SRC);
 
-        return mailService.send(notification);
+        mailService.send(notification);
     }
 
-    public boolean sendRegistrationCompletedNotification(Person person, String link) {
+    public void sendRegistrationCompletedNotification(Person person, String link) {
         Notification notification = NotificationBuilder.build(person,
                 REGISTRATION_MESSAGE_SUBJECT,
                 REGISTRATION_MESSAGE_SRC,
                 link);
 
-        return mailService.send(notification);
+        mailService.send(notification);
     }
 
     @Override
-    public boolean sendPasswordForNewManager(Person person) {
+    public void sendPasswordForNewManager(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 REGISTRATION_MESSAGE_SUBJECT,
                 ", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword());
 
-        return mailService.send(notification);
+        mailService.send(notification);
     }
 }

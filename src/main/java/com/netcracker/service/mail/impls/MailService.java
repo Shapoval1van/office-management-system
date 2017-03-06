@@ -49,7 +49,7 @@ public class MailService implements MailSending {
     }
 
     @Override
-    public boolean send(Notification notification) {
+    public void send(Notification notification) {
         SimpleMailMessage msg = new SimpleMailMessage();
         try {
             msg.setFrom(MAIL_LOGIN);
@@ -60,9 +60,6 @@ public class MailService implements MailSending {
             mailSender.send(msg);
         } catch (MailException e){
             // TODO add exception info to log
-            return false;
         }
-
-        return true;
     }
 }
