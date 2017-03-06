@@ -54,7 +54,7 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(errors);
     }
 
-    @ExceptionHandler({CannotCreateRequestException.class,
+    @ExceptionHandler({CannotCreateRequestException.class, CannotAssignRequestException.class,
             CannotDeleteRequestException.class, CannotCreateSubRequestException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorsDTO requestExceptionHandler(HttpServletRequest request, BaseException ex){

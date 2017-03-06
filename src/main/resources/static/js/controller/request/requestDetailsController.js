@@ -5,6 +5,10 @@
 
                 $scope.comments = [];
                 $scope.comment = "";
+                $scope.periodList =  {   "type": "select",
+                    "value": "Day",
+                    "values": [ "Day", "Month", "All"]
+                };
                 var requestId = $routeParams.requestId;
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -14,7 +18,6 @@
                     url: '/api/request/' + $routeParams.requestId
                 }).then(function successCallback(response) {
                     $scope.request = response.data;
-                    console.log(response.data);
                     $scope.creationTime = new Date(response.data.creationTime).toLocaleDateString("nl", {
                         year: "2-digit",
                         month: "2-digit",
@@ -23,6 +26,45 @@
                 }, function errorCallback(response) {
 
                 });
+
+                $http({
+                    method: 'GET',
+                    url: '/api/request/history/' + $routeParams.requestId + '?period=day'
+                }).then(function successCallback(response) {
+                    $scope.historyList = buildHistoryList(response.data);
+                }, function errorCallback(response) {
+
+                });
+
+                $scope.historyForPeriod = function(item_selected){
+                    var period = item_selected.toLowerCase();
+                    $http({
+                        method: 'GET',
+                        url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
+                    }).then(function successCallback(response) {
+                        $scope.historyList = buildHistoryList(response.data);
+                    }, function errorCallback(response) {
+
+                    });
+                };
+
+                function buildHistoryList(сhangeGroup) {
+                    var historyResult = [];
+                    сhangeGroup.forEach(function (item, arr) {
+                        item.changeItems.forEach(function (item1, arr1) {
+                            var historyItem = {};
+                            historyItem.property = item1.field.name.substr(0,1).toUpperCase()+item1.field.name.substr(1).toLowerCase();
+                            historyItem.newValue = item1.newVal;
+                            historyItem.oldValue = item1.oldVal;
+                            historyItem.createTime = item.createDate;
+                            historyItem.author = item.author.firstName +' ' + item.author.lastName;
+                            historyItem.authorId = item.author.id;
+                            historyResult.push(historyItem);
+                        });
+                    });
+                    return historyResult;
+                }
+
                 $http({
                     method: 'GET',
                     url: '/api/request/sub/' + $routeParams.requestId

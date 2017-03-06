@@ -3,9 +3,10 @@
  */
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("MainController", ["$scope", "$http", "$cookies",
-            function ($scope, $http, $cookies) {
+        .controller("MainController", ["$scope", "$http", "$cookies", "SessionService",
+            function ($scope, $http, $cookies, SessionService) {
 
+                SessionService.loadSession();
                 var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
                 var redirectIfTokenExist = "/demo";
                 var loginPageUrl = "/login";
@@ -17,20 +18,19 @@
                 };
 
                 if (isCurrentPageAnonymOnly()) {
-                    if ($cookies.get("access_token"))
+                    if (SessionService.isUserLoggedIn())
                         window.location.href = redirectIfTokenExist;
                 } else {
-                    if ($cookies.get("access_token"))
+                    if (SessionService.isUserLoggedIn())
                         $http.defaults.headers.common.Authorization =
-                            'Bearer ' + $cookies.get("access_token");
+                            'Bearer ' + SessionService.getAccessToken();
                     else
                         window.location = loginPageUrl;
                 }
 
                 $scope.logout = function () {
-                    $cookies.remove("access_token");
-                    localStorage.removeItem("currentUser");
-                    window.location.reload();
+                    SessionService.destroySession();
+                    window.location.href = '/login';
                 }
             }])
 })();
