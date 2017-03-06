@@ -1,6 +1,7 @@
 package com.netcracker.service.mail.impls;
 
 import com.netcracker.model.entity.Notification;
+import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.service.mail.interfaces.MailSending;
 import com.netcracker.util.NotificationTextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
@@ -22,6 +24,8 @@ public class MailService implements MailSending {
     private MailSender mailSender;
     @Autowired
     private NotificationTextBuilder notificationTextBuilder;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     /**
      * This method sends mail.
@@ -50,6 +54,7 @@ public class MailService implements MailSending {
     }
 
     @Override
+    @Transactional
     @Async
     public void send(Notification notification) {
         SimpleMailMessage msg = new SimpleMailMessage();
@@ -61,7 +66,7 @@ public class MailService implements MailSending {
 
             mailSender.send(msg);
         } catch (MailException e){
-            // TODO add exception info to log
+            notificationRepository.save(notification);
         }
     }
 }

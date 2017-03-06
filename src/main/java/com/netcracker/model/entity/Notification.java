@@ -4,6 +4,9 @@ import com.netcracker.repository.common.Persistable;
 
 public class Notification implements Persistable<Long> {
 
+    public static final String TABLE_NAME = "NOTIFICATION";
+    public static final String ID_COLUMN = "notification_id";
+
     private Long id;
     private Person person;
     private String link = "";
