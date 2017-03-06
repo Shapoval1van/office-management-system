@@ -99,7 +99,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
             if (parentId != null) {
                 request.setParent(new Request((Long) parentId));
             }
-            Integer requestGroupId = resultSet.getInt(REQUEST_GROUP_ID_COLUMN);
+            Integer requestGroupId = (Integer) resultSet.getObject(REQUEST_GROUP_ID_COLUMN);
             if (requestGroupId != null) {
                 request.setRequestGroup(new RequestGroup(requestGroupId));
             }
