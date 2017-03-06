@@ -1,6 +1,7 @@
 package com.netcracker.component;
 
 import com.netcracker.model.event.NewPasswordEvent;
+import com.netcracker.model.event.NotificationSendingErrorEvent;
 import com.netcracker.model.event.PersonRegistrationEvent;
 import com.netcracker.model.event.ResetPasswordEvent;
 import com.netcracker.service.notification.impls.NotificationService;
@@ -30,5 +31,10 @@ public class NotificationEventListener {
     @EventListener
     public void handleNewPassword(NewPasswordEvent event) {
         notificationService.sendPasswordForNewManager(event.getPerson());
+    }
+
+    @EventListener
+    public void handleNotificationSendingError(NotificationSendingErrorEvent event){
+        notificationService.saveFailedNotification(event.getNotification());
     }
 }

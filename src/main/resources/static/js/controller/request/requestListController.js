@@ -17,7 +17,7 @@
                 $scope.maxSize = 5;
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
-                $scope.selectedPriority = {priorityId: 2, name: 'NORMAL'};
+                $scope.selectedPriority = $scope.priorities[0];
                 $scope.assignedMessage = '';
                 $scope.selectedRequest = -1;
 
@@ -27,9 +27,8 @@
                 };
 
                 $scope.isAdmin = function (thing) {
-                    return currentUser.role === 'ADMINISTRATOR';
+                    return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
-
 
                 $scope.getTotalPage = function() {
                     $http({
@@ -103,14 +102,13 @@
                 };
 
                 $scope.update = function() {
-                    if($scope.selectedManager.length >= 3) {
+                    if($scope.selectedManager.length >= 2) {
                         console.log($scope.selectedManager);
 
                         $http({
                             method: 'GET',
-                            url: '/api/person/managers/' +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize,
-                            data: $scope.selectedManager
+                            url: '/api/person/managers/' +  $scope.selectedManager +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                         }).then(function successCallback(response) {
                             $scope.managers = response.data;
                         }, function errorCallback(response) {

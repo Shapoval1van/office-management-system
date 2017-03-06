@@ -1,15 +1,20 @@
 package com.netcracker.service.notification.interfaces;
 
+import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
 
 public interface NotificationSender {
-    boolean sendPasswordReminder(Person person, String link);
+    void sendPasswordReminder(Person person, String link);
 
-    boolean sendInformationNotification(Person person);
+    void sendInformationNotification(Person person);
 
-    boolean sendCustomInformationNotification(Person person);
+    void sendCustomInformationNotification(Person person);
 
-    boolean sendRegistrationCompletedNotification(Person person, String link);
+    void sendRegistrationCompletedNotification(Person person, String link);
 
-    boolean sendPasswordForNewManager(Person person);
+    void sendPasswordForNewManager(Person person);
+
+    void resendNotification();
+
+    void saveFailedNotification(Notification notification);
 }

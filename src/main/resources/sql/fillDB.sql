@@ -43,10 +43,11 @@ $$ LANGUAGE plpgsql;
 DO
 $$
 BEGIN
-  FOR i IN 1..20 LOOP
-    INSERT INTO request_group (name) VALUES
+  FOR i IN 1..2 LOOP
+    INSERT INTO request_group (name, author_id) VALUES
       (
-        CONCAT('Request group ', TO_CHAR(i, '99'))
+        CONCAT('qwr ', TO_CHAR(i, '99')),
+        1
       );
   END LOOP;
 END;

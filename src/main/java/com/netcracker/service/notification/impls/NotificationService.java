@@ -1,17 +1,28 @@
 package com.netcracker.service.notification.impls;
 
+import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
-import com.netcracker.model.notification.Notification;
+import com.netcracker.repository.data.interfaces.NotificationRepository;
+import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
+import com.netcracker.util.NotificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @PropertySource("classpath:notification/templates/notificationTemplates.properties")
 public class NotificationService implements NotificationSender {
+
+    private static final int RATE = 1800000;
+
     @Value("${password.reminder.subject}")
     private String PASSWORD_REMINDER_SUBJECT;
     @Value("${information.message.subject}")
@@ -30,51 +41,83 @@ public class NotificationService implements NotificationSender {
     @Value("${registration.message.src}")
     private String REGISTRATION_MESSAGE_SRC;
 
-
-
     @Autowired
     private MailService mailService;
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private PersonRepository personRepository;
 
-    public boolean sendPasswordReminder(Person person, String link) {
-        return mailService.send(person.getEmail(), PASSWORD_REMINDER_SUBJECT, Notification.newNotificationBuilder()
-                .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(PASSWORD_REMINDER_MESSAGE_SRC)
-                .setNotificationLink(link)
-                .build()
-                .toString());
-    }
-
-    public boolean sendInformationNotification(Person person) {
-        return mailService.send(person.getEmail(), INFORMATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
-                .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(INFORMATION_MESSAGE_SRC)
-                .build()
-                .toString());
-    }
-
-    public boolean sendCustomInformationNotification(Person person) {
-        return mailService.send(person.getEmail(), CUSTOM_INFORMATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
-                .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(CUSTOM_INFORMATION_MESSAGE_SRC)
-                .build()
-                .toString());
-    }
-
-    public boolean sendRegistrationCompletedNotification(Person person, String link) {
-        return mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
-                .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(REGISTRATION_MESSAGE_SRC)
-                .setNotificationLink(link)
-                .build()
-                .toString());
+    @Autowired
+    public void setNotificationRepository(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
-    public boolean sendPasswordForNewManager(Person person) {
-        return  mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, Notification.newNotificationBuilder()
-                .setNotificationRecipientName(person.getFirstName())
-                .setNotificationText(", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword())
-                .build()
-                .toString());
+    public void sendPasswordReminder(Person person, String link) {
+        Notification notification = NotificationBuilder.build(person,
+                PASSWORD_REMINDER_SUBJECT,
+                PASSWORD_REMINDER_MESSAGE_SRC,
+                link);
+
+        mailService.send(notification);
     }
+
+    @Override
+    public void sendInformationNotification(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                INFORMATION_MESSAGE_SUBJECT,
+                INFORMATION_MESSAGE_SRC);
+
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendCustomInformationNotification(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                CUSTOM_INFORMATION_MESSAGE_SUBJECT,
+                CUSTOM_INFORMATION_MESSAGE_SRC);
+
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendRegistrationCompletedNotification(Person person, String link) {
+        Notification notification = NotificationBuilder.build(person,
+                REGISTRATION_MESSAGE_SUBJECT,
+                REGISTRATION_MESSAGE_SRC,
+                link);
+
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendPasswordForNewManager(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                REGISTRATION_MESSAGE_SUBJECT,
+                ", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword());
+        mailService.send(notification);
+    }
+
+    @Override
+    @Scheduled(fixedRate = RATE)
+    @Transactional
+    public void resendNotification() {
+        List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
+        notifications.forEach(notification -> {
+            notificationRepository.delete(notification.getId());
+            Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
+            if (personOptional.isPresent()){
+                notification.setPerson(personOptional.get());
+                notification.setId(null);
+                mailService.send(notification);
+            }
+        });
+    }
+
+    @Override
+    @Transactional
+    public void saveFailedNotification(Notification notification) {
+        notificationRepository.save(notification);
+    }
+
 }

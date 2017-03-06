@@ -1,11 +1,19 @@
 package com.netcracker.service.mail.impls;
 
+import com.netcracker.model.entity.Notification;
+import com.netcracker.model.event.NotificationSendingErrorEvent;
+import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.service.mail.interfaces.MailSending;
+import com.netcracker.util.NotificationTextBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
@@ -16,6 +24,10 @@ public class MailService implements MailSending {
 
     @Inject
     private MailSender mailSender;
+    @Autowired
+    private NotificationTextBuilder notificationTextBuilder;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * This method sends mail.
@@ -24,6 +36,8 @@ public class MailService implements MailSending {
      * @param message Message text
      * @return true in case message sent successful or false if exception occurred.
      */
+    @Deprecated
+    @Override
     public boolean send(String recipient, String subject, String message) {
         SimpleMailMessage msg = new SimpleMailMessage();
         try {
@@ -39,5 +53,21 @@ public class MailService implements MailSending {
         }
 
         return true;
+    }
+
+    @Override
+    @Async
+    public void send(Notification notification) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        try {
+            msg.setFrom(MAIL_LOGIN);
+            msg.setTo(notification.getPerson().getEmail());
+            msg.setSubject(notification.getSubject());
+            msg.setText(notificationTextBuilder.buildText(notification));
+
+            mailSender.send(msg);
+        } catch (MailException e){
+            eventPublisher.publishEvent(new NotificationSendingErrorEvent(notification));
+        }
     }
 }
