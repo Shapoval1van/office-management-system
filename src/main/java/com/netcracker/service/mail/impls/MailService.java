@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -49,6 +50,7 @@ public class MailService implements MailSending {
     }
 
     @Override
+    @Async
     public void send(Notification notification) {
         SimpleMailMessage msg = new SimpleMailMessage();
         try {
