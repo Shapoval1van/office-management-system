@@ -1,6 +1,9 @@
 package com.netcracker.service.mail.impls;
 
+import com.netcracker.model.entity.Notification;
 import com.netcracker.service.mail.interfaces.MailSending;
+import com.netcracker.util.NotificationTextBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
@@ -16,6 +19,8 @@ public class MailService implements MailSending {
 
     @Inject
     private MailSender mailSender;
+    @Autowired
+    private NotificationTextBuilder notificationTextBuilder;
 
     /**
      * This method sends mail.
@@ -24,6 +29,8 @@ public class MailService implements MailSending {
      * @param message Message text
      * @return true in case message sent successful or false if exception occurred.
      */
+    @Deprecated
+    @Override
     public boolean send(String recipient, String subject, String message) {
         SimpleMailMessage msg = new SimpleMailMessage();
         try {
@@ -34,6 +41,24 @@ public class MailService implements MailSending {
 
             mailSender.send(msg);
         }catch (MailException e){
+            // TODO add exception info to log
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean send(Notification notification) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        try {
+            msg.setFrom(MAIL_LOGIN);
+            msg.setTo(notification.getPerson().getEmail());
+            msg.setSubject(notification.getSubject());
+            msg.setText(notificationTextBuilder.buildText(notification));
+
+            mailSender.send(msg);
+        } catch (MailException e){
             // TODO add exception info to log
             return false;
         }

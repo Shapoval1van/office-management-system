@@ -32,13 +32,8 @@ public class NotificationService implements NotificationSender {
     @Value("${registration.message.src}")
     private String REGISTRATION_MESSAGE_SRC;
 
-
-
     @Autowired
     private MailService mailService;
-    @Autowired
-    private NotificationTextBuilder notificationTextBuilder;
-
 
     public boolean sendPasswordReminder(Person person, String link) {
         Notification notification = new Notification();
@@ -47,7 +42,7 @@ public class NotificationService implements NotificationSender {
         notification.setSubject(PASSWORD_REMINDER_SUBJECT);
         notification.setLink(link);
 
-        return mailService.send(person.getEmail(), PASSWORD_REMINDER_SUBJECT, notificationTextBuilder.buildText(notification));
+        return mailService.send(notification);
     }
 
     public boolean sendInformationNotification(Person person) {
@@ -56,7 +51,7 @@ public class NotificationService implements NotificationSender {
         notification.setText(INFORMATION_MESSAGE_SRC);
         notification.setSubject(INFORMATION_MESSAGE_SUBJECT);
 
-        return mailService.send(person.getEmail(), INFORMATION_MESSAGE_SUBJECT, notificationTextBuilder.buildText(notification));
+        return mailService.send(notification);
     }
 
     public boolean sendCustomInformationNotification(Person person) {
@@ -65,7 +60,7 @@ public class NotificationService implements NotificationSender {
         notification.setText(CUSTOM_INFORMATION_MESSAGE_SRC);
         notification.setSubject(CUSTOM_INFORMATION_MESSAGE_SUBJECT);
 
-        return mailService.send(person.getEmail(), CUSTOM_INFORMATION_MESSAGE_SUBJECT, notificationTextBuilder.buildText(notification));
+        return mailService.send(notification);
     }
 
     public boolean sendRegistrationCompletedNotification(Person person, String link) {
@@ -75,7 +70,7 @@ public class NotificationService implements NotificationSender {
         notification.setSubject(REGISTRATION_MESSAGE_SUBJECT);
         notification.setLink(link);
 
-        return mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, notificationTextBuilder.buildText(notification));
+        return mailService.send(notification);
     }
 
     @Override
@@ -85,6 +80,6 @@ public class NotificationService implements NotificationSender {
         notification.setText(", you are welcome at our system. Let's start work!!!\n"+"Your pass: "+person.getPassword());
         notification.setSubject(REGISTRATION_MESSAGE_SUBJECT);
 
-        return  mailService.send(person.getEmail(), REGISTRATION_MESSAGE_SUBJECT, notificationTextBuilder.buildText(notification));
+        return mailService.send(notification);
     }
 }
