@@ -2,6 +2,19 @@
      color: #000;
      font-family: 'Roboto';
 }
+.animate-repeat {
+     line-height:40px;
+     list-style:none;
+     box-sizing:border-box;
+}
+
+.animate-repeat.ng-move,
+.animate-repeat.ng-enter,
+.animate-repeat.ng-leave {
+     -webkit-transition:all linear 0s;
+     transition:all linear 0s;
+}
+
 
 .ul-decoration{
      list-style: none;
