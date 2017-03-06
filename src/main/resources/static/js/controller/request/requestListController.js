@@ -27,7 +27,7 @@
                 };
 
                 $scope.isAdmin = function (thing) {
-                    return currentUser.role === 'ADMINISTRATOR';
+                    return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
 
                 $scope.getTotalPage = function() {

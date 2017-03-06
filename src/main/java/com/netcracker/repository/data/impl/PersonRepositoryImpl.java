@@ -33,7 +33,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
             "FROM " + TABLE_NAME + "  WHERE (LOWER(?) like concat('%', LOWER(first_name), '%')" +
             "                    OR LOWER(?) like concat('%', LOWER(last_name), '%')" +
             "                    OR LOWER(first_name) like LOWER(?)" +
-            "                    OR LOWER(last_name) like LOWER(?))";
+            "                    OR LOWER(last_name) like LOWER(?))" +
+            "                    AND role_id = 2";
 
     private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE role_id = 2";
