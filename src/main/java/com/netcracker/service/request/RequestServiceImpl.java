@@ -5,6 +5,8 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,6 +33,9 @@ public class RequestServiceImpl implements RequestService {
 
     private final FieldRepository fieldRepository;
 
+    private final RequestGroupRepository requestGroupRepository;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
     public RequestServiceImpl(RequestRepository requestRepository,
@@ -39,7 +44,8 @@ public class RequestServiceImpl implements RequestService {
                               RoleRepository roleRepository,
                               PriorityRepository priorityRepository,
                               ChangeGroupRepository changeGroupRepository,
-                              FieldRepository fieldRepository) {
+                              FieldRepository fieldRepository,
+                              RequestGroupRepository requestGroupRepository) {
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -47,6 +53,7 @@ public class RequestServiceImpl implements RequestService {
         this.priorityRepository = priorityRepository;
         this.changeGroupRepository = changeGroupRepository;
         this.fieldRepository = fieldRepository;
+        this.requestGroupRepository = requestGroupRepository;
     }
 
     @Override
@@ -108,6 +115,46 @@ public class RequestServiceImpl implements RequestService {
         return this.requestRepository.updateRequest(request);
     }
 
+    // TODO: 06.03.2017
+    @Override
+    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException {
+        LOGGER.trace("Get request with id {} from database", requestId);
+        Optional<Request> requestOptional = requestRepository.findOne(requestId);
+
+        if (!requestOptional.isPresent()) {
+            LOGGER.error("Request with id {} not exist", requestId);
+            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+        }
+
+        LOGGER.trace("Get request group with id {} from database");
+        Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
+
+        if (!requestGroupOptional.isPresent()) {
+            LOGGER.error("Request group with id {} not exist", requestGroupId);
+            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " not exist");
+        }
+
+        Request request = requestOptional.get();
+        request.setRequestGroup(new RequestGroup(requestGroupId));
+        // TODO: 07.03.2017 Add method save in service ?
+        return requestRepository.save(request);
+    }
+
+    @Override
+    public Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException {
+        LOGGER.trace("Get request with id {} from database", requestId);
+        Optional<Request> requestOptional = requestRepository.findOne(requestId);
+
+        if (!requestOptional.isPresent()) {
+            LOGGER.error("Request with id {} not exist", requestId);
+            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+        }
+
+        Request request = requestOptional.get();
+        request.setRequestGroup(null);
+        return requestRepository.save(request);
+    }
+
     @Override
     public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
         Request parent = requestRepository.findOne(parentId).orElseThrow(() ->
@@ -122,7 +169,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException {
         Optional<Request> requestOptional = getRequestById(id);
-        if(!requestOptional.isPresent()) {
+        if (!requestOptional.isPresent()) {
             throw new CannotDeleteRequestException("No such request id " + id);
         }
         Request request = requestOptional.get();
@@ -132,8 +179,8 @@ public class RequestServiceImpl implements RequestService {
             if (!request.getStatus().getId().equals(3)) {  // if request not closed
                 changeRequestStatus(request, new Status(5));
                 List<Request> subRequestList = getAllSubRequest(request.getId());
-                if (!subRequestList.isEmpty()){
-                    for (Request r : subRequestList){
+                if (!subRequestList.isEmpty()) {
+                    for (Request r : subRequestList) {
                         this.requestRepository.delete(r.getId());
                     }
                 }
@@ -152,10 +199,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(readOnly = true)
     public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
         try {
-            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,Period.valueOf(period.toUpperCase()));
+            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
             fill(changeGroups);
             return changeGroups;
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new HashSet<ChangeGroup>();
         }
     }
@@ -196,7 +243,7 @@ public class RequestServiceImpl implements RequestService {
         fill(request);
 
         Request parent = request.getParent();
-        if(parent != null) {
+        if (parent != null) {
             request.setParent(this.getRequestById(parent.getId()).orElse(null));
         }
     }
@@ -208,7 +255,7 @@ public class RequestServiceImpl implements RequestService {
 
     private void fill(Request request) {
         Person employee = request.getEmployee();
-        if(employee != null) {
+        if (employee != null) {
             employee = personRepository.findOne(employee.getId()).orElseGet(null);
 
             Role role = roleRepository.findOne(employee.getRole().getId()).orElseGet(null);
@@ -218,7 +265,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Person manager = request.getManager();
-        if(manager != null) {
+        if (manager != null) {
             manager = personRepository.findOne(manager.getId()).orElseGet(null);
             request.setManager(manager);
         }
@@ -230,9 +277,9 @@ public class RequestServiceImpl implements RequestService {
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
     }
 
-    private void fill(Set<ChangeGroup>  changeGroup){
-        changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
-                    ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
-                }));
+    private void fill(Set<ChangeGroup> changeGroup) {
+        changeGroup.forEach(cg -> cg.getChangeItems().forEach(ci -> {
+            ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
+        }));
     }
 }

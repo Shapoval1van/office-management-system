@@ -34,12 +34,13 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
-                                              @RequestParam(name = "period", defaultValue = "day") String period,
-                                              @PathVariable(name = "requestId") Long id) {
-        Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2)->{
-            if(cg1.getId()>cg2.getId()) return 1;
-            else if(cg1.getId()<cg2.getId()) return -1;
-            else return 0;});
+                                               @RequestParam(name = "period", defaultValue = "day") String period,
+                                               @PathVariable(name = "requestId") Long id) {
+        Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2) -> {
+            if (cg1.getId() > cg2.getId()) return 1;
+            else if (cg1.getId() < cg2.getId()) return -1;
+            else return 0;
+        });
         requestService.getRequestHistory(id, period).forEach(changeGroup -> historySet.add(new HistoryDTO(changeGroup)));
         return new ResponseEntity<>(historySet, HttpStatus.OK);
     }
@@ -48,7 +49,7 @@ public class RequestController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> getRequest(@PathVariable Long requestId) {
         Optional<Request> request = requestService.getRequestById(requestId);
-        if(request.isPresent()) {
+        if (request.isPresent()) {
             return ResponseEntity.ok(new FullRequestDTO(request.get()));
         } else {
             return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
@@ -83,7 +84,7 @@ public class RequestController {
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
     public ResponseEntity<Request> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
-                                           @RequestBody RequestDTO requestDTO) {
+                                                 @RequestBody RequestDTO requestDTO) {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         requestService.updateRequest(currentRequest, requestId);
@@ -113,7 +114,7 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable){
+    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
         List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
 
         return ResponseEntity.ok((requests
@@ -123,9 +124,23 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
+    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
         Long count = requestService.getCountFree(priorityId);
         return ResponseEntity.ok(count);
+    }
+
+    @PutMapping("/{requestId}/grouping")
+    @ResponseStatus(HttpStatus.OK)
+    public void addRequestToRequestGroup(@RequestBody RequestGroupDTO requestGroupDTO,
+                                         @PathVariable("requestId") Long requestId) throws ResourceNotFoundException {
+
+        requestService.addToRequestGroup(requestId, requestGroupDTO.getId());
+    }
+
+    @DeleteMapping("/{requestId}/group")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFromRequestGroup(@PathVariable("requestId") Long requestId) throws ResourceNotFoundException {
+        requestService.removeFromRequestGroup(requestId);
     }
 
 }

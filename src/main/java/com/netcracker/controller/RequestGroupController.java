@@ -4,6 +4,8 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.RequestGroup;
+import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.repository.common.impl.SimplePageable;
 import com.netcracker.service.requestGroup.RequestGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +40,14 @@ public class RequestGroupController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRequestGroup(@Validated @RequestBody RequestGroupDTO requestGroupDTO,
+    public void createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
                                    Principal principal) throws CurrentUserNotPresentException {
         requestGroupService.saveRequestGroup(requestGroupDTO, principal);
     }
 
     @PutMapping("/{requestGroupId}")
     @ResponseStatus(HttpStatus.OK)
-    public void editRequestGroup(@Validated @RequestBody RequestGroupDTO requestGroupDTO,
+    public void editRequestGroup(@Validated(UpdateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
                                  @PathVariable("requestGroupId") Integer requestGroupId) throws ResourceNotFoundException {
         requestGroupDTO.setId(requestGroupId);
         requestGroupService.updateRequestGroup(requestGroupDTO);

@@ -71,6 +71,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         RequestGroup requestGroup = entity.getRequestGroup();
         if (requestGroup != null) {
             columns.put(REQUEST_GROUP_ID_COLUMN, entity.getRequestGroup().getId());
+        } else {
+            columns.put(REQUEST_GROUP_ID_COLUMN, null);
         }
         return columns;
     }
@@ -97,9 +99,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
             if (parentId != null) {
                 request.setParent(new Request((Long) parentId));
             }
-            Object requestGroupId = resultSet.getObject(REQUEST_GROUP_ID_COLUMN);
+            Integer requestGroupId = resultSet.getInt(REQUEST_GROUP_ID_COLUMN);
             if (requestGroupId != null) {
-                request.setRequestGroup(new RequestGroup((Integer) requestGroupId));
+                request.setRequestGroup(new RequestGroup(requestGroupId));
             }
             return request;
         };
