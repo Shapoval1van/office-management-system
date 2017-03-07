@@ -7,7 +7,6 @@ INSERT INTO status (name) VALUES
   ('FREE'),
   ('IN PROGRESS'),
   ('CLOSED'),
-  ('REOPEN'),
   ('CANCELED');
 
 INSERT INTO priority (name) VALUES

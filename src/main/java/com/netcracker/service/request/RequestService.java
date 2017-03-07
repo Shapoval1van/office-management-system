@@ -20,7 +20,7 @@ public interface RequestService {
 
     Optional<Request> updateRequest(Request request, Long requestId);
 
-    Optional<Request> addToRequestGroup(Long requestId, Integer groupId) throws ResourceNotFoundException;
+    Optional<Request> addToRequestGroup(Long requestId, Integer groupId) throws ResourceNotFoundException, IncorrectStatusException;
 
     Optional<Request> removeFromRequestGroup(Long rrequestId) throws ResourceNotFoundException;
 
@@ -37,4 +37,8 @@ public interface RequestService {
     Long getCountFree(Integer priorityId);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period);
+
+    List<Request> getRequestsByRequestGroup(Integer requestGroupId);
+
+    List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
 }

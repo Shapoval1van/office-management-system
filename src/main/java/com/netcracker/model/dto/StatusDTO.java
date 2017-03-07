@@ -11,6 +11,9 @@ public class StatusDTO {
     @JsonView(View.Public.class)
     private String name;
 
+    public StatusDTO() {
+    }
+
     public StatusDTO(Status status) {
         this.id = status.getId();
         this.name = status.getName();

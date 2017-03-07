@@ -132,7 +132,7 @@ public class RequestController {
     @PutMapping("/{requestId}/grouping")
     @ResponseStatus(HttpStatus.OK)
     public void addRequestToRequestGroup(@RequestBody RequestGroupDTO requestGroupDTO,
-                                         @PathVariable("requestId") Long requestId) throws ResourceNotFoundException {
+                                         @PathVariable("requestId") Long requestId) throws ResourceNotFoundException, IncorrectStatusException {
 
         requestService.addToRequestGroup(requestId, requestGroupDTO.getId());
     }

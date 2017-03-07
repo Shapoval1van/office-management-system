@@ -1,6 +1,7 @@
 package com.netcracker.service.requestGroup;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.RequestGroup;
@@ -22,4 +23,6 @@ public interface RequestGroupService {
     Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO) throws ResourceNotFoundException;
 
     int getRequestGroupCountByAuthor(Long authorId);
+
+    void setRequestGroupStatus(Integer requestGroupId, Integer statusId) throws ResourceNotFoundException, IncorrectStatusException;
 }

@@ -1,8 +1,10 @@
 package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
+import com.netcracker.model.dto.StatusDTO;
 import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.UpdateValidatorGroup;
@@ -57,5 +59,12 @@ public class RequestGroupController {
     @ResponseStatus(HttpStatus.OK)
     public int getRequestGroupCountByAuthor(@PathVariable("authorId") Long authorId) {
         return requestGroupService.getRequestGroupCountByAuthor(authorId);
+    }
+
+    @PutMapping("/{requestGroupId}/status")
+    @ResponseStatus(HttpStatus.OK)
+    public void changeRequestGroupStatus(@PathVariable("requestGroupId") Integer requestGroupId,
+                                         @RequestBody StatusDTO statusDTO) throws ResourceNotFoundException, IncorrectStatusException {
+        requestGroupService.setRequestGroupStatus(requestGroupId, statusDTO.getId());
     }
 }

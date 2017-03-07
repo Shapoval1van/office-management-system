@@ -5,6 +5,7 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
+import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,9 +116,8 @@ public class RequestServiceImpl implements RequestService {
         return this.requestRepository.updateRequest(request);
     }
 
-    // TODO: 06.03.2017
     @Override
-    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException {
+    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException, IncorrectStatusException {
         LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
@@ -135,6 +135,16 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Request request = requestOptional.get();
+
+        LOGGER.trace("Get status with id {} from database", request.getStatus().getId());
+        Status status = statusRepository.findOne(request.getStatus().getId()).get();
+
+        if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.toString())) {
+            LOGGER.error("Request should be in FREE status for grouping. Current status is {}", status.getName());
+            throw new IncorrectStatusException("Incorrect status",
+                    "Request should be in FREE status for grouping. Current status is " + status.getName());
+        }
+
         request.setRequestGroup(new RequestGroup(requestGroupId));
         // TODO: 07.03.2017 Add method save in service ?
         return requestRepository.save(request);
@@ -205,6 +215,16 @@ public class RequestServiceImpl implements RequestService {
         } catch (IllegalArgumentException e) {
             return new HashSet<ChangeGroup>();
         }
+    }
+
+    @Override
+    public List<Request> getRequestsByRequestGroup(Integer requestGroupId) {
+        return requestRepository.findRequestsByRequestGroupId(requestGroupId);
+    }
+
+    @Override
+    public List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        return requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
     }
 
     @Override
