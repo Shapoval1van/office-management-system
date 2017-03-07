@@ -70,7 +70,7 @@
                         </a>
                     </h4>
                     <div id="collapseHistory" class="collapse in">
-                        <select class="input-sm" ng-model="periodList.value" ng-options="x for x in periodList.values"
+                        <select  id="historySelector" class="input-sm" ng-model="periodList.value" ng-options="x for x in periodList.values"
                                 ng-change="historyForPeriod(periodList.value)">
                         </select>
                         <div ng-if="historyList.length!=0">

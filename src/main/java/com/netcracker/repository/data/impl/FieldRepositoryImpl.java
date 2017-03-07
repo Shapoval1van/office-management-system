@@ -9,12 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class FieldRepositoryImpl extends GenericJdbcRepository<Field, Integer> implements FieldRepository{
 
     public static final String ID_COLUMN = "field_id";
     public static final String NAME_COLUMN = "name";
+
+    private final String FIND_BY_NAME = "SELECT * FROM field WHERE name = ?";
 
     public FieldRepositoryImpl() {
         super(Field.TABLE_NAME, Field.ID_COLUMN);
@@ -36,5 +39,10 @@ public class FieldRepositoryImpl extends GenericJdbcRepository<Field, Integer> i
             field.setName(resultSet.getString(NAME_COLUMN));
             return field;
         };
+    }
+
+    @Override
+    public Optional<Field> findFieldByName(String name) {
+        return super.queryForObject(FIND_BY_NAME, name);
     }
 }

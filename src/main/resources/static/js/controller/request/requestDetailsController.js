@@ -55,6 +55,7 @@
 
                 $scope.prioritySelect = function(item_selected1){
                     var priority = item_selected1.toLowerCase();
+                    var period = $('#historySelector').find(':selected').text().toLowerCase();
                     $http({
                         method: 'POST',
                         url: '/api/request/updatePriority/' + $routeParams.requestId,
@@ -71,6 +72,14 @@
                             priority: priority
                         }
                     }).then(function successCallback(response) {
+                        $http({
+                            method: 'GET',
+                            url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
+                        }).then(function successCallback(response) {
+                            $scope.historyList = buildHistoryList(response.data);
+                        }, function errorCallback(response) {
+
+                        });
                     }, function errorCallback(response) {
                     });
                 };

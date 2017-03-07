@@ -29,6 +29,8 @@ public class RequestServiceImpl implements RequestService {
 
     private final ChangeGroupRepository changeGroupRepository;
 
+    private final ChangeItemRepository changeItemRepository;
+
     private final FieldRepository fieldRepository;
 
 
@@ -39,6 +41,7 @@ public class RequestServiceImpl implements RequestService {
                               RoleRepository roleRepository,
                               PriorityRepository priorityRepository,
                               ChangeGroupRepository changeGroupRepository,
+                              ChangeItemRepository changeItemRepository,
                               FieldRepository fieldRepository) {
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
@@ -46,6 +49,7 @@ public class RequestServiceImpl implements RequestService {
         this.roleRepository = roleRepository;
         this.priorityRepository = priorityRepository;
         this.changeGroupRepository = changeGroupRepository;
+        this.changeItemRepository = changeItemRepository;
         this.fieldRepository = fieldRepository;
     }
 
@@ -110,13 +114,33 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Optional<Request> updateRequestPriority(Long requestId, String priority) {
-        Optional<Request> oldRequest = requestRepository.findOne(requestId);
-        if(!oldRequest.isPresent()) return Optional.empty();
+    public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
+        Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
+        if(!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
         if(!p.isPresent()) return Optional.empty();
-        oldRequest.get().setPriority(p.get());
-        return this.requestRepository.updateRequest(oldRequest.get());
+        Request oldRequest = new Request(futureNewRequest.get());
+        futureNewRequest.get().setPriority(p.get());
+
+        updateRequestHistory(futureNewRequest.get(),oldRequest,authorName);
+
+        return this.requestRepository.updateRequest(futureNewRequest.get());
+    }
+
+
+    private Optional<Request> updateRequestHistory(Request newRequest,  Request oldRequest , String authorName) {
+        Optional<Person> author = personRepository.findPersonByEmail(authorName);
+        if(!author.isPresent()) return Optional.empty();
+        ChangeGroup changeGroup = new ChangeGroup();
+        changeGroup.setRequest(new Request(oldRequest.getId()));
+        changeGroup.setAuthor(author.get());
+        changeGroup.setCreateDate(new Date(System.currentTimeMillis()));
+        Set<ChangeItem> changeItemSet = findMismatching(oldRequest, newRequest);
+        ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
+
+        changeItemSet.forEach(ci->ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
+        changeItemSet.forEach(changeItemRepository::save);
+        return Optional.of(newRequest);
     }
 
     @Override
@@ -245,5 +269,57 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
                     ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
                 }));
+    }
+
+    private Set<ChangeItem> findMismatching(Request oldRequest, Request newRequest) {
+        Set<ChangeItem> changeItemSet = new HashSet<>();
+        if(!isFieldValuesEquals(oldRequest.getEstimate(), newRequest.getEstimate())){
+            ChangeItem changeItem = new ChangeItem();
+            changeItem.setField(fieldRepository.findFieldByName("ESTIMATE").get());
+            changeItem.setOldVal(oldRequest.getEstimate().toString());
+            changeItem.setNewVal(newRequest.getEstimate().toString());
+            changeItemSet.add(changeItem);
+        }
+        if(!isFieldValuesEquals(oldRequest.getPriority(), newRequest.getPriority())){
+            ChangeItem changeItem = new ChangeItem();
+            changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
+            changeItem.setOldVal(priorityRepository.findOne(oldRequest.getPriority().getId()).get().getName());
+            changeItem.setNewVal(newRequest.getPriority().getName());
+            changeItemSet.add(changeItem);
+        }
+        if(!isFieldValuesEquals(oldRequest.getDescription(),newRequest.getDescription())){
+            ChangeItem changeItem = new ChangeItem();
+            changeItem.setField(fieldRepository.findFieldByName("DESCRIPTION").get());
+            changeItem.setOldVal(oldRequest.getDescription());
+            changeItem.setNewVal(newRequest.getDescription());
+            changeItemSet.add(changeItem);
+        }
+    return changeItemSet;
+    }
+
+
+    private boolean isFieldValuesEquals(Object o, Object o1) {
+        if ((o == null && o1 != null) || (o != null && o1 == null)) return false;
+        if (o == null && o1 == null) return true;
+
+        if (o instanceof String && o1 instanceof String){
+            return ((String)o).equals((String)o1);
+        }
+        if (o instanceof Timestamp && o1 instanceof Timestamp ){
+            return ((Timestamp)o).equals((Timestamp)o1);
+        }
+        if (o instanceof Status && o1 instanceof Status){
+            return ((Status)o).getId().equals(((Status) o1).getId());
+        }
+        if (o instanceof Person && o1 instanceof Person){
+            return ((Person)o).getId().equals(((Person) o1).getId());
+        }
+        if (o instanceof Priority && o1 instanceof Priority){
+            return ((Priority)o).getId().equals(((Priority) o1).getId());
+        }
+        if (o instanceof RequestGroup && o1 instanceof RequestGroup){
+            return ((RequestGroup)o).getId().equals(((RequestGroup) o1).getId());
+        }
+        else return false;
     }
 }

@@ -48,8 +48,8 @@ public class RequestController {
     @PostMapping(value = "/updatePriority/{requestId}")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                @RequestParam(name = "priority") String priority,
-                                               @PathVariable(name = "requestId") Long id) {
-        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority);
+                                               @PathVariable(name = "requestId") Long id, Principal principal) {
+        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal.getName());
         if(!newRequest.isPresent()){
             return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
         }
