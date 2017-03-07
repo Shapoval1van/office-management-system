@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface RequestGroupService {
     List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable);
 
-    List<RequestGroup> getRequestGroupByNamePart(String namePart, Pageable pageable);
+    List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId);
 
     Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup);
 

@@ -9,7 +9,7 @@ import java.util.List;
 public interface RequestGroupRepository extends JdbcRepository<RequestGroup, Integer> {
     List<RequestGroup> findRequestGroupByAuthorId(Long authorId, Pageable pageable);
 
-    List<RequestGroup> findRequestGroupByNameRegex(String regex, Pageable pageable);
+    List<RequestGroup> findRequestGroupByNameRegex(String regex, Long authorId);
 
     int countRequestGroupByAuthor(Long authorId);
 }

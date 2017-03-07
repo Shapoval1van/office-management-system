@@ -22,7 +22,7 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     public static final String AUTHOR_COLUMN = "author_id";
 
     private static final String GET_REQUEST_GROUP_BY_AUTHOR_ID = "SELECT request_group_id, name, author_id FROM request_group WHERE author_id = ?";
-    private static final String GET_REQUEST_GROUP_BY_NAME_PART = "SELECT request_group_id, name, author_id FROM request_group WHERE name ~* ?";
+    private static final String GET_REQUEST_GROUP_BY_NAME_PART = "SELECT request_group_id, name, author_id FROM request_group WHERE name ~* ? AND author_id = ?";
     private static final String COUNT_REQUEST_GROUP_BY_AUTHOR = "SELECT COUNT(*) FROM request_group WHERE author_id = ?";
 
 
@@ -59,9 +59,9 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     }
 
     @Override
-    public List<RequestGroup> findRequestGroupByNameRegex(String regex, Pageable pageable) {
-        LOGGER.debug("Search request group name that matches with {} ", regex);
-        return super.queryForList(GET_REQUEST_GROUP_BY_NAME_PART, pageable, regex);
+    public List<RequestGroup> findRequestGroupByNameRegex(String regex, Long authorId) {
+        LOGGER.debug("Search request group name that matches with {}. Author: {}", regex, authorId);
+        return super.queryForList(GET_REQUEST_GROUP_BY_NAME_PART, regex, authorId);
     }
 
     @Override

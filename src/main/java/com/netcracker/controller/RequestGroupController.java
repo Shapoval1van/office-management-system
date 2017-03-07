@@ -33,11 +33,10 @@ public class RequestGroupController {
         return requestGroupService.getRequestGroupByAuthorId(authorId, new SimplePageable(pageSize, pageNumber));
     }
 
-    @GetMapping({"/search/{namePart}"})
+    @GetMapping({"/author/{authorId}/search/{namePart}"})
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestGroup> getRequestGroupByNamePart(@PathVariable("namePart") String namePart) {
-        SimplePageable pageable = new SimplePageable(SimplePageable.DEFAULT_PAGE_SIZE, SimplePageable.DEFAULT_PAGE_NUMBER);
-        return requestGroupService.getRequestGroupByNamePart(namePart, pageable);
+    public List<RequestGroup> getRequestGroupByNamePart(@PathVariable("authorId") Long authorId, @PathVariable("namePart") String namePart) {
+        return requestGroupService.getRequestGroupByNamePart(namePart, authorId);
     }
 
     @PostMapping("/")
