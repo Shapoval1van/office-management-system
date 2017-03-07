@@ -2,7 +2,14 @@
     angular.module("OfficeManagementSystem")
         .controller("UpdateRequestController", ["$scope", "$http", "$routeParams",
             function ($scope, $http, $routeParams) {
-                $scope.requestCredentials ={};
+                $scope.requestCredentials = {
+                    priority:'2'
+                };
+
+                $scope.selectedManager = undefined;
+                $scope.managers = [];
+                $scope.currentPage = 1;
+                $scope.pageSize = 10;
 
                 var reguestId = $routeParams.requestId;
 
@@ -10,20 +17,28 @@
                     $http.get("/api/request/" + reguestId )
                         .then(function (callback) {
                             $scope.requestCredentials = callback.data;
+                            if ($scope.requestCredentials.manager == null){
+                                $("#input-manager").parents(".col-md-offset-3").fadeOut();
+                            }
+                            else $scope.selectedManager = $scope.requestCredentials.manager;
+                            if ($scope.requestCredentials.requestGroup == null) {
+                                $("#input-request-group").parents(".col-md-offset-3").fadeOut();
+                            }
+                            else $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
+                            $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
                         }, function (callback) {
                             console.log(callback)
                         })
                 };
 
+
                 $scope.getRequestCredential();
 
                 $scope.requestNameCheck = function () {
                     var nameValue = $scope.requestCredentials.name,
-                        regExp = /^[A-Z][a-zA-Z\d]{2,50}$/;
-
+                        regExp = /^[A-Z][a-zA-Z\d\s]{2,50}$/;
                     if (nameValue){
                         var lookFor = nameValue.search(regExp);
-
                         if (lookFor == -1){
                             $("#request-name-input-group").addClass("request-name-incorrect");
                             $("#request-description-field").addClass("form-control_offset");
@@ -31,7 +46,6 @@
                             $("#request-name-input-group").removeClass("request-name-incorrect");
                             $("#request-description-field").removeClass("form-control_offset");
                         }
-
                     }
                 };
 
@@ -39,26 +53,31 @@
                     $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
                     $scope.requestCredentials.status = $scope.requestCredentials.status.id;
                     $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
-                    $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
+                    if ($scope.requestCredentials.manager!=null) {
+                        $scope.requestCredentials.manager = $scope.selectedManager.id;
+                    }
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
-                            $scope.name = callback.data.name;
                         }, function (callback) {
                             console.log("Updating request Failure!")
+                            console.log($scope.requestCredentials)
                         })
                 }
 
-                $scope.statusDropdown = function(){
-                    var statusVisibility = $(".status-text-wrapper-outer").hasClass('active');
-                    if(statusVisibility){
-                        $(".status-text-wrapper-outer").removeClass("active");
-                        $(".status-text-wrapper-outer").fadeOut();
+                $scope.update = function() {
+                    if($scope.selectedManager.length >= 2) {
+                        console.log($scope.selectedManager);
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/managers/' +  $scope.selectedManager +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function successCallback(response) {
+                            $scope.managers = response.data;
+                            console.log($scope.managers);
+                        }, function errorCallback(response) {
+                        });
                     }
-                    else{
-                        $(".status-text-wrapper-outer").addClass("active");
-                        $(".status-text-wrapper-outer").fadeIn();
-                    }
-                }
+                };
 
             }])
 })();

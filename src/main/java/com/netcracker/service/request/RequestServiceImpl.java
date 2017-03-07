@@ -7,7 +7,6 @@ import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
@@ -56,7 +55,6 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException {
         if (subRequest.getParent() == null) {
@@ -118,27 +116,20 @@ public class RequestServiceImpl implements RequestService {
         return requests;
     }
 
-    @Transactional
     @Override
     public void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException {
-        Optional<Request> requestOptional = getRequestById(id);
-        if(!requestOptional.isPresent()) {
-            throw new CannotDeleteRequestException("No such request id " + id);
-        }
-        Request request = requestOptional.get();
-        if (request.getParent() != null) {
-            this.requestRepository.delete(id);
-        } else {
-            if (!request.getStatus().getId().equals(3)) {  // if request not closed
-                changeRequestStatus(request, new Status(5));
+        Request request = getRequestById(id).get();
+        if (request.getStatus().getId().equals(3))   // if request closed
+            throw new CannotDeleteRequestException("You cannot delete closed request");
+        else {
+            changeRequestStatus(request, new Status(5));
+            if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
-                if (!subRequestList.isEmpty()){
-                    for (Request r : subRequestList){
-                        this.requestRepository.delete(r.getId());
+                if (!subRequestList.isEmpty()) {
+                    for (Request r : subRequestList) {
+                        changeRequestStatus(r, new Status(5));
                     }
                 }
-            } else {
-                throw new CannotDeleteRequestException("You cannot delete closed request");
             }
         }
     }
