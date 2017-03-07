@@ -2,6 +2,7 @@ package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -41,6 +42,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     private final String COUNT_WITH_PRIORITY = "SELECT count(request_id) FROM " + TABLE_NAME +
             " WHERE priority_id = ? AND manager_id IS NULL ";
 
+    private final String GET_REQUESTS_BY_REQUEST_GROUP_ID = "SELECT * FROM request WHERE request_group_id = ?";
+
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
     }
@@ -71,6 +74,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         RequestGroup requestGroup = entity.getRequestGroup();
         if (requestGroup != null) {
             columns.put(REQUEST_GROUP_ID_COLUMN, entity.getRequestGroup().getId());
+        } else {
+            columns.put(REQUEST_GROUP_ID_COLUMN, null);
         }
         return columns;
     }
@@ -97,9 +102,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
             if (parentId != null) {
                 request.setParent(new Request((Long) parentId));
             }
-            Object requestGroupId = resultSet.getObject(REQUEST_GROUP_ID_COLUMN);
+            Long requestGroupId = (Long) resultSet.getObject(REQUEST_GROUP_ID_COLUMN);
             if (requestGroupId != null) {
-                request.setRequestGroup(new RequestGroup((Integer) requestGroupId));
+                request.setRequestGroup(new RequestGroup(requestGroupId.intValue()));
             }
             return request;
         };
@@ -135,6 +140,16 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countFree(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
+    }
+
+    @Override
+    public List<Request> findRequestsByRequestGroupId(Integer requestGroupId) {
+        return super.queryForList(GET_REQUESTS_BY_REQUEST_GROUP_ID, requestGroupId);
+    }
+
+    @Override
+    public List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable) {
+        return super.queryForList(GET_REQUESTS_BY_REQUEST_GROUP_ID, pageable, requestGroupId);
     }
 
     @Override

@@ -93,7 +93,8 @@ public class RequestServiceTest {
     public void deleteSubRequestTest() throws CannotDeleteRequestException, ResourceNotFoundException {
         request = requestService.getRequestById(4L).get();
         requestService.deleteRequestById(request.getId());
-        Assert.assertTrue(!requestService.getRequestById(4L).isPresent());
+        Assert.assertTrue(requestService.getRequestById(4L).isPresent());
+        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(5));
     }
 
     @Test
@@ -105,7 +106,8 @@ public class RequestServiceTest {
         request = requestService.getRequestById(3L).get();
         Assert.assertEquals(request.getStatus().getId(), new Integer(5));
         Assert.assertTrue(requestService.getRequestById(3L).isPresent());
-        Assert.assertTrue(!requestService.getRequestById(4L).isPresent());
+        Assert.assertTrue(requestService.getRequestById(4L).isPresent());
+        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(5));
     }
 
     @Test(expected = CannotDeleteRequestException.class)

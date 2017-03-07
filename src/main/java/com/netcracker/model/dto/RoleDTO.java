@@ -1,29 +1,33 @@
 package com.netcracker.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.model.entity.Status;
+import com.netcracker.model.entity.Role;
 import com.netcracker.model.view.View;
 
-public class StatusDTO {
+import java.util.List;
+
+/**
+ * Created by andrey on 04.03.2017.
+ */
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class RoleDTO {
     @JsonView(View.Public.class)
     private Integer id;
 
     @JsonView(View.Public.class)
     private String name;
 
-    public StatusDTO() {
+    public RoleDTO(Role role){
+        this.id = role.getId();
+        this.name = role.getName();
     }
-
-    public StatusDTO(Status status) {
-        this.id = status.getId();
-        this.name = status.getName();
-    }
-
-    public Status toStatus() {
-        Status status = new Status();
-        status.setId(this.id);
-        status.setName(this.name);
-        return status;
+    public Role toRole(){
+        Role role = new Role();
+        role.setId(this.id);
+        role.setName(this.name);
+        return role;
     }
 
     public Integer getId() {
@@ -41,4 +45,5 @@ public class StatusDTO {
     public void setName(String name) {
         this.name = name;
     }
+
 }
