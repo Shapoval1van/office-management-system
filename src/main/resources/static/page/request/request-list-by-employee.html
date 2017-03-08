@@ -1,7 +1,7 @@
 <nav class="nav-top">
     <h1 class="nav-top__brand">Hello, {{employeeName}}</h1>
-    <a class="request__modification-btn request__modification-btn_logout" href="/">
-        <i class="fa fa-sign-out" aria-hidden="true" ng-click="logout()"></i>Log out
+    <a class="request__modification-btn request__modification-btn_logout" ng-click="logout()">
+        <i class="fa fa-sign-out" aria-hidden="true"></i>Log out
     </a>
 </nav>
 
@@ -92,7 +92,7 @@
                                 <button class="request__modification-btn" ng-click="requestUpdate(request.id)">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit
                                 </button>
-                                <button class="request__modification-btn request__modification-btn_delete" ng-click="requestDelete(request.id)">
+                                <button class="request__modification-btn request__modification-btn_delete" ng-click="requestDelete(request.id)" >
                                     <i class="fa fa-ban" aria-hidden="true"></i>Delete
                                 </button>
                             </td>

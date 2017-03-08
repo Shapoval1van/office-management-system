@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListByEmployeeController", ["$scope", "$http", "$routeParams",
-            function ($scope, $http, $routeParams) {
+        .controller("RequestListByEmployeeController", ["$scope", "$http",
+            function ($scope, $http) {
 
                 var requestDetails = "/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -28,7 +28,7 @@
                 $scope.pageChanged = function() {
                     $http({
                         method: 'GET',
-                        url: '/api/request//requestListByEmployee/' +
+                        url: '/api/request/requestListByEmployee/' +
                         '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                     }).then(function successCallback(response) {
                         $scope.requests = response.data;
@@ -48,7 +48,15 @@
                 };
 
                 $scope.requestDelete = function(requestId) {
-                    window.location = requestDetails + requestId + '/delete';
+                    $http({
+                        method: 'DELETE',
+                        url: '/api/request/' + requestId + '/delete'
+                    }).then(function successCallback(response) {
+                        $scope.requests = response.data;
+                    }, function errorCallback(response) {
+                        console.log(response);
+                    });
+                    location.reload(true);
                 };
 
                 $scope.propertyName = 'name';
