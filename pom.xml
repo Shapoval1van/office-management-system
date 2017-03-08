@@ -69,6 +69,14 @@
 			<version>1</version>
 		</dependency>
 
+
+		<!--javers-->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-core</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+
 		<!--> Mail Template <-->
 		<dependency>
 			<groupId>org.apache.velocity</groupId>

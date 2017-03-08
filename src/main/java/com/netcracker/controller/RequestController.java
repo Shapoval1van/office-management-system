@@ -94,11 +94,11 @@ public class RequestController {
     }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
-    public ResponseEntity<Request> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
-                                           @RequestBody RequestDTO requestDTO) {
+    public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
+                                                 @Validated(CreateValidatorGroup.class)  @RequestBody RequestDTO requestDTO, Principal principal) {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
-        requestService.updateRequest(currentRequest, requestId);
+        requestService.updateRequest(currentRequest, requestId, principal.getName());
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 

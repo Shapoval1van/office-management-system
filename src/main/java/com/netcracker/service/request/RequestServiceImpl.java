@@ -5,6 +5,11 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ReferenceChange;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +37,8 @@ public class RequestServiceImpl implements RequestService {
 
     private final FieldRepository fieldRepository;
 
+    private final RequestGroupRepository requestGroupRepository;
+
 
     @Autowired
     public RequestServiceImpl(RequestRepository requestRepository,
@@ -41,7 +48,8 @@ public class RequestServiceImpl implements RequestService {
                               PriorityRepository priorityRepository,
                               ChangeGroupRepository changeGroupRepository,
                               ChangeItemRepository changeItemRepository,
-                              FieldRepository fieldRepository) {
+                              FieldRepository fieldRepository,
+                              RequestGroupRepository requestGroupRepository) {
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -50,6 +58,7 @@ public class RequestServiceImpl implements RequestService {
         this.changeGroupRepository = changeGroupRepository;
         this.changeItemRepository = changeItemRepository;
         this.fieldRepository = fieldRepository;
+        this.requestGroupRepository = requestGroupRepository;
     }
 
     @Override
@@ -105,8 +114,10 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> updateRequest(Request request, Long requestId) {
-        request.setId(requestId);
+    public Optional<Request> updateRequest(Request request, Long requestId, String authorName) {
+        Optional<Request> oldRequest = requestRepository.findOne(requestId);
+        if(!oldRequest.isPresent()) return Optional.empty();
+        updateRequestHistory(request,oldRequest.get(),authorName);
         return this.requestRepository.updateRequest(request);
     }
 
@@ -118,11 +129,10 @@ public class RequestServiceImpl implements RequestService {
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
         if(!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
-        futureNewRequest.get().setPriority(p.get());
-
+        futureNewRequest.get().setPriority(new Priority(p.get().getId()));
         updateRequestHistory(futureNewRequest.get(),oldRequest,authorName);
-
-        return this.requestRepository.updateRequest(futureNewRequest.get());
+        this.requestRepository.updateRequestPriority(futureNewRequest.get());
+        return futureNewRequest;
     }
 
 
@@ -135,7 +145,6 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.setCreateDate(new Date(System.currentTimeMillis()));
         Set<ChangeItem> changeItemSet = findMismatching(oldRequest, newRequest);
         ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
-
         changeItemSet.forEach(ci->ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
         changeItemSet.forEach(changeItemRepository::save);
         return Optional.of(newRequest);
@@ -259,58 +268,59 @@ public class RequestServiceImpl implements RequestService {
     private void fill(Set<ChangeGroup>  changeGroup){
         changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
                     ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
-                }));
+        }));
     }
 
+    /**
+     * Request should have only id for field that is custom POJO
+     * @param oldRequest
+     * @param newRequest
+     * @return Set<ChangeItem>
+     */
     private Set<ChangeItem> findMismatching(Request oldRequest, Request newRequest) {
         Set<ChangeItem> changeItemSet = new HashSet<>();
-        if(!isFieldValuesEquals(oldRequest.getEstimate(), newRequest.getEstimate())){
+        Javers javers = JaversBuilder.javers().build();
+        Diff diff = javers.compare(oldRequest, newRequest);
+        List<ValueChange> change = diff.getChangesByType(ValueChange.class);
+        change.forEach(c->{
             ChangeItem changeItem = new ChangeItem();
-            changeItem.setField(fieldRepository.findFieldByName("ESTIMATE").get());
-            changeItem.setOldVal(oldRequest.getEstimate().toString());
-            changeItem.setNewVal(newRequest.getEstimate().toString());
-            changeItemSet.add(changeItem);
-        }
-        if(!isFieldValuesEquals(oldRequest.getPriority(), newRequest.getPriority())){
-            ChangeItem changeItem = new ChangeItem();
-            changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
-            changeItem.setOldVal(priorityRepository.findOne(oldRequest.getPriority().getId()).get().getName());
-            changeItem.setNewVal(newRequest.getPriority().getName());
-            changeItemSet.add(changeItem);
-        }
-        if(!isFieldValuesEquals(oldRequest.getDescription(),newRequest.getDescription())){
-            ChangeItem changeItem = new ChangeItem();
-            changeItem.setField(fieldRepository.findFieldByName("DESCRIPTION").get());
-            changeItem.setOldVal(oldRequest.getDescription());
-            changeItem.setNewVal(newRequest.getDescription());
-            changeItemSet.add(changeItem);
-        }
-    return changeItemSet;
+            Optional affectedObject = c.getAffectedObject();
+            if(affectedObject.get() instanceof Request){
+                changeItem.setField(fieldRepository.findFieldByName(c.getPropertyName().toUpperCase()).get());
+                changeItem.setOldVal(c.getLeft()!=null?c.getLeft().toString():" ");
+                changeItem.setNewVal(c.getRight()!=null?c.getRight().toString():" ");
+                changeItemSet.add(changeItem);
+            }else {
+                if(affectedObject.get() instanceof Status){
+                    changeItem.setField(fieldRepository.findFieldByName("STATUS").get());
+                    changeItem.setOldVal(statusRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
+                    changeItem.setNewVal(statusRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
+                    changeItemSet.add(changeItem);
+                }
+                if(affectedObject.get() instanceof Person){
+                    changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
+                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).get().getFullName());
+                    changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
+                    changeItemSet.add(changeItem);
+                }
+                if(affectedObject.get() instanceof Priority){
+                    changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
+                    changeItem.setOldVal(priorityRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
+                    changeItem.setNewVal(priorityRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
+                    changeItemSet.add(changeItem);
+                }
+//                if(affectedObject.get() instanceof RequestGroup){
+//                    changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
+//                    changeItem.setOldVal(requestGroupRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
+//                    changeItem.setNewVal(requestGroupRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
+//                }
+            }
+        });
+        List<ReferenceChange> referenceChanges = diff.getChangesByType(ReferenceChange.class);
+//        referenceChanges.forEach(referenceChange -> {
+//            String fieldName = referenceChange.getPropertyName();
+//        });
+        return changeItemSet;
     }
 
-
-    private boolean isFieldValuesEquals(Object o, Object o1) {
-        if ((o == null && o1 != null) || (o != null && o1 == null)) return false;
-        if (o == null && o1 == null) return true;
-
-        if (o instanceof String && o1 instanceof String){
-            return ((String)o).equals((String)o1);
-        }
-        if (o instanceof Timestamp && o1 instanceof Timestamp ){
-            return ((Timestamp)o).equals((Timestamp)o1);
-        }
-        if (o instanceof Status && o1 instanceof Status){
-            return ((Status)o).getId().equals(((Status) o1).getId());
-        }
-        if (o instanceof Person && o1 instanceof Person){
-            return ((Person)o).getId().equals(((Person) o1).getId());
-        }
-        if (o instanceof Priority && o1 instanceof Priority){
-            return ((Priority)o).getId().equals(((Priority) o1).getId());
-        }
-        if (o instanceof RequestGroup && o1 instanceof RequestGroup){
-            return ((RequestGroup)o).getId().equals(((RequestGroup) o1).getId());
-        }
-        else return false;
-    }
 }

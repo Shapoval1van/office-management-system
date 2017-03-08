@@ -15,8 +15,8 @@ public interface RequestService {
     Optional<Request> getRequestById(Long id);
     Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException;
     Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
-    Optional<Request> updateRequest(Request request, Long requestId);
-    Optional<Request> updateRequestPriority(Long requestId, String priority,String authorName);
+    Optional<Request> updateRequest(Request request, Long requestId, String authorName);
+    Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
     void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException;
     int changeRequestStatus(Request request, Status status);

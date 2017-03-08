@@ -11,6 +11,7 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     int changeRequestStatus(Request request, Status status);
     List<Request> getAllSubRequest(Long parentId);
     Optional<Request> updateRequest(Request request);
+    int updateRequestPriority(Request request);
     int assignRequest(Long requestId, Long personId, Status status);
 
     Long countFree(Integer priorityId);
