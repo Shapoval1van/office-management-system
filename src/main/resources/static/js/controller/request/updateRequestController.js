@@ -59,10 +59,10 @@
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
                         }, function (callback) {
-                            console.log("Updating request Failure!")
+                            console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })
-                }
+                };
 
                 $scope.update = function() {
                     if($scope.selectedManager.length >= 2) {
@@ -77,6 +77,37 @@
                         }, function errorCallback(response) {
                         });
                     }
+                };
+
+                $scope.updateStatus = function (status) {
+                    var updateStatus = $scope.requestCredentials.status.id;
+                    switch (status){
+                        case 'begin':
+                            updateStatus = 2;
+                            break;
+                        case 'finish':
+                            updateStatus = 3;
+                            break;
+                        case 'reopen':
+                            updateStatus = 1;
+                            break;
+                        case 'cancel':
+                            updateStatus = 4;
+                            break;
+                    }
+                    $scope.requestCredentials.status = updateStatus;
+
+                    $scope.requestCredentials.estimate = $scope.requestCredentials.estimate;
+                    $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
+                    $scope.requestCredentials.manager = $scope.selectedManager.id;
+
+                    $http.put("/api/request/" + reguestId + "/update", $scope.requestCredentials)
+                        .then(function (callback) {
+
+                        }, function (callback) {
+                            console.log("Changing status failure!");
+                            console.log($scope.requestCredentials)
+                        });
                 };
 
             }])
