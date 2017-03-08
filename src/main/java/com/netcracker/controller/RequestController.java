@@ -35,8 +35,8 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
-                                              @RequestParam(name = "period", defaultValue = "day") String period,
-                                              @PathVariable(name = "requestId") Long id) {
+                                               @RequestParam(name = "period", defaultValue = "day") String period,
+                                               @PathVariable(name = "requestId") Long id) {
         Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2)->{
             if(cg1.getId()>cg2.getId()) return 1;
             else if(cg1.getId()<cg2.getId()) return -1;
@@ -61,7 +61,7 @@ public class RequestController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> getRequest(@PathVariable Long requestId) {
         Optional<Request> request = requestService.getRequestById(requestId);
-        if (request.isPresent()) {
+        if(request.isPresent()) {
             return ResponseEntity.ok(new FullRequestDTO(request.get()));
         } else {
             return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
@@ -135,9 +135,25 @@ public class RequestController {
                 .collect(Collectors.toList())));
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/requestListByEmployee/")
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal){
+        List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+
+        return ResponseEntity.ok((requests
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList())));
+    }
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
     public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
         Long count = requestService.getCountFree(priorityId);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/countAllRequestByEmployee")
+    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal){
+        Long count = requestService.getCountAllRequestByEmployee(principal.getName());
         return ResponseEntity.ok(count);
     }
 

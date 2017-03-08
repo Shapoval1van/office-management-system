@@ -1,0 +1,112 @@
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Hello, {{employeeName}}</h1>
+    <a class="request__modification-btn request__modification-btn_logout" ng-click="logout()">
+        <i class="fa fa-sign-out" aria-hidden="true"></i>Log out
+    </a>
+</nav>
+
+<section class="main-form section-padding" ng-cloak="" ng-controller="RequestListByEmployeeController">
+    <div class="container-fluid">
+        <div class="row content">
+            <!-- Modal for messages-->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Message</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{assignedMessage}}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for search manager-->
+            <div class="modal fade" id="modalSearch" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Assignee</h4>
+                        </div>
+                        <div class="modal-body">
+                            Selected manager: <p ng-show="!isUndefined(selectedManager)">{{selectedManager.firstName + ' ' + selectedManager.lastName }}</p>
+                            <input ng-change="update()" type="text" ng-model="selectedManager"
+                                   uib-typeahead="manager as manager.firstName + ' ' +  manager.lastName for manager in managers"
+                                   class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                    data-toggle="modal"  ng-click="assign()"
+                                    data-target="#myModal">Assign</button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-2 sidenav">
+                 <h4 class="filter-article">Filter</h4>
+                 <ul class="nav nav-pills nav-stacked">
+                     <li class="active"><a href="/requestList">Active requests</a></li>
+                     <li><a href="/newRequest">New requests</a></li>
+                     <li><a href="/closedRequests">Closed requests</a></li>
+                 </ul><br>
+             </div>
+
+            <div class="col-sm-10">
+                <div id="collapseHistory" class="collapse in">
+                    <table class="table table-hover">
+                        <thead class="thead-inverse">
+                        <tr>
+                            <th ng-click="sortBy('name')">Name</th>
+                            <th ng-click="sortBy('description')">Details</th>
+                            <th ng-click="sortBy('manager.name')">Manager</th>
+                            <th ng-click="sortBy('estimate')">Estimate</th>
+                            <th ng-click="sortBy('priority.id')">Priority</th>
+                            <th ng-click="sortBy('creationTime')">Created</th>
+                            <th ng-click="sortBy('status.id')">Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr uib-tooltip="Click to see details"
+                            scope="row" ng-repeat="request in requests | orderBy:propertyName:reverse" class="request-row">
+                            <td ng-click="requestDetails(request.id)">{{ request.name }}</td>
+                            <td ng-click="requestDetails(request.id)">{{ request.description | limitTo: 50 }}</td>
+                            <td ng-click="requestDetails(request.id)">
+                                {{ request.manager.firstName}}
+                                <br>
+                                {{ request.manager.lastName}}
+                            </td>
+                            <td ng-click="requestDetails(request.id)">{{ request.estimate | date : 'yyyy-MM-dd HH:mm:ss' }}</td>
+                            <td ng-click="requestDetails(request.id)">{{ request.priority.name }}</td>
+                            <td ng-click="requestDetails(request.id)">{{ request.creationTime | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td ng-click="requestDetails(request.id)">{{ request.status.name }}</td>
+                            <td>
+                                <button class="request__modification-btn" ng-click="requestUpdate(request.id)">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit
+                                </button>
+                                <button class="request__modification-btn request__modification-btn_delete" ng-click="requestDelete(request.id)" >
+                                    <i class="fa fa-ban" aria-hidden="true"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="center-block">
+                        <ul uib-pagination total-items="totalItems" ng-model="currentPage"
+                            max-size="maxSize" class="pagination-md" boundary-links="true"
+                            ng-change="pageChanged()" items-per-page="pageSize"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

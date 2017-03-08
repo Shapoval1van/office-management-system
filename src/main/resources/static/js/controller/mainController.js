@@ -8,7 +8,7 @@
 
                 SessionService.loadSession();
                 var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
-                var redirectIfTokenExist = "/demo";
+                var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
                 var isCurrentPageAnonymOnly = function () {
