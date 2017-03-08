@@ -32,6 +32,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
+    private final String UPDATE_REQUEST_PRIORITY = "UPDATE " + TABLE_NAME + " SET priority_id = ? WHERE request_id = ?";
+
     private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
             "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id FROM " +
             TABLE_NAME + " WHERE parent_id = ?";
@@ -130,6 +132,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public int updateRequestPriority(Request request) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_PRIORITY, request.getPriority().getId(), request.getId());
     }
 
     @Override

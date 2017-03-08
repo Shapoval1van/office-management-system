@@ -102,6 +102,7 @@ public class NotificationService implements NotificationSender {
     @Scheduled(fixedRate = RATE)
     @Transactional
     public void resendNotification() {
+
         List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
         notifications.forEach(notification -> {
             notificationRepository.delete(notification.getId());
@@ -112,6 +113,7 @@ public class NotificationService implements NotificationSender {
                 mailService.send(notification);
             }
         });
+
     }
 
     @Override

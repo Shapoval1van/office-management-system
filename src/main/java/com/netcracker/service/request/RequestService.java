@@ -1,7 +1,7 @@
 package com.netcracker.service.request;
 
-import com.netcracker.exception.*;
 import com.netcracker.model.entity.ChangeGroup;
+import com.netcracker.exception.*;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.Pageable;
@@ -18,11 +18,13 @@ public interface RequestService {
 
     Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
 
-    Optional<Request> updateRequest(Request request, Long requestId);
-
     Optional<Request> addToRequestGroup(Long requestId, Integer groupId) throws ResourceNotFoundException, IncorrectStatusException;
 
     Optional<Request> removeFromRequestGroup(Long rrequestId) throws ResourceNotFoundException;
+
+    Optional<Request> updateRequest(Request request, Long requestId, String authorName);
+
+    Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 

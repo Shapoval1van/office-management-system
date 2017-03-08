@@ -8,12 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class PriorityRepositoryImpl extends GenericJdbcRepository<Priority, Integer> implements PriorityRepository {
 
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String NAME_COLUMN = "name";
+
+    private final String FIND_BY_NAME = "SELECT * FROM priority WHERE name = ?";
 
     public PriorityRepositoryImpl() {
         super(Priority.TABLE_NAME, Priority.ID_COLUMN);
@@ -35,5 +38,10 @@ public class PriorityRepositoryImpl extends GenericJdbcRepository<Priority, Inte
             priority.setName(resultSet.getString(NAME_COLUMN));
             return priority;
         };
+    }
+
+    @Override
+    public Optional<Priority> findPriorityByName(String name) {
+        return super.queryForObject(FIND_BY_NAME, name.toUpperCase());
     }
 }

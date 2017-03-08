@@ -35,15 +35,26 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
-                                               @RequestParam(name = "period", defaultValue = "day") String period,
-                                               @PathVariable(name = "requestId") Long id) {
-        Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2) -> {
-            if (cg1.getId() > cg2.getId()) return 1;
-            else if (cg1.getId() < cg2.getId()) return -1;
-            else return 0;
-        });
+                                              @RequestParam(name = "period", defaultValue = "day") String period,
+                                              @PathVariable(name = "requestId") Long id) {
+        Set<HistoryDTO> historySet = new TreeSet<>((cg1, cg2)->{
+            if(cg1.getId()>cg2.getId()) return 1;
+            else if(cg1.getId()<cg2.getId()) return -1;
+            else return 0;});
         requestService.getRequestHistory(id, period).forEach(changeGroup -> historySet.add(new HistoryDTO(changeGroup)));
         return new ResponseEntity<>(historySet, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/updatePriority/{requestId}")
+    public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
+                                               @RequestParam(name = "priority") String priority,
+                                               @PathVariable(name = "requestId") Long id, Principal principal) {
+        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal.getName());
+        if(!newRequest.isPresent()){
+            return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new MessageDTO("Request updated"), HttpStatus.OK);
     }
 
     @JsonView(View.Public.class)
@@ -84,11 +95,11 @@ public class RequestController {
     }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
-    public ResponseEntity<Request> updateRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId,
-                                                 @RequestBody RequestDTO requestDTO) {
+    public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
+                                                 @Validated(CreateValidatorGroup.class)  @RequestBody RequestDTO requestDTO, Principal principal) {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
-        requestService.updateRequest(currentRequest, requestId);
+        requestService.updateRequest(currentRequest, requestId, principal.getName());
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
@@ -115,7 +126,7 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
+    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable){
         List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
 
         return ResponseEntity.ok((requests
@@ -125,7 +136,7 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
+    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
         Long count = requestService.getCountFree(priorityId);
         return ResponseEntity.ok(count);
     }
