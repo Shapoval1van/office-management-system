@@ -34,21 +34,6 @@
 
                 $scope.getRequestCredential();
 
-                $scope.requestNameCheck = function () {
-                    var nameValue = $scope.requestCredentials.name,
-                        regExp = /^[A-Z][a-zA-Z\d\s]{2,50}$/;
-                    if (nameValue){
-                        var lookFor = nameValue.search(regExp);
-                        if (lookFor == -1){
-                            $("#request-name-input-group").addClass("request-name-incorrect");
-                            $("#request-description-field").addClass("form-control_offset");
-                        }else{
-                            $("#request-name-input-group").removeClass("request-name-incorrect");
-                            $("#request-description-field").removeClass("form-control_offset");
-                        }
-                    }
-                };
-
                 $scope.sendRequestCredentials = function () {
                     $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
                     $scope.requestCredentials.status = $scope.requestCredentials.status.id;
@@ -58,11 +43,12 @@
                     }
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
+                            window.location = "/requestListByEmployee";
                         }, function (callback) {
-                            console.log("Updating request Failure!")
+                            console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })
-                }
+                };
 
                 $scope.update = function() {
                     if($scope.selectedManager.length >= 2) {
@@ -77,6 +63,37 @@
                         }, function errorCallback(response) {
                         });
                     }
+                };
+
+                $scope.updateStatus = function (status) {
+                    var updateStatus = $scope.requestCredentials.status.id;
+                    switch (status){
+                        case 'begin':
+                            updateStatus = 2;
+                            break;
+                        case 'finish':
+                            updateStatus = 3;
+                            break;
+                        case 'reopen':
+                            updateStatus = 1;
+                            break;
+                        case 'cancel':
+                            updateStatus = 4;
+                            break;
+                    }
+                    $scope.requestCredentials.status = updateStatus;
+
+                    $scope.requestCredentials.estimate = $scope.requestCredentials.estimate;
+                    $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
+                    $scope.requestCredentials.manager = $scope.selectedManager.id;
+
+                    $http.put("/api/request/" + reguestId + "/update", $scope.requestCredentials)
+                        .then(function (callback) {
+
+                        }, function (callback) {
+                            console.log("Changing status failure!");
+                            console.log($scope.requestCredentials)
+                        });
                 };
 
             }])

@@ -9,6 +9,7 @@ import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -104,6 +105,8 @@ public class RequestController {
 
     @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/delete")
     public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/requestListByEmployee");
         try {
             Optional<Request> request = requestService.getRequestById(requestId);
             if (!request.isPresent())
@@ -113,7 +116,7 @@ public class RequestController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
@@ -134,9 +137,25 @@ public class RequestController {
                 .collect(Collectors.toList())));
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/requestListByEmployee/")
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal){
+        List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+
+        return ResponseEntity.ok((requests
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList())));
+    }
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
     public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
         Long count = requestService.getCountFree(priorityId);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/countAllRequestByEmployee")
+    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal){
+        Long count = requestService.getCountAllRequestByEmployee(principal.getName());
         return ResponseEntity.ok(count);
     }
 

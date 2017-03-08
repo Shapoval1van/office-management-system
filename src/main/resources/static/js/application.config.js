@@ -44,7 +44,6 @@
                     .when("/request/:requestId/update", {
                         templateUrl: "/static/page/request/update-request-page.html",
                         controller: "UpdateRequestController"
-                            ///request/:requestId/
                     })
                     .when("/request/:requestId/",{
                          templateUrl: "/static/page/request/details.html",
@@ -54,6 +53,10 @@
                          templateUrl: "/static/page/request/list.html",
                          controller: "RequestListController"
                      })
+                    .when("/requestListByEmployee",{
+                        templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

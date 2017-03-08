@@ -29,6 +29,7 @@
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
+                            window.location = "/requestListByEmployee";
                         }, function (callback) {
                             console.log("Creating request Failure!")
                         })
