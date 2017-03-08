@@ -20,6 +20,7 @@ INSERT INTO field (name) VALUES
   ('STATUS'),
   ('MANAGER'),
   ('PRIORITY'),
+  ('ESTIMATE'),
   ('GROUP');
 
 DO

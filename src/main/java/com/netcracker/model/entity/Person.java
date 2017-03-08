@@ -112,6 +112,10 @@ public class Person implements Persistable<Long>, UserDetails {
         this.enabled = enabled;
     }
 
+    public String getFullName(){
+        return this.firstName +" "+this.getLastName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

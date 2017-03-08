@@ -53,8 +53,8 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         Map<String, Object> columns = new HashMap<>();
         columns.put(CHANGE_GROUP_COLUMN, entity.getId());
         columns.put(CREATED_COLUMN, entity.getCreateDate());
-        columns.put(AUTHOR_ID_COLUMN, entity.getAuthor());
-        columns.put(REQUEST_ID_COLUMN, entity.getRequest());
+        columns.put(AUTHOR_ID_COLUMN, entity.getAuthor().getId());
+        columns.put(REQUEST_ID_COLUMN, entity.getRequest().getId());
         return columns;
     }
 
