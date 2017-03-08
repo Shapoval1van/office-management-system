@@ -20,7 +20,7 @@ public interface RequestService {
 
     Optional<Request> addToRequestGroup(Long requestId, Integer groupId) throws ResourceNotFoundException, IncorrectStatusException;
 
-    Optional<Request> removeFromRequestGroup(Long rrequestId) throws ResourceNotFoundException;
+    Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException;
 
     Optional<Request> updateRequest(Request request, Long requestId, String authorName);
 
