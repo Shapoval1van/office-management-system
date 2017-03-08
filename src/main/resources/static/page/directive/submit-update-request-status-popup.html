@@ -8,10 +8,8 @@
             <div class="modal-body">
                 <p><h4>Do you want to {{newStatus}} "{{request.name}}" ?</h4></p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger"
-                        nk-click="">Proceed
-                </button>
+            <div class="modal-footer" ng-controller = "UpdateRequestController">
+                <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="updateStatus(newStatus)">Proceed</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>

@@ -14,6 +14,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @PropertySource("classpath:notification/templates/notificationTemplates.properties")
 public class NotificationService implements NotificationSender {
@@ -99,7 +102,7 @@ public class NotificationService implements NotificationSender {
     @Scheduled(fixedRate = RATE)
     @Transactional
     public void resendNotification() {
-/*
+
         List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
         notifications.forEach(notification -> {
             notificationRepository.delete(notification.getId());
@@ -110,7 +113,7 @@ public class NotificationService implements NotificationSender {
                 mailService.send(notification);
             }
         });
-*/
+
     }
 
     @Override
