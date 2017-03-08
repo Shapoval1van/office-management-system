@@ -53,8 +53,8 @@ public class RegistrationController {
         Person person = personDTO.toPerson();
         person.setPassword(buildRandomPassword());
         Token token = registrationService.registerPerson(person, this.buildRequestLink(request), person.getRole().getId());
-        System.out.println(token.toString());
-        registrationService.confirmEmail(token.toString());
+        System.out.println(token.getTokenValue());
+        registrationService.confirmEmail(token.getTokenValue());
         return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }
 

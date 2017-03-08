@@ -58,6 +58,10 @@
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })
+                    .when("/registrationAdmin", {
+                        templateUrl: "/static/page/registration/admin-registration-page.html",
+                        controller: "AdminRegistrationController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

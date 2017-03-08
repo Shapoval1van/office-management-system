@@ -11,9 +11,11 @@
                 var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
+                //FIXME: Rewrite it. Check only URL.
                 var isCurrentPageAnonymOnly = function () {
                     return anonymOnlyPages.some(function (anonymOnlyPage) {
-                        return (~window.location.href.indexOf(anonymOnlyPage))
+                        //FIXME: Change it !!!
+                        return (~window.location.href.indexOf(anonymOnlyPage) && !(~window.location.href.indexOf("/registrationAdmin")));
                     });
                 };
 
