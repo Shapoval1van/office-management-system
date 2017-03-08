@@ -46,9 +46,9 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
-    public List<RequestGroup> getRequestGroupByNamePart(String namePart, Pageable pageable) {
+    public List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId) {
         String regex = generateRegexByNamePart(namePart);
-        return requestGroupRepository.findRequestGroupByNameRegex(regex, pageable);
+        return requestGroupRepository.findRequestGroupByNameRegex(regex, authorId);
     }
 
     @Override

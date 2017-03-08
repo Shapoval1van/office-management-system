@@ -1,0 +1,31 @@
+<div class="modal fade" id="groupLinkPopup" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Link to group</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input ng-change="updateGroupInput()" type="text" ng-model="selectedRequestGroup"
+                               uib-typeahead="group as group.name for group in groups"
+                               class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
+                    </div>
+                    <div class="input-group-btn">
+                        <button ng-show="isGroupSelected()" type="button" class="btn btn-default" data-dismiss="modal"
+                                data-toggle="modal"  ng-click="link()"
+                                data-target="#messageModal">Link</button>
+
+                        <button ng-hide="isGroupSelected()" type="button" class="btn btn-default" data-dismiss="modal"
+                                data-toggle="modal"  ng-click="createGroup()"
+                                data-target="#messageModal">Create group</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

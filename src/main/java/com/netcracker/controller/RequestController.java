@@ -7,6 +7,7 @@ import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
+import com.netcracker.repository.common.impl.SimplePageable;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -154,4 +155,12 @@ public class RequestController {
         requestService.removeFromRequestGroup(requestId);
     }
 
+    @GetMapping("/request-group/{requestGroupId}/page/{pageNumber}/size/{pageSize}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Request> getRequestByRequestGroup(@PathVariable("requestGroupId") Integer requestGroupId,
+                                                  @PathVariable("pageNumber") Integer pageNumber,
+                                                  @PathVariable("pageSize") Integer pageSize) {
+        Pageable pageable = new SimplePageable(pageSize, pageNumber);
+        return requestService.getRequestsByRequestGroup(requestGroupId, pageable);
+    }
 }

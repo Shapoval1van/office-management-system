@@ -7,7 +7,16 @@
         <div class="row">
             <div class="col-md-offset-1 input-group">
                 <h1 class="title-text">{{request.name}}</h1>
-                <span class="input-group-btn"><change-request-status-button></change-request-status-button></span>
+                <span ng-show="request.requestGroup == null" class="input-group-btn">
+                    <change-request-status-button></change-request-status-button>
+                </span>
+                <span ng-controller = "UpdateRequestLinkToGroupController"
+                      ng-show="(request.status.id == 1)" class="input-group-btn">
+                    <message-popup></message-popup>
+                    <group-link-popup></group-link-popup>
+                    <button style="margin: 5%" type="button" class="btn btn-default" data-dismiss="modal"
+                            data-toggle="modal"  data-target="#groupLinkPopup">Link</button>
+                </span>
             </div>
             <div class="col-md-offset-1 col-md-5" id="accordion">
                 <div class="row toggle-border">
