@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
@@ -261,6 +262,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Request request = getRequestById(requestId).get();
         Optional<Person> person = Optional.ofNullable(personRepository.findOne(personId)
