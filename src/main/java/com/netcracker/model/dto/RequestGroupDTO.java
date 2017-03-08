@@ -3,6 +3,8 @@ package com.netcracker.model.dto;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.RequestGroup;
+import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.model.view.View;
 
 import javax.validation.constraints.NotNull;
@@ -12,7 +14,7 @@ public class RequestGroupDTO {
     private Integer id;
 
     @JsonView(View.Public.class)
-    @NotNull
+    @NotNull(groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String name;
 
     @JsonView(View.Public.class)

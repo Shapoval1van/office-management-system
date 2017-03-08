@@ -10,6 +10,9 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
+import com.netcracker.util.enums.status.StatusEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
 
     private final RequestGroupRepository requestGroupRepository;
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
     public RequestServiceImpl(RequestRepository requestRepository,
@@ -151,6 +155,55 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException, IncorrectStatusException {
+        LOGGER.trace("Get request with id {} from database", requestId);
+        Optional<Request> requestOptional = requestRepository.findOne(requestId);
+
+        if (!requestOptional.isPresent()) {
+            LOGGER.error("Request with id {} not exist", requestId);
+            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+        }
+
+        LOGGER.trace("Get request group with id {} from database");
+        Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
+
+        if (!requestGroupOptional.isPresent()) {
+            LOGGER.error("Request group with id {} not exist", requestGroupId);
+            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " not exist");
+        }
+
+        Request request = requestOptional.get();
+
+        LOGGER.trace("Get status with id {} from database", request.getStatus().getId());
+        Status status = statusRepository.findOne(request.getStatus().getId()).get();
+
+        if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.toString())) {
+            LOGGER.error("Request should be in FREE status for grouping. Current status is {}", status.getName());
+            throw new IncorrectStatusException("Incorrect status",
+                    "Request should be in FREE status for grouping. Current status is " + status.getName());
+        }
+
+        request.setRequestGroup(new RequestGroup(requestGroupId));
+        // TODO: 07.03.2017 Add method save in service ?
+        return requestRepository.save(request);
+    }
+
+    @Override
+    public Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException {
+        LOGGER.trace("Get request with id {} from database", requestId);
+        Optional<Request> requestOptional = requestRepository.findOne(requestId);
+
+        if (!requestOptional.isPresent()) {
+            LOGGER.error("Request with id {} not exist", requestId);
+            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+        }
+
+        Request request = requestOptional.get();
+        request.setRequestGroup(null);
+        return requestRepository.save(request);
+    }
+
+    @Override
     public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
         Request parent = requestRepository.findOne(parentId).orElseThrow(() ->
                 new ResourceNotFoundException("No such parent request"));
@@ -187,12 +240,22 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(readOnly = true)
     public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
         try {
-            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,Period.valueOf(period.toUpperCase()));
+            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
             fill(changeGroups);
             return changeGroups;
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new HashSet<ChangeGroup>();
         }
+    }
+
+    @Override
+    public List<Request> getRequestsByRequestGroup(Integer requestGroupId) {
+        return requestRepository.findRequestsByRequestGroupId(requestGroupId);
+    }
+
+    @Override
+    public List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        return requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
     }
 
     @Override
@@ -231,7 +294,7 @@ public class RequestServiceImpl implements RequestService {
         fill(request);
 
         Request parent = request.getParent();
-        if(parent != null) {
+        if (parent != null) {
             request.setParent(this.getRequestById(parent.getId()).orElse(null));
         }
     }
@@ -243,7 +306,7 @@ public class RequestServiceImpl implements RequestService {
 
     private void fill(Request request) {
         Person employee = request.getEmployee();
-        if(employee != null) {
+        if (employee != null) {
             employee = personRepository.findOne(employee.getId()).orElseGet(null);
 
             Role role = roleRepository.findOne(employee.getRole().getId()).orElseGet(null);
@@ -253,7 +316,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Person manager = request.getManager();
-        if(manager != null) {
+        if (manager != null) {
             manager = personRepository.findOne(manager.getId()).orElseGet(null);
             request.setManager(manager);
         }

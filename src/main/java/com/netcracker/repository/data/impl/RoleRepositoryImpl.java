@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,6 +49,11 @@ public class RoleRepositoryImpl extends GenericJdbcRepository<Role, Integer> imp
         return queryForObject(this.buildFindByNameQuery(), name);
     }
 
+    @Override
+    public Optional<Role> findRoleById(int id){return super.findOne(id);}
+
+    @Override
+    public List<Role> findAllRoles(){return super.findAll();}
     private String buildFindByNameQuery(){
         return new StringBuilder("SELECT * FROM ")
                 .append(this.TABLE_NAME)

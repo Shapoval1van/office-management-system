@@ -55,10 +55,10 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler({CannotCreateRequestException.class, CannotAssignRequestException.class,
-            CannotDeleteRequestException.class, CannotCreateSubRequestException.class})
+            CannotDeleteRequestException.class, CannotCreateSubRequestException.class, IncorrectStatusException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorsDTO requestExceptionHandler(HttpServletRequest request, BaseException ex){
-        ErrorDTO error = new ErrorDTO(HttpStatus.NOT_FOUND.value(),request.getRequestURL().toString(),ex.getMessage(),ex.getDescription());
+    public ErrorsDTO requestExceptionHandler(HttpServletRequest request, BaseException ex) {
+        ErrorDTO error = new ErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURL().toString(), ex.getMessage(), ex.getDescription());
         return new ErrorsDTO(Collections.singletonList(error));
     }
 }
