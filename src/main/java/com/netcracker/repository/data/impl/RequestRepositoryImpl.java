@@ -30,6 +30,10 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String GET_AVAILABLE_REQUESTS_BY_PRIORITY = "SELECT * FROM request WHERE priority_id = ? AND manager_id IS NULL";
     public static final String GET_AVAILABLE_REQUESTS = "SELECT * FROM request WHERE manager_id IS NULL";
 
+    public static final String GET_ALL_REQUESTS_BY_EMPLOYEE = "SELECT * FROM request WHERE employee_id = ? " +
+            "AND status_id!=5";
+
+
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
     private final String UPDATE_REQUEST_PRIORITY = "UPDATE " + TABLE_NAME + " SET priority_id = ? WHERE request_id = ?";
@@ -45,6 +49,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
             " WHERE priority_id = ? AND manager_id IS NULL ";
 
     private final String GET_REQUESTS_BY_REQUEST_GROUP_ID = "SELECT * FROM request WHERE request_group_id = ?";
+
+    private final String COUNT_ALL_REQUEST_BY_EMPLOYEE = "SELECT count(request_id) FROM " + TABLE_NAME +
+            " WHERE employee_id = ? AND status_id!=5";
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -147,6 +154,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countFree(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
+    }
+
+    @Override
+    public Long countAllRequestByEmployee(Long employeeID) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_EMPLOYEE, Long.class, employeeID);
     }
 
     @Override

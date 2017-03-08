@@ -36,7 +36,11 @@ public interface RequestService {
 
     List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
 
+    List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
+
     Long getCountFree(Integer priorityId);
+
+    Long getCountAllRequestByEmployee(String employeeEmail);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period);
 

@@ -288,8 +288,25 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    public List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
+        Person employee = personRepository.findPersonByEmail(employeeEmail).get();
+        List<Request> requestList = requestRepository.queryForList(
+                RequestRepositoryImpl.GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
+
+        requestList.forEach(this::fillRequest);
+
+        return requestList;
+    }
+
+    @Override
     public Long getCountFree(Integer priorityId) {
         return requestRepository.countFree(priorityId);
+    }
+
+    @Override
+    public Long getCountAllRequestByEmployee(String employeeEmail) {
+        Person employee = personRepository.findPersonByEmail(employeeEmail).get();
+        return requestRepository.countAllRequestByEmployee(employee.getId());
     }
 
     private void fillRequest(Request request) {
