@@ -133,7 +133,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
         if(!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
-        futureNewRequest.get().setPriority(new Priority(p.get().getId()));
+        futureNewRequest.get().setPriority(p.get());
         updateRequestHistory(futureNewRequest.get(),oldRequest,authorName);
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
@@ -141,6 +141,8 @@ public class RequestServiceImpl implements RequestService {
 
 
     private Optional<Request> updateRequestHistory(Request newRequest,  Request oldRequest , String authorName) {
+        normalizeRequestObj(newRequest);
+        normalizeRequestObj(oldRequest);
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
         if(!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
@@ -384,6 +386,18 @@ public class RequestServiceImpl implements RequestService {
 //            String fieldName = referenceChange.getPropertyName();
 //        });
         return changeItemSet;
+    }
+
+     void normalizeRequestObj(Request request){
+        if(request.getPriority()!=null){
+            request.setPriority(new Priority(request.getPriority().getId()));
+        }
+        if(request.getStatus()!=null){
+            request.setStatus(new Status(request.getStatus().getId()));
+        }
+        if(request.getManager()!=null){
+            request.setManager(new Person(request.getManager().getId()));
+        }
     }
 
 }
