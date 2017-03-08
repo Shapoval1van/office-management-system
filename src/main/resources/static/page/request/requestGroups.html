@@ -1,0 +1,61 @@
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Request Group Details</h1>
+</nav>
+
+<section class="main-form section-padding" ng-cloak="" ng-controller="RequestGroupController">
+    <div class="container">
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label >Group Name:</label>
+                <input type="text" class="form-control"  ng-model="groupInput" ng-change="getGroups()">
+            </div>
+            <a ng-click="createGroup()" class="btn btn-info" role="button">Create Group</a>
+            <a ng-click="getAllGroups()" class="btn btn-info" role="button">Get All My Groups</a>
+        </div>
+
+
+        <div id="collapseHistory" class="collapse in">
+            <table class="table table-hover">
+                <thead class="thead-inverse">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Author First Name</th>
+                    <th>Author Last Name</th>
+                    <th>Email of Author</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr uib-tooltip="Click to see details"
+                    scope="row" ng-repeat="group in groups">
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.id }}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.name | limitTo: 50 }}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.firstName}}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.lastName}}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.email }}</td>
+
+                    <!--<td>-->
+                    <!--&lt;!&ndash;<button class="bnt" data-toggle="modal" data-target="#myModal"&ndash;&gt;-->
+                    <!--&lt;!&ndash;ng-click="assignToMe(request.id)">Assign to me</button>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<button ng-show="isAdmin()" class="bnt" data-toggle="modal"&ndash;&gt;-->
+                    <!--&lt;!&ndash;ng-click="selectRequest(request.id)" data-target="#modalSearch">Assign</button>&ndash;&gt;-->
+                    <!--</td>-->
+
+                </tr>
+                </tbody>
+            </table>
+            <!--<div class="center-block">-->
+            <!--<ul uib-pagination total-items="totalItems" ng-model="currentPage"-->
+            <!--max-size="maxSize" class="pagination-sm" boundary-links="true"-->
+            <!--ng-change="pageChanged()" items-per-page="pageSize"></ul>-->
+            <!--</div>-->
+        </div>
+
+    </div>
+
+
+
+    </div>
+</section>

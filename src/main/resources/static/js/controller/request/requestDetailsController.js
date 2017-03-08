@@ -5,9 +5,10 @@
 
                 $scope.comments = [];
                 $scope.comment = "";
-                $scope.periodList =  {   "type": "select",
+                $scope.periodList = {
+                    "type": "select",
                     "value": "Day",
-                    "values": [ "Day", "Month", "All"]
+                    "values": ["Day", "Month", "All"]
                 };
 
                 var requestId = $routeParams.requestId;
@@ -41,7 +42,7 @@
 
                 });
 
-                $scope.historyForPeriod = function(item_selected){
+                $scope.historyForPeriod = function (item_selected) {
                     var period = item_selected.toLowerCase();
                     $http({
                         method: 'GET',
@@ -89,11 +90,11 @@
                     сhangeGroup.forEach(function (item, arr) {
                         item.changeItems.forEach(function (item1, arr1) {
                             var historyItem = {};
-                            historyItem.property = item1.field.name.substr(0,1).toUpperCase()+item1.field.name.substr(1).toLowerCase();
+                            historyItem.property = item1.field.name.substr(0, 1).toUpperCase() + item1.field.name.substr(1).toLowerCase();
                             historyItem.newValue = item1.newVal;
                             historyItem.oldValue = item1.oldVal;
                             historyItem.createTime = item.createDate;
-                            historyItem.author = item.author.firstName +' ' + item.author.lastName;
+                            historyItem.author = item.author.firstName + ' ' + item.author.lastName;
                             historyItem.authorId = item.author.id;
                             historyResult.push(historyItem);
                         });
@@ -142,7 +143,7 @@
                 $scope.getUserName = function (userId) {
 
                     if (userId == currentUser.id)
-                        return currentUser.lastName + " " +  currentUser.firstName;
+                        return currentUser.lastName + " " + currentUser.firstName;
                     else
                         return "User id: " + userId;
 

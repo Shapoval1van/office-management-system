@@ -54,6 +54,10 @@
                          templateUrl: "/static/page/request/list.html",
                          controller: "RequestListController"
                      })
+                    .when("/requestGroups",{
+                        templateUrl: "/static/page/request/requestGroups.html",
+                        controller: "RequestGroupController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
