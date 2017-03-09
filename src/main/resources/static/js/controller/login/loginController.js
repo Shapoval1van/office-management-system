@@ -21,8 +21,8 @@
                 var cookiesLivingTime = 1000 * 60 * 60 * 24 * 7;
                 // Cookies expiration date
                 var cookiesExpirationDate = new Date(Number(new Date()) + cookiesLivingTime);
-                //var host = "https://management-office.herokuapp.com";
-                var host = "http://localhost:8080";
+                var host = "https://management-office.herokuapp.com";
+                // var host = "http://localhost:8080";
 
                 if (!!registrationToken) {
                     $http.get("/api/v1/registration/" + registrationToken)

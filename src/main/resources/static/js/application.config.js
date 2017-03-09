@@ -62,6 +62,10 @@
                         templateUrl: "/static/page/registration/admin-registration-page.html",
                         controller: "AdminRegistrationController"
                     })
+                    .when("/requestListByEmployee", {
+                        templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
