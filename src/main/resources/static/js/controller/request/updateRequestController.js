@@ -2,29 +2,62 @@
     angular.module("OfficeManagementSystem")
         .controller("UpdateRequestController", ["$scope", "$http", "$routeParams",
             function ($scope, $http, $routeParams) {
-                $scope.requestCredentials = {
-                    priority:'2'
-                };
+                $scope.requestCredentials = {};
 
                 $scope.selectedManager = undefined;
+                $scope.estimateTime = undefined;
                 $scope.managers = [];
                 $scope.currentPage = 1;
                 $scope.pageSize = 10;
+                $scope.calendarClick = false;
 
                 var reguestId = $routeParams.requestId;
+
+                function formatDate(dateVal) {
+                    var newDate = new Date(dateVal);
+                    var sMonth = padValue(newDate.getMonth() + 1);
+                    var sDay = padValue(newDate.getDate());
+                    var sYear = newDate.getFullYear();
+                    var sHour = newDate.getHours();
+                    var sMinute = padValue(newDate.getMinutes());
+                    var sAMPM = "AM";
+                    var iHourCheck = parseInt(sHour);
+
+                    if (iHourCheck > 12) {
+                        sAMPM = "PM";
+                        sHour = iHourCheck - 12;
+                    }
+                    else if (iHourCheck === 0) {
+                        sHour = "12";
+                    }
+                    sHour = padValue(sHour);
+                    return sMonth + "/" + sDay + "/" + sYear + " " + sHour + ":" + sMinute + " " + sAMPM;
+                }
+
+                function padValue(value) {
+                    return (value < 10) ? "0" + value : value;
+                }
 
                 $scope.getRequestCredential = function () {
                     $http.get("/api/request/" + reguestId )
                         .then(function (callback) {
                             $scope.requestCredentials = callback.data;
+                            if ($scope.requestCredentials.estimate!=null){
+                                $scope.estimateTime = formatDate($scope.requestCredentials.estimate);
+                            }
                             if ($scope.requestCredentials.manager == null){
                                 $("#input-manager").parents(".col-md-offset-3").fadeOut();
+                                $scope.requestCredentials.manager = null;
                             }
-                            else $scope.selectedManager = $scope.requestCredentials.manager;
+                            else {
+                                $scope.selectedManager = $scope.requestCredentials.manager;
+                            }
                             if ($scope.requestCredentials.requestGroup == null) {
                                 $("#input-request-group").parents(".col-md-offset-3").fadeOut();
                             }
-                            else $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
+                            else {
+                                $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
+                            }
                             $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
                         }, function (callback) {
                             console.log(callback)
@@ -32,15 +65,28 @@
                 };
 
 
+                $scope.calendarButtonClick = function(){
+                    $scope.calendarClick = true;
+                };
+
                 $scope.getRequestCredential();
 
                 $scope.sendRequestCredentials = function () {
-                    $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
+                    if ($scope.calendarClick==true) {
+                        $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
+                    } else if ($scope.estimateTime!=undefined && $scope.calendarClick==false){
+                        $scope.requestCredentials.estimate = new Date($scope.estimateTime).getTime();
+                    } else if ($scope.estimateTime==undefined){
+                        $scope.requestCredentials.estimate = null;
+                    }
                     $scope.requestCredentials.status = $scope.requestCredentials.status.id;
                     $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
-                    if ($scope.requestCredentials.manager!=null) {
+                    if ($scope.selectedManager!=undefined) {
                         $scope.requestCredentials.manager = $scope.selectedManager.id;
+                    } else {
+                        $scope.requestCredentials.manager = $scope.requestCredentials.manager;
                     }
+
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
                             window.location = "/requestListByEmployee";
