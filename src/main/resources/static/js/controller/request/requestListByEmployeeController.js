@@ -48,15 +48,19 @@
                 };
 
                 $scope.requestDelete = function(requestId) {
-                    $http({
-                        method: 'DELETE',
-                        url: '/api/request/' + requestId + '/delete'
-                    }).then(function successCallback(response) {
-                        $scope.requests = response.data;
-                    }, function errorCallback(response) {
-                        console.log(response);
-                    });
-                    location.reload(true);
+                    $scope.userConfirm = confirm("Delete this task?");
+                    if($scope.userConfirm){
+                        $http({
+                            method: 'DELETE',
+                            url: '/api/request/' + requestId + '/delete'
+                        }).then(function successCallback(response) {
+                            $scope.requests = response.data;
+                        }, function errorCallback(response) {
+                            console.log(response);
+                        });
+                        location.reload(true);
+                        $scope.userConfirm = false;
+                    }
                 };
 
                 $scope.propertyName = 'name';
