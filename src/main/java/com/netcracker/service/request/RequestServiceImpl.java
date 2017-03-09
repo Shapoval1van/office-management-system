@@ -151,6 +151,9 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.setAuthor(author.get());
         changeGroup.setCreateDate(new Date(System.currentTimeMillis()));
         Set<ChangeItem> changeItemSet = findMismatching(oldRequest, newRequest);
+        if(changeItemSet.size()==0){
+            return Optional.empty();
+        }
         ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
         changeItemSet.forEach(ci->ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
         changeItemSet.forEach(changeItemRepository::save);
