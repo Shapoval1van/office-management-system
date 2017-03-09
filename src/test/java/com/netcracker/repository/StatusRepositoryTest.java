@@ -2,7 +2,7 @@ package com.netcracker.repository;
 
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Status;
-import com.netcracker.repository.data.StatusRepository;
+import com.netcracker.repository.data.interfaces.StatusRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

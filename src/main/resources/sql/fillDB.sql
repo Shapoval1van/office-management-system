@@ -7,7 +7,6 @@ INSERT INTO status (name) VALUES
   ('FREE'),
   ('IN PROGRESS'),
   ('CLOSED'),
-  ('REOPEN'),
   ('CANCELED');
 
 INSERT INTO priority (name) VALUES
@@ -16,12 +15,13 @@ INSERT INTO priority (name) VALUES
   ('LOW');
 
 INSERT INTO field (name) VALUES
-  ('name'),
-  ('description'),
-  ('status_id'),
-  ('manager_id'),
-  ('priority_id'),
-  ('group_id');
+  ('NAME'),
+  ('DESCRIPTION'),
+  ('STATUS'),
+  ('MANAGER'),
+  ('PRIORITY'),
+  ('ESTIMATE'),
+  ('GROUP');
 
 DO
 $$
@@ -43,10 +43,11 @@ $$ LANGUAGE plpgsql;
 DO
 $$
 BEGIN
-  FOR i IN 1..20 LOOP
-    INSERT INTO request_group (name) VALUES
+  FOR i IN 1..2 LOOP
+    INSERT INTO request_group (name, author_id) VALUES
       (
-        CONCAT('Request group ', TO_CHAR(i, '99'))
+        CONCAT('qwr ', TO_CHAR(i, '99')),
+        1
       );
   END LOOP;
 END;

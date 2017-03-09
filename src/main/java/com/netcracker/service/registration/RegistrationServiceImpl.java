@@ -9,9 +9,10 @@ import com.netcracker.model.entity.Token;
 import com.netcracker.model.entity.TokenType;
 import com.netcracker.model.event.NewPasswordEvent;
 import com.netcracker.model.event.PersonRegistrationEvent;
-import com.netcracker.repository.data.PersonRepository;
-import com.netcracker.repository.data.RoleRepository;
-import com.netcracker.repository.data.TokenRepository;
+import com.netcracker.model.event.ResetPasswordEvent;
+import com.netcracker.repository.data.interfaces.PersonRepository;
+import com.netcracker.repository.data.interfaces.RoleRepository;
+import com.netcracker.repository.data.interfaces.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
@@ -42,10 +40,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     @Override
-    public Token registerPerson(Person person, String requestLink, String roleName) throws Exception {
+    public Token registerPerson(Person person, String requestLink, int roleId) throws Exception {
 
         Optional<Person> savedOptional = this.personRepository.findPersonByEmail(person.getEmail());
-
         if (savedOptional.isPresent()) {
             if (savedOptional.get().isEnabled()) {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
@@ -65,14 +62,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
 
-        person.setEnabled(false);
-        person.setRole(this.loadRoleByName(roleName));
-        if (person.getRole() != null && (person.getRole().getId() == 2 || person.getRole().getName() == "ROLE_OFFICE MANAGER")) {
-            NewPasswordEvent newPasswordEvent = new NewPasswordEvent(person);
-            eventPublisher.publishEvent(newPasswordEvent);
-        }
+        person.setRole(this.loadRoleById(roleId));
+        if (person.getRole().getId()!= EMPLOYEEID )
+            person.setEnabled(true);
+        else
+            person.setEnabled(false);
         person.setPassword(passwordEncoder.encode(person.getPassword()));
-
         Optional<Person> personOptional = this.personRepository.save(person);
 
         if (personOptional.isPresent()) {
@@ -81,6 +76,21 @@ public class RegistrationServiceImpl implements RegistrationService {
             return verificationTokenOptional.orElse(null);
         } else return null;
     }
+
+
+    @Transactional
+    @Override
+    public List<Role> findAllRolesForAdminRegistration() throws Exception{
+        List<Role> allRoles = this.roleRepository.findAllRoles();
+        List<Role> allRolesForAdminRegistration = new ArrayList<>();
+        for (Role role : allRoles){
+            if (role.getId()!= EMPLOYEEID){
+                allRolesForAdminRegistration.add(role);
+            }
+        }
+
+        return allRolesForAdminRegistration;
+     }
 
     @Transactional
     @Override
@@ -97,8 +107,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
 
+
     private Role loadRoleByName(String roleName) throws ResourceNotFoundException {
         return this.roleRepository.findRoleByName(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException(Role.TABLE_NAME));
+    }
+
+    private Role loadRoleById(int roleId) throws ResourceNotFoundException {
+        return this.roleRepository.findRoleById(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException(Role.TABLE_NAME));
     }
 
@@ -124,8 +140,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void publishOnRegistrationCompleteEvent(Person person, Optional<Token> verificationToken, String requestLink) {
         verificationToken.ifPresent((token) -> {
-            PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
-            eventPublisher.publishEvent(event);
+            if (person.getRole().getId() == EMPLOYEEID) {
+                PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
+                eventPublisher.publishEvent(event);
+            }else{
+                ResetPasswordEvent event = new ResetPasswordEvent(requestLink, person, token);
+                eventPublisher.publishEvent(event);
+            }
+
         });
 
     }

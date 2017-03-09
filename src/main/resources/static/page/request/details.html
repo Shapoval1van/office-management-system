@@ -5,8 +5,18 @@
 <section class="main-form section-padding" ng-cloak="">
     <div class="container">
         <div class="row">
-            <div class="col-md-offset-1">
+            <div class="col-md-offset-1 input-group">
                 <h1 class="title-text">{{request.name}}</h1>
+                <span ng-show="request.requestGroup == null" class="input-group-btn">
+                    <change-request-status-button></change-request-status-button>
+                </span>
+                <span ng-controller = "UpdateRequestLinkToGroupController"
+                      ng-show="(request.status.id == 1)" class="input-group-btn">
+                    <message-popup></message-popup>
+                    <group-link-popup></group-link-popup>
+                    <button style="margin: 5%" type="button" class="btn btn-default" data-dismiss="modal"
+                            data-toggle="modal"  data-target="#groupLinkPopup">Link</button>
+                </span>
             </div>
             <div class="col-md-offset-1 col-md-5" id="accordion">
                 <div class="row toggle-border">
@@ -22,7 +32,11 @@
                                     <li><span class="bold">Author:</span> <a ng-href="#">{{request.employee.firstName +
                                         data.employee.lastName}}</a></li>
                                     <li><span class="bold">Created:</span> {{creationTime}}</li>
-                                    <li><span class="bold">Priority:</span> {{request.priority.name}}</li>
+                                    <li><span class="bold">Priority:</span>
+                                        <select class="input-sm" ng-model="priorityList.value" ng-options="x for x in priorityList.values"
+                                                ng-change="prioritySelect(priorityList.value)">
+                                        </select>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="col-md-offset-1 col-md-4 border">
@@ -66,19 +80,35 @@
                         </a>
                     </h4>
                     <div id="collapseHistory" class="collapse in">
-                        <table class="table">
-                            <thead class="thead-inverse">
-                            <tr>
-                                <th>#</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Username</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                        <select  id="historySelector" class="input-sm" ng-model="periodList.value" ng-options="x for x in periodList.values"
+                                ng-change="historyForPeriod(periodList.value)">
+                        </select>
+                        <div ng-if="historyList.length!=0">
+                            <table class="table">
+                                <thead class="thead-inverse">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>New value</th>
+                                    <th>Old value</th>
+                                    <th>Author</th>
+                                    <th>Time creation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr  class="animate-repeat" ng-repeat="history in historyList">
+                                    <th>{{history.property}}</th>
+                                    <td>{{history.newValue}}</td>
+                                    <td>{{history.oldValue}}</td>
+                                    <!--TODO author id-->
+                                    <td><a ng-href="#">{{history.author}}</a></td>
+                                    <td>{{history.createTime}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-if="historyList.length==0">
+                            No changes for this period
+                        </div>
                     </div>
                 </div>
             </div>

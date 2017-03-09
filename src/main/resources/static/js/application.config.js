@@ -46,10 +46,26 @@
                         controller: "UpdateRequestController"
                             ///request/:requestId/
                     })
-                     .when("/request/:requestId/",{
+                    .when("/request/:requestId/",{
                          templateUrl: "/static/page/request/details.html",
                          controller: "RequestDetailsController"
                      })
+                    .when("/requestList",{
+                         templateUrl: "/static/page/request/list.html",
+                         controller: "RequestListController"
+                     })
+                    .when("/requestGroups",{
+                        templateUrl: "/static/page/request/requestGroups.html",
+                        controller: "RequestGroupController"
+                    })
+                    .when("/registrationAdmin", {
+                        templateUrl: "/static/page/registration/admin-registration-page.html",
+                        controller: "AdminRegistrationController"
+                    })
+                    .when("/requestListByEmployee", {
+                        templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });

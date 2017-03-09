@@ -8,7 +8,7 @@
 
                 $scope.requestNameCheck = function () {
                     var nameValue = $scope.requestCredentials.name,
-                        regExp = /^[A-Z][a-zA-Z\d]{2,50}$/;
+                        regExp = /^[A-Z][a-zA-Z\d\s]{2,50}$/;
 
                     if (nameValue){
                         var lookFor = nameValue.search(regExp);
@@ -29,6 +29,7 @@
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
+                            window.location = "/requestListByEmployee";
                         }, function (callback) {
                             console.log("Creating request Failure!")
                         })

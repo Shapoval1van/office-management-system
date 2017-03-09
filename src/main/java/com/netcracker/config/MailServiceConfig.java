@@ -6,10 +6,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@EnableAsync(proxyTargetClass = true)
+@EnableScheduling
 @PropertySource("classpath:mail.properties")
 public class MailServiceConfig {
+
     @Value("${mail.login}")
     private String MAIL_LOGIN;
     @Value("${mail.password}")

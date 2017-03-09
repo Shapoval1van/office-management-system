@@ -8,8 +8,9 @@ public class RequestGroup implements Persistable<Integer> {
 
     private Integer id;
     private String name;
+    private Person author;
 
-    public RequestGroup(){
+    public RequestGroup() {
     }
 
     public RequestGroup(Integer id) {
@@ -32,6 +33,14 @@ public class RequestGroup implements Persistable<Integer> {
         this.name = name;
     }
 
+    public Person getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Person author) {
+        this.author = author;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,6 +49,7 @@ public class RequestGroup implements Persistable<Integer> {
         RequestGroup that = (RequestGroup) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (author != null ? !author.equals(that.author) : that.author != null) return false;
         return name != null ? name.equals(that.name) : that.name == null;
     }
 
@@ -47,6 +57,7 @@ public class RequestGroup implements Persistable<Integer> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
         return result;
     }
 }

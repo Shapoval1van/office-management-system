@@ -47,8 +47,10 @@ public class CommentDTO {
         comment.setId(this.id);
         comment.setBody(this.body);
         comment.setPublishDate(this.publishDate);
-        comment.setAuthor(new Person(this.author));
-        comment.setRequest(new Request(this.request));
+        if (this.author != null)
+            comment.setAuthor(new Person(this.author));
+        if (this.request != null)
+            comment.setRequest(new Request(this.request));
         return comment;
     }
 

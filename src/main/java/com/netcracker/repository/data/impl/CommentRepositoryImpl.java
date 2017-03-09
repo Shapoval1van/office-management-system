@@ -4,6 +4,7 @@ import com.netcracker.model.entity.Comment;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.CommentRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -62,4 +63,11 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
         List<Comment> requestComments = super.queryForList(FIND_COMMENTS_BY_REQUEST_ID, requestId);
         return requestComments;
     }
+
+    @Override
+    public List<Comment> findCommentByRequestId(Long requestId, Pageable pageable) {
+        List<Comment> requestComments = super.queryForList(FIND_COMMENTS_BY_REQUEST_ID, pageable, requestId);
+        return requestComments;
+    }
+
 }

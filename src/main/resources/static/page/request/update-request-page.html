@@ -1,3 +1,8 @@
+<script src="../../js/controller/request/updateRequestController.js"></script>
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Update Request</h1>
+</nav>
+
 <section class = "main-form" ng-cloak="">
     <div class = "container">
         <div class = "row">
@@ -6,7 +11,7 @@
                     <div class = "col-md-offset-3 col-md-6">
                         <div id = "request-name-input-group" class = "input-group login-input">
                             <span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>
-                            <input type = "text" class = "form-control" placeholder = "Request name" ng-model="requestCredentials.name" ng-blur="requestNameCheck()" required>
+                            <input type = "text" readonly="readonly" class = "form-control" placeholder = "Request name" ng-model="requestCredentials.name">
                         </div>
                     </div>
                     <div class = "col-md-offset-3 col-md-6">
@@ -20,27 +25,30 @@
                                 <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
-                            <input type='text' class="form-control"/>
+                            <input type='text' class="form-control" placeholder = "Estimate time"/>
                         </div>
                     </div>
 
                     <div class = "col-md-offset-3 col-md-6">
                         <div id = "request-manager-input-group" class = "input-group login-input">
                             <span class = "input-group-addon"><i class = "fa fa-user" aria-hidden="true"></i></span>
-                            <input type = "text" class = "form-control" placeholder = "Manager name" ng-model="requestCredentials.manager.name">
+                            <input id="input-manager" type = "text" class = "form-control" placeholder = "Manager name"
+                                   ng-change="update()"  ng-model="selectedManager"
+                                   uib-typeahead="manager as manager.firstName + ' ' +  manager.lastName for manager in managers"
+                                   class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
                         </div>
                     </div>
 
-                    <div class = "col-md-offset-3 col-md-6">
-                        <div id = "request-group-input-group" class = "input-group login-input">
-                            <span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>
-                            <input type = "text" class = "form-control" placeholder = "Group name" ng-model="requestCredentials.group.name">
-                        </div>
-                    </div>
+                    <!--<div class = "col-md-offset-3 col-md-6">-->
+                        <!--<div id = "request-group-input-group" class = "input-group login-input">-->
+                            <!--<span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>-->
+                            <!--<input id="input-request-group" type = "text" class = "form-control" placeholder = "Group name" ng-model="requestCredentials.requestGroup">-->
+                        <!--</div>-->
+                    <!--</div>-->
 
-                    <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
+                    <div id="priority-input-group" ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
                         <div class = "input-group"><label>Priority:</label></div>
-                        <div class="btn-group input-group login-input">
+                        <div class="btn-group input-group login-input" placeholder = "Estimate time">
                             <label id="low-priority" class="btn" ng-model="requestCredentials.priority"
                                    ng-class = "{ 'btn-success': requestCredentials.priority == '3', 'btn-info': requestCredentials.priority != '3'}"
                                    uib-btn-radio="'3'" uib-uncheckable="uncheckable">Low</label>
@@ -52,29 +60,6 @@
                                    uib-uncheckable="uncheckable">High</label>
                         </div>
                     </div>
-
-                <div class="col-md-offset-3 col-md-6">
-                    <div class="status-group">
-                        <span id="status-dropdown" class="status-dropdown btn btn-primary" ng-click="statusDropdown()">Status List<i class="fa fa-caret-down" aria-hidden="true"></i></span>
-                        <div class="status-text-wrapper-outer">
-                        <span class="status-text-wrapper-inner">
-                            <label class="status-text-wrapper status-text-wrapper_free">
-                                <input type="radio" name="status" value="free" checked>Free
-                            </label>
-                            <label class="status-text-wrapper status-text-wrapper_inprogress">
-                                <input type="radio" name="status" value="inprogress">In Progress
-                            </label>
-                            <label class="status-text-wrapper status-text-wrapper_closed">
-                                <input type="radio" name="status" value="closed">Closed
-                            </label>
-                            <label class="status-text-wrapper status-text-wrapper_reopen">
-                                <input type="radio" name="status" value="reopen">Reopen
-                            </label>
-                        </span>
-                        </div>
-                    </div>
-                </div>
-
 
                     <div class = "col-md-offset-3 col-md-6">
                         <input type = "submit" class = "btn btn-default login-btn" ng-click="sendRequestCredentials()" value="Update">

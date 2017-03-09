@@ -1,0 +1,50 @@
+<nav class="nav-top">
+    <h1 class="nav-top__brand">Request Group Details</h1>
+</nav>
+
+<section class="main-form section-padding" ng-cloak="" ng-controller="RequestGroupController">
+    <div class="container">
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label >Group Name:</label>
+                <input type="text" class="form-control"  ng-model="groupInput" ng-change="getGroups()">
+            </div>
+            <a ng-click="createGroup()" class="btn btn-info" role="button">Create Group</a>
+            <a ng-click="getAllGroups()" class="btn btn-info" role="button">Get All My Groups</a>
+        </div>
+
+
+        <div id="collapseHistory" class="collapse in">
+            <table class="table table-hover">
+                <thead class="thead-inverse">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Author First Name</th>
+                    <th>Author Last Name</th>
+                    <th>Email of Author</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr uib-tooltip="Click to see details"
+                    scope="row" ng-repeat="group in groups">
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.id }}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.name | limitTo: 50 }}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.firstName}}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.lastName}}</td>
+                    <td ng-click="requestGroupDetails(requestGroupId)">{{ group.author.email }}</td>
+
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    </div>
+</section>

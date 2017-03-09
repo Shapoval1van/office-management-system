@@ -1,0 +1,130 @@
+a:hover{
+    color: #ffffff;
+    text-decoration: none;
+}
+#description{
+    width: 100%;
+}
+
+#calendar{
+    width: 60%;
+}
+
+#timepicker{
+    width: 40%;
+    float: left;
+}
+
+.form-control_offset{
+    margin-top: 20px!important;
+}
+
+.request-name-incorrect{
+    position: relative;
+}
+
+.request-name-incorrect::after{
+    content: "Request name must contain at least 3 letters and start with capital letter!";
+    color: #ff6464;
+    font-size: 15px;
+    position: absolute;
+    top: 40px;
+    left: 0;
+}
+
+.filter-article, .thead-inverse th, .ng-binding{
+    text-align: center;
+}
+.filter-article, .thead-inverse th{
+    color: #337ab7;
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+    font-weight: 900;
+}
+.thead-inverse th:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.nav-top{
+    position: relative;
+}
+.request__modification-btn_logout{
+    position: absolute;
+    top: 30px;
+    right: 50px;
+}
+.request-row{
+    cursor: pointer;
+    vertical-align: middle;
+}
+.request-row:nth-of-type(2n+1){
+    background-color: #e7e7e7;
+}
+.request-row td{
+    font-family: 'Noto serif', serif;
+    font-size: 15px;
+    vertical-align: middle!important;
+}
+.request__modification-btn{
+    padding: 5px 10px;
+    background-color: #5a97c4;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 5px;
+    border: 1px solid #333;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.request__modification-btn:hover{
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+.request__modification-btn_delete{
+    background-color: #d44d4d;
+}
+.request__modification-btn i{
+    margin-right: 3px;
+}
+.status-group{
+    margin-bottom: 20px;
+}
+.status-text-wrapper{
+    display: block;
+    cursor: pointer;
+    margin: 10px 0;
+}
+.status-dropdown i{
+    margin-left: 10px;
+}
+.status-text-wrapper-outer{
+    display: none;
+}
+.status-text-wrapper-inner{
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: inline-block;
+    border: 1px solid #000;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2)
+}
+.status-text-wrapper{
+    color: #286090;
+}
+.status-text-wrapper input{
+    margin-right: 10px;
+}
+.status-text-wrapper_inprogress{
+    color: #00cc00;
+}
+.status-text-wrapper_closed{
+    color: #ef0000;
+}
+.status-text-wrapper_reopen{
+    color: #6255ff;
+}
+.center-block{
+    text-align: center;
+}
+
+
+

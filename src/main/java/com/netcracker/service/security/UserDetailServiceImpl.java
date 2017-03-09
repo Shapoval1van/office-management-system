@@ -3,8 +3,8 @@ package com.netcracker.service.security;
 
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
-import com.netcracker.repository.data.PersonRepository;
-import com.netcracker.repository.data.RoleRepository;
+import com.netcracker.repository.data.interfaces.PersonRepository;
+import com.netcracker.repository.data.interfaces.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

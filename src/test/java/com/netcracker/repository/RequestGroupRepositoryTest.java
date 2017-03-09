@@ -2,7 +2,7 @@ package com.netcracker.repository;
 
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.*;
-import com.netcracker.repository.data.RequestGroupRepository;
+import com.netcracker.repository.data.interfaces.RequestGroupRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +31,7 @@ public class RequestGroupRepositoryTest {
             requestGroup = new RequestGroup();
             requestGroup.setId(1);
             requestGroup.setName("Request group   1");
+            requestGroup.setAuthor(new Person(2L));
         }
 
         @Test
