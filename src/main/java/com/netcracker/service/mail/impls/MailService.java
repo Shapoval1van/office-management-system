@@ -2,7 +2,6 @@ package com.netcracker.service.mail.impls;
 
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.event.NotificationSendingErrorEvent;
-import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.service.mail.interfaces.MailSending;
 import com.netcracker.util.NotificationTextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
@@ -28,6 +26,7 @@ public class MailService implements MailSending {
     private NotificationTextBuilder notificationTextBuilder;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+
 
     /**
      * This method sends mail.
@@ -64,7 +63,6 @@ public class MailService implements MailSending {
             msg.setTo(notification.getPerson().getEmail());
             msg.setSubject(notification.getSubject());
             msg.setText(notificationTextBuilder.buildText(notification));
-
             mailSender.send(msg);
         } catch (MailException e){
             eventPublisher.publishEvent(new NotificationSendingErrorEvent(notification));
