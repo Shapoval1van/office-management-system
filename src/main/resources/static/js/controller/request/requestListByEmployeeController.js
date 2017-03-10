@@ -48,7 +48,7 @@
                 };
 
                 $scope.requestDelete = function(requestId) {
-                    $scope.userConfirm = confirm("Delete this task?");
+                    $scope.userConfirm = confirm("Do you really want cancel this request?");
                     if($scope.userConfirm){
                         $http({
                             method: 'DELETE',

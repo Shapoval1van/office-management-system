@@ -225,12 +225,12 @@ public class RequestServiceImpl implements RequestService {
         if (request.getStatus().getId().equals(3))   // if request closed
             throw new CannotDeleteRequestException("You cannot delete closed request");
         else {
-            changeRequestStatus(request, new Status(5));
+            changeRequestStatus(request, new Status(4));
             if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty()) {
                     for (Request r : subRequestList) {
-                        changeRequestStatus(r, new Status(5));
+                        changeRequestStatus(r, new Status(4));
                     }
                 }
             }
