@@ -94,7 +94,7 @@ public class RequestServiceTest {
         request = requestService.getRequestById(4L).get();
         requestService.deleteRequestById(request.getId());
         Assert.assertTrue(requestService.getRequestById(4L).isPresent());
-        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(5));
+        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(4));
     }
 
     @Test
@@ -104,10 +104,10 @@ public class RequestServiceTest {
         request = requestService.getRequestById(3L).get();
         requestService.deleteRequestById(request.getId());
         request = requestService.getRequestById(3L).get();
-        Assert.assertEquals(request.getStatus().getId(), new Integer(5));
+        Assert.assertEquals(request.getStatus().getId(), new Integer(4));
         Assert.assertTrue(requestService.getRequestById(3L).isPresent());
         Assert.assertTrue(requestService.getRequestById(4L).isPresent());
-        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(5));
+        Assert.assertEquals(requestService.getRequestById(4L).get().getStatus().getId(), new Integer(4));
     }
 
     @Test(expected = CannotDeleteRequestException.class)

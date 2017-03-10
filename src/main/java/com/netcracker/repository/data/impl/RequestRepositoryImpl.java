@@ -34,7 +34,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
             CREATION_TIME_COLUMN + " " + DESC_SORT;
 
     public static final String GET_ALL_REQUESTS_BY_EMPLOYEE = "SELECT * FROM request WHERE employee_id = ? " +
-            "AND status_id!=5";
+            "AND status_id!=4";
 
 
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
@@ -54,7 +54,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     private final String GET_REQUESTS_BY_REQUEST_GROUP_ID = "SELECT * FROM request WHERE request_group_id = ?";
 
     private final String COUNT_ALL_REQUEST_BY_EMPLOYEE = "SELECT count(request_id) FROM " + TABLE_NAME +
-            " WHERE employee_id = ? AND status_id!=5";
+            " WHERE employee_id = ? AND status_id!=4";
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -76,12 +76,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         Person manager = entity.getManager();
         if (manager != null) {
             columns.put(MANAGER_ID_COLUMN, entity.getManager().getId());
+        } else {
+            columns.put(MANAGER_ID_COLUMN, null);
         }
 
         Request parent = entity.getParent();
         if (parent != null) {
             columns.put(PARENT_ID_COLUMN, entity.getParent().getId());
+        } else {
+            columns.put(PARENT_ID_COLUMN, null);
         }
+
 
         RequestGroup requestGroup = entity.getRequestGroup();
         if (requestGroup != null) {
@@ -122,7 +127,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         };
     }
 
-    //@Transactional
+
     @Override
     public int changeRequestStatus(Request request, Status status) {
         return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
@@ -134,7 +139,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
 
-    //@Transactional
+
     @Override
     public Optional<Request> updateRequest(Request request) {
         if (request.getId() != null) {

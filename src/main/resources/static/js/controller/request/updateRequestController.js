@@ -4,12 +4,13 @@
             function ($scope, $http, $routeParams) {
                 $scope.requestCredentials = {};
 
-                $scope.selectedManager = undefined;
+                //$scope.selectedManager = undefined;
+                //$scope.managers = [];
+                //$scope.currentPage = 1;
+                //$scope.pageSize = 10;
                 $scope.estimateTime = undefined;
-                $scope.managers = [];
-                $scope.currentPage = 1;
-                $scope.pageSize = 10;
                 $scope.calendarClick = false;
+
 
                 var reguestId = $routeParams.requestId;
 
@@ -45,20 +46,31 @@
                             if ($scope.requestCredentials.estimate!=null){
                                 $scope.estimateTime = formatDate($scope.requestCredentials.estimate);
                             }
-                            if ($scope.requestCredentials.manager == null){
-                                $("#input-manager").parents(".col-md-offset-3").fadeOut();
-                                $scope.requestCredentials.manager = null;
+                            // if ($scope.requestCredentials.manager == null){
+                            //     $("#input-manager").parents(".col-md-offset-3").fadeOut();
+                            //     $scope.requestCredentials.manager = null;
+                            // }
+                            // else {
+                            //     $scope.selectedManager = $scope.requestCredentials.manager;
+                            // }
+                            // if ($scope.requestCredentials.requestGroup == null) {
+                            //     $("#input-request-group").parents(".col-md-offset-3").fadeOut();
+                            // }
+                            // else {
+                            //     $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
+                            // }
+                            if ($scope.requestCredentials.manager!=null) {
+                                $scope.requestCredentials.manager = $scope.requestCredentials.manager.id;
                             }
-                            else {
-                                $scope.selectedManager = $scope.requestCredentials.manager;
+                            if ($scope.requestCredentials.parent!=null) {
+                                $scope.requestCredentials.parent = $scope.requestCredentials.parent.id;
                             }
-                            if ($scope.requestCredentials.requestGroup == null) {
-                                $("#input-request-group").parents(".col-md-offset-3").fadeOut();
-                            }
-                            else {
-                                $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
+                            if ($scope.requestCredentials.requestGroup!=null) {
+                                $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.id;
                             }
                             $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
+                            $scope.requestCredentials.status = $scope.requestCredentials.status.id;
+                            $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
                         }, function (callback) {
                             console.log(callback)
                         })
@@ -79,14 +91,6 @@
                     } else if ($scope.estimateTime==undefined){
                         $scope.requestCredentials.estimate = null;
                     }
-                    $scope.requestCredentials.status = $scope.requestCredentials.status.id;
-                    $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
-                    if ($scope.selectedManager!=undefined) {
-                        $scope.requestCredentials.manager = $scope.selectedManager.id;
-                    } else {
-                        $scope.requestCredentials.manager = $scope.requestCredentials.manager;
-                    }
-
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
                             window.location = "/requestListByEmployee";
@@ -96,20 +100,20 @@
                         })
                 };
 
-                $scope.update = function() {
-                    if($scope.selectedManager.length >= 2) {
-                        console.log($scope.selectedManager);
-                        $http({
-                            method: 'GET',
-                            url: '/api/person/managers/' +  $scope.selectedManager +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.managers = response.data;
-                            console.log($scope.managers);
-                        }, function errorCallback(response) {
-                        });
-                    }
-                };
+                // $scope.update = function() {
+                //     if($scope.selectedManager.length >= 2) {
+                //         console.log($scope.selectedManager);
+                //         $http({
+                //             method: 'GET',
+                //             url: '/api/person/managers/' +  $scope.selectedManager +
+                //             '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                //         }).then(function successCallback(response) {
+                //             $scope.managers = response.data;
+                //             console.log($scope.managers);
+                //         }, function errorCallback(response) {
+                //         });
+                //     }
+                // };
 
                 $scope.updateStatus = function (status) {
                     var updateStatus = $scope.requestCredentials.status.id;
