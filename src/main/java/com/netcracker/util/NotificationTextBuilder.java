@@ -19,18 +19,19 @@ public class NotificationTextBuilder {
 
     public NotificationTextBuilder() {
         engine = new VelocityEngine();
-        context = new VelocityContext();
-        writer = new StringWriter();
         engine.init();
     }
 
-    public String buildText(Notification notification){
+    public synchronized String buildText(Notification notification){
+        context = new VelocityContext();
+        writer = new StringWriter();
         template = engine.getTemplate(notification.getText());
         context.put("name", notification.getPerson().getFirstName());
         if(!notification.getLink().equals("")) {
             context.put("link", notification.getLink());
         }
         template.merge(context,writer);
-        return writer.toString();
+        String string = writer.toString();
+        return string;
     }
 }
