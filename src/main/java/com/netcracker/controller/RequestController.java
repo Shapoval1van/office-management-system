@@ -2,6 +2,7 @@ package com.netcracker.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.*;
+import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
@@ -49,10 +50,10 @@ public class RequestController {
     @PostMapping(value = "/updatePriority/{requestId}")
     @PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
-                                               @RequestParam(name = "priority") String priority,
-                                               @PathVariable(name = "requestId") Long id, Principal principal) {
+                                                   @RequestParam(name = "priority") String priority,
+                                                   @PathVariable(name = "requestId") Long id, Principal principal) {
         Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal.getName());
-        if(!newRequest.isPresent()){
+        if (!newRequest.isPresent()) {
             return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new MessageDTO("Request updated"), HttpStatus.OK);
@@ -62,7 +63,7 @@ public class RequestController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> getRequest(@PathVariable Long requestId) {
         Optional<Request> request = requestService.getRequestById(requestId);
-        if(request.isPresent()) {
+        if (request.isPresent()) {
             return ResponseEntity.ok(new FullRequestDTO(request.get()));
         } else {
             return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
@@ -98,7 +99,7 @@ public class RequestController {
     @PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
-                                                 @Validated(CreateValidatorGroup.class)  @RequestBody RequestDTO requestDTO, Principal principal) {
+                                                 @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal.getName());
@@ -131,7 +132,7 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable){
+    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
         List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
 
         return ResponseEntity.ok((requests
@@ -141,7 +142,7 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/requestListByEmployee/")
-    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal){
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
         List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
 
         return ResponseEntity.ok((requests
@@ -151,13 +152,13 @@ public class RequestController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId){
+    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
         Long count = requestService.getCountFree(priorityId);
         return ResponseEntity.ok(count);
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/countAllRequestByEmployee")
-    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal){
+    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal) {
         Long count = requestService.getCountAllRequestByEmployee(principal.getName());
         return ResponseEntity.ok(count);
     }
@@ -165,15 +166,16 @@ public class RequestController {
     @PutMapping("/{requestId}/grouping")
     @ResponseStatus(HttpStatus.OK)
     public void addRequestToRequestGroup(@RequestBody RequestGroupDTO requestGroupDTO,
-                                         @PathVariable("requestId") Long requestId) throws ResourceNotFoundException, IncorrectStatusException {
+                                         @PathVariable("requestId") Long requestId,
+                                         Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
 
-        requestService.addToRequestGroup(requestId, requestGroupDTO.getId());
+        requestService.addToRequestGroup(requestId, requestGroupDTO.getId(), principal);
     }
 
     @DeleteMapping("/{requestId}/group")
     @ResponseStatus(HttpStatus.OK)
-    public void removeFromRequestGroup(@PathVariable("requestId") Long requestId) throws ResourceNotFoundException {
-        requestService.removeFromRequestGroup(requestId);
+    public void removeFromRequestGroup(@PathVariable("requestId") Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+        requestService.removeFromRequestGroup(requestId, principal);
     }
 
     @GetMapping("/request-group/{requestGroupId}/page/{pageNumber}/size/{pageSize}")

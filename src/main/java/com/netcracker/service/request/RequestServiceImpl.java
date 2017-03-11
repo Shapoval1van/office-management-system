@@ -1,6 +1,7 @@
 package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
+import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
@@ -131,12 +132,12 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
-        if(!futureNewRequest.isPresent()) return Optional.empty();
+        if (!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
-        if(!p.isPresent()) return Optional.empty();
+        if (!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
         futureNewRequest.get().setPriority(p.get());
-        updateRequestHistory(futureNewRequest.get(),oldRequest,authorName);
+        updateRequestHistory(futureNewRequest.get(), oldRequest, authorName);
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
     }
@@ -159,27 +160,39 @@ public class RequestServiceImpl implements RequestService {
         return Optional.of(newRequest);
     }
 
+    /**
+     * Add request to request group
+     * If request already in group - rewrite group
+     *
+     * @param requestId
+     * @param requestGroupId
+     * @param principal      Principal of current user
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws IncorrectStatusException
+     * @throws IllegalAccessException
+     */
     @Override
-    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException, IncorrectStatusException {
-        LOGGER.trace("Get request with id {} from database", requestId);
+    public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+        LOGGER.trace("Getting request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
-            LOGGER.error("Request with id {} not exist", requestId);
+            LOGGER.error("Request with id {} does not exist", requestId);
             throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
         }
 
-        LOGGER.trace("Get request group with id {} from database");
+        LOGGER.trace("Getting request group with id {} from database");
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOptional.isPresent()) {
-            LOGGER.error("Request group with id {} not exist", requestGroupId);
-            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " not exist");
+            LOGGER.error("Request group with id {} does not exist", requestGroupId);
+            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " does not exist");
         }
 
         Request request = requestOptional.get();
 
-        LOGGER.trace("Get status with id {} from database", request.getStatus().getId());
+        LOGGER.trace("Getting status with id {} from database", request.getStatus().getId());
         Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.toString())) {
@@ -188,13 +201,24 @@ public class RequestServiceImpl implements RequestService {
                     "Request should be in FREE status for grouping. Current status is " + status.getName());
         }
 
+        if (!isAccessLegal(requestGroupOptional.get(), principal))
+            throw new IllegalAccessException("Add to request group can only author or administrator");
+
         request.setRequestGroup(new RequestGroup(requestGroupId));
-        // TODO: 07.03.2017 Add method save in service ?
-        return requestRepository.save(request);
+        return requestRepository.updateRequestGroup(requestId, requestGroupId);
     }
 
+    /**
+     * Remove request from request group
+     *
+     * @param requestId
+     * @param principal
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws IllegalAccessException
+     */
     @Override
-    public Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException {
+    public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
@@ -204,8 +228,13 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Request request = requestOptional.get();
-        request.setRequestGroup(null);
-        return requestRepository.save(request);
+
+        RequestGroup requestGroup = requestGroupRepository.findOne(request.getRequestGroup().getId()).get();
+
+        if (!isAccessLegal(requestGroup, principal))
+            throw new IllegalAccessException("Add to request group can only author or administrator");
+
+        return requestRepository.removeRequestFromRequestGroup(request.getId());
     }
 
     @Override
@@ -352,9 +381,9 @@ public class RequestServiceImpl implements RequestService {
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
     }
 
-    private void fill(Set<ChangeGroup>  changeGroup){
-        changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
-                    ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
+    private void fill(Set<ChangeGroup> changeGroup) {
+        changeGroup.forEach(cg -> cg.getChangeItems().forEach(ci -> {
+            ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
         }));
     }
 }

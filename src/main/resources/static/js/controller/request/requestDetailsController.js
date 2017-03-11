@@ -152,6 +152,10 @@
                     $scope.comments.push(comment);
                 });
 
+                $scope.requestStatusButtonsHide = function(request){
+                    return request.manager == null;
+                    // TODO hide for employee
+                };
 
             }])
 })();
