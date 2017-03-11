@@ -6,6 +6,8 @@
         .controller("MainController", ["$scope", "$http", "$cookies", "SessionService",
             function ($scope, $http, $cookies, SessionService) {
 
+                $scope.Session = SessionService;
+
                 SessionService.loadSession();
                 var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
                 var redirectIfTokenExist = "/requestListByEmployee";
