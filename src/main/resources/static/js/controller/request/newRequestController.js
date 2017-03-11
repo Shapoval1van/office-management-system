@@ -9,7 +9,7 @@
                 };
                 
                 $scope.sendRequestCredentials = function () {
-                    $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
+                    //$scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
