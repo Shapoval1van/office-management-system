@@ -7,6 +7,7 @@ import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.util.ChangeTracker;
+import com.netcracker.util.enums.role.RoleEnum;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -385,5 +386,21 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.forEach(cg -> cg.getChangeItems().forEach(ci -> {
             ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
         }));
+    }
+
+    private boolean isAccessLegal(RequestGroup requestGroup, Principal principal) throws CurrentUserNotPresentException, IllegalAccessException {
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+        if (!currentUser.isPresent()) {
+            LOGGER.warn("Current user not present");
+            throw new CurrentUserNotPresentException("Current user not present");
+        } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
+                LOGGER.error("Add to request group can only author or administrator");
+                return false;
+            }
+        }
+
+        return true;
     }
 }
