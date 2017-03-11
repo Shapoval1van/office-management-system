@@ -10,7 +10,6 @@
                     "value": "Day",
                     "values": ["Day", "Month", "All"]
                 };
-
                 var requestId = $routeParams.requestId;
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 

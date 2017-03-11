@@ -42,7 +42,7 @@ public interface RequestService {
 
     Long getCountAllRequestByEmployee(String employeeEmail);
 
-    Set<ChangeGroup> getRequestHistory(Long requestId, String period);
+    Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 

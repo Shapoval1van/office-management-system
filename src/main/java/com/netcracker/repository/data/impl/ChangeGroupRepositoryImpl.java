@@ -2,6 +2,7 @@ package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.ChangeGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -37,16 +38,18 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         super(ChangeGroup.TABLE_NAME, ChangeGroup.ID_COLUMN);
     }
 
-    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period){
+    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable){
         switch (period){
             case DAY:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_DAY), new Object[]{id}, resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_DAY).concat(pageable(pageable)), new Object[]{id}, resultSetExtractor());
             case MONTH:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_MONTH), new Object[]{id},resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_MONTH).concat(pageable(pageable)), new Object[]{id},resultSetExtractor());
             default:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID,new Object[]{id},resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(pageable(pageable)),new Object[]{id},resultSetExtractor());
         }
     }
+
+
 
     @Override
     public Map<String, Object> mapColumns(ChangeGroup entity) {
@@ -65,7 +68,7 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
             public ChangeGroup mapRow(ResultSet resultSet, int i) throws SQLException {
                 ChangeGroup changeGroup = new ChangeGroup();
                 changeGroup.setId(resultSet.getLong(CHANGE_GROUP_COLUMN));
-                changeGroup.setCreateDate(resultSet.getDate(CREATED_COLUMN));
+                changeGroup.setCreateDate(resultSet.getTimestamp(CREATED_COLUMN));
                 changeGroup.setAuthor(new Person(resultSet.getLong(AUTHOR_ID_COLUMN)));
                 changeGroup.setRequest(new Request(resultSet.getLong(REQUEST_ID_COLUMN)));
                 return changeGroup;
@@ -97,5 +100,13 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
                 return new HashSet<>(changeGroupMap.values());
             }
         };
+    }
+
+    private String pageable (Pageable pageable){
+        StringBuilder stringBuilder = new StringBuilder();
+        return stringBuilder.append(" LIMIT ")
+                .append(pageable.getPageSize())
+                .append(" OFFSET ")
+                .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
     }
 }

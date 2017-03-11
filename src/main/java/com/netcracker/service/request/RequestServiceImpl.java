@@ -5,11 +5,7 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
-import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
+import com.netcracker.util.ChangeTracker;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +39,8 @@ public class RequestServiceImpl implements RequestService {
 
     private final RequestGroupRepository requestGroupRepository;
 
+    private final ChangeTracker changeTracker;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
@@ -54,7 +52,8 @@ public class RequestServiceImpl implements RequestService {
                               ChangeGroupRepository changeGroupRepository,
                               ChangeItemRepository changeItemRepository,
                               FieldRepository fieldRepository,
-                              RequestGroupRepository requestGroupRepository) {
+                              RequestGroupRepository requestGroupRepository,
+                              ChangeTracker changeTracker) {
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -64,6 +63,7 @@ public class RequestServiceImpl implements RequestService {
         this.changeItemRepository = changeItemRepository;
         this.fieldRepository = fieldRepository;
         this.requestGroupRepository = requestGroupRepository;
+        this.changeTracker = changeTracker;
     }
 
     @Override
@@ -122,6 +122,7 @@ public class RequestServiceImpl implements RequestService {
     public Optional<Request> updateRequest(Request request, Long requestId, String authorName) {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         if(!oldRequest.isPresent()) return Optional.empty();
+        if(personRepository.findOne(request.getManager().getId()).get().getRole().getId()!=2) return Optional.empty();
         updateRequestHistory(request,oldRequest.get(),authorName);
         return this.requestRepository.updateRequest(request);
     }
@@ -142,15 +143,13 @@ public class RequestServiceImpl implements RequestService {
 
 
     private Optional<Request> updateRequestHistory(Request newRequest,  Request oldRequest , String authorName) {
-        normalizeRequestObj(newRequest);
-        normalizeRequestObj(oldRequest);
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
         if(!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
         changeGroup.setRequest(new Request(oldRequest.getId()));
         changeGroup.setAuthor(author.get());
-        changeGroup.setCreateDate(new Date(System.currentTimeMillis()));
-        Set<ChangeItem> changeItemSet = findMismatching(oldRequest, newRequest);
+        changeGroup.setCreateDate(new Timestamp(System.currentTimeMillis()));
+        Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
         if(changeItemSet.size()==0){
             return Optional.empty();
         }
@@ -244,9 +243,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
+    public Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
-            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
+            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
+                    Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
             return changeGroups;
         } catch (IllegalArgumentException e) {
@@ -357,69 +357,4 @@ public class RequestServiceImpl implements RequestService {
                     ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
         }));
     }
-
-    /**
-     * Request should have only id for field that is custom POJO
-     * @param oldRequest
-     * @param newRequest
-     * @return Set<ChangeItem>
-     */
-    private Set<ChangeItem> findMismatching(Request oldRequest, Request newRequest) {
-        Set<ChangeItem> changeItemSet = new HashSet<>();
-        Javers javers = JaversBuilder.javers().build();
-        Diff diff = javers.compare(oldRequest, newRequest);
-        List<ValueChange> change = diff.getChangesByType(ValueChange.class);
-        change.forEach(c->{
-            ChangeItem changeItem = new ChangeItem();
-            Optional affectedObject = c.getAffectedObject();
-            if(affectedObject.get() instanceof Request){
-                changeItem.setField(fieldRepository.findFieldByName(c.getPropertyName().toUpperCase()).get());
-                changeItem.setOldVal(c.getLeft()!=null?c.getLeft().toString():" ");
-                changeItem.setNewVal(c.getRight()!=null?c.getRight().toString():" ");
-                changeItemSet.add(changeItem);
-            }else {
-                if(affectedObject.get() instanceof Status){
-                    changeItem.setField(fieldRepository.findFieldByName("STATUS").get());
-                    changeItem.setOldVal(statusRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-                    changeItem.setNewVal(statusRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-                    changeItemSet.add(changeItem);
-                }
-                if(affectedObject.get() instanceof Person){
-                    changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
-                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).get().getFullName());
-                    changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
-                    changeItemSet.add(changeItem);
-                }
-                if(affectedObject.get() instanceof Priority){
-                    changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
-                    changeItem.setOldVal(priorityRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-                    changeItem.setNewVal(priorityRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-                    changeItemSet.add(changeItem);
-                }
-//                if(affectedObject.get() instanceof RequestGroup){
-//                    changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
-//                    changeItem.setOldVal(requestGroupRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-//                    changeItem.setNewVal(requestGroupRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-//                }
-            }
-        });
-        List<ReferenceChange> referenceChanges = diff.getChangesByType(ReferenceChange.class);
-//        referenceChanges.forEach(referenceChange -> {
-//            String fieldName = referenceChange.getPropertyName();
-//        });
-        return changeItemSet;
-    }
-
-     void normalizeRequestObj(Request request){
-        if(request.getPriority()!=null){
-            request.setPriority(new Priority(request.getPriority().getId()));
-        }
-        if(request.getStatus()!=null){
-            request.setStatus(new Status(request.getStatus().getId()));
-        }
-        if(request.getManager()!=null){
-            request.setManager(new Person(request.getManager().getId()));
-        }
-    }
-
 }
