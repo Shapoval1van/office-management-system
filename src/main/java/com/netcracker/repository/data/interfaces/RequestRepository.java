@@ -20,9 +20,14 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     int assignRequest(Long requestId, Long personId, Status status);
 
     Long countFree(Integer priorityId);
+
     Long countAllRequestByEmployee(Long employeeId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable);
+
+    int updateRequestGroup(Long requestId, Integer requestGroupId);
+
+    int removeRequestFromRequestGroup(Long requestId);
 }

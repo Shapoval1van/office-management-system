@@ -54,6 +54,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     private final String COUNT_ALL_REQUEST_BY_EMPLOYEE = "SELECT count(request_id) FROM " + TABLE_NAME +
             " WHERE employee_id = ? AND status_id!=5";
 
+    private final String UPDATE_REQUEST_GROUP = "UPDATE " + TABLE_NAME + " SET request_group_id = ? WHERE request_id = ?";
+
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
     }
@@ -170,6 +172,16 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable) {
         return super.queryForList(GET_REQUESTS_BY_REQUEST_GROUP_ID, pageable, requestGroupId);
+    }
+
+    @Override
+    public int updateRequestGroup(Long requestId, Integer requestGroupId) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, requestGroupId, requestId);
+    }
+
+    @Override
+    public int removeRequestFromRequestGroup(Long requestId) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, null, requestId);
     }
 
     @Override

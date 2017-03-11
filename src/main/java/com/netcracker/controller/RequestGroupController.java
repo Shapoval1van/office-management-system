@@ -1,6 +1,7 @@
 package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
@@ -49,9 +50,10 @@ public class RequestGroupController {
     @PutMapping("/{requestGroupId}")
     @ResponseStatus(HttpStatus.OK)
     public void editRequestGroup(@Validated(UpdateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
-                                 @PathVariable("requestGroupId") Integer requestGroupId) throws ResourceNotFoundException {
+                                 @PathVariable("requestGroupId") Integer requestGroupId,
+                                 Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         requestGroupDTO.setId(requestGroupId);
-        requestGroupService.updateRequestGroup(requestGroupDTO);
+        requestGroupService.updateRequestGroup(requestGroupDTO, principal);
     }
 
     @GetMapping("/count/author/{authorId}")
@@ -63,7 +65,8 @@ public class RequestGroupController {
     @PutMapping("/{requestGroupId}/status")
     @ResponseStatus(HttpStatus.OK)
     public void changeRequestGroupStatus(@PathVariable("requestGroupId") Integer requestGroupId,
-                                         @RequestBody StatusDTO statusDTO) throws ResourceNotFoundException, IncorrectStatusException {
-        requestGroupService.setRequestGroupStatus(requestGroupId, statusDTO.getId());
+                                         @RequestBody StatusDTO statusDTO,
+                                         Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+        requestGroupService.setRequestGroupStatus(requestGroupId, statusDTO.getId(), principal);
     }
 }
