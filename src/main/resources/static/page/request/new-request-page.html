@@ -10,7 +10,7 @@
                     <div class="row">
                         <form class="form-horizontal col-lg-10 col-lg-offset-1">
                             <fieldset>
-                                <legend>New request</legend>
+                                <legend>{{pageTitle}}</legend>
                                 <div class="form-group">
                                     <label for="inputTitle" class="col-lg-2 control-label">Title</label>
                                     <div class="col-lg-10">
@@ -39,10 +39,17 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" ng-show="!update">
                                     <div class="col-lg-10 col-lg-offset-2">
                                         <button type="submit" class="btn btn-primary" ng-click="sendRequestCredentials()">Save</button>
                                         <button type="reset" class="btn btn-default">Reset</button>
+                                        <a href="/" class="btn btn-default">Cancel</a>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="update">
+                                    <div class="col-lg-10 col-lg-offset-2">
+                                        <button type="submit" class="btn btn-primary" ng-click="updateRequestCredentials()">Update</button>
+                                        <a href="/" class="btn btn-default">Cancel</a>
                                     </div>
                                 </div>
                             </fieldset>
