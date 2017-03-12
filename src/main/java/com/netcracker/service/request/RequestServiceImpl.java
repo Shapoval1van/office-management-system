@@ -126,12 +126,15 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> updateRequest(Request request, Long requestId, String authorName) {
+    public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         if(!oldRequest.isPresent()) return Optional.empty();
-        if(personRepository.findOne(request.getManager().getId()).get().getRole().getId()!=2) return Optional.empty();
-        updateRequestHistory(request,oldRequest.get(),authorName);
-        return this.requestRepository.updateRequest(request);
+        if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager()!=null)
+            throw new IllegalAccessException("You cannot update request because manager has already assigned.");
+        else {
+            updateRequestHistory(request, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(request);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -415,5 +418,18 @@ public class RequestServiceImpl implements RequestService {
         }
 
         return true;
+    }
+
+    private boolean isCurrentUserAdmin(Principal principal) throws CurrentUserNotPresentException {
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+        if (!currentUser.isPresent())
+            throw new CurrentUserNotPresentException("Current user not present");
+        else {
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
+                return false;
+            } else
+                return true;
+        }
     }
 }
