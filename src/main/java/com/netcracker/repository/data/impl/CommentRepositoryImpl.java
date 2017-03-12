@@ -6,6 +6,7 @@ import com.netcracker.model.entity.Request;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.CommentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,8 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
     public static final String AUTHOR_ID = "author_id";
     public static final String PUBLISH_DATE = "publish_date";
 
-    private final String FIND_COMMENTS_BY_REQUEST_ID = "SELECT comment_id, body, request_id, author_id, publish_date FROM comment WHERE request_id=?";
+    @Value("${comment.find.by.request.id}")
+    private String FIND_COMMENTS_BY_REQUEST_ID;
 
     public CommentRepositoryImpl() {
         super(Comment.TABLE_NAME, Comment.ID_COLUMN);
