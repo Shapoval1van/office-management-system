@@ -14,6 +14,8 @@ public interface NotificationSender {
 
     void sendPasswordForNewManager(Person person);
 
+    void sendChangeStatusEvent(Person person);
+
     void resendNotification();
 
     void saveFailedNotification(Notification notification);
