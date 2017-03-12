@@ -34,10 +34,15 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
             "FROM  " + TABLE_NAME + " WHERE (LOWER(CONCAT(first_name, last_name)) like LOWER(CONCAT('%', REPLACE(? , ' ', '%'), '%'))) AND " +
             "  role_id = 2";
 
+//    private final String UPDATE_USER = "UPDATE "  + TABLE_NAME + " set first_name = ?, last_name = ?, role_id = ?"+
+//            " WHERE person_id = ?";
+
     private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE role_id = 2";
 
-    private final String UPDATE_PERSON_PASSWORD = "UPDATE " + TABLE_NAME + " SET password = ? WHERE email = ?";
+    private final String FIND_ADMIN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
+            " FROM " + TABLE_NAME + " WHERE role_id = 1 AND person_id!= ?";
+
 
     public PersonRepositoryImpl() {
         super(Person.TABLE_NAME, Person.ID_COLUMN);
@@ -80,17 +85,12 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public Optional<Person> updatePersonPassword(Person person) {
-        if (person.getId() != null) {
-            return super.save(person);
-        }else{
+    public Optional<Person> updateUser(Person user, Long userId) {
+        if (user.getId() != null) {
+            return super.save(user);
+        } else {
             return Optional.empty();
         }
-    }
-
-    @Override
-    public int updatePersonPassword(String newPassword, String email) {
-        return getJdbcTemplate().update(UPDATE_PERSON_PASSWORD, newPassword, email);
     }
 
     @Override
@@ -101,5 +101,10 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Override
     public List<Person> getManagers(Pageable pageable) {
         return super.queryForList(FIND_MANAGER, pageable);
+    }
+
+    @Override
+    public List<Person> getAdmins(Pageable pageable, Long currentAdminId) {
+        return super.queryForList(FIND_ADMIN, currentAdminId);
     }
 }

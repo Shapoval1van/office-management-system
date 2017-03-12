@@ -36,6 +36,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String GET_ALL_REQUESTS_BY_EMPLOYEE = "SELECT * FROM request WHERE employee_id = ? " +
             "AND status_id!=4";
 
+    public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
     private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
 
@@ -139,6 +140,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public List<Request> getAllSubRequest(Long parentId) {
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
+    }
+
+    @Override
+    public List<Request> getAllAssignedRequest(Long managerId) {
+        return super.queryForList(GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER, managerId);
     }
 
 

@@ -134,15 +134,15 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         Status status = statusOptional.get();
         String statusName = status.getName();
 
-        if (statusName.equalsIgnoreCase(StatusEnum.FREE.toString()) ||
-                statusName.equalsIgnoreCase(StatusEnum.CANCELED.toString())) {
+        if (statusName.equalsIgnoreCase(StatusEnum.FREE.getName()) ||
+                statusName.equalsIgnoreCase(StatusEnum.CANCELED.getName())) {
             LOGGER.error("Can't set status {} for group", statusName);
             throw new IncorrectStatusException("Not available status", "Status " + statusName + " not available for group");
         }
 
         List<Request> requestsOfRequestGroup = requestRepository.findRequestsByRequestGroupId(requestGroupId);
 
-        Integer canceledStatusId = statusRepository.findStatusByName(StatusEnum.CANCELED.toString()).get().getId();
+        Integer canceledStatusId = statusRepository.findStatusByName(StatusEnum.CANCELED.getName()).get().getId();
 
         for (Request request :
                 requestsOfRequestGroup) {
@@ -178,7 +178,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             LOGGER.warn("Current user not present");
             throw new CurrentUserNotPresentException("Current user not present");
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
-            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
                 LOGGER.error("Access only for author or administrator");
                 return false;

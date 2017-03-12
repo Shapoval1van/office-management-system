@@ -124,8 +124,8 @@ public class RequestServiceImpl implements RequestService {
     public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         if(!oldRequest.isPresent()) return Optional.empty();
-        if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager()!=null)
-            throw new IllegalAccessException("You cannot update request because manager has already assigned.");
+        if (!isCurrentUserAdmin(principal) && oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId())
+            throw new IllegalAccessException("You cannot update non free requests.");
         else {
             updateRequestHistory(request, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(request);
@@ -199,7 +199,7 @@ public class RequestServiceImpl implements RequestService {
         LOGGER.trace("Getting status with id {} from database", request.getStatus().getId());
         Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
-        if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.toString())) {
+        if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.getName())) {
             LOGGER.error("Request should be in FREE status for grouping. Current status is {}", status.getName());
             throw new IncorrectStatusException("Incorrect status",
                     "Request should be in FREE status for grouping. Current status is " + status.getName());
@@ -254,15 +254,15 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException {
         Request request = getRequestById(id).get();
-        if (request.getStatus().getId().equals(3))   // if request closed
+        if (StatusEnum.CLOSED.getName().equals(request.getStatus().getName()))
             throw new CannotDeleteRequestException("You cannot delete closed request");
         else {
-            changeRequestStatus(request, new Status(4));
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
             if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty()) {
                     for (Request r : subRequestList) {
-                        changeRequestStatus(r, new Status(4));
+                        changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()));
                     }
                 }
             }
@@ -397,7 +397,7 @@ public class RequestServiceImpl implements RequestService {
             LOGGER.warn("Current user not present");
             throw new CurrentUserNotPresentException("Current user not present");
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
-            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
                 LOGGER.error("Add to request group can only author or administrator");
                 return false;
@@ -412,7 +412,7 @@ public class RequestServiceImpl implements RequestService {
         if (!currentUser.isPresent())
             throw new CurrentUserNotPresentException("Current user not present");
         else {
-            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
                 return false;
             } else

@@ -48,7 +48,7 @@ public class RequestController {
 
 
     @PostMapping(value = "/updatePriority/{requestId}")
-    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
+    //@PreAuthorize("hasAuthority('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {

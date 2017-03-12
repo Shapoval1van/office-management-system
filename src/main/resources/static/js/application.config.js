@@ -44,7 +44,6 @@
                     .when("/request/:requestId/update", {
                         templateUrl: "/static/page/request/update-request-page.html",
                         controller: "UpdateRequestController"
-                            ///request/:requestId/
                     })
                     .when("/request/:requestId/",{
                          templateUrl: "/static/page/request/details.html",
