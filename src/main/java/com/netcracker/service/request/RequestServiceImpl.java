@@ -4,6 +4,7 @@ import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.NotificationChangeStatus;
+import com.netcracker.model.event.NotificationRequestUpdateEvent;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
@@ -132,8 +133,10 @@ public class RequestServiceImpl implements RequestService {
         if (!isCurrentUserAdmin(principal) && oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId())
             throw new IllegalAccessException("You cannot update non free requests.");
         else {
-            updateRequestHistory(request, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(request);
+                Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
+                eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
+                updateRequestHistory(request, oldRequest.get(), principal.getName());
+                return this.requestRepository.updateRequest(request);
         }
     }
 

@@ -39,4 +39,9 @@ public class NotificationEventListener {
     public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
         notificationService.sendChangeStatusEvent(changeStatus.getPerson());
     }
+
+    @EventListener
+    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
+        notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
+    }
 }
