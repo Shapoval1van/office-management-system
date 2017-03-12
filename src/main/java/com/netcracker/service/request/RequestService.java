@@ -1,7 +1,8 @@
 package com.netcracker.service.request;
 
-import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.exception.*;
+import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.Pageable;
@@ -18,11 +19,11 @@ public interface RequestService {
 
     Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
 
-    Optional<Request> addToRequestGroup(Long requestId, Integer groupId) throws ResourceNotFoundException, IncorrectStatusException;
+    int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;
 
-    Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException;
+    int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
-    Optional<Request> updateRequest(Request request, Long requestId, String authorName);
+    Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
     Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
 
@@ -42,7 +43,7 @@ public interface RequestService {
 
     Long getCountAllRequestByEmployee(String employeeEmail);
 
-    Set<ChangeGroup> getRequestHistory(Long requestId, String period);
+    Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 

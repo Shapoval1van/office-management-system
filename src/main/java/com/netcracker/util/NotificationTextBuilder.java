@@ -12,24 +12,16 @@ import java.io.StringWriter;
 @Component
 public class NotificationTextBuilder {
 
-    private VelocityEngine engine;
-    private StringWriter writer;
-    private Template template;
-    private VelocityContext context;
-
-    public NotificationTextBuilder() {
-        engine = new VelocityEngine();
-        context = new VelocityContext();
-        writer = new StringWriter();
-        engine.init();
-    }
-
     public String buildText(Notification notification){
-        template = engine.getTemplate(notification.getText());
+        VelocityEngine engine = new VelocityEngine();
+        VelocityContext context = new VelocityContext();
+        engine.init();
+        Template template = engine.getTemplate(notification.getText());
         context.put("name", notification.getPerson().getFirstName());
         if(!notification.getLink().equals("")) {
             context.put("link", notification.getLink());
         }
+        StringWriter writer = new StringWriter();
         template.merge(context,writer);
         return writer.toString();
     }

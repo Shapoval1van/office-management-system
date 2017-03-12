@@ -1,19 +1,19 @@
 package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
+import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.entity.*;
+import com.netcracker.model.event.NotificationChangeStatus;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
-import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
+import com.netcracker.util.ChangeTracker;
+import com.netcracker.util.enums.role.RoleEnum;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +24,9 @@ import java.util.*;
 
 @Service
 public class RequestServiceImpl implements RequestService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final RequestRepository requestRepository;
 
@@ -43,6 +46,8 @@ public class RequestServiceImpl implements RequestService {
 
     private final RequestGroupRepository requestGroupRepository;
 
+    private final ChangeTracker changeTracker;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
@@ -54,7 +59,8 @@ public class RequestServiceImpl implements RequestService {
                               ChangeGroupRepository changeGroupRepository,
                               ChangeItemRepository changeItemRepository,
                               FieldRepository fieldRepository,
-                              RequestGroupRepository requestGroupRepository) {
+                              RequestGroupRepository requestGroupRepository,
+                              ChangeTracker changeTracker) {
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -64,6 +70,7 @@ public class RequestServiceImpl implements RequestService {
         this.changeItemRepository = changeItemRepository;
         this.fieldRepository = fieldRepository;
         this.requestGroupRepository = requestGroupRepository;
+        this.changeTracker = changeTracker;
     }
 
     @Override
@@ -119,38 +126,40 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> updateRequest(Request request, Long requestId, String authorName) {
+    public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         if(!oldRequest.isPresent()) return Optional.empty();
-        updateRequestHistory(request,oldRequest.get(),authorName);
-        return this.requestRepository.updateRequest(request);
+        if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager()!=null)
+            throw new IllegalAccessException("You cannot update request because manager has already assigned.");
+        else {
+            updateRequestHistory(request, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(request);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
-        if(!futureNewRequest.isPresent()) return Optional.empty();
+        if (!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
-        if(!p.isPresent()) return Optional.empty();
+        if (!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
         futureNewRequest.get().setPriority(p.get());
-        updateRequestHistory(futureNewRequest.get(),oldRequest,authorName);
+        updateRequestHistory(futureNewRequest.get(), oldRequest, authorName);
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
     }
 
 
     private Optional<Request> updateRequestHistory(Request newRequest,  Request oldRequest , String authorName) {
-        normalizeRequestObj(newRequest);
-        normalizeRequestObj(oldRequest);
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
         if(!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
         changeGroup.setRequest(new Request(oldRequest.getId()));
         changeGroup.setAuthor(author.get());
-        changeGroup.setCreateDate(new Date(System.currentTimeMillis()));
-        Set<ChangeItem> changeItemSet = findMismatching(oldRequest, newRequest);
+        changeGroup.setCreateDate(new Timestamp(System.currentTimeMillis()));
+        Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
         if(changeItemSet.size()==0){
             return Optional.empty();
         }
@@ -160,27 +169,39 @@ public class RequestServiceImpl implements RequestService {
         return Optional.of(newRequest);
     }
 
+    /**
+     * Add request to request group
+     * If request already in group - rewrite group
+     *
+     * @param requestId
+     * @param requestGroupId
+     * @param principal      Principal of current user
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws IncorrectStatusException
+     * @throws IllegalAccessException
+     */
     @Override
-    public Optional<Request> addToRequestGroup(Long requestId, Integer requestGroupId) throws ResourceNotFoundException, IncorrectStatusException {
-        LOGGER.trace("Get request with id {} from database", requestId);
+    public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+        LOGGER.trace("Getting request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
-            LOGGER.error("Request with id {} not exist", requestId);
+            LOGGER.error("Request with id {} does not exist", requestId);
             throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
         }
 
-        LOGGER.trace("Get request group with id {} from database");
+        LOGGER.trace("Getting request group with id {} from database");
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOptional.isPresent()) {
-            LOGGER.error("Request group with id {} not exist", requestGroupId);
-            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " not exist");
+            LOGGER.error("Request group with id {} does not exist", requestGroupId);
+            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " does not exist");
         }
 
         Request request = requestOptional.get();
 
-        LOGGER.trace("Get status with id {} from database", request.getStatus().getId());
+        LOGGER.trace("Getting status with id {} from database", request.getStatus().getId());
         Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.toString())) {
@@ -189,13 +210,24 @@ public class RequestServiceImpl implements RequestService {
                     "Request should be in FREE status for grouping. Current status is " + status.getName());
         }
 
+        if (!isAccessLegal(requestGroupOptional.get(), principal))
+            throw new IllegalAccessException("Add to request group can only author or administrator");
+
         request.setRequestGroup(new RequestGroup(requestGroupId));
-        // TODO: 07.03.2017 Add method save in service ?
-        return requestRepository.save(request);
+        return requestRepository.updateRequestGroup(requestId, requestGroupId);
     }
 
+    /**
+     * Remove request from request group
+     *
+     * @param requestId
+     * @param principal
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws IllegalAccessException
+     */
     @Override
-    public Optional<Request> removeFromRequestGroup(Long requestId) throws ResourceNotFoundException {
+    public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
@@ -205,8 +237,13 @@ public class RequestServiceImpl implements RequestService {
         }
 
         Request request = requestOptional.get();
-        request.setRequestGroup(null);
-        return requestRepository.save(request);
+
+        RequestGroup requestGroup = requestGroupRepository.findOne(request.getRequestGroup().getId()).get();
+
+        if (!isAccessLegal(requestGroup, principal))
+            throw new IllegalAccessException("Add to request group can only author or administrator");
+
+        return requestRepository.removeRequestFromRequestGroup(request.getId());
     }
 
     @Override
@@ -225,12 +262,12 @@ public class RequestServiceImpl implements RequestService {
         if (request.getStatus().getId().equals(3))   // if request closed
             throw new CannotDeleteRequestException("You cannot delete closed request");
         else {
-            changeRequestStatus(request, new Status(5));
+            changeRequestStatus(request, new Status(4));
             if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty()) {
                     for (Request r : subRequestList) {
-                        changeRequestStatus(r, new Status(5));
+                        changeRequestStatus(r, new Status(4));
                     }
                 }
             }
@@ -239,14 +276,23 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
+        if(request.getEmployee()!=null){
+            Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
+            eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
+            return requestRepository.changeRequestStatus(request, status);
+        }
+        Optional<Request> requestDB = requestRepository.findOne(request.getId());
+        Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
+        eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
         return requestRepository.changeRequestStatus(request, status);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Set<ChangeGroup> getRequestHistory(Long requestId, String period) {
+    public Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
-            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId, Period.valueOf(period.toUpperCase()));
+            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
+                    Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
             return changeGroups;
         } catch (IllegalArgumentException e) {
@@ -352,74 +398,38 @@ public class RequestServiceImpl implements RequestService {
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
     }
 
-    private void fill(Set<ChangeGroup>  changeGroup){
-        changeGroup.forEach(cg->cg.getChangeItems().forEach(ci->{
-                    ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
+    private void fill(Set<ChangeGroup> changeGroup) {
+        changeGroup.forEach(cg -> cg.getChangeItems().forEach(ci -> {
+            ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
         }));
     }
 
-    /**
-     * Request should have only id for field that is custom POJO
-     * @param oldRequest
-     * @param newRequest
-     * @return Set<ChangeItem>
-     */
-    private Set<ChangeItem> findMismatching(Request oldRequest, Request newRequest) {
-        Set<ChangeItem> changeItemSet = new HashSet<>();
-        Javers javers = JaversBuilder.javers().build();
-        Diff diff = javers.compare(oldRequest, newRequest);
-        List<ValueChange> change = diff.getChangesByType(ValueChange.class);
-        change.forEach(c->{
-            ChangeItem changeItem = new ChangeItem();
-            Optional affectedObject = c.getAffectedObject();
-            if(affectedObject.get() instanceof Request){
-                changeItem.setField(fieldRepository.findFieldByName(c.getPropertyName().toUpperCase()).get());
-                changeItem.setOldVal(c.getLeft()!=null?c.getLeft().toString():" ");
-                changeItem.setNewVal(c.getRight()!=null?c.getRight().toString():" ");
-                changeItemSet.add(changeItem);
-            }else {
-                if(affectedObject.get() instanceof Status){
-                    changeItem.setField(fieldRepository.findFieldByName("STATUS").get());
-                    changeItem.setOldVal(statusRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-                    changeItem.setNewVal(statusRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-                    changeItemSet.add(changeItem);
-                }
-                if(affectedObject.get() instanceof Person){
-                    changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
-                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).get().getFullName());
-                    changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
-                    changeItemSet.add(changeItem);
-                }
-                if(affectedObject.get() instanceof Priority){
-                    changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
-                    changeItem.setOldVal(priorityRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-                    changeItem.setNewVal(priorityRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-                    changeItemSet.add(changeItem);
-                }
-//                if(affectedObject.get() instanceof RequestGroup){
-//                    changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
-//                    changeItem.setOldVal(requestGroupRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
-//                    changeItem.setNewVal(requestGroupRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
-//                }
+    private boolean isAccessLegal(RequestGroup requestGroup, Principal principal) throws CurrentUserNotPresentException, IllegalAccessException {
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+        if (!currentUser.isPresent()) {
+            LOGGER.warn("Current user not present");
+            throw new CurrentUserNotPresentException("Current user not present");
+        } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
+                LOGGER.error("Add to request group can only author or administrator");
+                return false;
             }
-        });
-        List<ReferenceChange> referenceChanges = diff.getChangesByType(ReferenceChange.class);
-//        referenceChanges.forEach(referenceChange -> {
-//            String fieldName = referenceChange.getPropertyName();
-//        });
-        return changeItemSet;
+        }
+
+        return true;
     }
 
-     void normalizeRequestObj(Request request){
-        if(request.getPriority()!=null){
-            request.setPriority(new Priority(request.getPriority().getId()));
-        }
-        if(request.getStatus()!=null){
-            request.setStatus(new Status(request.getStatus().getId()));
-        }
-        if(request.getManager()!=null){
-            request.setManager(new Person(request.getManager().getId()));
+    private boolean isCurrentUserAdmin(Principal principal) throws CurrentUserNotPresentException {
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+        if (!currentUser.isPresent())
+            throw new CurrentUserNotPresentException("Current user not present");
+        else {
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
+                return false;
+            } else
+                return true;
         }
     }
-
 }

@@ -1,18 +1,14 @@
 package com.netcracker.service.requestGroup;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.RequestGroupDTO;
-import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.Request;
-import com.netcracker.model.entity.RequestGroup;
-import com.netcracker.model.entity.Status;
+import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
-import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.RequestGroupRepository;
-import com.netcracker.repository.data.interfaces.RequestRepository;
-import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.repository.data.interfaces.*;
+import com.netcracker.util.enums.role.RoleEnum;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +35,9 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Autowired
     private StatusRepository statusRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
@@ -79,7 +78,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
-    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO) throws ResourceNotFoundException {
+    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
 
         LOGGER.debug("Get request group with id {} from database", requestGroupDTO.getId());
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
@@ -95,6 +94,9 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             requestGroup.setName(requestGroupDTO.getName());
         }
 
+        if (!isAccessLegal(requestGroup, principal))
+            throw new IllegalAccessException("Update request group can only author or administrator");
+
         LOGGER.trace("Update request group");
         return saveRequestGroup(requestGroup);
     }
@@ -106,8 +108,21 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
-    public void setRequestGroupStatus(Integer requestGroupId, Integer statusId)
-            throws ResourceNotFoundException, IncorrectStatusException {
+    public void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal)
+            throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+
+        LOGGER.trace("Getting request group with id {} from database", requestGroupId);
+        Optional<RequestGroup> requestGroupOption = requestGroupRepository.findOne(requestGroupId);
+
+        if (!requestGroupOption.isPresent()) {
+            LOGGER.error("Request group with id {} does not exist", requestGroupId);
+            throw new ResourceNotFoundException("Can't find request group with id " + requestGroupId);
+        }
+
+        if (!isAccessLegal(requestGroupOption.get(), principal))
+            throw new IllegalAccessException("Update request group can only author or administrator");
+
+
         LOGGER.trace("Get status with id {} from database", statusId);
         Optional<Status> statusOptional = statusRepository.findOne(statusId);
 
@@ -155,5 +170,21 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         LOGGER.trace("Build {} regex from {} name part", regex, namePart);
 
         return regex;
+    }
+
+    private boolean isAccessLegal(RequestGroup requestGroup, Principal principal) throws CurrentUserNotPresentException, IllegalAccessException {
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+        if (!currentUser.isPresent()) {
+            LOGGER.warn("Current user not present");
+            throw new CurrentUserNotPresentException("Current user not present");
+        } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
+                LOGGER.error("Access only for author or administrator");
+                return false;
+            }
+        }
+
+        return true;
     }
 }

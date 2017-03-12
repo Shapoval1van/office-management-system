@@ -64,10 +64,10 @@ public class RequestControllerTest {
                 .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
                 .findAny()
                 .orElse(null);
-
         assertNotNull("the JSON message converter must not be null",
                 this.mappingJackson2HttpMessageConverter);
     }
+
 
     @Before
     public void setup() throws Exception {

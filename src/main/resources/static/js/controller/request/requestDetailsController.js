@@ -10,7 +10,6 @@
                     "value": "Day",
                     "values": ["Day", "Month", "All"]
                 };
-
                 var requestId = $routeParams.requestId;
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -153,6 +152,10 @@
                     $scope.comments.push(comment);
                 });
 
+                $scope.requestStatusButtonsHide = function(request){
+                    return request.manager == null;
+                    // TODO hide for employee
+                };
 
             }])
 })();

@@ -29,12 +29,10 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     private final String FIND_PERSON_BY_EMAIL = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE email = ?";
 
-    private final String FIND_MANAGER_NAME_PATTERN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled, concat('%', first_name, '%')\n" +
-            "FROM " + TABLE_NAME + "  WHERE (LOWER(?) like concat('%', LOWER(first_name), '%')" +
-            "                    OR LOWER(?) like concat('%', LOWER(last_name), '%')" +
-            "                    OR LOWER(first_name) like LOWER(?)" +
-            "                    OR LOWER(last_name) like LOWER(?))" +
-            "                    AND role_id = 2";
+
+    private final String FIND_MANAGER_NAME_PATTERN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled " +
+            "FROM  " + TABLE_NAME + " WHERE (LOWER(CONCAT(first_name, last_name)) like LOWER(CONCAT('%', REPLACE(? , ' ', '%'), '%'))) AND " +
+            "  role_id = 2";
 
     private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE role_id = 2";
@@ -97,8 +95,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     @Override
     public List<Person> getManagers(Pageable pageable, String namePattern) {
-        String regex = "%" + namePattern + "%";
-        return super.queryForList(FIND_MANAGER_NAME_PATTERN, pageable, namePattern, namePattern, regex, regex);
+        return super.queryForList(FIND_MANAGER_NAME_PATTERN, pageable, namePattern);
     }
 
     @Override
