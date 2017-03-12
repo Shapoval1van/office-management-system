@@ -12,6 +12,8 @@
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
     <link rel="stylesheet" href="/static/style/new/bootstrap.min.css">
+    <!--ng Tables-->
+    <link rel="stylesheet" href="https://unpkg.com/ng-table@2.0.2/bundles/ng-table.min.css">
 
     <!--FONT AWESOME-->
     <script src="https://use.fontawesome.com/58465b10c8.js"></script>
@@ -44,7 +46,8 @@
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -54,7 +57,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a ng-show = "Session.isUserLoggedIn()" href="#" ng-click = "logout()">Logout</a></li>
+                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -90,6 +93,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 <!--/WebSocket-->
 
+<!--angular tables-->
+<script src="https://unpkg.com/ng-table@2.0.2/bundles/ng-table.min.js"></script>
+
 <script src="/static/js/application.js"></script>
 <script src="/static/js/application.config.js"></script>
 
@@ -103,6 +109,7 @@
 
 <script src="/static/js/service/commentService.js"></script>
 <script src="/static/js/service/sessionService.js"></script>
+<script src="/static/js/service/request/requestService.js"></script>
 
 <script src="/static/js/controller/component/priority-buttons.js"></script>
 <script src="/static/js/controller/component/calendar.js"></script>

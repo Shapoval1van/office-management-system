@@ -50,6 +50,10 @@
                          templateUrl: "/static/page/request/details.html",
                          controller: "RequestDetailsController"
                      })
+                    .when("/request/:requestId/details", {
+                        templateUrl: "/static/page/request/request-details.html",
+                        controller: "RequestDetailsController"
+                    })
                     .when("/requestList",{
                          templateUrl: "/static/page/request/list.html",
                          controller: "RequestListController"
