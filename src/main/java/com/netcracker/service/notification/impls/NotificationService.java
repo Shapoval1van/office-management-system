@@ -31,6 +31,9 @@ public class NotificationService implements NotificationSender {
     private String REGISTRATION_MESSAGE_SUBJECT;
     @Value("${custom.information.message.subject}")
     private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
+    @Value("${status.message.subject}")
+    private String REQUEST_STATUS_CHANGE_SUBJECT;
+
 
     @Value("${password.reminder.message.src}")
     private String PASSWORD_REMINDER_MESSAGE_SRC;
@@ -40,6 +43,8 @@ public class NotificationService implements NotificationSender {
     private String CUSTOM_INFORMATION_MESSAGE_SRC;
     @Value("${registration.message.src}")
     private String REGISTRATION_MESSAGE_SRC;
+    @Value("${requestStatus.message.src}")
+    private String STATUS_CHANGE_MESSAGE_SRC;
 
     @Autowired
     private MailService mailService;
@@ -87,6 +92,14 @@ public class NotificationService implements NotificationSender {
                 REGISTRATION_MESSAGE_SRC,
                 link);
 
+        mailService.send(notification);
+    }
+
+
+    @Override
+    public void sendChangeStatusEvent(Person person){
+        Notification notification = NotificationBuilder.build(person,
+                REQUEST_STATUS_CHANGE_SUBJECT, STATUS_CHANGE_MESSAGE_SRC);
         mailService.send(notification);
     }
 

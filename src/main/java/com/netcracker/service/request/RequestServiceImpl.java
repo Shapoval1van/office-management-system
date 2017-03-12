@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.entity.*;
+import com.netcracker.model.event.NotificationChangeStatus;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
@@ -12,6 +13,7 @@ import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,9 @@ import java.util.*;
 
 @Service
 public class RequestServiceImpl implements RequestService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final RequestRepository requestRepository;
 
@@ -268,6 +273,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
+        if(request.getEmployee()!=null){
+            Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
+            eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
+            return requestRepository.changeRequestStatus(request, status);
+        }
+        Optional<Request> requestDB = requestRepository.findOne(request.getId());
+        Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
+        eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
         return requestRepository.changeRequestStatus(request, status);
     }
 
