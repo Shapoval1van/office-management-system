@@ -7,6 +7,7 @@ import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestGroupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -21,9 +22,14 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     public static final String NAME_COLUMN = "name";
     public static final String AUTHOR_COLUMN = "author_id";
 
-    private static final String GET_REQUEST_GROUP_BY_AUTHOR_ID = "SELECT request_group_id, name, author_id FROM request_group WHERE author_id = ?";
-    private static final String GET_REQUEST_GROUP_BY_NAME_PART = "SELECT request_group_id, name, author_id FROM request_group WHERE name ~* ? AND author_id = ?";
-    private static final String COUNT_REQUEST_GROUP_BY_AUTHOR = "SELECT COUNT(*) FROM request_group WHERE author_id = ?";
+    @Value("${request.group.find.by.author}")
+    private String GET_REQUEST_GROUP_BY_AUTHOR_ID;
+
+    @Value("${request.group.find.by.name.part}")
+    private String GET_REQUEST_GROUP_BY_NAME_PART;
+
+    @Value("${request.group.count.by.author}")
+    private String COUNT_REQUEST_GROUP_BY_AUTHOR;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestGroupRepositoryImpl.class);

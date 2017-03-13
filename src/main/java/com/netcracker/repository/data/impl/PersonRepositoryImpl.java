@@ -5,6 +5,7 @@ import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -26,18 +27,17 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String ROLE_ID_COLUMN = "role_id";
     public static final String ENABLED_COLUMN = "enabled";
 
-    private final String FIND_PERSON_BY_EMAIL = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
-            " FROM " + TABLE_NAME + " WHERE email = ?";
+    @Value("${person.find.by.email}")
+    private String FIND_PERSON_BY_EMAIL;
 
+    @Value("${person.find.by.name.pattern}")
+    private String FIND_MANAGER_NAME_PATTERN;
 
-    private final String FIND_MANAGER_NAME_PATTERN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled " +
-            "FROM  " + TABLE_NAME + " WHERE (LOWER(CONCAT(first_name, last_name)) like LOWER(CONCAT('%', REPLACE(? , ' ', '%'), '%'))) AND " +
-            "  role_id = 2";
+    @Value("${person.find.manager}")
+    private String FIND_MANAGER;
 
-    private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
-            " FROM " + TABLE_NAME + " WHERE role_id = 2";
-
-    private final String UPDATE_PERSON_PASSWORD = "UPDATE " + TABLE_NAME + " SET password = ? WHERE email = ?";
+    @Value("${person.update.password}")
+    private String UPDATE_PERSON_PASSWORD;
 
     public PersonRepositoryImpl() {
         super(Person.TABLE_NAME, Person.ID_COLUMN);

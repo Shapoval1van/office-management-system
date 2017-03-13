@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController

@@ -4,6 +4,7 @@ package com.netcracker.repository.data.impl;
 import com.netcracker.model.entity.Field;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.data.interfaces.FieldRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +18,8 @@ public class FieldRepositoryImpl extends GenericJdbcRepository<Field, Integer> i
     public static final String ID_COLUMN = "field_id";
     public static final String NAME_COLUMN = "name";
 
-    private final String FIND_BY_NAME = "SELECT * FROM field WHERE name = ?";
+    @Value("${field.select.all}")
+    private String FIND_BY_NAME;
 
     public FieldRepositoryImpl() {
         super(Field.TABLE_NAME, Field.ID_COLUMN);
