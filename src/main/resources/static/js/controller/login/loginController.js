@@ -7,6 +7,9 @@
                     window.location.reload()
                 }
 
+                $scope.username = "";
+                $scope.password = "";
+
                 $scope.personCredentials = {
                     grant_type: "password",
                     username: "",
@@ -34,22 +37,12 @@
                 }
 
                 $scope.sendPersonCredentials = function () {
-                    console.log($scope.personCredentials);
-                    var req = {
-                        method: 'POST',
-                        url: host + "/oauth/token",
-                        headers: {
-                            "Authorization": "Basic " + encoded,
-                            "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
-                        },
-                        data: $httpParamSerializer($scope.personCredentials)
-                    };
-                    $http(req).then(function (callback) {
-                        SessionService.createSession(callback);
-                        window.location.reload();
-                    }, function (callback) {
-                        console.log("Error");
-                        window.alert(callback.data.error_description)
+                    $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
+                        if(response.isError){
+                            window.alert(response.data.error_description);
+                        } else {
+                            window.location.reload();
+                        }
                     });
                 };
 
