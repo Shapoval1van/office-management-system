@@ -3,7 +3,7 @@
         .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService","RegistrationService",
             function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService,RegistrationService) {
 
-                if (SessionService.isUserLoggedIn()){
+                if ($scope.Session.isUserLoggedIn()){
                     window.location.reload()
                 }
 
@@ -11,18 +11,16 @@
                 $scope.password = "";
 
 
-                var registrationToken = $routeParams.registrationToken;
-
-                if (!!registrationToken) {
-                    RegistrationService.activateUser(registrationToken)
-                        .then(function (callback) {
-                            $scope.personCredentials.username = callback.data.email;
-                        }, function () {
-                            console.log("Registration error")
+                if (!!$routeParams.registrationToken) {
+                    RegistrationService.activateUser($routeParams.registrationToken)
+                        .then(function (response) {
+                            $scope.personCredentials.username = response.data.email;
+                        }, function (response) {
+                            window.alert("Activation error.");
                         })
                 }
 
-                $scope.sendPersonCredentials = function () {
+                $scope.performLogin = function () {
                     $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
                         if(response.isError){
                             window.alert(response.data.error_description);
