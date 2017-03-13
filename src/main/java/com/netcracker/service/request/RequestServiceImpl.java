@@ -485,7 +485,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (!currentUser.isPresent()) {
             LOGGER.warn("Current user not present");
-            throw new CurrentUserNotPresentException(messageSource.getMessage(USER_NOT_PRESENT, null, locale));
+            throw new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
             Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {

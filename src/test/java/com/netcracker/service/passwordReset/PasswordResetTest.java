@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -48,6 +49,9 @@ public class PasswordResetTest {
 
     @Mock
     ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    MessageSource messageSource;
 
     @InjectMocks
     PasswordResetServiceImpl passwordResetService;
