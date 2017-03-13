@@ -141,6 +141,14 @@
             return currentUser;
         };
 
+        service.getUserRole = function () {
+          if (currentUser){
+              return currentUser.role;
+          } else {
+              return null;
+          }
+        };
+
         service._isOlderThanNow = function (time) {
             return new Date().getTime() < time;
         };

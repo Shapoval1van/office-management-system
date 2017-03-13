@@ -3,7 +3,7 @@
         .controller("RegistrationController", ["$scope", "$http","RegistrationService",
             function ($scope, $http, RegistrationService) {
 
-                if ($scope.Session.isUserLoggedIn() && !($scope.Session.getCurrentUser().role == 'ROLE_ADMINISTRATOR')){
+                if ($scope.Session.isUserLoggedIn() && !($scope.Session.getUserRole() == 'ROLE_ADMINISTRATOR')){
                     window.location = "/";
                 }
 
@@ -19,24 +19,19 @@
 
                 ];
 
-                $http.get("/api/v1/registration/roleData")
-                    .then(function (response) {
-                        response.data.roles.forEach(function (role){
-                            if (role.id == 1){
-                                role.name = "Administrator";
+                if ($scope.Session.getUserRole() == 'ROLE_ADMINISTRATOR'){
+                    RegistrationService.loadRoles()
+                        .then(function (response) {
+                            if (response.isError){
+                                alert("Load role error!");
+                            } else {
+                                $scope.roles = response.roles;
                             }
-                            if (role.id == 2){
-                                role.name = "Manager";
-                            }
-                            $scope.roles.push(role);
-                        });
-                    }, function (response) {
-                        alert("Load role error!");
-                    });
-
+                        })
+                }
 
                 $scope.sendPersonCredentials = function () {
-                    if ($scope.Session.getCurrentUser().role == 'ROLE_ADMINISTRATOR'){
+                    if ($scope.Session.getUserRole() == 'ROLE_ADMINISTRATOR'){
                         RegistrationService.registerAnyUser($scope.personCredentials)
                             .then(function (response) {
                                 if (response.isError){
