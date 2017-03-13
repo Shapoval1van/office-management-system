@@ -9,7 +9,7 @@
                 $scope.Session = SessionService;
 
                 SessionService.loadSession();
-                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
+                var anonymOnlyPages = ["login", "resetPassword", "reset"];
                 var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
