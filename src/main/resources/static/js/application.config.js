@@ -62,10 +62,6 @@
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })
-                    .when("/registrationAdmin", {
-                        templateUrl: "/static/page/registration/admin-registration-page.html",
-                        controller: "AdminRegistrationController"
-                    })
                     .when("/requestListByEmployee", {
                         templateUrl: "/static/page/request/request-list-by-employee.html",
                         controller: "RequestListByEmployeeController"
