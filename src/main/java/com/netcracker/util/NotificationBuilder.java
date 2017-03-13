@@ -3,6 +3,7 @@ package com.netcracker.util;
 
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 
 public class NotificationBuilder {
 
@@ -15,8 +16,20 @@ public class NotificationBuilder {
         return notification;
     }
 
+    public static Notification build(Person person, String subject, String text, Request request){
+        Notification notification = new Notification();
+        notification.setPerson(person);
+        notification.setText(text);
+        notification.setSubject(subject);
+        notification.setRequestName(request.getName());
+        notification.setRequestEstimate(request.getEstimate().toLocalDateTime().toString());
+        notification.setRequestDescription(request.getDescription());
+        return notification;
+    }
+
     public static Notification build(Person person, String subject, String text){
         return build(person, subject, text, "");
     }
+
 
 }

@@ -2,6 +2,7 @@ package com.netcracker.service.notification.impls;
 
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
@@ -14,7 +15,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -33,6 +36,8 @@ public class NotificationService implements NotificationSender {
     private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
     @Value("${status.message.subject}")
     private String REQUEST_STATUS_CHANGE_SUBJECT;
+    @Value("${request.expiry.reminder.message.subject}")
+    private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
 
 
     @Value("${password.reminder.message.src}")
@@ -45,6 +50,8 @@ public class NotificationService implements NotificationSender {
     private String REGISTRATION_MESSAGE_SRC;
     @Value("${requestStatus.message.src}")
     private String STATUS_CHANGE_MESSAGE_SRC;
+    @Value("${request.expiry.reminder.message.src}")
+    private String REQUEST_EXPIRY_REMINDER_MESSAGE_SRC;
 
     @Autowired
     private MailService mailService;
@@ -133,6 +140,22 @@ public class NotificationService implements NotificationSender {
     @Transactional
     public void saveFailedNotification(Notification notification) {
         notificationRepository.save(notification);
+    }
+
+    /**
+     * Expects request has unique id and single manager for it
+     *
+     * @param expiringRequests list of requests with expiry estimate time
+     */
+    @Override
+    public void sendRequestExpiryReminder(List<Request> expiringRequests) {
+        expiringRequests.forEach(request -> {
+            Notification notification = NotificationBuilder.build(request.getManager(),
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT,
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SRC,
+                    request);
+            mailService.send(notification);
+        });
     }
 
 }

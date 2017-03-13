@@ -1,0 +1,6 @@
+Hello $name, <br> you are managing request $requestName that estimate time is going to end tomorrow.
+<ul>Request details:
+    <li>Estimate $requestEstimate</li>
+    <li>$requestDescription</li>
+</ul>
+<br><br> <i>Best regards, Office Management System</i>
