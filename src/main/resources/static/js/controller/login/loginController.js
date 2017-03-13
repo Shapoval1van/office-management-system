@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
         .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService",
-            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService) {
+            function ($scope, $http, $resource, $routeParams) {
 
-                if (SessionService.isUserLoggedIn()){
+                if ($scope.Session.isUserLoggedIn()){
                     window.location.reload()
                 }
 
@@ -12,7 +12,6 @@
 
 
                 var registrationToken = $routeParams.registrationToken;
-
                 if (!!registrationToken) {
                     $http.get("/api/v1/registration/" + registrationToken)
                         .then(function (callback) {
@@ -22,12 +21,14 @@
                         })
                 }
 
-                $scope.sendPersonCredentials = function () {
-                    SessionService.login($scope.username, $scope.password).then(function (callback) {
-                        // тут callback вже приходить обробленим і ми його можем юзати
-                        window.location.reload();
-                    }, function (callback) {
-                        window.alert(callback.data.error_description)
+
+                $scope.performLogin = function () {
+                    $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
+                        if(response.isError){
+                            window.alert(response.data.error_description);
+                        } else {
+                            window.location.reload();
+                        }
                     });
                 };
 

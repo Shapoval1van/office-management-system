@@ -13,7 +13,7 @@
                 $scope.responseEmail = "";
                 $scope.expiration = "";
 
-                $scope.sendPersonCredentials = function () {
+                $scope.performLogin = function () {
                     $http.post("/api/v1/registration", $scope.personCredentials)
                         .then(function (callback) {
                             $scope.responseEmail = callback.data.email;

@@ -134,7 +134,7 @@
 
                 };
 
-                $scope.sendPersonCredentials = function () {
+                $scope.performLogin = function () {
 
                     $scope.personCredentials.role = $scope.data.model;
                     $http.post("/api/v1/registration/adminRegistrationPerson", $scope.personCredentials)

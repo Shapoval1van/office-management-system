@@ -101,7 +101,7 @@
             return false;
         };
 
-        service.login = function (username, password) {
+        service.performLogin = function (username, password) {
 
             var personCredentials = {
                 grant_type: "password",
@@ -111,23 +111,22 @@
                 scope: "read write"
             };
 
-            var encoded = btoa("client:");
-
             var req = {
                 method: 'POST',
                 url: "/oauth/token",
                 headers: {
-                    "Authorization": "Basic " + encoded,
+                    "Authorization": "Basic " + btoa("client:"),
                     "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
                 },
                 data: $httpParamSerializer(personCredentials)
             };
+
             var promise = $http(req).then(function (callback) {
-                // тут попередньо обробляємо дані і повертаємо їх далі
                 service.createSession(callback);
+                callback.isError = false;
                 return callback;
             }, function (callback) {
-                console.log("Error");
+                callback.isError = true;
                 return callback;
             });
 
