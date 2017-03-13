@@ -101,6 +101,39 @@
             return false;
         };
 
+        service.login = function (username, password) {
+
+            var personCredentials = {
+                grant_type: "password",
+                username: username,
+                password: password,
+                client_id: "client",
+                scope: "read write"
+            };
+
+            var encoded = btoa("client:");
+
+            var req = {
+                method: 'POST',
+                url: "/oauth/token",
+                headers: {
+                    "Authorization": "Basic " + encoded,
+                    "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
+                },
+                data: $httpParamSerializer(personCredentials)
+            };
+            var promise = $http(req).then(function (callback) {
+                // тут попередньо обробляємо дані і повертаємо їх далі
+                service.createSession(callback);
+                return callback;
+            }, function (callback) {
+                console.log("Error");
+                return callback;
+            });
+
+            return promise;
+        };
+
         service.getAccessToken = function () {
             return currentSession.accessToken;
         };

@@ -7,22 +7,11 @@
                     window.location.reload()
                 }
 
-                $scope.personCredentials = {
-                    grant_type: "password",
-                    username: "",
-                    password: "",
-                    client_id: "client",
-                    scope: "read write"
-                };
+                $scope.username = "";
+                $scope.password = "";
+
 
                 var registrationToken = $routeParams.registrationToken;
-                var encoded = btoa("client:");
-                // Cookies living time (in milliseconds)
-                var cookiesLivingTime = 1000 * 60 * 60 * 24 * 7;
-                // Cookies expiration date
-                var cookiesExpirationDate = new Date(Number(new Date()) + cookiesLivingTime);
-                //var host = "https://management-office.herokuapp.com";
-                var host = "http://localhost:8080";
 
                 if (!!registrationToken) {
                     $http.get("/api/v1/registration/" + registrationToken)
@@ -34,21 +23,10 @@
                 }
 
                 $scope.sendPersonCredentials = function () {
-                    console.log($scope.personCredentials);
-                    var req = {
-                        method: 'POST',
-                        url: host + "/oauth/token",
-                        headers: {
-                            "Authorization": "Basic " + encoded,
-                            "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
-                        },
-                        data: $httpParamSerializer($scope.personCredentials)
-                    };
-                    $http(req).then(function (callback) {
-                        SessionService.createSession(callback);
+                    SessionService.login($scope.username, $scope.password).then(function (callback) {
+                        // тут callback вже приходить обробленим і ми його можем юзати
                         window.location.reload();
                     }, function (callback) {
-                        console.log("Error");
                         window.alert(callback.data.error_description)
                     });
                 };
