@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService",
-            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService) {
+        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService","RegistrationService",
+            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService,RegistrationService) {
 
                 if (SessionService.isUserLoggedIn()){
                     window.location.reload()
@@ -10,25 +10,11 @@
                 $scope.username = "";
                 $scope.password = "";
 
-                $scope.personCredentials = {
-                    grant_type: "password",
-                    username: "",
-                    password: "",
-                    client_id: "client",
-                    scope: "read write"
-                };
 
                 var registrationToken = $routeParams.registrationToken;
-                var encoded = btoa("client:");
-                // Cookies living time (in milliseconds)
-                var cookiesLivingTime = 1000 * 60 * 60 * 24 * 7;
-                // Cookies expiration date
-                var cookiesExpirationDate = new Date(Number(new Date()) + cookiesLivingTime);
-                //var host = "https://management-office.herokuapp.com";
-                var host = "http://localhost:8080";
 
                 if (!!registrationToken) {
-                    $http.get("/api/v1/registration/" + registrationToken)
+                    RegistrationService.activateUser(registrationToken)
                         .then(function (callback) {
                             $scope.personCredentials.username = callback.data.email;
                         }, function () {
