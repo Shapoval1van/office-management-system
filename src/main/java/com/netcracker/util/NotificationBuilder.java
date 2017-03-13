@@ -21,9 +21,7 @@ public class NotificationBuilder {
         notification.setPerson(person);
         notification.setText(text);
         notification.setSubject(subject);
-        notification.setRequestName(request.getName());
-        notification.setRequestEstimate(request.getEstimate().toLocalDateTime().toString());
-        notification.setRequestDescription(request.getDescription());
+        notification.setRequest(request);
         return notification;
     }
 

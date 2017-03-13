@@ -14,7 +14,6 @@ import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-  //  private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
-  private static final long REMIND_TIME_BEFORE_EXPIRY =  60_000; // 1 minute
+  private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -333,6 +331,7 @@ public class RequestServiceImpl implements RequestService {
                 )
                 .collect(Collectors.toList());
         requests.forEach(this::fill);
+
         eventPublisher.publishEvent(new RequestExpiringEvent(requests));
     }
 

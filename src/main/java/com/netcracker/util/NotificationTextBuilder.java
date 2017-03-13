@@ -18,8 +18,13 @@ public class NotificationTextBuilder {
         engine.init();
         Template template = engine.getTemplate(notification.getText());
         context.put("name", notification.getPerson().getFirstName());
-        if(!notification.getLink().equals("")) {
+        if (!notification.getLink().equals("")) {
             context.put("link", notification.getLink());
+        }
+        if (notification.getRequest() != null) {
+            context.put("requestName", notification.getRequest().getName());
+            context.put("requestEstimate", notification.getRequest().getEstimate());
+            context.put("requestDescription", notification.getRequest().getDescription());
         }
         StringWriter writer = new StringWriter();
         template.merge(context,writer);
