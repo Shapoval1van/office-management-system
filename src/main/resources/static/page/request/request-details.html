@@ -100,32 +100,41 @@
                                 </div>
                             </uib-tab>
                             <uib-tab index="1" heading="History">
-                                <table ng-table="tableParams" class="table" show-filter="true">
+                                <table st-table="displayedHistory" st-safe-src="historyList" class="table table-stripped">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th st-sort="field.name">Property</th>
+                                        <th st-sort="newVal">New value</th>
+                                        <th st-sort="oldVal">Old value</th>
+                                        <th st-sort="author.lastName">Author</th>
+                                        <th st-sort="createDate">Change time</th>
+                                    </tr>
+                                    </thead>
                                     <!--TODO Sorry. Could not find a better solution. But I'm trying-->
-                                    <tbody ng-repeat="historyItem in historyList">
-                                    <tr ng-repeat="changeItem in historyItem.changeItems">
-                                        <td title="'#'">
-                                            {{$parent.$index + $index + 1}}
+                                    <tbody>
+                                    <tr ng-repeat="historyItem in displayedHistory">
+                                        <td>
+                                            {{$index + 1}}
                                         </td>
-                                        <td title="'Property'">
-                                            {{changeItem.field.name}}
+                                        <td>
+                                            {{historyItem.field.name}}
                                         </td>
-                                        <td title="'New value'">
-                                            {{changeItem.newVal}}
+                                        <td>
+                                            {{historyItem.newVal}}
                                         </td>
-                                        <td title="'Old value'">
-                                            {{changeItem.oldVal}}
+                                        <td>
+                                            {{historyItem.oldVal}}
                                         </td>
-                                        <td title="'Author'">
+                                        <td>
                                             <a href="#">
                                                 {{historyItem.author.firstName}}
                                                 {{historyItem.author.lastName}}
                                             </a>
                                         </td>
-                                        <td title="'Change time'">
+                                        <td >
                                             {{historyItem.createDate | date : 'dd.MM.yyyy HH:mm:ss'}}
                                         </td>
-                                    </tr>
                                     </tbody>
                                 </table>
                                 <div ng-click="getNextPage('month')">

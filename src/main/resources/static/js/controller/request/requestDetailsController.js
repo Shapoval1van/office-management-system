@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', '$routeParams', "CommentService", "RequestService", "NgTableParams",
-            function ($scope, $routeParams, CommentService, RequestService, NgTableParams) {
+        .controller("RequestDetailsController", ['$scope', "$filter", '$routeParams', "CommentService", "RequestService",
+            function ($scope, $filter, $routeParams, CommentService, RequestService) {
 
-                var PAGE_SIZE = 1;
+                var PAGE_SIZE = 2;
 
                 $scope.pageNumber = 1;
 
@@ -13,7 +13,6 @@
                 $scope.comments = [];
                 $scope.comment = "";
 
-                $scope.tableParams = new NgTableParams({}, {});
 
                 $scope.periodList = {
                     type: "select",
@@ -34,8 +33,12 @@
                 $scope.getHistoryPage = function (period, pageNumber) {
                     return RequestService.getRequestHistory(requestId, period, PAGE_SIZE, pageNumber)
                         .then(function (callback) {
-                            callback.data.forEach(function (item) {
-                                $scope.historyList.push(item);
+                            callback.data.forEach(function (historyItem) {
+                                historyItem.changeItems.forEach(function (changeItem) {
+                                    changeItem.author = historyItem.author;
+                                    changeItem.createDate = historyItem.createDate;
+                                    $scope.historyList.push(changeItem);
+                                });
                             });
 
                         }, function (callback) {

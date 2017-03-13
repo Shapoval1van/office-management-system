@@ -6,6 +6,6 @@
         "ngAnimate",
         "ngTouch",
         "ui.bootstrap",
-        "ngTable"
+        "smart-table"
     ])
 })();
