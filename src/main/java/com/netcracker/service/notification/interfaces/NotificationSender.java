@@ -18,6 +18,8 @@ public interface NotificationSender {
 
     void sendUpdateRequestEvent(Person person);
 
+    void sendUpdateUserEvent(Person person);
+
     void resendNotification();
 
     void saveFailedNotification(Notification notification);

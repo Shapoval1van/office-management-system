@@ -129,14 +129,21 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
+        Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if(!oldRequest.isPresent()) return Optional.empty();
-        if (!isCurrentUserAdmin(principal) && oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId())
+        if (isCurrentUserAdmin(principal)){
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
+            updateRequestHistory(request, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(request);
+        } else if (!person.get().getId().equals(currentUser.get().getId())){
+            throw new IllegalAccessException("You have no permission to update this request.");
+        } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
             throw new IllegalAccessException("You cannot update non free requests.");
-        else {
-                Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
-                eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
-                updateRequestHistory(request, oldRequest.get(), principal.getName());
-                return this.requestRepository.updateRequest(request);
+        } else {
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
+            updateRequestHistory(request, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(request);
         }
     }
 

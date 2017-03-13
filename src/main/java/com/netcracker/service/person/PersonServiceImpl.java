@@ -2,14 +2,14 @@ package com.netcracker.service.person;
 
 import com.netcracker.exception.CannotUpdateUserException;
 import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Role;
+import com.netcracker.model.event.NotificationUserUpdateEvent;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.util.enums.role.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +19,17 @@ import java.util.Optional;
 public class PersonServiceImpl implements PersonService {
 
     @Autowired
-    private RoleRepository roleRepository;
+    private ApplicationEventPublisher eventPublisher;
+
+    private final RoleRepository roleRepository;
+
+    private final PersonRepository personRepository;
 
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    private RequestRepository requestRepository;
+    public PersonServiceImpl(RoleRepository roleRepository, PersonRepository personRepository) {
+        this.roleRepository = roleRepository;
+        this.personRepository = personRepository;
+    }
 
     public Optional<Person> getPersonById(Long id) {
         Optional<Person> person = this.personRepository.findOne(id);
@@ -33,24 +37,29 @@ public class PersonServiceImpl implements PersonService {
             Role role = this.roleRepository.findOne(person.get().getRole().getId()).orElseGet(null);
             person.get().setRole(role);
         }
-
         return person;
     }
 
     @Override
     public Optional<Person> updateUser(Person user, Long userId) throws CannotUpdateUserException {
-        Optional<Person> oldUser = getPersonById(userId); //TODO
+        Optional<Person> oldUser = getPersonById(userId);
         if (!oldUser.isPresent()) return Optional.empty();
-        if (RoleEnum.EMPLOYEE.getId().equals(oldUser.get().getRole().getId()))
-            return this.personRepository.updateUser(user, userId);
+        if (RoleEnum.EMPLOYEE.getId().equals(oldUser.get().getRole().getId())){
+            eventPublisher.publishEvent(new NotificationUserUpdateEvent(user));
+            this.personRepository.updateUser(user);
+            return Optional.of(user);
+        } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
+                && RoleEnum.EMPLOYEE.getId().equals(user.getRole().getId()))
+            throw new CannotUpdateUserException("Cannot update user from manager to employee!");
+        else if (RoleEnum.ADMINISTRATOR.getId().equals(oldUser.get().getRole().getId())
+                && RoleEnum.EMPLOYEE.getId().equals(user.getRole().getId()))
+            throw new CannotUpdateUserException("Cannot update user from admin to employee!");
         else {
-            List<Request> requests = requestRepository.getAllAssignedRequest(oldUser.get().getId());
-            if (!requests.isEmpty())
-                throw new CannotUpdateUserException("User has assigned requests!");
-            else return this.personRepository.updateUser(user, userId);
+            eventPublisher.publishEvent(new NotificationUserUpdateEvent(user));
+            this.personRepository.updateUser(user);
+            return Optional.of(user);
         }
     }
-
 
     @Override
     public List<Person> getManagers(Pageable pageable, String namePattern) {

@@ -18,9 +18,11 @@
                         .then(function (callback) {
                             $scope.responseEmail = callback.data.email;
                             $scope.expiration = callback.data.expiration;
-                            window.alert("To verify the data provided we have sent you a message to your email : "+$scope.responseEmail)
+                            swal("Registration Successful!", "To verify the data provided we have sent you a message to your email : "+$scope.responseEmail, "success");
+                            //window.alert("To verify the data provided we have sent you a message to your email : "+$scope.responseEmail)
                         }, function (callback) {
-                            window.alert("Registration Failure! This email is already used!")
+                            swal("Registration Failure!", "This email is already used!", "error");
+                            //window.alert("Registration Failure! This email is already used!")
 
                         })
                 };

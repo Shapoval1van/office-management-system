@@ -34,8 +34,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
             "FROM  " + TABLE_NAME + " WHERE (LOWER(CONCAT(first_name, last_name)) like LOWER(CONCAT('%', REPLACE(? , ' ', '%'), '%'))) AND " +
             "  role_id = 2";
 
-//    private final String UPDATE_USER = "UPDATE "  + TABLE_NAME + " set first_name = ?, last_name = ?, role_id = ?"+
-//            " WHERE person_id = ?";
+    private final String UPDATE_USER = "UPDATE "  + TABLE_NAME + " set first_name = ?, last_name = ?, role_id = ?"+
+            " WHERE person_id = ?";
 
     private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE role_id = 2";
@@ -85,12 +85,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public Optional<Person> updateUser(Person user, Long userId) {
-        if (user.getId() != null) {
-            return super.save(user);
-        } else {
-            return Optional.empty();
-        }
+    public int updateUser(Person user) {
+        return getJdbcTemplate().update(UPDATE_USER, user.getFirstName(), user.getLastName(), user.getRole().getId(), user.getId());
     }
 
     @Override

@@ -63,9 +63,8 @@ public class PersonController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/admins")
     public ResponseEntity<?> getListOfAdmins(Pageable pageable, Principal principal) {
-        //Optional<Person> currentAdmin = personService.findPersonByEmail(principal.getName());
-        //String name = currentAdmin.get().getFirstName();
-        List<Person> admins = personService.getAdmins(pageable, 3l);
+        Optional<Person> currentAdmin = personService.findPersonByEmail(principal.getName());
+        List<Person> admins = personService.getAdmins(pageable, currentAdmin.get().getId());
         System.out.print(admins);
         return ResponseEntity.ok((admins
                 .stream()

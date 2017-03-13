@@ -35,6 +35,8 @@ public class NotificationService implements NotificationSender {
     private String REQUEST_STATUS_CHANGE_SUBJECT;
     @Value("${update.request.message.subject}")
     private String REQUEST_UPDATE_SUBJECT;
+    @Value("${update.user.message.subject}")
+    private String USER_UPDATE_SUBJECT;
 
 
     @Value("${password.reminder.message.src}")
@@ -49,6 +51,8 @@ public class NotificationService implements NotificationSender {
     private String STATUS_CHANGE_MESSAGE_SRC;
     @Value("${update.request.message.src}")
     private String REQUEST_UPDATE_MESSAGE_SRC;
+    @Value("${update.user.message.src}")
+    private String USER_UPDATE_MESSAGE_SRC;
 
     @Autowired
     private MailService mailService;
@@ -111,6 +115,13 @@ public class NotificationService implements NotificationSender {
     public void sendUpdateRequestEvent(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 REQUEST_UPDATE_SUBJECT, REQUEST_UPDATE_MESSAGE_SRC);
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendUpdateUserEvent(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                USER_UPDATE_SUBJECT, USER_UPDATE_MESSAGE_SRC);
         mailService.send(notification);
     }
 

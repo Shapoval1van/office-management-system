@@ -49,7 +49,8 @@
                         window.location.reload();
                     }, function (callback) {
                         console.log("Error");
-                        window.alert(callback.data.error_description)
+                        swal("Oops...", callback.data.error_description, "error");
+                        //window.alert(callback.data.error_description)
                     });
                 };
 
