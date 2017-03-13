@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestGroupController", ['$scope', '$routeParams', '$location', '$http', "CommentService",
-            function ($scope, $routeParams, $location, $http, CommentService) {
+        .controller("RequestGroupController", ['$scope', '$routeParams', '$location', '$http', "WebSocketService",
+            function ($scope, $routeParams, $location, $http, WebSocketService) {
 
                 var requestId = $routeParams.requestId;
 

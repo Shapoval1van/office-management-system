@@ -1,11 +1,12 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', "$filter", '$routeParams', "CommentService", "RequestService",
-            function ($scope, $filter, $routeParams, CommentService, RequestService) {
+        .controller("RequestDetailsController", ['$scope', "$filter", '$routeParams', "WebSocketService", "RequestService",
+            function ($scope, $filter, $routeParams, WebSocketService, RequestService) {
 
                 var PAGE_SIZE = 2;
 
-                $scope.pageNumber = 1;
+                $scope.historyPageNumber = 1;
+                $scope.commentPageNumber = 1;
 
                 $scope.request = {};
                 $scope.historyList = [];
@@ -47,16 +48,24 @@
                         });
                 };
 
-                $scope.getHistoryPage("month", $scope.pageNumber);
+                $scope.getHistoryPage("month", $scope.historyPageNumber);
 
                 $scope.getNextPage = function (period) {
-                    $scope.pageNumber++;
-                    $scope.getHistoryPage(period, $scope.pageNumber);
+                    $scope.historyPageNumber++;
+                    $scope.getHistoryPage(period, $scope.historyPageNumber);
                 };
 
                 $scope.getPageSize = function () {
                     return PAGE_SIZE;
                 };
+
+                //Subscribe to topic /topic/request/{requestId}
+                WebSocketService.initialize(requestId);
+                //Receive message from web socket
+                WebSocketService.receive().then(null, null, function (comment) {
+                    $scope.comments.push(comment);
+                });
+
                 //
                 // $http({
                 //     method: 'GET',

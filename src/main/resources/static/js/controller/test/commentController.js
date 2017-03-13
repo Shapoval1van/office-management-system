@@ -3,8 +3,8 @@
  */
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("CommentController", ["$scope", "CommentService", "$routeParams", "$http",
-            function ($scope, CommentService, $routeParams, $http) {
+        .controller("CommentController", ["$scope", "WebSocketService", "$routeParams", "$http",
+            function ($scope, WebSocketService, $routeParams, $http) {
 
             }])
 })();
