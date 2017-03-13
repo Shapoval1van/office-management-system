@@ -10,17 +10,12 @@ import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.util.ChangeTracker;
 import com.netcracker.util.enums.role.RoleEnum;
 import com.netcracker.util.enums.status.StatusEnum;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
-import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,7 +33,6 @@ public class RequestServiceImpl implements RequestService {
 
   private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
 
-    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     private final MessageSource messageSource;
@@ -76,7 +70,9 @@ public class RequestServiceImpl implements RequestService {
                               ChangeItemRepository changeItemRepository,
                               FieldRepository fieldRepository,
                               RequestGroupRepository requestGroupRepository,
-                              ChangeTracker changeTracker) {
+                              ChangeTracker changeTracker,
+                              ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
         this.messageSource = messageSource;
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
@@ -155,10 +151,13 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         if(!oldRequest.isPresent()) return Optional.empty();
         if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager()!=null)
-            throw new IllegalAccessException("You cannot update request because manager has already assigned.");
+            throw new IllegalAccessException(messageSource
+                    .getMessage(REQUEST_ERROR_UPDATE_ALREADY_ASSIGNED, null, locale));
         else {
             updateRequestHistory(request, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(request);

@@ -11,6 +11,7 @@ public class MessageConstant {
     public static final String REQUEST_ERROR_DELETE_CLOSED = "request.error.delete.closed";
     public static final String REQUEST_ERROR_ALREADY_ASSIGNED = "request.error.already.assigned";
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
+    public static final String REQUEST_ERROR_UPDATE_ALREADY_ASSIGNED = "request.error.update.already.assigned";
 
     // SUB REQUEST ERROR
     public static final String SUB_REQUEST_ERROR_PARENT = "subrequest.error.parent";
