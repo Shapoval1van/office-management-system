@@ -9,7 +9,7 @@
                 $scope.Session = SessionService;
 
                 SessionService.loadSession();
-                var anonymOnlyPages = ["login", "resetPassword", "reset"];
+                var anonymOnlyPages = ["resetPassword", "reset"];
                 var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
@@ -28,8 +28,7 @@
                     if (SessionService.isUserLoggedIn())
                         $http.defaults.headers.common.Authorization =
                             'Bearer ' + SessionService.getAccessToken();
-                    else
-                        window.location = loginPageUrl;
+
                 }
 
                 $scope.logout = function () {

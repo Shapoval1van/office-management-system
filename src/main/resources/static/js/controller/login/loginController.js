@@ -3,8 +3,21 @@
         .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService","RegistrationService",
             function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService,RegistrationService) {
 
+                $scope._relocateUser = function () {
+                    if ($scope.Session.getUserRole()=="ROLE_EMPLOYEE"){
+                        window.location.href = "/requestListByEmployee"
+                    }
+                    if ($scope.Session.getUserRole()=="ROLE_OFFICE MANAGER"){
+                        window.location.href = "/requestList"
+                    }
+                    if ($scope.Session.getUserRole()=="ROLE_ADMINISTRATOR"){
+                        window.location.href = "/demo"
+                    }
+                }
+
+
                 if ($scope.Session.isUserLoggedIn()){
-                    window.location.reload()
+                    $scope._relocateUser();
                 }
 
                 $scope.username = "";
@@ -25,10 +38,11 @@
                         if(response.isError){
                             window.alert(response.data.error_description);
                         } else {
-                            window.location.reload();
+                            $scope._relocateUser();
                         }
                     });
                 };
+
 
             }])
 })();
