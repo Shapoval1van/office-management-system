@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> implements RequestRepository {
@@ -60,6 +57,15 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
+
+    @Value("${request.all.per.calendar.month}")
+    private String GET_ALL_REQUEST_FOR_MOUTH;
+
+    @Value("${request.all.per.calendar.year}")
+    private String GET_ALL_REQUEST_FOR_YEAR;
+
+    @Value("${request.all.per.calendar.quarter}")
+    private String GET_ALL_REQUEST_FOR_QUARTER;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -191,6 +197,42 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable) {
         return super.queryForList(GET_REQUESTS_BY_REQUEST_GROUP_ID, pageable, requestGroupId);
+    }
+
+    @Override
+    public List<Request> findRequestByCreatorIdForPeriod(Long personId, String reportPeriod) {
+        if(reportPeriod == null){
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toUpperCase();
+        switch (reportPeriod){
+            case "month":
+                return super.queryForList(GET_ALL_REQUEST_FOR_MOUTH, personId);
+            case "quarter":
+                return super.queryForList(GET_ALL_REQUEST_FOR_QUARTER, personId);
+            case "year":
+                return super.queryForList(GET_ALL_REQUEST_FOR_YEAR, personId);
+            default:
+                return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Request> findRequestByCreatorIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        if(reportPeriod == null){
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toUpperCase();
+        switch (reportPeriod){
+            case "month":
+                return super.queryForList(GET_ALL_REQUEST_FOR_MOUTH, pageable,  personId);
+            case "quarter":
+                return super.queryForList(GET_ALL_REQUEST_FOR_QUARTER, pageable, personId);
+            case "year":
+                return super.queryForList(GET_ALL_REQUEST_FOR_YEAR, pageable, personId);
+            default:
+                return new ArrayList<>();
+        }
     }
 
     @Override

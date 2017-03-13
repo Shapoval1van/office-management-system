@@ -1,4 +1,4 @@
-(function () {
+ (function () {
     angular.module("OfficeManagementSystem")
         .config(["$routeProvider", "$locationProvider",
             function ($routeProvider, $locationProvider) {
@@ -64,6 +64,10 @@
                     })
                     .when("/requestListByEmployee", {
                         templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
+                    })
+                    .when("/repotr", {
+                        templateUrl: "/static/page/report.html",
                         controller: "RequestListByEmployeeController"
                     })
                     .otherwise({
