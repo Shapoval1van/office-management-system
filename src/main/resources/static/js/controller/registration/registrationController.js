@@ -7,8 +7,13 @@
                     firstName:"",
                     lastName:"",
                     email:"",
-                    password:""
+                    password:"",
+                    role:-1
                 };
+
+                $scope.roles = [
+
+                ];
 
                 $scope.sendPersonCredentials = function () {
                     RegistrationService.registerEmployee($scope.personCredentials)
@@ -18,7 +23,6 @@
                             } else {
                                 window.alert("To verify the data provided we have sent you a message to your email : "+response.responseEmail)
                             }
-
                         })
                 };
             }])

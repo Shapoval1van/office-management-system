@@ -30,9 +30,9 @@
                             <span class="input-group-addon"><i class="fa fa-user"></i></span>
                             <div class="pass-wrapper">
                                 <select class="form-control" name="repeatSelect" id="repeatSelect"
-                                        ng-model="data.model">
-                                    <option ng-repeat="option in data.availableOptions" value="{{option.id}}">
-                                        {{option.displayValue}}
+                                        ng-model="personCredentials.role">
+                                    <option ng-repeat="option in roles" value="{{option.id}}">
+                                        {{option.name}}
                                     </option>
                                 </select>
                             </div>
