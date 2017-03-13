@@ -1,9 +1,16 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', "$filter", '$routeParams', "WebSocketService", "RequestService",
-            function ($scope, $filter, $routeParams, WebSocketService, RequestService) {
+        .controller("RequestDetailsController", ['$scope', '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
+            function ($scope, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
 
-                var PAGE_SIZE = 2;
+                var PAGE_SIZE = 10;
+
+                var authorsList = [];
+                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                authorsList.push({
+                    id: currentUser.id,
+                    name: currentUser.firstName + ' ' + currentUser.lastName
+                });
 
                 $scope.historyPageNumber = 1;
                 $scope.commentPageNumber = 1;
@@ -14,22 +21,24 @@
                 $scope.comments = [];
                 $scope.comment = "";
 
-
                 $scope.periodList = {
                     type: "select",
                     value: "Day",
                     values: ["Day", "Month", "All"]
                 };
                 var requestId = $routeParams.requestId;
-                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-                RequestService.getRequestById(requestId)
-                    .then(function (callback) {
-                        $scope.request = callback.data;
-                    }, function (callback) {
-                        console.log("Error");
-                        console.log(callback);
-                    });
+                $scope.getRequest = function () {
+                    RequestService.getRequestById(requestId)
+                        .then(function (callback) {
+                            $scope.request = callback.data;
+                        }, function (callback) {
+                            console.log("Error");
+                            console.log(callback);
+                        });
+                };
+
+                $scope.getRequest();
 
                 $scope.getHistoryPage = function (period, pageNumber) {
                     return RequestService.getRequestHistory(requestId, period, PAGE_SIZE, pageNumber)
@@ -50,7 +59,7 @@
 
                 $scope.getHistoryPage("month", $scope.historyPageNumber);
 
-                $scope.getNextPage = function (period) {
+                $scope.getNextHistoryPage = function (period) {
                     $scope.historyPageNumber++;
                     $scope.getHistoryPage(period, $scope.historyPageNumber);
                 };
@@ -66,6 +75,54 @@
                     $scope.comments.push(comment);
                 });
 
+                $scope.sendComment = function () {
+                    return CommentService.addComment($scope.comment, requestId)
+                        .then(function (callback) {
+                            console.log("Success");
+                            $scope.comment = "";
+                        }, function (callback) {
+                            console.log("Failure");
+                        })
+                };
+
+                $scope.getCommentsOfRequest = function (pageNumber, pageSize) {
+                    return CommentService.getCommentsByRequestId(requestId, pageNumber, pageSize)
+                        .then(function (callback) {
+                            callback.data.forEach(function (comment) {
+                                $scope.comments.push(comment);
+                            })
+                        }, function (callback) {
+                            console.log("Failure");
+                        })
+                };
+
+                $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+
+                $scope.getNextCommentPage = function () {
+                    $scope.commentPageNumber++;
+                    $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+                };
+
+                $scope.getAuthorName = function (id) {
+                    var authorName = "";
+                    authorsList.forEach(function (author) {
+                        if (author.id === id)
+                            authorName = author.name;
+                    });
+
+                    if (authorName.length < 1)
+                        PersonService.getPersonById(id)
+                            .then(function (callback) {
+                                var author = {
+                                    id: id,
+                                    name: callback.data.firstName + ' ' + callback.data.lastName
+                                };
+                                authorsList.push(author);
+                                authorName = author.name;
+                            });
+
+                    return authorName;
+                };
                 //
                 // $http({
                 //     method: 'GET',

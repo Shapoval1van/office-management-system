@@ -92,15 +92,44 @@
                         <uib-tabset active="activeForm">
                             <uib-tab index="0" heading="Comments">
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="list-group">
-
+                                    <div class="col-md-12">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="comment">Your comment:</label>
+                                                <textarea placeholder="Write comment here"
+                                                          ng-model="$parent.$parent.comment" id="comment"
+                                                          class="form-control"></textarea>
+                                                <button class="btn btn-success" ng-click="sendComment()">Send comment
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div id="comments-wrapper">
+                                        <div class="col-lg-12 col-md-12"
+                                             ng-repeat="comment in comments | orderBy: 'publishDate': true ">
+                                            <div class="list-group comment-wrapper">
+                                                <div class="comment-header">
+                                                    <span class="comment-author">{{getAuthorName(comment.author.id)}}</span>
+                                                    <span class="comment-date">
+                                                    {{comment.publishDate | date: "dd.MM.yyyy HH:mm"}}
+                                                </span>
+                                                </div>
+                                                <div class="comment-body">
+                                                    <p>{{comment.body}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div ng-click="getNextCommentPage()">
+                                                <p>Show {{getPageSize()}} more</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </uib-tab>
                             <uib-tab index="1" heading="History">
-                                <table st-table="displayedHistory" st-safe-src="historyList" class="table table-stripped">
+                                <table st-table="displayedHistory" st-safe-src="historyList"
+                                       class="table table-stripped">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -111,7 +140,6 @@
                                         <th st-sort="createDate">Change time</th>
                                     </tr>
                                     </thead>
-                                    <!--TODO Sorry. Could not find a better solution. But I'm trying-->
                                     <tbody>
                                     <tr ng-repeat="historyItem in displayedHistory">
                                         <td>
@@ -132,12 +160,12 @@
                                                 {{historyItem.author.lastName}}
                                             </a>
                                         </td>
-                                        <td >
+                                        <td>
                                             {{historyItem.createDate | date : 'dd.MM.yyyy HH:mm:ss'}}
                                         </td>
                                     </tbody>
                                 </table>
-                                <div ng-click="getNextPage('month')">
+                                <div ng-click="getNextHistoryPage('month')">
                                     <p>Show {{getPageSize()}} more</p>
                                 </div>
                             </uib-tab>

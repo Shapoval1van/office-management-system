@@ -25,7 +25,7 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
     public static final String AUTHOR_ID = "author_id";
     public static final String PUBLISH_DATE = "publish_date";
 
-    private final String FIND_COMMENTS_BY_REQUEST_ID = "SELECT comment_id, body, request_id, author_id, publish_date FROM comment WHERE request_id=?";
+    private final String FIND_COMMENTS_BY_REQUEST_ID = "SELECT comment_id, body, request_id, author_id, publish_date FROM comment WHERE request_id=? ORDER BY publish_date DESC";
 
     public CommentRepositoryImpl() {
         super(Comment.TABLE_NAME, Comment.ID_COLUMN);
