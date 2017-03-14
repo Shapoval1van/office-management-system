@@ -27,8 +27,7 @@ import java.util.*;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final RequestRepository requestRepository;
 
@@ -53,7 +52,8 @@ public class RequestServiceImpl implements RequestService {
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
-    public RequestServiceImpl(RequestRepository requestRepository,
+    public RequestServiceImpl(ApplicationEventPublisher eventPublisher,
+                              RequestRepository requestRepository,
                               PersonRepository personRepository,
                               StatusRepository statusRepository,
                               RoleRepository roleRepository,
@@ -63,6 +63,7 @@ public class RequestServiceImpl implements RequestService {
                               FieldRepository fieldRepository,
                               RequestGroupRepository requestGroupRepository,
                               ChangeTracker changeTracker) {
+        this.eventPublisher = eventPublisher;
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -282,10 +283,8 @@ public class RequestServiceImpl implements RequestService {
             changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
             if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
-                if (!subRequestList.isEmpty()) {
-                    for (Request r : subRequestList)
-                        changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()));
-                }
+                if (!subRequestList.isEmpty())
+                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId())));
             }
         }
     }

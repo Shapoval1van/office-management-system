@@ -24,20 +24,28 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestGroupServiceImpl.class);
 
-    @Autowired
-    private RequestGroupRepository requestGroupRepository;
+    private final RequestGroupRepository requestGroupRepository;
+
+    private final PersonRepository personRepository;
+
+    private final RequestRepository requestRepository;
+
+    private final StatusRepository statusRepository;
+
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    private RequestRepository requestRepository;
-
-    @Autowired
-    private StatusRepository statusRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
+    public RequestGroupServiceImpl(RequestGroupRepository requestGroupRepository,
+                                   PersonRepository personRepository,
+                                   RequestRepository requestRepository,
+                                   StatusRepository statusRepository,
+                                   RoleRepository roleRepository) {
+        this.requestGroupRepository = requestGroupRepository;
+        this.personRepository = personRepository;
+        this.requestRepository = requestRepository;
+        this.statusRepository = statusRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
@@ -72,7 +80,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             throw new CurrentUserNotPresentException("Can't fetch information about current user");
         } else
             requestGroup.setAuthor(currentUser.get());
-
 
         return saveRequestGroup(requestGroup);
     }

@@ -3,12 +3,12 @@ package com.netcracker.model.event;
 
 import com.netcracker.model.entity.Person;
 
-public class NotificationUserUpdateEvent {
+public class NotificationPersonUpdateEvent {
     private Person person;
 
-    public NotificationUserUpdateEvent(){}
+    public NotificationPersonUpdateEvent(){}
 
-    public NotificationUserUpdateEvent(Person person) {
+    public NotificationPersonUpdateEvent(Person person) {
         this.person = person;
     }
 

@@ -34,7 +34,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
             "FROM  " + TABLE_NAME + " WHERE (LOWER(CONCAT(first_name, last_name)) like LOWER(CONCAT('%', REPLACE(? , ' ', '%'), '%'))) AND " +
             "  role_id = 2";
 
-    private final String UPDATE_USER = "UPDATE "  + TABLE_NAME + " set first_name = ?, last_name = ?, role_id = ?"+
+    private final String UPDATE_PERSON = "UPDATE "  + TABLE_NAME + " set first_name = ?, last_name = ?, role_id = ?"+
             " WHERE person_id = ?";
 
     private final String FIND_MANAGER = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
@@ -42,6 +42,12 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     private final String FIND_ADMIN = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
             " FROM " + TABLE_NAME + " WHERE role_id = 1 AND person_id!= ?";
+
+    public static final String GET_AVAILABLE_PERSONS_BY_ROLE = "SELECT person_id, first_name, last_name, email, password, role_id, enabled"+
+            " FROM person WHERE role_id = ? AND enabled = true ORDER BY last_name DESC";
+
+    public static final String GET_AVAILABLE_PERSONS = "SELECT person_id, first_name, last_name, email, password, role_id, enabled" +
+            " FROM person WHERE enabled = true ORDER BY last_name DESC";
 
 
     public PersonRepositoryImpl() {
@@ -85,8 +91,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public int updateUser(Person user) {
-        return getJdbcTemplate().update(UPDATE_USER, user.getFirstName(), user.getLastName(), user.getRole().getId(), user.getId());
+    public int updatePerson(Person person) {
+        return getJdbcTemplate().update(UPDATE_PERSON, person.getFirstName(), person.getLastName(), person.getRole().getId(), person.getId());
     }
 
     @Override
@@ -99,8 +105,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         return super.queryForList(FIND_MANAGER, pageable);
     }
 
-    @Override
-    public List<Person> getAdmins(Pageable pageable, Long currentAdminId) {
-        return super.queryForList(FIND_ADMIN, currentAdminId);
-    }
+//    @Override
+//    public List<Person> getAdmins(Pageable pageable, Long currentAdminId) {
+//        return super.queryForList(FIND_ADMIN, currentAdminId);
+//    }
+
 }

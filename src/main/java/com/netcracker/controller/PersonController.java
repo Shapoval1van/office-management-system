@@ -1,7 +1,7 @@
 package com.netcracker.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.exception.CannotUpdateUserException;
+import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.MessageDTO;
@@ -39,34 +39,44 @@ public class PersonController {
     }
 
     @JsonView(View.Public.class)
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{userId}")
-    public ResponseEntity<?> getUser(@PathVariable Long userId){
-        Optional<Person> user = personService.getPersonById(userId);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(new PersonDTO(user.get()));
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
+    public ResponseEntity<?> getPerson(@PathVariable Long personId){
+        Optional<Person> person = personService.getPersonById(personId);
+        if (person.isPresent()) {
+            return ResponseEntity.ok(new PersonDTO(person.get()));
         } else {
             return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{userId}/update")
-    public ResponseEntity<Person> updateUser(@PathVariable Long userId,
-                                                 @Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO) throws ResourceNotFoundException, IllegalAccessException, CannotUpdateUserException {
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}/update")
+    public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
+                                               @Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO) throws ResourceNotFoundException, IllegalAccessException, CannotUpdatePersonException {
         Person currentUser = personDTO.toPerson();
-        currentUser.setId(userId);
-        Optional<Person> user = personService.updateUser(currentUser, userId);
-        if(!user.isPresent()){
+        currentUser.setId(personId);
+        Optional<Person> person = personService.updatePerson(currentUser, personId);
+        if(!person.isPresent()){
             new ResponseEntity<>(currentUser, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/admins")
-    public ResponseEntity<?> getListOfAdmins(Pageable pageable, Principal principal) {
-        Optional<Person> currentAdmin = personService.findPersonByEmail(principal.getName());
-        List<Person> admins = personService.getAdmins(pageable, currentAdmin.get().getId());
-        System.out.print(admins);
-        return ResponseEntity.ok((admins
+//    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/admins")
+//    public ResponseEntity<?> getListOfAdmins(Pageable pageable, Principal principal) {
+//        Optional<Person> currentAdmin = personService.findPersonByEmail(principal.getName());
+//        List<Person> admins = personService.getAdmins(pageable, currentAdmin.get().getId());
+//        System.out.print(admins);
+//        return ResponseEntity.ok((admins
+//                .stream()
+//                .map(PersonDTO::new)
+//                .collect(Collectors.toList())));
+//    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/persons/{roleId}")
+    public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
+        List<Person> personList = personService.getAvailablePersonList(roleId, pageable);
+
+        return ResponseEntity.ok((personList
                 .stream()
                 .map(PersonDTO::new)
                 .collect(Collectors.toList())));

@@ -27,16 +27,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     static final int EXPIRATION = 60 * 24;
 
+    private final PersonRepository personRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final TokenRepository tokenRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final ApplicationEventPublisher eventPublisher;
+
     @Autowired
-    private PersonRepository personRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private TokenRepository tokenRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    public RegistrationServiceImpl(PersonRepository personRepository,
+                                   RoleRepository roleRepository,
+                                   TokenRepository tokenRepository,
+                                   PasswordEncoder passwordEncoder,
+                                   ApplicationEventPublisher eventPublisher) {
+        this.personRepository = personRepository;
+        this.roleRepository = roleRepository;
+        this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
+    }
 
     @Transactional
     @Override

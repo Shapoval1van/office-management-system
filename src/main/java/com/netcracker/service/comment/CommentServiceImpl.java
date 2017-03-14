@@ -24,14 +24,20 @@ public class CommentServiceImpl implements CommentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+
+    private final PersonRepository personRepository;
+
+    private final RequestRepository requestRepository;
 
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    private RequestRepository requestRepository;
+    public CommentServiceImpl(CommentRepository commentRepository,
+                              PersonRepository personRepository,
+                              RequestRepository requestRepository) {
+        this.commentRepository = commentRepository;
+        this.personRepository = personRepository;
+        this.requestRepository = requestRepository;
+    }
 
     @Override
     public List<Comment> getCommentByRequestId(Long requestId) {

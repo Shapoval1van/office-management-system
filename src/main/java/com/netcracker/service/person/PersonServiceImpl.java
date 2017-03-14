@@ -1,10 +1,11 @@
 package com.netcracker.service.person;
 
-import com.netcracker.exception.CannotUpdateUserException;
+import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
-import com.netcracker.model.event.NotificationUserUpdateEvent;
+import com.netcracker.model.event.NotificationPersonUpdateEvent;
 import com.netcracker.repository.common.Pageable;
+import com.netcracker.repository.data.impl.PersonRepositoryImpl;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.util.enums.role.RoleEnum;
@@ -18,15 +19,17 @@ import java.util.Optional;
 @Service
 public class PersonServiceImpl implements PersonService {
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final RoleRepository roleRepository;
 
     private final PersonRepository personRepository;
 
     @Autowired
-    public PersonServiceImpl(RoleRepository roleRepository, PersonRepository personRepository) {
+    public PersonServiceImpl(ApplicationEventPublisher eventPublisher,
+                             RoleRepository roleRepository,
+                             PersonRepository personRepository) {
+        this.eventPublisher = eventPublisher;
         this.roleRepository = roleRepository;
         this.personRepository = personRepository;
     }
@@ -41,23 +44,23 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Optional<Person> updateUser(Person user, Long userId) throws CannotUpdateUserException {
-        Optional<Person> oldUser = getPersonById(userId);
+    public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
+        Optional<Person> oldUser = getPersonById(personId);
         if (!oldUser.isPresent()) return Optional.empty();
         if (RoleEnum.EMPLOYEE.getId().equals(oldUser.get().getRole().getId())){
-            eventPublisher.publishEvent(new NotificationUserUpdateEvent(user));
-            this.personRepository.updateUser(user);
-            return Optional.of(user);
+            eventPublisher.publishEvent(new NotificationPersonUpdateEvent(person));
+            this.personRepository.updatePerson(person);
+            return Optional.of(person);
         } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
-                && RoleEnum.EMPLOYEE.getId().equals(user.getRole().getId()))
-            throw new CannotUpdateUserException("Cannot update user from manager to employee!");
+                && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
+            throw new CannotUpdatePersonException("Cannot update user from manager to employee!");
         else if (RoleEnum.ADMINISTRATOR.getId().equals(oldUser.get().getRole().getId())
-                && RoleEnum.EMPLOYEE.getId().equals(user.getRole().getId()))
-            throw new CannotUpdateUserException("Cannot update user from admin to employee!");
+                && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
+            throw new CannotUpdatePersonException("Cannot update user from admin to employee!");
         else {
-            eventPublisher.publishEvent(new NotificationUserUpdateEvent(user));
-            this.personRepository.updateUser(user);
-            return Optional.of(user);
+            eventPublisher.publishEvent(new NotificationPersonUpdateEvent(person));
+            this.personRepository.updatePerson(person);
+            return Optional.of(person);
         }
     }
 
@@ -74,9 +77,19 @@ public class PersonServiceImpl implements PersonService {
         return this.personRepository.findPersonByEmail(email);
     }
 
+//    @Override
+//    public List<Person> getAdmins(Pageable pageable, Long currentAdminId) {
+//        return this.personRepository.getAdmins(pageable, currentAdminId);
+//    }
+
     @Override
-    public List<Person> getAdmins(Pageable pageable, Long currentAdminId) {
-        return this.personRepository.getAdmins(pageable, currentAdminId);
+    public List<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
+        Optional<Role> role = roleRepository.findOne(roleId);
+        List<Person> personList = role.isPresent() ? personRepository.queryForList(
+                PersonRepositoryImpl.GET_AVAILABLE_PERSONS_BY_ROLE, pageable, roleId)
+                : personRepository.queryForList(PersonRepositoryImpl.GET_AVAILABLE_PERSONS, pageable);
+
+        return personList;
     }
 
 }

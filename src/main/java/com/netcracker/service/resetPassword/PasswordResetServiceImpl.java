@@ -20,17 +20,24 @@ import java.util.UUID;
 @Service
 public class PasswordResetServiceImpl implements PasswordResetService {
 
-    @Autowired
-    private TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
+
+    private final PersonRepository personRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    public PasswordResetServiceImpl(TokenRepository tokenRepository,
+                                    PersonRepository personRepository,
+                                    PasswordEncoder passwordEncoder,
+                                    ApplicationEventPublisher eventPublisher) {
+        this.tokenRepository = tokenRepository;
+        this.personRepository = personRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

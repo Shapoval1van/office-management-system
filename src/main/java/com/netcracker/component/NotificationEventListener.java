@@ -51,7 +51,7 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleUpdateUser(NotificationUserUpdateEvent userUpdateEvent){
+    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
         notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
     }
 }
