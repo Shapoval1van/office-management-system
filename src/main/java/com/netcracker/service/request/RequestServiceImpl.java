@@ -31,7 +31,7 @@ import static com.netcracker.util.MessageConstant.*;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-  private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
+    private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
 
     private ApplicationEventPublisher eventPublisher;
 
@@ -105,6 +105,10 @@ public class RequestServiceImpl implements RequestService {
                 new CannotCreateSubRequestException(messageSource
                         .getMessage(MANAGER_ERROR_MAIL, new Object[]{email}, locale)));
 
+        priorityRepository.findOne(subRequest.getPriority().getId()).orElseThrow(() ->
+                new CannotCreateSubRequestException(messageSource
+                        .getMessage(PRIORITY_ERROR_ID, new Object[]{subRequest.getPriority().getId()}, locale)));
+
         subRequest.setManager(manager);
 
         long parentId = subRequest.getParent().getId();
@@ -117,8 +121,14 @@ public class RequestServiceImpl implements RequestService {
                     .getMessage(SUB_REQUEST_ERROR_PARENT_IS_SUB_REQUEST, null, locale));
         }
 
+        if ((parentRequest.getManager() == null || !Objects.equals(parentRequest.getManager().getId(), manager.getId()))
+                && manager.getRole().getId() != 1) {
+            throw new CannotCreateSubRequestException(messageSource
+                    .getMessage(SUB_REQUEST_ERROR_ILLEGAL_ACCESS, null, locale));
+        }
+
         String parentStatus = parentRequest.getStatus().getName();
-        if (StatusEnum.CANCELED.toString().equals(parentStatus) || StatusEnum.CANCELED.toString().equals(parentStatus)) {
+        if (StatusEnum.CANCELED.toString().equals(parentStatus) || StatusEnum.CLOSED.toString().equals(parentStatus)) {
             throw new CannotCreateSubRequestException(messageSource
                     .getMessage(SUB_REQUEST_ERROR_PARENT_CLOSED, null, locale));
         }

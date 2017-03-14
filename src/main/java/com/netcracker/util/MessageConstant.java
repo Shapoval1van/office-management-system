@@ -17,6 +17,7 @@ public class MessageConstant {
     public static final String SUB_REQUEST_ERROR_PARENT = "subrequest.error.parent";
     public static final String SUB_REQUEST_ERROR_PARENT_IS_SUB_REQUEST = "subrequest.error.parentIsSubrequest";
     public static final String SUB_REQUEST_ERROR_PARENT_CLOSED = "subrequest.error.parentClosed";
+    public static final String SUB_REQUEST_ERROR_ILLEGAL_ACCESS = "subrequest.error.illegal.access";
 
     // STATUS ERROR
     public static final String STATUS_ERROR = "status.error";
@@ -29,6 +30,7 @@ public class MessageConstant {
 
     // EMPLOYEE ERROR
     public static final String EMPLOYEE_ERROR_MAIL = "employee.error.email";
+    public static final String EMPLOYEE_ERROR_ID = "employee.error.id";
 
     // REQUEST GROUP ERROR
     public static final String REQUEST_GROUP_ILLEGAL_ACCESS = "request.group.error.illegal.access";
@@ -36,4 +38,7 @@ public class MessageConstant {
 
     //TOKEN
     public static final String TOKEN_ERROR_EXPIRED = "token.error.expired";
+
+    //PRIORITY
+    public static final String PRIORITY_ERROR_ID = "priority.error.id";
 }
