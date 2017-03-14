@@ -48,8 +48,8 @@
                 };
 
                 $scope.requestDelete = function(requestId) {
-                    $scope.userConfirm = confirm("Do you really want cancel this request?");
-                    if($scope.userConfirm){
+                    //$scope.userConfirm = confirm("Do you really want cancel this request?");
+                    //if($scope.userConfirm){
                         $http({
                             method: 'DELETE',
                             url: '/api/request/' + requestId + '/delete'
@@ -58,9 +58,9 @@
                         }, function errorCallback(response) {
                             console.log(response);
                         });
-                        location.reload(true);
-                        $scope.userConfirm = false;
-                    }
+                        //location.reload(true);
+                        //$scope.userConfirm = false;
+                    //}
                 };
 
                 $scope.propertyName = 'name';

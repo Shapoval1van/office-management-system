@@ -29,7 +29,7 @@ public interface RequestService {
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 
-    void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException;
+    void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException;
 
     int changeRequestStatus(Request request, Status status);
 

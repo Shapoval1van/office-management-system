@@ -16,6 +16,8 @@ public interface NotificationSender {
 
     void sendChangeStatusEvent(Person person);
 
+    void sendNewRequestEvent(Person person);
+
     void sendUpdateRequestEvent(Person person);
 
     void sendUpdateUserEvent(Person person);

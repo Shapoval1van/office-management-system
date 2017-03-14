@@ -4,6 +4,7 @@ import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.NotificationChangeStatus;
+import com.netcracker.model.event.NotificationNewRequestEvent;
 import com.netcracker.model.event.NotificationRequestUpdateEvent;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.impl.RequestRepositoryImpl;
@@ -123,6 +124,7 @@ public class RequestServiceImpl implements RequestService {
                 new CannotCreateRequestException("No status 'FREE'")
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
+        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
         return this.requestRepository.save(request);
     }
 
@@ -267,18 +269,22 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void deleteRequestById(Long id) throws CannotDeleteRequestException, ResourceNotFoundException {
+    public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Request request = getRequestById(id).get();
+        Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (StatusEnum.CLOSED.getName().equals(request.getStatus().getName()))
             throw new CannotDeleteRequestException("You cannot delete closed request");
+        else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.getEmployee().getId()))
+            throw new CannotDeleteRequestException("You have no permission to delete this request");
+        else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
+            throw new CannotDeleteRequestException("You cannot delete non free request");
         else {
             changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
             if (request.getParent()==null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty()) {
-                    for (Request r : subRequestList) {
+                    for (Request r : subRequestList)
                         changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()));
-                    }
                 }
             }
         }

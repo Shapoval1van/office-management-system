@@ -33,6 +33,8 @@ public class NotificationService implements NotificationSender {
     private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
     @Value("${status.message.subject}")
     private String REQUEST_STATUS_CHANGE_SUBJECT;
+    @Value("${new.request.message.subject}")
+    private String NEW_REQUEST_SUBJECT;
     @Value("${update.request.message.subject}")
     private String REQUEST_UPDATE_SUBJECT;
     @Value("${update.user.message.subject}")
@@ -49,6 +51,8 @@ public class NotificationService implements NotificationSender {
     private String REGISTRATION_MESSAGE_SRC;
     @Value("${requestStatus.message.src}")
     private String STATUS_CHANGE_MESSAGE_SRC;
+    @Value("${new.request.message.src}")
+    private String NEW_REQUEST_MESSAGE_SRC;
     @Value("${update.request.message.src}")
     private String REQUEST_UPDATE_MESSAGE_SRC;
     @Value("${update.user.message.src}")
@@ -107,21 +111,32 @@ public class NotificationService implements NotificationSender {
     @Override
     public void sendChangeStatusEvent(Person person){
         Notification notification = NotificationBuilder.build(person,
-                REQUEST_STATUS_CHANGE_SUBJECT, STATUS_CHANGE_MESSAGE_SRC);
+                REQUEST_STATUS_CHANGE_SUBJECT,
+                STATUS_CHANGE_MESSAGE_SRC);
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendNewRequestEvent(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                NEW_REQUEST_SUBJECT,
+                NEW_REQUEST_MESSAGE_SRC);
         mailService.send(notification);
     }
 
     @Override
     public void sendUpdateRequestEvent(Person person) {
         Notification notification = NotificationBuilder.build(person,
-                REQUEST_UPDATE_SUBJECT, REQUEST_UPDATE_MESSAGE_SRC);
+                REQUEST_UPDATE_SUBJECT,
+                REQUEST_UPDATE_MESSAGE_SRC);
         mailService.send(notification);
     }
 
     @Override
     public void sendUpdateUserEvent(Person person) {
         Notification notification = NotificationBuilder.build(person,
-                USER_UPDATE_SUBJECT, USER_UPDATE_MESSAGE_SRC);
+                USER_UPDATE_SUBJECT,
+                USER_UPDATE_MESSAGE_SRC);
         mailService.send(notification);
     }
 

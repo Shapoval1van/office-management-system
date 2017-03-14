@@ -41,6 +41,11 @@ public class NotificationEventListener {
     }
 
     @EventListener
+    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent){
+        notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
+    }
+
+    @EventListener
     public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
         notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
     }
