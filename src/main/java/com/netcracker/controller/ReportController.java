@@ -32,5 +32,4 @@ public class ReportController {
         return responseList;
     }
 
-
 }
