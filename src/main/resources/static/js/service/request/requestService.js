@@ -23,6 +23,15 @@
                         });
                 };
 
+                requestService.cancelRequest = function (requestId) {
+                    return $http.delete("/api/request/" + requestId + "/delete")
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 return requestService;
             }])
 })();

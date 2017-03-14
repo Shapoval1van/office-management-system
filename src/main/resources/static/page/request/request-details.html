@@ -1,6 +1,6 @@
 <div id="wrapper" class="toggled">
     <side-bar></side-bar>
-    <div id="page-content-wrapper">
+    <div id="page-content-wrapper" ng-cloak="">
         <div class="container-fluid">
             <!-- Отута весь контент -->
             <div class="jumbotron bordered">
@@ -19,11 +19,31 @@
                                         </div>
                                     </div>
 
+                                    <div class="col-md-6 btn-group">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <cancel-request-btn></cancel-request-btn>
+                                            </div>
+                                            <div class="col-md-3" ng-hide="request.requestGroup">
+                                                <add-to-request-group-btn></add-to-request-group-btn>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="form-group col-md-6 col-lg-6">
                                         <label for="status" class="col-lg-1 control-label">Status:</label>
                                         <div class="col-lg-12">
                                         <span class="form-control-static" id="status">
                                             {{request.status.name}}
+                                        </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-6 col-lg-6">
+                                        <label for="priority" class="col-lg-1 control-label">Priority:</label>
+                                        <div class="col-lg-12">
+                                        <span class="form-control-static" id="priority">
+                                            {{request.priority.name}}
                                         </span>
                                         </div>
                                     </div>
@@ -47,15 +67,6 @@
                                             <span ng-if="!request.estimate">
                                                 Not specified
                                             </span>
-                                        </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group col-md-6 col-lg-6">
-                                        <label for="priority" class="col-lg-1 control-label">Priority:</label>
-                                        <div class="col-lg-12">
-                                        <span class="form-control-static" id="priority">
-                                            {{request.priority.name}}
                                         </span>
                                         </div>
                                     </div>

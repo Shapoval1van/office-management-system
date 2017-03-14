@@ -1,13 +1,13 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
-            function ($scope, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
+        .controller("RequestDetailsController", ['$scope', "$q", '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
+            function ($scope, $q, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
 
                 var PAGE_SIZE = 10;
 
-                var authorsList = [];
+                $scope.authorsList = [];
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                authorsList.push({
+                $scope.authorsList.push({
                     id: currentUser.id,
                     name: currentUser.firstName + ' ' + currentUser.lastName
                 });
@@ -103,46 +103,42 @@
                     $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
                 };
 
+                var isGetAuthorRequestPending = false;
+
                 $scope.getAuthorName = function (id) {
                     var authorName = "";
-                    authorsList.forEach(function (author) {
-                        if (author.id === id)
-                            authorName = author.name;
-                    });
+                    for (var i = 0; i < $scope.authorsList.length; i++) {
+                        if ($scope.authorsList[i].id === id) {
+                            return $scope.authorsList[i].name;
+                        }
+                    }
 
-                    if (authorName.length < 1)
+                    if (authorName.length < 1 && !isGetAuthorRequestPending) {
+                        isGetAuthorRequestPending = true;
                         PersonService.getPersonById(id)
                             .then(function (callback) {
-                                var author = {
-                                    id: id,
-                                    name: callback.data.firstName + ' ' + callback.data.lastName
-                                };
-                                authorsList.push(author);
-                                authorName = author.name;
+                                isGetAuthorRequestPending = false;
+                                var author = {};
+                                author.id = callback.data.id;
+                                author.name = callback.data.firstName + ' ' + callback.data.lastName;
+                                $scope.authorsList.push(author);
+                                return author.name;
+                            }, function (callback) {
+                                isGetAuthorRequestPending = false;
+                                console.log("Failure");
                             });
+                    }
 
-                    return authorName;
                 };
-                //
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/' + $routeParams.requestId
-                // }).then(function successCallback(response) {
-                //     $scope.request = response.data;
-                //     $scope.priorityList = {
-                //         "type": "select",
-                //         "value": response.data.priority.name.substr(0, 1).toUpperCase() + response.data.priority.name.substr(1).toLocaleLowerCase(),
-                //         "values": ["High", "Normal", "Low"]
-                //     };
-                //     $scope.creationTime = new Date(response.data.creationTime).toLocaleDateString("nl", {
-                //         year: "2-digit",
-                //         month: "2-digit",
-                //         day: "2-digit"
-                //     });
-                // }, function errorCallback(response) {
-                //
-                // });
 
+                $scope.cancelRequest = function () {
+                    return RequestService.cancelRequest($scope.request.id)
+                        .then(function (callback) {
+                            window.location.reload();
+                        }, function () {
+                            console.log("Failure cancel");
+                        })
+                };
                 // $http({
                 //     method: 'GET',
                 //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'
@@ -164,109 +160,12 @@
                 //     });
                 // };
 
-                // $scope.prioritySelect = function (item_selected1) {
-                //     var priority = item_selected1.toLowerCase();
-                //     var period = $('#historySelector').find(':selected').text().toLowerCase();
-                //     $http({
-                //         method: 'POST',
-                //         url: '/api/request/updatePriority/' + $routeParams.requestId,
-                //         headers: {
-                //             "Content-type": "application/x-www-form-urlencoded;"
-                //         },
-                //         transformRequest: function (obj) {
-                //             var str = [];
-                //             for (var p in obj)
-                //                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-                //             return str.join("&");
-                //         },
-                //         data: {
-                //             priority: priority
-                //         }
-                //     }).then(function successCallback(response) {
-                //         $http({
-                //             method: 'GET',
-                //             url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
-                //         }).then(function successCallback(response) {
-                //             $scope.historyList = buildHistoryList(response.data);
-                //         }, function errorCallback(response) {
-                //
-                //         });
-                //     }, function errorCallback(response) {
-                //     });
-                // };
-                //
-                // function buildHistoryList(сhangeGroup) {
-                //     var historyResult = [];
-                //     сhangeGroup.forEach(function (item, arr) {
-                //         item.changeItems.forEach(function (item1, arr1) {
-                //             var historyItem = {};
-                //             historyItem.property = item1.field.name.substr(0, 1).toUpperCase() + item1.field.name.substr(1).toLowerCase();
-                //             historyItem.newValue = item1.newVal;
-                //             historyItem.oldValue = item1.oldVal;
-                //             historyItem.createTime = item.createDate;
-                //             historyItem.author = item.author.firstName + ' ' + item.author.lastName;
-                //             historyItem.authorId = item.author.id;
-                //             historyResult.push(historyItem);
-                //         });
-                //     });
-                //     return historyResult;
-                // }
-                //
                 // $http({
                 //     method: 'GET',
                 //     url: '/api/request/sub/' + $routeParams.requestId
                 // }).then(function successCallback(response) {
                 //     $scope.subRequest = response.data;
                 // }, function errorCallback(response) {
-                //
-                // });
-                //
-                // CommentService.initialize(requestId);
-                //
-                // $scope.sendOnEnterKey = function (event) {
-                //     if (event.keyCode === 13 && $scope.comment.length > 0)
-                //         $scope.sendComment();
-                // };
-                //
-                // $scope.getCommentOfRequest = function () {
-                //     return $http.get("/api/comment/request/" + requestId)
-                //         .then(function (callback) {
-                //             $scope.comments = callback.data;
-                //         }, function (callback) {
-                //             console.log(callback)
-                //         })
-                // };
-                //
-                // $scope.getCommentOfRequest();
-                //
-                // $scope.sendComment = function () {
-                //     $http.post("/api/comment/", {
-                //         body: $scope.comment,
-                //         request: requestId
-                //     }).then(function () {
-                //         $scope.comment = "";
-                //     }, function () {
-                //
-                //     })
-                // };
-                // //FIXME
-                // $scope.getUserName = function (userId) {
-                //
-                //     if (userId == currentUser.id)
-                //         return currentUser.lastName + " " + currentUser.firstName;
-                //     else
-                //         return "User id: " + userId;
-                //
-                // };
-                //
-                // CommentService.receive().then(null, null, function (comment) {
-                //     $scope.comments.push(comment);
-                // });
-                //
-                // $scope.requestStatusButtonsHide = function (request) {
-                //     return request.manager == null;
-                //     // TODO hide for employee
-                // };
 
             }])
 })();
