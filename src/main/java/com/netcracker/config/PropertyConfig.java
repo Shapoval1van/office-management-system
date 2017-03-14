@@ -29,6 +29,15 @@ public class PropertyConfig {
         return messageSource;
     }
 
+    @Bean(name = "sqlMessageSource")
+    public ResourceBundleMessageSource sqlMessageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource ();
+        messageSource.setBasename("property/sql/sql.properties");
+        messageSource.setDefaultEncoding("UTF-8");
+
+        return messageSource;
+    }
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();

@@ -33,6 +33,7 @@ public class RequestServiceImpl implements RequestService {
 
   private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
 
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     private final MessageSource messageSource;

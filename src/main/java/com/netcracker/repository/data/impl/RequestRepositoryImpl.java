@@ -4,7 +4,10 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -58,14 +61,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
 
-    @Value("${request.all.per.calendar.month}")
-    private String GET_ALL_REQUEST_FOR_MOUTH;
-
-    @Value("${request.all.per.calendar.year}")
-    private String GET_ALL_REQUEST_FOR_YEAR;
-
-    @Value("${request.all.per.calendar.quarter}")
-    private String GET_ALL_REQUEST_FOR_QUARTER;
+    @Autowired
+    private MessageSource messageSource;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -200,36 +197,19 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> findRequestByCreatorIdForPeriod(Long personId, String reportPeriod) {
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod) {
+        Locale locale = LocaleContextHolder.getLocale();
         if(reportPeriod == null){
             return new ArrayList<>();
         }
         reportPeriod = reportPeriod.toUpperCase();
         switch (reportPeriod){
             case "month":
-                return super.queryForList(GET_ALL_REQUEST_FOR_MOUTH, personId);
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"month"}, locale), personId);
             case "quarter":
-                return super.queryForList(GET_ALL_REQUEST_FOR_QUARTER, personId);
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"quarter"}, locale), personId);
             case "year":
-                return super.queryForList(GET_ALL_REQUEST_FOR_YEAR, personId);
-            default:
-                return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public List<Request> findRequestByCreatorIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
-        if(reportPeriod == null){
-            return new ArrayList<>();
-        }
-        reportPeriod = reportPeriod.toUpperCase();
-        switch (reportPeriod){
-            case "month":
-                return super.queryForList(GET_ALL_REQUEST_FOR_MOUTH, pageable,  personId);
-            case "quarter":
-                return super.queryForList(GET_ALL_REQUEST_FOR_QUARTER, pageable, personId);
-            case "year":
-                return super.queryForList(GET_ALL_REQUEST_FOR_YEAR, pageable, personId);
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"year"}, locale), personId);
             default:
                 return new ArrayList<>();
         }
@@ -238,6 +218,64 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public int updateRequestGroup(Long requestId, Integer requestGroupId) {
         return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, requestGroupId, requestId);
+    }
+
+    @Override
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        Locale locale = LocaleContextHolder.getLocale();
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toUpperCase();
+        switch (reportPeriod) {
+            case "month":
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"month"}, locale), pageable, personId);
+            case "quarter":
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"quarter"}, locale), pageable, personId);
+            case "year":
+                return super.queryForList(messageSource.getMessage("request.all.per.date", new Object[]{"year"}, locale), pageable, personId);
+            default:
+                return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod) {
+        Locale locale = LocaleContextHolder.getLocale();
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toUpperCase();
+        switch (reportPeriod) {
+            case "month":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"month"}, locale), personId);
+            case "quarter":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"quarter"}, locale), personId);
+            case "year":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"year"}, locale), personId);
+            default:
+                return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        Locale locale = LocaleContextHolder.getLocale();
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toUpperCase();
+        switch (reportPeriod) {
+            case "month":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"month"}, locale), pageable, personId);
+            case "quarter":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"quarter"}, locale), pageable, personId);
+            case "year":
+                return super.queryForList(messageSource.getMessage("request.all.per.date.by.manager", new Object[]{"year"}, locale), pageable, personId);
+            default:
+                return new ArrayList<>();
+        }
+
     }
 
     @Override
