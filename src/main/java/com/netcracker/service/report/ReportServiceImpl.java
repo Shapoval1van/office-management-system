@@ -9,7 +9,6 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class ReportServiceImpl implements ReportService {
     private RoleRepository roleRepository;
 
     @Autowired
-    @Qualifier("sqlMessageSource")
     private  MessageSource messageSource;
 
     @Transactional(readOnly = true)
