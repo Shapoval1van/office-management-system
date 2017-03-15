@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.netcracker.util.MessageConstant.USER_ERROR_NOT_PRESENT;
+import static com.netcracker.util.MessageConstant.NOT_DATA_FOR_THIS_ROLE;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -80,7 +81,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException,  NotDataForThisRoleException {
         Person person = getPerson(personId);
         Role role = getRole(person);
         if(chartsType == ChartsType.AREA){

@@ -50,7 +50,7 @@ public class ReportController {
                                                @Pattern(regexp = "(quarter|year|month)")
                                                @RequestParam(name = "period", defaultValue = "month") String period,
                                                @Pattern(regexp = "(pie|area)")
-                                               @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+                                               @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         return reportService.getDataForChartsToEmployee(personId,period, ChartsType.valueOf(type.toUpperCase()));
     }
 }
