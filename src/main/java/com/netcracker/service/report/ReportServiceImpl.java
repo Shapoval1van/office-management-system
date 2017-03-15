@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.netcracker.util.MessageConstant.NOT_DATA_FOR_THIS_ROLE;
 import static com.netcracker.util.MessageConstant.USER_ERROR_NOT_PRESENT;
 
 @Service
@@ -75,6 +74,21 @@ public class ReportServiceImpl implements ReportService {
         }
         else if(chartsType == ChartsType.PIE){
             List<Request> requestList = requestRepository.findRequestByManagerIdForPeriod(personId, period);
+            return buildReportDTOtoPieCharts(requestList);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+        Person person = getPerson(personId);
+        Role role = getRole(person);
+        if(chartsType == ChartsType.AREA){
+            List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+            return buildReportDTOtoAreaCharts(requestList);
+        }
+        else if(chartsType == ChartsType.PIE){
+            List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
             return buildReportDTOtoPieCharts(requestList);
         }
         return new ArrayList<>();

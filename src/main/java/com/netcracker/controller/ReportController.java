@@ -44,4 +44,13 @@ public class ReportController {
                                                  @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         return reportService.getDataForChartsToManager(personId,period, ChartsType.valueOf(type.toUpperCase()));
     }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/chartsForEmployee/{personId}")
+    public List<ReportDTO> getChartsForEmployee(@PathVariable(name = "personId") Long personId,
+                                               @Pattern(regexp = "(quarter|year|month)")
+                                               @RequestParam(name = "period", defaultValue = "month") String period,
+                                               @Pattern(regexp = "(pie|area)")
+                                               @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+        return reportService.getDataForChartsToEmployee(personId,period, ChartsType.valueOf(type.toUpperCase()));
+    }
 }
