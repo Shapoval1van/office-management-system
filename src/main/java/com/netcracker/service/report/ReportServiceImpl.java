@@ -75,6 +75,21 @@ public class ReportServiceImpl implements ReportService {
         return new ArrayList<>();
     }
 
+    @Override
+    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+        Person person = getPerson(personId);
+        Role role = getRole(person);
+        if(chartsType == ChartsType.AREA){
+            List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+            return buildReportDTOtoAreaCharts(requestList);
+        }
+        else if(chartsType == ChartsType.PIE){
+            List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+            return buildReportDTOtoPieCharts(requestList);
+        }
+        return new ArrayList<>();
+    }
+
     private List<ReportDTO> buildReportDTOtoAreaCharts(List<Request> requestList){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         Collections.sort(requestList, Comparator.comparing(Request::getCreationTime));
@@ -135,7 +150,7 @@ public class ReportServiceImpl implements ReportService {
 
     private Role getRole(Person person) throws NotSupportThisRoleExeption{
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
-        if (!role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+        if (!(role.getName().equals(Role.ROLE_OFFICE_MANAGER)||role.getName().equals(Role.ROLE_EMPLOYEE))){
             throw  new NotSupportThisRoleExeption();
         }
         return role;
