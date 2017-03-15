@@ -70,6 +70,7 @@ public class RequestServiceTest {
         subRequest.setName("Test Sub Request");
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+        subRequest.setPriority(new Priority(-1));
 
         requestService.saveSubRequest(subRequest, managerEmail).get();
     }

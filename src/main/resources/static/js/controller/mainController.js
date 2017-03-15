@@ -6,8 +6,10 @@
         .controller("MainController", ["$scope", "$http", "$cookies", "SessionService",
             function ($scope, $http, $cookies, SessionService) {
 
+                $scope.Session = SessionService;
+
                 SessionService.loadSession();
-                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
+                var anonymOnlyPages = ["resetPassword", "reset"];
                 var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
@@ -26,13 +28,16 @@
                     if (SessionService.isUserLoggedIn())
                         $http.defaults.headers.common.Authorization =
                             'Bearer ' + SessionService.getAccessToken();
-                    else
-                        window.location = loginPageUrl;
+
                 }
 
                 $scope.logout = function () {
                     SessionService.destroySession();
                     window.location.href = '/login';
+                };
+
+                $scope.goToUrl = function (url) {
+                  window.location.href = url;
                 }
             }])
 })();

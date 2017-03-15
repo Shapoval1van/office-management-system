@@ -6,6 +6,7 @@
         "ngAnimate",
         "ngTouch",
         "ui.bootstrap",
-        "ng-fusioncharts"
+        "ng-fusioncharts",
+        "smart-table"
     ])
 })();

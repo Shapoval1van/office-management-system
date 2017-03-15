@@ -1,56 +1,48 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService",
-            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService) {
+        .controller("LoginController", ["$scope", "$http", "$cookies", "$resource", "$routeParams", "$httpParamSerializer","SessionService","RegistrationService",
+            function ($scope, $http, $cookies, $resource, $routeParams, $httpParamSerializer, SessionService,RegistrationService) {
 
-                if (SessionService.isUserLoggedIn()){
-                    window.location.reload()
+                $scope._relocateUser = function () {
+                    if ($scope.Session.getUserRole()=="ROLE_EMPLOYEE"){
+                        window.location.href = "/requestListByEmployee"
+                    }
+                    if ($scope.Session.getUserRole()=="ROLE_OFFICE MANAGER"){
+                        window.location.href = "/requestList"
+                    }
+                    if ($scope.Session.getUserRole()=="ROLE_ADMINISTRATOR"){
+                        window.location.href = "/demo"
+                    }
                 }
 
-                $scope.personCredentials = {
-                    grant_type: "password",
-                    username: "",
-                    password: "",
-                    client_id: "client",
-                    scope: "read write"
-                };
 
-                var registrationToken = $routeParams.registrationToken;
-                var encoded = btoa("client:");
-                // Cookies living time (in milliseconds)
-                var cookiesLivingTime = 1000 * 60 * 60 * 24 * 7;
-                // Cookies expiration date
-                var cookiesExpirationDate = new Date(Number(new Date()) + cookiesLivingTime);
-                var host = "https://management-office.herokuapp.com";
-                // var host = "http://localhost:8080";
+                if ($scope.Session.isUserLoggedIn()){
+                    $scope._relocateUser();
+                }
 
-                if (!!registrationToken) {
-                    $http.get("/api/v1/registration/" + registrationToken)
-                        .then(function (callback) {
-                            $scope.personCredentials.username = callback.data.email;
-                        }, function () {
-                            console.log("Registration error")
+                $scope.username = "";
+                $scope.password = "";
+
+
+                if (!!$routeParams.registrationToken) {
+                    RegistrationService.activateUser($routeParams.registrationToken)
+                        .then(function (response) {
+                            $scope.personCredentials.username = response.data.email;
+                        }, function (response) {
+                            window.alert("Activation error.");
                         })
                 }
 
-                $scope.sendPersonCredentials = function () {
-                    var req = {
-                        method: 'POST',
-                        url: host + "/oauth/token",
-                        headers: {
-                            "Authorization": "Basic " + encoded,
-                            "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
-                        },
-                        data: $httpParamSerializer($scope.personCredentials)
-                    };
-                    $http(req).then(function (callback) {
-                        SessionService.createSession(callback);
-                        window.location.reload();
-                    }, function (callback) {
-                        console.log("Error");
-                        window.alert(callback.data.error_description)
+                $scope.performLogin = function () {
+                    $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
+                        if(response.isError){
+                            window.alert(response.data.error_description);
+                        } else {
+                            $scope._relocateUser();
+                        }
                     });
                 };
+
 
             }])
 })();

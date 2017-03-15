@@ -72,13 +72,14 @@ INSERT INTO public.request (request_id, name, description, creation_time, status
     2
   );
 
-INSERT INTO public.request (request_id, name, description, creation_time, status_id, employee_id, priority_id) VALUES
+INSERT INTO public.request (request_id, name, description, creation_time, status_id, employee_id, priority_id, manager_id) VALUES
   (
     3,
     'Request test',
     'Request test description',
     TIMESTAMP '2017-02-24 00:59:02.184181',
     1,
+    2,
     2,
     2
   );

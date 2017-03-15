@@ -1,0 +1,13 @@
+.form-sign-wrapper {
+    margin-top: 120px;
+    margin-bottom: 80px;
+}
+
+.form-sign {
+    max-width: 420px;
+    padding: 15px 35px 15px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
