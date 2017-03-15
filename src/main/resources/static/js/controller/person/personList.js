@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("PersonListController", ["$scope", "$http", "$routeParams", "PersonService",
-            function ($scope, $http, $routeParams, PersonService) {
+        .controller("PersonListController", ["$scope", "$http",
+            function ($scope, $http) {
 
-                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                var personDetails = "/person/";
                 $scope.pageSize = 10;
                 $scope.persons = {};
                 $scope.roles = [{roleId: 4, name: 'ALL'},
@@ -19,9 +19,6 @@
                     return (typeof thing === "undefined");
                 };
 
-                $scope.isAdmin = function (thing) {
-                    return currentUser.role === 'ROLE_ADMINISTRATOR';
-                };
 
                 $scope.getTotalPage = function() {
                     $http({
@@ -57,6 +54,21 @@
                     $scope.pageChanged(1); // get first page
                 };
 
+                $scope.personUpdate = function(personId) {
+                    window.location = personDetails + personId + '/update';
+                };
+
+
+                $scope.personDelete = function(personId) {
+                    $http({
+                        method: 'DELETE',
+                        url: '/api/person/' + personId + '/delete'
+                    }).then(function successCallback(response) {
+                        $scope.persons = response.data;
+                    }, function errorCallback(response) {
+                        console.log(response);
+                    });
+                };
 
             }])
 })();

@@ -7,7 +7,7 @@
                     window.location = "/";
                 }
 
-                $scope.personCredentials = {
+                $scope.person = {
                     firstName:"",
                     lastName:"",
                     email:"",
@@ -32,7 +32,7 @@
 
                 $scope.sendPersonCredentials = function () {
                     if ($scope.Session.getUserRole() == 'ROLE_ADMINISTRATOR'){
-                        RegistrationService.registerAnyUser($scope.personCredentials)
+                        RegistrationService.registerAnyUser($scope.person)
                             .then(function (response) {
                                 if (response.isError){
                                     window.alert("Registration Failure!")
@@ -41,7 +41,7 @@
                                 }
                             })
                     } else {
-                        RegistrationService.registerEmployee($scope.personCredentials)
+                        RegistrationService.registerEmployee($scope.person)
                             .then(function (response) {
                                 if (response.isError){
                                     window.alert("Registration Failure!")

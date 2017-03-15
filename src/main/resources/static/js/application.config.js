@@ -73,6 +73,10 @@
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"
                     })
+                    .when("/person/:personId/update", {
+                        templateUrl: "/static/page/person/person-update.html",
+                        controller: "UpdatePersonController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
