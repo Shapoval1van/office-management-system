@@ -30,40 +30,48 @@
                     return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
 
-                $scope.getTotalPage = function() {
-                    $http({
-                        method: 'GET',
-                        url: '/api/request/count/' + $scope.selectedPriority.priorityId
-                    }).then(function successCallback(response) {
-                        $scope.totalItems = response.data;
-                    }, function errorCallback(response) {
-                    });
+                $scope.getTotalPage = function () {
+                    RequestService.getPageCountByPriority($scope.selectedPriority.priorityId)
+                        .then(function successCallback(response) {
+                            $scope.totalItems = response.data;
+                        }, function errorCallback(response) {
+                        });
                 };
 
-                $scope.pageChanged = function() {
-                    $http({
-                        method: 'GET',
-                        url: '/api/request/available/' + $scope.selectedPriority.priorityId +
-                        '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                    }).then(function successCallback(response) {
-                        $scope.requests = [];
-                        $scope.requests = response.data;
-                    }, function errorCallback(response) {
-                    });
+                $scope.pageChanged = function () {
+                    RequestService.getAvailableRequest($scope.selectedPriority.priorityId, $scope.currentPage, $scope.pageSize)
+                        .then(function (callback) {
+                            $scope.requests = [];
+                            $scope.requests = callback.data;
+                        }, function () {
+
+                        })
                 };
+
+                // $scope.pageChanged = function() {
+                //     $http({
+                //         method: 'GET',
+                //         url: '/api/request/available/' + $scope.selectedPriority.priorityId +
+                //         '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                //     }).then(function successCallback(response) {
+                //         $scope.requests = [];
+                //         $scope.requests = response.data;
+                //     }, function errorCallback(response) {
+                //     });
+                // };
 
                 $scope.getTotalPage(); //
                 $scope.pageChanged(1); // get first page
 
-                $scope.requestDetails = function(requestId) {
+                $scope.requestDetails = function (requestId) {
                     window.location = requestDetails + requestId;
                 };
 
-                $scope.isSelected = function(requestId) {
+                $scope.isSelected = function (requestId) {
                     return requestId === $scope.selectedPriority.priorityId;
                 };
 
-                $scope.priorityChange = function(priorityId) {
+                $scope.priorityChange = function (priorityId) {
                     $scope.getTotalPage(); //
                     $scope.pageChanged(1); // get first page
                 };
@@ -105,7 +113,7 @@
                         })
                 };
 
-                $scope.selectRequest = function(requestId) {
+                $scope.selectRequest = function (requestId) {
                     $scope.selectedRequest = requestId;
                 };
 
