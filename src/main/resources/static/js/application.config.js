@@ -46,13 +46,17 @@
                         controller: "UpdateRequestController"
                             ///request/:requestId/
                     })
-                    .when("/request/:requestId/",{
-                         templateUrl: "/static/page/request/details.html",
-                         controller: "RequestDetailsController"
-                     })
+                    // .when("/request/:requestId/",{
+                    //      templateUrl: "/static/page/request/details.html",
+                    //      controller: "RequestDetailsController"
+                    //  })
                     .when("/request/:requestId/details", {
                         templateUrl: "/static/page/request/request-details.html",
                         controller: "RequestDetailsController"
+                    })
+                    .when("/request/free", {
+                        templateUrl: "/static/page/request/free-request-page.html",
+                        controller: "RequestListController"
                     })
                     .when("/requestList",{
                          templateUrl: "/static/page/request/list.html",
