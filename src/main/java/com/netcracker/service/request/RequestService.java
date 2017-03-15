@@ -23,7 +23,7 @@ public interface RequestService {
 
     int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
-    Optional<Request> updateRequest(Request request, Long requestId, String authorName);
+    Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
     Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
 
@@ -48,4 +48,6 @@ public interface RequestService {
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    void checkRequestsForExpiry();
 }

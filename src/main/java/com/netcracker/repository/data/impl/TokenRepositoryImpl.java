@@ -5,6 +5,7 @@ import com.netcracker.model.entity.Token;
 import com.netcracker.model.entity.TokenType;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.data.interfaces.TokenRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -23,14 +24,14 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
     public static final String DATE_EXPIRED_COLUMN = "date_expired";
     public static final String TOKEN_TYPE_COLUM = "token_type";
 
-    private final String FIND_TOKEN = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
-            "WHERE token = ?";
+    @Value("${token.find}")
+    private String FIND_TOKEN;
 
-    private final String FIND_REGISTRATION_TOKEN_BY_PERSONE = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
-            "WHERE person_id = ? AND token_type = 1";
+    @Value("${token.registration.find.by.person}")
+    private String FIND_REGISTRATION_TOKEN_BY_PERSON;
 
-    private final String FIND_RESET_PASS_TOKEN_BY_PERSONE = "SELECT token_id, token, person_id, token_type, date_expired FROM TOKEN " +
-            "WHERE person_id = ? AND token_type = 2";
+    @Value("${token.reset.pass.find.by.person}")
+    private String FIND_RESET_PASS_TOKEN_BY_PERSON;
 
 
     public TokenRepositoryImpl() {
@@ -66,12 +67,12 @@ public class TokenRepositoryImpl extends GenericJdbcRepository<Token, Long> impl
 
     @Override
     public Optional<Token> findRegistrationTokenByPerson(Long personId) {
-        return this.queryForObject(FIND_REGISTRATION_TOKEN_BY_PERSONE, personId);
+        return this.queryForObject(FIND_REGISTRATION_TOKEN_BY_PERSON, personId);
     }
 
     @Override
     public Optional<Token> findResetPassTokenByPerson(Long personId) {
-        return this.queryForObject(FIND_RESET_PASS_TOKEN_BY_PERSONE, personId);
+        return this.queryForObject(FIND_RESET_PASS_TOKEN_BY_PERSON, personId);
     }
 
     @Override

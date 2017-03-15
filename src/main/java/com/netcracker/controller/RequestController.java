@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,7 +45,7 @@ public class RequestController {
 
 
     @PostMapping(value = "/updatePriority/{requestId}")
-    @PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
+    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {
@@ -96,13 +93,13 @@ public class RequestController {
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
-    @PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
+    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
-                                                 @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) {
+                                                 @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
-        Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal.getName());
+        Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal);
         if(!result.isPresent()){
             new ResponseEntity<>(currentRequest, HttpStatus.BAD_REQUEST);
         }

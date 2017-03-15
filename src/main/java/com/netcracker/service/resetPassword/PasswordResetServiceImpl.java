@@ -10,15 +10,22 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.netcracker.util.MessageConstant.TOKEN_ERROR_EXPIRED;
+
 @Service
 public class PasswordResetServiceImpl implements PasswordResetService {
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private TokenRepository tokenRepository;
@@ -31,6 +38,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -51,10 +59,11 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Person updatePasswordForPersonByEmail(String password, String token) throws OutdatedTokenException {
+        Locale locale = LocaleContextHolder.getLocale();
         Optional<Token> passwordResetToken = tokenRepository.findTokenByValue(token);
         if (passwordResetToken.isPresent()) {
             if (passwordResetToken.get().getDateExpired().getTime() < System.currentTimeMillis()) {
-                throw new OutdatedTokenException("Token was expired");
+                throw new OutdatedTokenException(messageSource.getMessage(TOKEN_ERROR_EXPIRED, null, locale));
             }
             Optional<Person> person = personRepository.findOne(passwordResetToken.get().getPerson().getId());
             person.get().setPassword(passwordEncoder.encode(password));

@@ -13,16 +13,24 @@ import com.netcracker.util.enums.status.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+
+import static com.netcracker.util.MessageConstant.*;
 
 @Service
 public class RequestGroupServiceImpl implements RequestGroupService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestGroupServiceImpl.class);
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private RequestGroupRepository requestGroupRepository;
@@ -38,6 +46,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Autowired
     private RoleRepository roleRepository;
+
 
     @Override
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
@@ -58,18 +67,22 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Override
     public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         LOGGER.trace("Convert dto to entity");
         RequestGroup requestGroup = requestGroupDTO.toRequestGroup();
 
         String currentUserEmail = principal.getName();
         if (currentUserEmail.isEmpty()) {
             LOGGER.error("Current user not present");
-            throw new CurrentUserNotPresentException("Current user not present");
+            throw new CurrentUserNotPresentException(messageSource
+                    .getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         }
         Optional<Person> currentUser = personRepository.findPersonByEmail(currentUserEmail);
         if (!currentUser.isPresent()) {
             LOGGER.error("Can't fetch information about current user");
-            throw new CurrentUserNotPresentException("Can't fetch information about current user");
+            throw new CurrentUserNotPresentException(messageSource
+                    .getMessage(USER_WITH_EMAIL_NOT_PRESENT, new Object[]{currentUserEmail}, locale));
         } else
             requestGroup.setAuthor(currentUser.get());
 
@@ -79,13 +92,15 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Override
     public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
 
         LOGGER.debug("Get request group with id {} from database", requestGroupDTO.getId());
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
 
         if (!requestGroupOptional.isPresent()) {
             LOGGER.error("Request group with id {} not exist", requestGroupDTO.getId());
-            throw new ResourceNotFoundException("Request group with id" + requestGroupDTO.getId() + " not exist");
+            throw new ResourceNotFoundException(messageSource
+                    .getMessage(REQUEST_GROUP_NOT_EXIST, new Object[]{requestGroupDTO.getId()}, locale));
         }
 
         RequestGroup requestGroup = requestGroupOptional.get();
@@ -95,7 +110,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         }
 
         if (!isAccessLegal(requestGroup, principal))
-            throw new IllegalAccessException("Update request group can only author or administrator");
+            throw new IllegalAccessException(messageSource
+                    .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         LOGGER.trace("Update request group");
         return saveRequestGroup(requestGroup);
@@ -110,17 +126,20 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     @Override
     public void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal)
             throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
 
         LOGGER.trace("Getting request group with id {} from database", requestGroupId);
         Optional<RequestGroup> requestGroupOption = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOption.isPresent()) {
             LOGGER.error("Request group with id {} does not exist", requestGroupId);
-            throw new ResourceNotFoundException("Can't find request group with id " + requestGroupId);
+            throw new ResourceNotFoundException(messageSource
+                    .getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestGroupId}, locale));
         }
 
         if (!isAccessLegal(requestGroupOption.get(), principal))
-            throw new IllegalAccessException("Update request group can only author or administrator");
+            throw new IllegalAccessException(messageSource
+                    .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
 
         LOGGER.trace("Get status with id {} from database", statusId);
@@ -128,7 +147,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
         if (!statusOptional.isPresent()) {
             LOGGER.error("Status with id {} not found", statusId);
-            throw new ResourceNotFoundException("Status with id " + statusId + " not found");
+            throw new ResourceNotFoundException(messageSource
+                    .getMessage(STATUS_ERROR, new Object[]{statusId}, locale));
         }
 
         Status status = statusOptional.get();
@@ -137,7 +157,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         if (statusName.equalsIgnoreCase(StatusEnum.FREE.toString()) ||
                 statusName.equalsIgnoreCase(StatusEnum.CANCELED.toString())) {
             LOGGER.error("Can't set status {} for group", statusName);
-            throw new IncorrectStatusException("Not available status", "Status " + statusName + " not available for group");
+            throw new IncorrectStatusException(messageSource.getMessage(STATUS_ERROR_NOT_AVAILABLE, null, locale),
+                    messageSource.getMessage(STATUS_ERROR_NOT_AVAILABLE_FOR_GROUP, new Object[]{statusName}, locale));
         }
 
         List<Request> requestsOfRequestGroup = requestRepository.findRequestsByRequestGroupId(requestGroupId);
@@ -173,10 +194,13 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     private boolean isAccessLegal(RequestGroup requestGroup, Principal principal) throws CurrentUserNotPresentException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (!currentUser.isPresent()) {
             LOGGER.warn("Current user not present");
-            throw new CurrentUserNotPresentException("Current user not present");
+            throw new CurrentUserNotPresentException(messageSource
+                    .getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
             Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {

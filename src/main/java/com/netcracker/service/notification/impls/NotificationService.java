@@ -2,6 +2,7 @@ package com.netcracker.service.notification.impls;
 
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.repository.data.interfaces.NotificationRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
@@ -31,6 +32,11 @@ public class NotificationService implements NotificationSender {
     private String REGISTRATION_MESSAGE_SUBJECT;
     @Value("${custom.information.message.subject}")
     private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
+    @Value("${status.message.subject}")
+    private String REQUEST_STATUS_CHANGE_SUBJECT;
+    @Value("${request.expiry.reminder.message.subject}")
+    private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
+
 
     @Value("${password.reminder.message.src}")
     private String PASSWORD_REMINDER_MESSAGE_SRC;
@@ -40,6 +46,10 @@ public class NotificationService implements NotificationSender {
     private String CUSTOM_INFORMATION_MESSAGE_SRC;
     @Value("${registration.message.src}")
     private String REGISTRATION_MESSAGE_SRC;
+    @Value("${requestStatus.message.src}")
+    private String STATUS_CHANGE_MESSAGE_SRC;
+    @Value("${request.expiry.reminder.message.src}")
+    private String REQUEST_EXPIRY_REMINDER_MESSAGE_SRC;
 
     @Autowired
     private MailService mailService;
@@ -90,6 +100,14 @@ public class NotificationService implements NotificationSender {
         mailService.send(notification);
     }
 
+
+    @Override
+    public void sendChangeStatusEvent(Person person){
+        Notification notification = NotificationBuilder.build(person,
+                REQUEST_STATUS_CHANGE_SUBJECT, STATUS_CHANGE_MESSAGE_SRC);
+        mailService.send(notification);
+    }
+
     @Override
     public void sendPasswordForNewManager(Person person) {
         Notification notification = NotificationBuilder.build(person,
@@ -102,7 +120,6 @@ public class NotificationService implements NotificationSender {
     @Scheduled(fixedRate = RATE)
     @Transactional
     public void resendNotification() {
-
         List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
         notifications.forEach(notification -> {
             notificationRepository.delete(notification.getId());
@@ -120,6 +137,22 @@ public class NotificationService implements NotificationSender {
     @Transactional
     public void saveFailedNotification(Notification notification) {
         notificationRepository.save(notification);
+    }
+
+    /**
+     * Expects request has unique id and single manager for it
+     *
+     * @param expiringRequests list of requests with expiry estimate time
+     */
+    @Override
+    public void sendRequestExpiryReminder(List<Request> expiringRequests) {
+        expiringRequests.forEach(request -> {
+            Notification notification = NotificationBuilder.build(request.getManager(),
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT,
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SRC,
+                    request);
+            mailService.send(notification);
+        });
     }
 
 }

@@ -3,6 +3,7 @@ package com.netcracker.repository.data.impl;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.data.interfaces.PriorityRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,8 @@ public class PriorityRepositoryImpl extends GenericJdbcRepository<Priority, Inte
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String NAME_COLUMN = "name";
 
-    private final String FIND_BY_NAME = "SELECT * FROM priority WHERE name = ?";
+    @Value("${priority.find.by.name}")
+    private String FIND_BY_NAME;
 
     public PriorityRepositoryImpl() {
         super(Priority.TABLE_NAME, Priority.ID_COLUMN);

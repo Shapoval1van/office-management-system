@@ -1,0 +1,10 @@
+Hello $name,
+you are managing request "$requestName" that estimate time is going to end tomorrow.
+
+Request details:
+    Estimate
+    $requestEstimate
+    Description
+    $requestDescription
+
+Best regards, Office Management System
