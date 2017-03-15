@@ -48,4 +48,6 @@ public interface RequestService {
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    void checkRequestsForExpiry();
 }

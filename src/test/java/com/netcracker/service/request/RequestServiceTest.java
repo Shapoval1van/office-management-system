@@ -3,7 +3,8 @@ package com.netcracker.service.request;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.CannotDeleteRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.entity.*;
+import com.netcracker.model.entity.Priority;
+import com.netcracker.model.entity.Request;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,12 +47,13 @@ public class RequestServiceTest {
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
         subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
+        subRequest.setPriority(new Priority(1));
 
         Request saveSubRequest = requestService.saveSubRequest(subRequest, managerEmail).get();
 
         //Assert.assertEquals(saveSubRequest.getId(), new Long(5));
         Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
-        Assert.assertEquals(saveSubRequest.getStatus().getId(), new Integer(2));
+        Assert.assertEquals(saveSubRequest.getStatus().getId(), new Integer(1));
         Assert.assertEquals(saveSubRequest.getParent(), request);
     }
 
@@ -68,6 +70,7 @@ public class RequestServiceTest {
         subRequest.setName("Test Sub Request");
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+        subRequest.setPriority(new Priority(-1));
 
         requestService.saveSubRequest(subRequest, managerEmail).get();
     }

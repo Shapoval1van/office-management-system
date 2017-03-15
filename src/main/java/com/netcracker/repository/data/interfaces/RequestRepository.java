@@ -1,5 +1,7 @@
 package com.netcracker.repository.data.interfaces;
 
+import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.JdbcRepository;
@@ -32,4 +34,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     int updateRequestGroup(Long requestId, Integer requestGroupId);
 
     int removeRequestFromRequestGroup(Long requestId);
+
+    List<Request> getRequests(Integer priorityId, Pageable pageable, Optional<Priority> priority);
+
+    List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
 }

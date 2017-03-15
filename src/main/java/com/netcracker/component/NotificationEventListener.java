@@ -1,5 +1,7 @@
 package com.netcracker.component;
 
+import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.model.event.*;
 import com.netcracker.service.notification.impls.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +55,10 @@ public class NotificationEventListener {
     @EventListener
     public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
         notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleRequestExpiring(RequestExpiringEvent event){
+        notificationService.sendRequestExpiryReminder(event.getExpiringRequests());
     }
 }

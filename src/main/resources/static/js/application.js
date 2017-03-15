@@ -5,6 +5,7 @@
         "ngCookies",
         "ngAnimate",
         "ngTouch",
-        "ui.bootstrap"
+        "ui.bootstrap",
+        "smart-table"
     ])
 })();

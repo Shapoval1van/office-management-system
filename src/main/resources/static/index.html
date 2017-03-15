@@ -1,20 +1,28 @@
 <!DOCTYPE html>
-<html lang="ua" ng-app="OfficeManagementSystem">
+<html lang="en" ng-app="OfficeManagementSystem">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Office Management System</title>
     <base href="/"/>
     <!--FONT-->
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <!--STYLES-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="/static/style/new/bootstrap.min.css">
+
     <!--FONT AWESOME-->
     <script src="https://use.fontawesome.com/58465b10c8.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Noto+Serif" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/style/new/main.css">
+    <link rel="stylesheet" href="/static/style/new/sidebar.css">
+    <link rel="stylesheet" href="/static/style/new/sign-form.css">
 
     <link rel="stylesheet" href="/static/style/index.css">
     <link rel="stylesheet" href="/static/style/login/login.css">
@@ -24,18 +32,40 @@
     <link rel="stylesheet" href="/static/style/component/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="/static/style/request/details.css">
     <link rel="stylesheet" type="text/css" href="/static/style/sweet-alert/sweetalert.css">
-    <!--/STYLES-->
+    <link rel="stylesheet" href="/static/style/request/request-details.css">
 
+
+    <!--/STYLES-->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body ng-controller="MainController">
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Office management system</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <ng-view>
 
 </ng-view>
-
-
-<footer class="footer">
-    <h3 class="footer__copyright">&#169; Office Management System, 2017. All rights reserved </h3>
-</footer>
 
 <!--SCRIPT-->
 <script src="/static/js/sweet-alert/sweetalert.min.js"></script>
@@ -64,6 +94,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 <!--/WebSocket-->
 
+<!--Smart tables-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-smart-table/2.1.8/smart-table.min.js"></script>
+
 <script src="/static/js/application.js"></script>
 <script src="/static/js/application.config.js"></script>
 
@@ -75,8 +108,12 @@
 <script src="/static/js/controller/demo/demoController.js"></script>
 <script src="/static/js/controller/test/commentController.js"></script>
 
-<script src="/static/js/service/commentService.js"></script>
+<script src="/static/js/service/comment/commentService.js"></script>
 <script src="/static/js/service/sessionService.js"></script>
+<script src="/static/js/service/webSocketService.js"></script>
+<script src="/static/js/service/person/personService.js"></script>
+<script src="/static/js/service/request/requestService.js"></script>
+<script src="/static/js/service/registration/registrationService.js"></script>
 
 <script src="/static/js/controller/component/priority-buttons.js"></script>
 <script src="/static/js/controller/component/calendar.js"></script>
@@ -89,8 +126,8 @@
 <script src="/static/js/controller/request/requestListController.js"></script>
 <script src="/static/js/controller/request/requestListByEmployeeController.js"></script>
 <script src="/static/js/controller/request/updateRequestLinkToGroupController.js"></script>
-<script src="/static/js/controller/registration/adminRegistrationController.js"></script>
 
+<script src="/static/js/directive/sideBar.js"></script>
 <script src="/static/js/directive/welcomeHeader.js"></script>
 <script src="/static/js/directive/officeManagerSidebar.js"></script>
 <script src="/static/js/directive/exitPopup.js"></script>
@@ -98,6 +135,10 @@
 <script src="/static/js/directive/submitUpdateRequestStatusPopup.js"></script>
 <script src="/static/js/directive/groupLinkPopup.js"></script>
 <script src="/static/js/directive/messagePopup.js"></script>
+<script src="/static/js/directive/button/cancelRequestBtn.js"></script>
+<script src="/static/js/directive/button/addToRequestGroupBtn.js"></script>
+<script src="/static/js/directive/button/assignToMeBtn.js"></script>
+<script src="/static/js/directive/button/assignToSmbBtn.js"></script>
 <!--/SCRIPT-->
 </body>
 </html>

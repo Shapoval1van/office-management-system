@@ -6,8 +6,8 @@ import com.netcracker.model.entity.*;
 import com.netcracker.model.event.NotificationChangeStatus;
 import com.netcracker.model.event.NotificationNewRequestEvent;
 import com.netcracker.model.event.NotificationRequestUpdateEvent;
+import com.netcracker.model.event.RequestExpiringEvent;
 import com.netcracker.repository.common.Pageable;
-import com.netcracker.repository.data.impl.RequestRepositoryImpl;
 import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.util.ChangeTracker;
 import com.netcracker.util.enums.role.RoleEnum;
@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.netcracker.util.MessageConstant.*;
 
 @Service
 public class RequestServiceImpl implements RequestService {
 
-    private final ApplicationEventPublisher eventPublisher;
+    private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
+
+    private ApplicationEventPublisher eventPublisher;
+
+    private final MessageSource messageSource;
 
     private final RequestRepository requestRepository;
 
@@ -52,7 +62,7 @@ public class RequestServiceImpl implements RequestService {
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestServiceImpl.class);
 
     @Autowired
-    public RequestServiceImpl(ApplicationEventPublisher eventPublisher,
+    public RequestServiceImpl(MessageSource messageSource,
                               RequestRepository requestRepository,
                               PersonRepository personRepository,
                               StatusRepository statusRepository,
@@ -62,8 +72,10 @@ public class RequestServiceImpl implements RequestService {
                               ChangeItemRepository changeItemRepository,
                               FieldRepository fieldRepository,
                               RequestGroupRepository requestGroupRepository,
-                              ChangeTracker changeTracker) {
+                              ChangeTracker changeTracker,
+                              ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
+        this.messageSource = messageSource;
         this.requestRepository = requestRepository;
         this.personRepository = personRepository;
         this.statusRepository = statusRepository;
@@ -85,44 +97,65 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException {
+        Locale locale = LocaleContextHolder.getLocale();
         if (subRequest.getParent() == null) {
-            throw new CannotCreateSubRequestException("No parent request");
+            throw new CannotCreateSubRequestException(messageSource
+                    .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{"null"}, locale));
         }
 
         Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
-                new CannotCreateSubRequestException("No manager with email " + email));
+                new CannotCreateSubRequestException(messageSource
+                        .getMessage(MANAGER_ERROR_MAIL, new Object[]{email}, locale)));
+
+        priorityRepository.findOne(subRequest.getPriority().getId()).orElseThrow(() ->
+                new CannotCreateSubRequestException(messageSource
+                        .getMessage(PRIORITY_ERROR_ID, new Object[]{subRequest.getPriority().getId()}, locale)));
 
         subRequest.setManager(manager);
 
-        Request parentRequest = requestRepository.findOne(subRequest.getParent().getId()).orElseThrow(() ->
-                new CannotCreateSubRequestException("No parent request with id " + subRequest.getParent().getId()));
+        long parentId = subRequest.getParent().getId();
+        Request parentRequest = requestRepository.findOne(parentId).orElseThrow(() ->
+                new CannotCreateSubRequestException(messageSource
+                        .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{parentId}, locale)));
 
         if (parentRequest.getParent() != null) {
-            throw new CannotCreateSubRequestException("Parent request is sub request");
+            throw new CannotCreateSubRequestException(messageSource
+                    .getMessage(SUB_REQUEST_ERROR_PARENT_IS_SUB_REQUEST, null, locale));
+        }
+
+        if ((parentRequest.getManager() == null || !Objects.equals(parentRequest.getManager().getId(), manager.getId()))
+                && manager.getRole().getId() != 1) {
+            throw new CannotCreateSubRequestException(messageSource
+                    .getMessage(SUB_REQUEST_ERROR_ILLEGAL_ACCESS, null, locale));
         }
 
         String parentStatus = parentRequest.getStatus().getName();
-        if ("CANCELED".equals(parentStatus) || "CLOSED".equals(parentStatus)) {
-            throw new CannotCreateSubRequestException("Parent request is closed or canceled");
+        if (StatusEnum.CANCELED.toString().equals(parentStatus) || StatusEnum.CLOSED.toString().equals(parentStatus)) {
+            throw new CannotCreateSubRequestException(messageSource
+                    .getMessage(SUB_REQUEST_ERROR_PARENT_CLOSED, null, locale));
         }
 
         subRequest.setCreationTime(new Timestamp(System.currentTimeMillis()));
         subRequest.setEmployee(parentRequest.getEmployee());
-        subRequest.setPriority(parentRequest.getPriority());
-        subRequest.setStatus(statusRepository.findStatusByName("IN PROGRESS").orElseThrow(() ->
-                new CannotCreateSubRequestException("No status 'IN PROGRESS'")));
+        subRequest.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.toString()).orElseThrow(() ->
+                new CannotCreateSubRequestException(messageSource
+                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.toString()}, locale))));
         return requestRepository.save(subRequest);
     }
 
     @Override
     public Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
-                new CannotCreateRequestException("No employee with email " + email));
+                new CannotCreateRequestException(messageSource
+                        .getMessage(EMPLOYEE_ERROR_MAIL, new Object[] {email}, locale)));
 
         request.setEmployee(manager);
 
-        request.setStatus(statusRepository.findStatusByName("FREE").orElseThrow(() ->
-                new CannotCreateRequestException("No status 'FREE'")
+        request.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.toString()).orElseThrow(() ->
+                new CannotCreateRequestException(messageSource
+                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.toString()}, locale))
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
         eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
@@ -131,6 +164,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
@@ -196,12 +231,15 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         LOGGER.trace("Getting request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
             LOGGER.error("Request with id {} does not exist", requestId);
-            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+            throw new ResourceNotFoundException(messageSource
+                    .getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
         }
 
         LOGGER.trace("Getting request group with id {} from database");
@@ -209,7 +247,8 @@ public class RequestServiceImpl implements RequestService {
 
         if (!requestGroupOptional.isPresent()) {
             LOGGER.error("Request group with id {} does not exist", requestGroupId);
-            throw new ResourceNotFoundException("Request group with id " + requestGroupId + " does not exist");
+            throw new ResourceNotFoundException(messageSource
+                    .getMessage(REQUEST_GROUP_NOT_EXIST, new Object[]{requestGroupId}, locale));
         }
 
         Request request = requestOptional.get();
@@ -219,12 +258,12 @@ public class RequestServiceImpl implements RequestService {
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.getName())) {
             LOGGER.error("Request should be in FREE status for grouping. Current status is {}", status.getName());
-            throw new IncorrectStatusException("Incorrect status",
-                    "Request should be in FREE status for grouping. Current status is " + status.getName());
+            throw new IncorrectStatusException(messageSource.getMessage(STATUS_ERROR_INCORRECT, null, locale),
+                    messageSource.getMessage(REQUEST_ERROR_MUST_FREE, new Object[]{status.getName()}, locale));
         }
 
         if (!isAccessLegal(requestGroupOptional.get(), principal))
-            throw new IllegalAccessException("Add to request group can only author or administrator");
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         request.setRequestGroup(new RequestGroup(requestGroupId));
         return requestRepository.updateRequestGroup(requestId, requestGroupId);
@@ -241,12 +280,14 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
             LOGGER.error("Request with id {} not exist", requestId);
-            throw new ResourceNotFoundException("Request with id " + requestId + " not exist");
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
         }
 
         Request request = requestOptional.get();
@@ -254,15 +295,17 @@ public class RequestServiceImpl implements RequestService {
         RequestGroup requestGroup = requestGroupRepository.findOne(request.getRequestGroup().getId()).get();
 
         if (!isAccessLegal(requestGroup, principal))
-            throw new IllegalAccessException("Add to request group can only author or administrator");
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         return requestRepository.removeRequestFromRequestGroup(request.getId());
     }
 
     @Override
     public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Request parent = requestRepository.findOne(parentId).orElseThrow(() ->
-                new ResourceNotFoundException("No such parent request"));
+                new ResourceNotFoundException(messageSource.getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{parentId}, locale)));
 
         List<Request> requests = requestRepository.getAllSubRequest(parentId);
         requests.forEach(e -> fillRequest(e, parent));
@@ -325,9 +368,30 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
     }
 
+    @Scheduled(fixedRate = REMIND_TIME_BEFORE_EXPIRY)
+    @Override
+    public void checkRequestsForExpiry() {
+        Long currentTime = System.currentTimeMillis();
+
+        List<Request> requests = requestRepository.findAll().stream()
+                .filter(r -> r.getEstimate() != null)
+                .filter(r ->
+                        {
+                            Long difference = r.getEstimate().getTime() - currentTime;
+                            return (difference >= 0) &&
+                                    (difference < REMIND_TIME_BEFORE_EXPIRY);
+                        }
+                )
+                .collect(Collectors.toList());
+        requests.forEach(this::fill);
+
+        eventPublisher.publishEvent(new RequestExpiringEvent(requests));
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
+        Locale locale = LocaleContextHolder.getLocale();
         Request request = getRequestById(requestId).get();
         Optional<Person> person = Optional.ofNullable(personRepository.findOne(personId)
                 .orElse((personRepository.findPersonByEmail(principal.getName()).get())));
@@ -337,15 +401,13 @@ public class RequestServiceImpl implements RequestService {
             return true;
         }
 
-        throw new CannotAssignRequestException("Request is already assigned");
+        throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
     }
 
     @Override
     public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = priority.isPresent() ? requestRepository.queryForList(
-                RequestRepositoryImpl.GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
-                : requestRepository.queryForList(RequestRepositoryImpl.GET_AVAILABLE_REQUESTS, pageable);
+        List<Request> requestList = requestRepository.getRequests(priorityId, pageable, priority);
 
         requestList.forEach(this::fillRequest);
 
@@ -356,8 +418,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
-        List<Request> requestList = requestRepository.queryForList(
-                RequestRepositoryImpl.GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
+        List<Request> requestList = requestRepository.getRequestsByEmployee(pageable, employee);
 
         requestList.forEach(this::fillRequest);
 
@@ -420,10 +481,12 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private boolean isAccessLegal(RequestGroup requestGroup, Principal principal) throws CurrentUserNotPresentException, IllegalAccessException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (!currentUser.isPresent()) {
             LOGGER.warn("Current user not present");
-            throw new CurrentUserNotPresentException("Current user not present");
+            throw new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
             Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {

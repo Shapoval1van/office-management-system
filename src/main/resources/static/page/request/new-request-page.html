@@ -1,59 +1,62 @@
-<nav class="nav-top">
-    <h1 class="nav-top__brand">New Request</h1>
-</nav>
 
-<section class = "main-form" ng-cloak="">
-    <div class = "container">
-        <div class = "row">
-            <form name = "newRequestForm">
-                <div ng-controller = "NewRequestController">
-                    <div class = "col-md-offset-3 col-md-6">
-                        <div id = "request-name-input-group" class = "input-group login-input">
-                            <span class = "input-group-addon"><i class = "fa fa-file-text o" aria-hidden="true"></i></span>
-                            <input type = "text" name="requestName" class = "form-control" placeholder = "Request name" ng-model="requestCredentials.name"  ng-pattern="requestNameRegExp" required>
-                        </div>
-                        <span class="incorrect" ng-show="newRequestForm.requestName.$dirty && newRequestForm.requestName.$invalid">
-                            <span ng-show="newRequestForm.requestName.$error.pattern">{{wrongRequestNameMessage}}</span>
-                        </span>
-                    </div>
-                    <div class = "col-md-offset-3 col-md-6">
-                        <div id="request-description-field" class = "input-group login-input">
-                            <span class = "input-group-addon"><i class = "fa fa-file-text-o" aria-hidden="true"></i></span>
-                            <textarea id = "description" class = "form-control" ng-model="requestCredentials.description" placeholder="Description"></textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-offset-3 col-md-6" ng-controller="DatepickerPopupCtrl">
-                        <div class="input-group login-input date" id='datetimepicker1'>
-                                <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
-                            <input type='text' class="form-control" placeholder = "Estimate time" />
-                        </div>
-                    </div>
-                    <div ng-controller="ButtonsCtrl" class="col-md-offset-3 col-md-6">
-                        <div class = "input-group"><label>Priority:</label></div>
-                        <div class="btn-group input-group login-input">
-                            <label id="low-priority" class="btn" ng-model="requestCredentials.priority"
-                                   ng-class = "{ 'btn-success': requestCredentials.priority == '3', 'btn-info': requestCredentials.priority != '3'}"
-                                   uib-btn-radio="'3'" uib-uncheckable="uncheckable">Low</label>
-                            <label id="normal-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'2'"
-                                   ng-class = "{ 'btn-warning': requestCredentials.priority == '2', 'btn-info': requestCredentials.priority != '2'}"
-                                   uib-uncheckable="uncheckable">Normal</label>
-                            <label id="high-priority" class="btn btn-info" ng-model="requestCredentials.priority" uib-btn-radio="'1'"
-                                   ng-class = "{ 'btn-danger': requestCredentials.priority == '1', 'btn-info': requestCredentials.priority != '1'}"
-                                   uib-uncheckable="uncheckable">High</label>
-                        </div>
-                    </div>
+<!---->
 
-                    <div class = "col-md-offset-3 col-md-6">
-                        <input type = "submit" class = "btn btn-default login-btn" ng-click="sendRequestCredentials()" value="Create"
-                        ng-disabled="newRequestForm.requestName.$invalid">
-                    </div>
-                    <div class = "col-md-offset-3 col-md-6">
-                        <a href = "/" type = "button" class = "btn btn-default login-btn">Cancel</a>
+<div ng-controller = "NewRequestController">
+    <div id="wrapper" class="toggled">
+        <side-bar></side-bar>
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="jumbotron bordered">
+                    <div class="row">
+                        <form class="form-horizontal col-lg-10 col-lg-offset-1">
+                            <fieldset>
+                                <legend>{{pageTitle}}</legend>
+                                <div class="form-group">
+                                    <label for="inputTitle" class="col-lg-2 control-label">Title</label>
+                                    <div class="col-lg-10">
+                                        <input type="text" ng-disabled="update" class="form-control" id="inputTitle" placeholder="Title" ng-model="requestCredentials.name">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="textArea" class="col-lg-2 control-label">Details</label>
+                                    <div class="col-lg-10">
+                                        <textarea class="form-control" rows="3" id="textArea" ng-model="requestCredentials.description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEstimate" class="col-lg-2 control-label">Estimate</label>
+                                    <div class="col-lg-10">
+                                        <input type="date" class="form-control" id="inputEstimate" placeholder="Estimate" ng-model="requestCredentials.estimate">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select" class="col-lg-2 control-label">Priority</label>
+                                    <div class="col-lg-10">
+                                        <select class="form-control" id="select" ng-model="requestCredentials.priority">
+                                            <option value="1" >Low</option>
+                                            <option value="2">Normal</option>
+                                            <option value="3">High</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="!update">
+                                    <div class="col-lg-10 col-lg-offset-2">
+                                        <button type="submit" class="btn btn-primary" ng-click="sendRequestCredentials()">Save</button>
+                                        <button type="reset" class="btn btn-default">Reset</button>
+                                        <a href="/" class="btn btn-default">Cancel</a>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="update">
+                                    <div class="col-lg-10 col-lg-offset-2">
+                                        <button type="submit" class="btn btn-primary" ng-click="updateRequestCredentials()">Update</button>
+                                        <a href="/" class="btn btn-default">Cancel</a>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</section>
+</div>

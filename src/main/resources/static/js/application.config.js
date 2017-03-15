@@ -45,10 +45,18 @@
                         templateUrl: "/static/page/request/update-request-page.html",
                         controller: "UpdateRequestController"
                     })
-                    .when("/request/:requestId/",{
-                         templateUrl: "/static/page/request/details.html",
-                         controller: "RequestDetailsController"
-                     })
+                    // .when("/request/:requestId/",{
+                    //      templateUrl: "/static/page/request/details.html",
+                    //      controller: "RequestDetailsController"
+                    //  })
+                    .when("/request/:requestId/details", {
+                        templateUrl: "/static/page/request/request-details.html",
+                        controller: "RequestDetailsController"
+                    })
+                    .when("/request/free", {
+                        templateUrl: "/static/page/request/free-request-page.html",
+                        controller: "RequestListController"
+                    })
                     .when("/requestList",{
                          templateUrl: "/static/page/request/list.html",
                          controller: "RequestListController"
@@ -56,10 +64,6 @@
                     .when("/requestGroups",{
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
-                    })
-                    .when("/registrationAdmin", {
-                        templateUrl: "/static/page/registration/admin-registration-page.html",
-                        controller: "AdminRegistrationController"
                     })
                     .when("/requestListByEmployee", {
                         templateUrl: "/static/page/request/request-list-by-employee.html",

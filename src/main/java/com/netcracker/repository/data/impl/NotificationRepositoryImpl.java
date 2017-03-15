@@ -4,6 +4,7 @@ import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.data.interfaces.NotificationRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -19,10 +20,9 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
     public static final String SUBJECT_COLUMN = "subject";
     public static final String TEXT_COLUMN = "notification_text";
     public static final String LINK_COLUMN = "link";
-    public static final String CREATED_COLUMN = "created";
 
-    public static final String GET_ALL_NOTIFICATION_SORTED_BY_DATE = "select "+ID_COLUMN+", person_id, subject, notification_text, link, created " +
-            " from "+Notification.TABLE_NAME+" order by "+CREATED_COLUMN;
+    @Value("${notification.find.all.sort.by.date}")
+    public String GET_ALL_NOTIFICATION_SORTED_BY_DATE;
 
     public NotificationRepositoryImpl() {
         super(Notification.TABLE_NAME, Notification.ID_COLUMN);

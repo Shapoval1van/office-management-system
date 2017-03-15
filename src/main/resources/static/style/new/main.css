@@ -1,0 +1,14 @@
+.navbar {
+    margin-bottom: 0;
+}
+
+.bordered {
+    border: solid 1px #c7c7c7;
+}
+
+.td-details {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}

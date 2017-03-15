@@ -1,0 +1,42 @@
+.st-sort-ascent:before {
+    content: '\25B2';
+}
+
+.st-sort-descent:before {
+    content: '\25BC';
+}
+#comments-wrapper {
+
+}
+
+.comment-wrapper {
+    height: 100%;
+    padding: 10px;
+    box-shadow: 0px 0px 2px -1px black;
+}
+
+.comment-header {
+    font-family: Roboto, serif, bold;
+    color: black;
+    font-size: 12px;
+    text-align: left;
+    border-bottom: 1px solid lightgray;
+}
+
+.comment-author {
+    color: #C6372F;
+    font-size: 17px;
+}
+
+.comment-date {
+    color: #AAA09F;
+    font-size: 14px;
+}
+
+.comment-body p {
+    font-family: Roboto, serif;
+    color: black;
+    font-size: 15px;
+    text-align: left;
+    white-space: pre-wrap;
+}
