@@ -34,6 +34,10 @@
                 $scope.logout = function () {
                     SessionService.destroySession();
                     window.location.href = '/login';
+                };
+
+                $scope.goToUrl = function (url) {
+                  window.location.href = url;
                 }
             }])
 })();

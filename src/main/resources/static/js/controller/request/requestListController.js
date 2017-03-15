@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListController", ["$scope", "$http", "$routeParams",
-            function ($scope, $http, $routeParams) {
+        .controller("RequestListController", ["$scope", "$http", "$routeParams", "PersonService",
+            function ($scope, $http, $routeParams, PersonService) {
 
-                $scope.selectedManager = undefined;
+                $scope.selectedManager;
                 $scope.managers = [];
 
                 var requestDetails = "/request/";
@@ -46,6 +46,7 @@
                         url: '/api/request/available/' + $scope.selectedPriority.priorityId +
                         '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                     }).then(function successCallback(response) {
+                        $scope.requests = [];
                         $scope.requests = response.data;
                     }, function errorCallback(response) {
                     });
@@ -67,58 +68,49 @@
                     $scope.pageChanged(1); // get first page
                 };
 
-                $scope.assignToMe = function(requestId) {
-                    $http({
-                        method: 'POST',
-                        url: '/api/request/assignRequest',
-                        data: {
-                            'requestId': requestId,
-                            'personId': currentUser.id
-                        }
-                    }).then(function successCallback(response) {
-                        $scope.assignedMessage = response.data.message;
-                    }, function errorCallback(response) {
-                        $scope.assignedMessage = response.data.errors
-                            .map(function(e) {return e.detail})
-                            .join('. ');
-                    });
-                };
-
-                $scope.assign = function() {
-                    $http({
-                        method: 'POST',
-                        url: '/api/request/assignRequest',
-                        data: {
-                            'requestId': $scope.selectedRequest,
-                            'personId': $scope.selectedManager.id
-                        }
-                    }).then(function successCallback(response) {
-                        $scope.assignedMessage = response.data.message;
-                    }, function errorCallback(response) {
-                        $scope.assignedMessage = response.data.errors
-                            .map(function(e) {return e.detail})
-                            .join('. ');
-                    });
-                };
-
-                $scope.update = function() {
-                    if($scope.selectedManager.length >= 2) {
-                        console.log($scope.selectedManager);
-
-                        $http({
-                            method: 'GET',
-                            url: '/api/person/managers/' +  $scope.selectedManager +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.managers = response.data;
-                        }, function errorCallback(response) {
+                $scope.assignToMe = function (requestId) {
+                    return PersonService.assign(requestId, currentUser.id)
+                        .then(function (response) {
+                            $scope.assignedMessage = response.data.message;
+                        }, function (response) {
+                            $scope.assignedMessage = response.data.errors
+                                .map(function (e) {
+                                    return e.detail
+                                })
+                                .join('. ');
                         });
-                    }
+                };
+
+                $scope.assignToSmb = function () {
+                    return PersonService.assign($scope.request.id, $scope.selectedManager.id)
+                        .then(function (response) {
+                            $scope.assignedMessage = response.data.message;
+                        }, function (response) {
+                            $scope.assignedMessage = response.data.errors
+                                .map(function (e) {
+                                    return e.detail
+                                })
+                                .join('. ');
+                        });
+                };
+
+
+                $scope.update = function () {
+                    //TODO: Change page number and page size
+                    return PersonService.searchManagerByName($scope.selectedManager, 1, 20)
+                        .then(function (callback) {
+                            $scope.managers = callback.data;
+                        }, function () {
+                            console.log("Failure");
+                        })
                 };
 
                 $scope.selectRequest = function(requestId) {
                     $scope.selectedRequest = requestId;
                 };
 
+                $scope.goToRequestDetailsPage = function (requestId) {
+                    $scope.goToUrl("/request/" + requestId + "/details");
+                }
             }])
 })();
