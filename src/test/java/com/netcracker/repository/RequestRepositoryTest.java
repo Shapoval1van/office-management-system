@@ -16,7 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -103,11 +102,5 @@ public class RequestRepositoryTest {
         Assert.assertEquals(updatedRequest.getName(), "Hello");
         Assert.assertEquals(updatedRequest.getDescription(), "Request test description");
 
-    }
-
-    @Test
-    public void test (){
-        List<Request> requestList = requestRepository.findRequestByManagerIdForPeriod(2l,"quarter");
-        System.out.print("");
     }
 }

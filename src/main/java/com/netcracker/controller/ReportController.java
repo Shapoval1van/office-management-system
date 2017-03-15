@@ -1,7 +1,10 @@
 package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.NotSupportThisRoleExeption;
+import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.dto.RequestDTO;
+import com.netcracker.model.entity.ChartsType;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,4 +35,13 @@ public class ReportController {
         return responseList;
     }
 
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/chartsForManager/{personId}")
+    public List<ReportDTO> getChartsForManager(@PathVariable(name = "personId") Long personId,
+                                               @Pattern(regexp = "(quarter|year|month)")
+                                                 @RequestParam(name = "period", defaultValue = "month") String period,
+                                               @Pattern(regexp = "(pie|area)")
+                                                 @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+        return reportService.getDataForChartsToManager(personId,period, ChartsType.valueOf(type.toUpperCase()));
+    }
 }

@@ -23,7 +23,9 @@ public class PropertyConfig {
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource ();
+        messageSource.setBasename("property/message/messages");
         messageSource.setDefaultEncoding("UTF-8");
+
         return messageSource;
     }
 

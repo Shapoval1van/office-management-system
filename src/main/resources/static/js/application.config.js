@@ -66,9 +66,9 @@
                         templateUrl: "/static/page/request/request-list-by-employee.html",
                         controller: "RequestListByEmployeeController"
                     })
-                    .when("/repotr", {
-                        templateUrl: "/static/page/report.html",
-                        controller: "RequestListByEmployeeController"
+                    .when("/report", {
+                        templateUrl: "/static/page/report/report.html",
+                        controller: "ReportController"
                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"

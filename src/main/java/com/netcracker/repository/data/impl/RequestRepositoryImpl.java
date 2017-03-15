@@ -247,7 +247,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         if (reportPeriod == null) {
             return new ArrayList<>();
         }
-        reportPeriod = reportPeriod.toUpperCase();
+        reportPeriod = reportPeriod.toLowerCase();
         return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER),pageable, personId);
     }
 
