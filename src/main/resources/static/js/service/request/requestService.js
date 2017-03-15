@@ -32,6 +32,14 @@
                         })
                 };
 
+                requestService.isCanceled = function (request) {
+                    return request.status.name == "CANCELED";
+                };
+
+                requestService.isAssigned = function (request) {
+                    return request.manager != null;
+                };
+
                 return requestService;
             }])
 })();

@@ -21,11 +21,18 @@
 
                                     <div class="col-md-6 btn-group">
                                         <div class="row">
-                                            <div class="col-md-3">
+                                            <div class="col-md-3" ng-hide="isCanceled()">
                                                 <cancel-request-btn></cancel-request-btn>
                                             </div>
-                                            <div class="col-md-3" ng-hide="request.requestGroup">
+                                            <div class="col-md-3" ng-show="isCurrentUserManager()">
                                                 <add-to-request-group-btn></add-to-request-group-btn>
+                                            </div>
+                                            <div class="col-md-3"
+                                                 ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()">
+                                                <assign-to-me-btn></assign-to-me-btn>
+                                            </div>
+                                            <div class="col-md-3" ng-show="isCurrentUserAdministrator()">
+                                                <assign-to-smb-btn></assign-to-smb-btn>
                                             </div>
                                         </div>
                                     </div>

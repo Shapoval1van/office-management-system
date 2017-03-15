@@ -1,10 +1,11 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', "$q", '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
-            function ($scope, $q, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
+        .controller("RequestDetailsController", ['$scope', '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
+            function ($scope, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
 
                 var PAGE_SIZE = 10;
-
+                $scope.selectedManager;
+                $scope.assignedMessage = "";
                 $scope.authorsList = [];
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.authorsList.push({
@@ -138,6 +139,58 @@
                         }, function () {
                             console.log("Failure cancel");
                         })
+                };
+
+                $scope.update = function () {
+                    //TODO: Change page number and page size
+                    return PersonService.searchManagerByName($scope.selectedManager, 1, 20)
+                        .then(function (callback) {
+                            $scope.managers = callback.data;
+                        }, function () {
+                            console.log("Failure");
+                        })
+                };
+
+                $scope.assignToMe = function (requestId) {
+                    return PersonService.assign(requestId, currentUser.id)
+                        .then(function (response) {
+                            $scope.assignedMessage = response.data.message;
+                        }, function (response) {
+                            $scope.assignedMessage = response.data.errors
+                                .map(function (e) {
+                                    return e.detail
+                                })
+                                .join('. ');
+                        });
+                };
+
+                $scope.assignToSmb = function () {
+                    return PersonService.assign($scope.request.id, $scope.selectedManager.id)
+                        .then(function (response) {
+                            $scope.assignedMessage = response.data.message;
+                        }, function (response) {
+                            $scope.assignedMessage = response.data.errors
+                                .map(function (e) {
+                                    return e.detail
+                                })
+                                .join('. ');
+                        });
+                };
+
+                $scope.isCanceled = function () {
+                    return RequestService.isCanceled($scope.request);
+                };
+
+                $scope.isAssigned = function () {
+                    return RequestService.isAssigned($scope.request);
+                };
+
+                $scope.isCurrentUserManager = function () {
+                    return currentUser.role == "ROLE_OFFICE MANAGER";
+                };
+
+                $scope.isCurrentUserAdministrator = function () {
+                    return currentUser.role == "ROLE_ADMINISTRATOR";
                 };
                 // $http({
                 //     method: 'GET',
