@@ -130,16 +130,16 @@ public class RequestServiceImpl implements RequestService {
         }
 
         String parentStatus = parentRequest.getStatus().getName();
-        if (StatusEnum.CANCELED.toString().equals(parentStatus) || StatusEnum.CLOSED.toString().equals(parentStatus)) {
+        if (StatusEnum.CANCELED.getName().equals(parentStatus) || StatusEnum.CLOSED.getName().equals(parentStatus)) {
             throw new CannotCreateSubRequestException(messageSource
                     .getMessage(SUB_REQUEST_ERROR_PARENT_CLOSED, null, locale));
         }
 
         subRequest.setCreationTime(new Timestamp(System.currentTimeMillis()));
         subRequest.setEmployee(parentRequest.getEmployee());
-        subRequest.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.toString()).orElseThrow(() ->
+        subRequest.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.getName()).orElseThrow(() ->
                 new CannotCreateSubRequestException(messageSource
-                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.toString()}, locale))));
+                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))));
         return requestRepository.save(subRequest);
     }
 
@@ -153,9 +153,9 @@ public class RequestServiceImpl implements RequestService {
 
         request.setEmployee(manager);
 
-        request.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.toString()).orElseThrow(() ->
+        request.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.getName()).orElseThrow(() ->
                 new CannotCreateRequestException(messageSource
-                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.toString()}, locale))
+                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
         eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
@@ -175,9 +175,9 @@ public class RequestServiceImpl implements RequestService {
             updateRequestHistory(request, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(request);
         } else if (!person.get().getId().equals(currentUser.get().getId())){
-            throw new IllegalAccessException("You have no permission to update this request.");
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
         } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
-            throw new IllegalAccessException("You cannot update non free requests.");
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
             updateRequestHistory(request, oldRequest.get(), principal.getName());
@@ -314,14 +314,16 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
+        Locale locale = LocaleContextHolder.getLocale();
+
         Request request = getRequestById(id).get();
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (StatusEnum.CLOSED.getName().equals(request.getStatus().getName()))
-            throw new CannotDeleteRequestException("You cannot delete closed request");
+            throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CLOSED, null, locale));
         else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.getEmployee().getId()))
-            throw new CannotDeleteRequestException("You have no permission to delete this request");
+            throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_PERMISSION, null, locale));
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
-            throw new CannotDeleteRequestException("You cannot delete non free request");
+            throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
             changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
             if (request.getParent()==null) {
@@ -499,9 +501,10 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private boolean isCurrentUserAdmin(Principal principal) throws CurrentUserNotPresentException {
+        Locale locale = LocaleContextHolder.getLocale();
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (!currentUser.isPresent())
-            throw new CurrentUserNotPresentException("Current user not present");
+            throw new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         else {
             Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {

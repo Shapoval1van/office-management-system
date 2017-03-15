@@ -1,8 +1,5 @@
 package com.netcracker.util.enums.role;
 
-/**
- * Created by Max on 10.03.2017.
- */
 public enum RoleEnum {
     ADMINISTRATOR(1, "ROLE_ADMINISTRATOR"),
     PROJECT_MANAGER(2, "ROLE_OFFICE MANAGER"),

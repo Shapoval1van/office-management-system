@@ -1,0 +1,63 @@
+(function () {
+    angular.module("OfficeManagementSystem")
+        .controller("PersonListController", ["$scope", "$http", "$routeParams", "PersonService",
+            function ($scope, $http, $routeParams, PersonService) {
+
+                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                $scope.pageSize = 10;
+                $scope.persons = {};
+                $scope.roles = [{roleId: 4, name: 'ALL'},
+                    {roleId: 1, name: 'ADMINISTRATOR'},
+                    {roleId: 2, name: 'OFFICE MANAGER'},
+                    {roleId: 3, name: 'EMPLOYEE'}]; // TODO need controller for roles
+                $scope.maxSize = 5;
+                $scope.totalItems = 0;
+                $scope.currentPage = 1;
+                $scope.selectedRole = $scope.roles[0];
+
+                $scope.isUndefined = function (thing) {
+                    return (typeof thing === "undefined");
+                };
+
+                $scope.isAdmin = function (thing) {
+                    return currentUser.role === 'ROLE_ADMINISTRATOR';
+                };
+
+                $scope.getTotalPage = function() {
+                    $http({
+                        method: 'GET',
+                        url: '/api/person/count/' + $scope.selectedRole.roleId
+                    }).then(function successCallback(response) {
+                        $scope.totalItems = response.data;
+                    }, function errorCallback(response) {
+                    });
+                };
+
+                $scope.pageChanged = function() {
+                    $http({
+                        method: 'GET',
+                        url: '/api/person/persons/' + $scope.selectedRole.roleId +
+                        '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                    }).then(function successCallback(response) {
+                        $scope.persons = [];
+                        $scope.persons = response.data;
+                    }, function errorCallback(response) {
+                    });
+                };
+
+                $scope.getTotalPage(); //
+                $scope.pageChanged(1); // get first page
+
+                $scope.isSelected = function(requestId) {
+                    return requestId === $scope.selectedRole.roleId;
+                };
+
+                $scope.roleChange = function(roleId) {
+                    $scope.getTotalPage(); //
+                    $scope.pageChanged(1); // get first page
+                };
+
+
+            }])
+})();
+

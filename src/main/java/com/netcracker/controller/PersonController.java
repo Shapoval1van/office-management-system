@@ -4,15 +4,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.dto.MessageDTO;
+import com.netcracker.model.dto.FullPersonDTO;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
-import com.netcracker.model.view.View;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.dto.PersonDTO;
-import com.netcracker.model.entity.Person;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.person.PersonService;
@@ -25,10 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
@@ -49,16 +41,6 @@ public class PersonController {
         return ResponseEntity.ok(personService.getManagers(pageable, namePattern));
     }
 
-    @JsonView(View.Public.class)
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
-    public ResponseEntity<?> getPerson(@PathVariable Long personId){
-        Optional<Person> person = personService.getPersonById(personId);
-        if (person.isPresent()) {
-            return ResponseEntity.ok(new PersonDTO(person.get()));
-        } else {
-            return new ResponseEntity<>(new MessageDTO("No such id"), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}/update")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
@@ -72,16 +54,6 @@ public class PersonController {
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
 
-//    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/admins")
-//    public ResponseEntity<?> getListOfAdmins(Pageable pageable, Principal principal) {
-//        Optional<Person> currentAdmin = personService.findPersonByEmail(principal.getName());
-//        List<Person> admins = personService.getAdmins(pageable, currentAdmin.get().getId());
-//        System.out.print(admins);
-//        return ResponseEntity.ok((admins
-//                .stream()
-//                .map(PersonDTO::new)
-//                .collect(Collectors.toList())));
-//    }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/persons/{roleId}")
     public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
@@ -89,19 +61,26 @@ public class PersonController {
 
         return ResponseEntity.ok((personList
                 .stream()
-                .map(PersonDTO::new)
+                .map(FullPersonDTO::new)
                 .collect(Collectors.toList())));
     }
 
     @GetMapping("/{personId}")
     @JsonView(View.Public.class)
     @ResponseStatus(HttpStatus.OK)
-    public PersonDTO getPersonById(@PathVariable("personId") Long id) throws ResourceNotFoundException {
+    public FullPersonDTO getPersonById(@PathVariable("personId") Long id) throws ResourceNotFoundException {
         Optional<Person> personOptional = personService.getPersonById(id);
         if (!personOptional.isPresent()) {
             LOGGER.error("Person with id {} not exist", id);
             throw new ResourceNotFoundException("Can't find person with id " + id);
         } else
-            return new PersonDTO(personOptional.get());
+            return new FullPersonDTO(personOptional.get());
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
+    public ResponseEntity<?> getCountActivePersonByRole(@PathVariable Integer roleId) {
+        Long count = personService.getCountActivePersonByRole(roleId);
+        return ResponseEntity.ok(count);
+
     }
 }

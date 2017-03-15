@@ -10,13 +10,15 @@ import java.util.Optional;
 public interface PersonService {
     Optional<Person> getPersonById(Long id);
 
+    Long getCountActivePersonByRole(Integer roleId);
+
+    //Long getCountPassivePersons(Integer priorityId);
+
     Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
 
     List<Person> getManagers(Pageable pageable, String namePattern);
 
     Optional<Person> findPersonByEmail(String email);
-
-    //List<Person> getAdmins(Pageable pageable, Long currentAdminId);
 
     List<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
 }

@@ -44,7 +44,7 @@ public class PersonDTO {
     private Integer role;
     @JsonView(View.Public.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private boolean enabled;
+    private Boolean enabled;
 
     public PersonDTO() {
     }
@@ -127,7 +127,7 @@ public class PersonDTO {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 }
