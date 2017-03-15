@@ -9,7 +9,7 @@ import com.netcracker.model.dto.StatusDTO;
 import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.UpdateValidatorGroup;
-import com.netcracker.repository.common.impl.SimplePageable;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.requestGroup.RequestGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,12 +26,10 @@ public class RequestGroupController {
     @Autowired
     private RequestGroupService requestGroupService;
 
-    @GetMapping({"/author/{authorId}/page/{pageNumber}/size/{pageSize}"})
+    @GetMapping({"/author/{authorId}"})
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestGroup> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId,
-                                                      @PathVariable("pageNumber") Integer pageNumber,
-                                                      @PathVariable("pageSize") Integer pageSize) {
-        return requestGroupService.getRequestGroupByAuthorId(authorId, new SimplePageable(pageSize, pageNumber));
+    public List<RequestGroup> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
+        return requestGroupService.getRequestGroupByAuthorId(authorId, pageable);
     }
 
     @GetMapping({"/author/{authorId}/search/{namePart}"})

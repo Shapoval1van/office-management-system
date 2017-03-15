@@ -44,7 +44,7 @@
                     .when("/request/:requestId/update", {
                         templateUrl: "/static/page/request/update-request-page.html",
                         controller: "UpdateRequestController"
-                            ///request/:requestId/
+                        ///request/:requestId/
                     })
                     // .when("/request/:requestId/",{
                     //      templateUrl: "/static/page/request/details.html",
@@ -58,11 +58,19 @@
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
-                    .when("/requestList",{
-                         templateUrl: "/static/page/request/list.html",
-                         controller: "RequestListController"
-                     })
-                    .when("/requestGroups",{
+                    .when("/requestList", {
+                        templateUrl: "/static/page/request/list.html",
+                        controller: "RequestListController"
+                    })
+                    .when("/request-group", {
+                        templateUrl: "/static/page/request-group/request-group.html",
+                        controller: "RequestGroupController"
+                    })
+                    .when("/request-group/:requestGroupId/requests", {
+                        templateUrl: "/static/page/request-group/request-by-request-group.html",
+                        controller: "RequestGroupDetailsController"
+                    })
+                    .when("/requestGroups", {
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })

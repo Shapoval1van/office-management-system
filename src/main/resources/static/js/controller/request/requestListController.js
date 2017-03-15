@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListController", ["$scope", "$http", "$routeParams", "PersonService",
-            function ($scope, $http, $routeParams, PersonService) {
+        .controller("RequestListController", ["$scope", "$http", "$routeParams", "PersonService", "RequestService",
+            function ($scope, $http, $routeParams, PersonService, RequestService) {
 
                 $scope.selectedManager;
                 $scope.managers = [];
@@ -48,18 +48,6 @@
                         })
                 };
 
-                // $scope.pageChanged = function() {
-                //     $http({
-                //         method: 'GET',
-                //         url: '/api/request/available/' + $scope.selectedPriority.priorityId +
-                //         '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                //     }).then(function successCallback(response) {
-                //         $scope.requests = [];
-                //         $scope.requests = response.data;
-                //     }, function errorCallback(response) {
-                //     });
-                // };
-
                 $scope.getTotalPage(); //
                 $scope.pageChanged(1); // get first page
 
@@ -101,7 +89,6 @@
                                 .join('. ');
                         });
                 };
-
 
                 $scope.update = function () {
                     //TODO: Change page number and page size

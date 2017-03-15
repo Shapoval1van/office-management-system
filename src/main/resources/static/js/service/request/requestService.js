@@ -50,6 +50,15 @@
                         })
                 };
 
+                requestService.getRequestsByRequestGroup = function (requestGroupId, pageNumber, pageSize) {
+                    return $http.get("/api/request/request-group/" + requestGroupId + "?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 requestService.isCanceled = function (request) {
                     return request.status.name == "CANCELED";
                 };

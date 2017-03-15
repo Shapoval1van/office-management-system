@@ -24,7 +24,7 @@
                                             <div class="col-md-3" ng-hide="isCanceled()">
                                                 <cancel-request-btn></cancel-request-btn>
                                             </div>
-                                            <div class="col-md-3" ng-show="isCurrentUserManager()">
+                                            <div class="col-md-3" ng-show="isCurrentUserManager() || isCurrentUserAdministrator()">
                                                 <add-to-request-group-btn></add-to-request-group-btn>
                                             </div>
                                             <div class="col-md-3"

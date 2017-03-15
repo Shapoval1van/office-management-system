@@ -31,7 +31,7 @@ import static com.netcracker.util.MessageConstant.*;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-    private static final long REMIND_TIME_BEFORE_EXPIRY =  3_600_000; // 1 hour
+    private static final long REMIND_TIME_BEFORE_EXPIRY = 3_600_000; // 1 hour
 
     private ApplicationEventPublisher eventPublisher;
 
@@ -147,7 +147,7 @@ public class RequestServiceImpl implements RequestService {
 
         Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CannotCreateRequestException(messageSource
-                        .getMessage(EMPLOYEE_ERROR_MAIL, new Object[] {email}, locale)));
+                        .getMessage(EMPLOYEE_ERROR_MAIL, new Object[]{email}, locale)));
 
         request.setEmployee(manager);
 
@@ -164,8 +164,8 @@ public class RequestServiceImpl implements RequestService {
         Locale locale = LocaleContextHolder.getLocale();
 
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
-        if(!oldRequest.isPresent()) return Optional.empty();
-        if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager()!=null)
+        if (!oldRequest.isPresent()) return Optional.empty();
+        if (!isCurrentUserAdmin(principal) && oldRequest.get().getManager() != null)
             throw new IllegalAccessException(messageSource
                     .getMessage(REQUEST_ERROR_UPDATE_ALREADY_ASSIGNED, null, locale));
         else {
@@ -189,19 +189,19 @@ public class RequestServiceImpl implements RequestService {
     }
 
 
-    private Optional<Request> updateRequestHistory(Request newRequest,  Request oldRequest , String authorName) {
+    private Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) {
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
-        if(!author.isPresent()) return Optional.empty();
+        if (!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
         changeGroup.setRequest(new Request(oldRequest.getId()));
         changeGroup.setAuthor(author.get());
         changeGroup.setCreateDate(new Timestamp(System.currentTimeMillis()));
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
-        if(changeItemSet.size()==0){
+        if (changeItemSet.size() == 0) {
             return Optional.empty();
         }
         ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
-        changeItemSet.forEach(ci->ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
+        changeItemSet.forEach(ci -> ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
         changeItemSet.forEach(changeItemRepository::save);
         return Optional.of(newRequest);
     }
@@ -323,7 +323,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
-        if(request.getEmployee()!=null){
+        if (request.getEmployee() != null) {
             Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
             eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
             return requestRepository.changeRequestStatus(request, status);
@@ -354,7 +354,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
-        return requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
+        List<Request> requestsByRequestGroupId = requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
+        requestsByRequestGroupId.forEach(this::fillRequest);
+        return requestsByRequestGroupId;
     }
 
     @Scheduled(fixedRate = REMIND_TIME_BEFORE_EXPIRY)
