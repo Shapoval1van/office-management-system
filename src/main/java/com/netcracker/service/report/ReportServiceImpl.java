@@ -1,7 +1,7 @@
 package com.netcracker.service.report;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
-import com.netcracker.exception.NotSupportThisRoleExeption;
+import com.netcracker.exception.NotDataForThisRoleException;
 import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.netcracker.util.MessageConstant.NOT_DATA_FOR_THIS_ROLE;
 import static com.netcracker.util.MessageConstant.USER_ERROR_NOT_PRESENT;
 
 @Service
@@ -33,10 +34,10 @@ public class ReportServiceImpl implements ReportService {
     private RoleRepository roleRepository;
 
     @Autowired
-    private  MessageSource messageSource;
+    private StatusRepository statusRepository;
 
     @Autowired
-    private StatusRepository statusRepository;
+    private MessageSource messageSource;
 
     @Transactional(readOnly = true)
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period) throws CurrentUserNotPresentException {
@@ -51,9 +52,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable) throws CurrentUserNotPresentException {
+    public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable) throws CurrentUserNotPresentException, NotDataForThisRoleException {
+        Locale locale = LocaleContextHolder.getLocale();
         Person person = getPerson(personId);
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
+        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)){
+            throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
+        }
         if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
             return requestRepository.findRequestByManagerIdForPeriod(personId, period, pageable);
         }
@@ -61,7 +66,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+    public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
         Role role = getRole(person);
         if(chartsType == ChartsType.AREA){
@@ -133,10 +138,11 @@ public class ReportServiceImpl implements ReportService {
         return person;
     }
 
-    private Role getRole(Person person) throws NotSupportThisRoleExeption{
+    private Role getRole(Person person) throws NotDataForThisRoleException {
+        Locale locale = LocaleContextHolder.getLocale();
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
         if (!role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
-            throw  new NotSupportThisRoleExeption();
+            throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         }
         return role;
     }

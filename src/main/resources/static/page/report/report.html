@@ -1,11 +1,57 @@
-<section class="main-form section-padding" ng-cloak="">
-    <div class="container">
-        <div fusioncharts width="600" height="400" type="area2d" dataSource="{{myDataSource}}">
+<div id="wrapper" class="toggled">
+    <side-bar></side-bar>
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <div class="jumbotron bordered">
+                <div class="row">
+                    <table st-table="displayedHistory" st-safe-src="historyList"
+                           class="table table-stripped">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th st-sort="field.name">Name</th>
+                            <th st-sort="newVal">Estimate</th>
+                            <th st-sort="oldVal">Priority</th>
+                            <th st-sort="author.lastName">Author</th>
+                            <th st-sort="createDate">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!--<tr ng-repeat="historyItem in displayedHistory">-->
+                        <!--<td>-->
+                        <!--{{$index + 1}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                        <!--{{historyItem.field.name}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                        <!--{{historyItem.newVal}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                        <!--{{historyItem.oldVal}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                        <!--<a href="#">-->
+                        <!--{{historyItem.author.firstName}}-->
+                        <!--{{historyItem.author.lastName}}-->
+                        <!--</a>-->
+                        <!--</td>-->
+                        <!--<td>-->
+                        <!--{{historyItem.createDate | date : 'dd.MM.yyyy HH:mm:ss'}}-->
+                        <!--</td>-->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class = "col-md-6" fusioncharts  type="area2d" dataSource="{{areaChart}}">
 
-        </div>
+                    </div>
 
-        <div fusioncharts width="600" height="400" type="pie2d" dataSource="{{myDataSource1}}">
+                    <div class = "col-md-6" fusioncharts  type="pie2d" dataSource="{{pieChart}}">
 
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</section>
+</div>

@@ -1,7 +1,7 @@
 package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
-import com.netcracker.exception.NotSupportThisRoleExeption;
+import com.netcracker.exception.NotDataForThisRoleException;
 import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.entity.ChartsType;
@@ -29,7 +29,7 @@ public class ReportController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/allRequest/{personId}")
     public List<RequestDTO> getAllRequestByCreatorForPeriod(@Pattern(regexp = "(quarter|year|month)")
                                                             @RequestParam(name = "period", defaultValue = "month") String period,
-                                                            @PathVariable(name = "personId") Long personId, Pageable pageable) throws CurrentUserNotPresentException {
+                                                            @PathVariable(name = "personId") Long personId, Pageable pageable) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         List<RequestDTO> responseList = new ArrayList<>();
         reportService.getAllRequestByPersonIdForPeriod(personId, period, pageable).forEach(request -> responseList.add(new RequestDTO(request)));
         return responseList;
@@ -41,7 +41,7 @@ public class ReportController {
                                                @Pattern(regexp = "(quarter|year|month)")
                                                  @RequestParam(name = "period", defaultValue = "month") String period,
                                                @Pattern(regexp = "(pie|area)")
-                                                 @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotSupportThisRoleExeption {
+                                                 @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         return reportService.getDataForChartsToManager(personId,period, ChartsType.valueOf(type.toUpperCase()));
     }
 }
