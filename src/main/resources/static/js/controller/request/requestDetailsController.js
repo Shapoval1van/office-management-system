@@ -231,7 +231,7 @@
                 };
                 //FIXME: Move to service
                 $scope.isAssignedManager = function () {
-                    return currentUser.id === $scope.request.manager.id;
+                    return $scope.request.manager && currentUser.id === $scope.request.manager.id;
                 };
                 //FIXME: Move to service
                 $scope.isClosed = function () {
