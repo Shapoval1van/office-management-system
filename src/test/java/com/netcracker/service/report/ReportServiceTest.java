@@ -8,6 +8,7 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.service.request.RequestService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +46,10 @@ public class ReportServiceTest {
 
     @Mock
     private MessageSource messageSource;
+
+    @Mock
+    private RequestService requestService;
+
 
     @InjectMocks
     private ReportService reportService = new ReportServiceImpl();
