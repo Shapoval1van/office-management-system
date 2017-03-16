@@ -5,13 +5,11 @@ import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> implements RequestRepository {
@@ -36,6 +34,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.find.all.by.employee}")
     public String GET_ALL_REQUESTS_BY_EMPLOYEE;
+    //public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
@@ -60,6 +59,24 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
+
+    @Value("${request.all.per.month}")
+    private String GET_ALL_REQUEST_BY_MONTH;
+
+    @Value("${request.all.per.quarter}")
+    private String GET_ALL_REQUEST_BY_QR;
+
+    @Value("${request.all.per.year}")
+    private String GET_ALL_REQUEST_BY_YEAR;
+
+    @Value("${request.all.per.month.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_MONTH;
+
+    @Value("${request.all.per.quarter.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_QUARTER;
+
+    @Value("${request.all.per.year.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_YEAR;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -153,6 +170,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
 
+//    @Override
+//    public List<Request> getAllAssignedRequest(Long managerId) {
+//        return super.queryForList(GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER, managerId);
+//    }
+
 
     @Override
     public Optional<Request> updateRequest(Request request) {
@@ -194,8 +216,45 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod) {
+        Locale locale = LocaleContextHolder.getLocale();
+        if(reportPeriod == null){
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_EMPLOYEE), personId);
+    }
+
+    @Override
     public int updateRequestGroup(Long requestId, Integer requestGroupId) {
         return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, requestGroupId, requestId);
+    }
+
+    @Override
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_EMPLOYEE), pageable, personId);
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER), personId);
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER),pageable, personId);
     }
 
     @Override
@@ -206,5 +265,18 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Optional<Request> findOne(Long requestId) {
         return super.findOne(requestId);
+    }
+
+    private String getQueryByPeriod(String period, String role) {
+        switch (period) {
+            case "month":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_MONTH:GET_ALL_REQUEST_BY_MONTH;
+            case "quarter":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_QUARTER:GET_ALL_REQUEST_BY_QR;
+            case "year":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_YEAR:GET_ALL_REQUEST_BY_YEAR;
+            default:
+                return "";
+        }
     }
 }

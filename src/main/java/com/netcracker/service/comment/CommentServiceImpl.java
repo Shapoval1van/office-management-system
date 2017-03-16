@@ -1,5 +1,6 @@
 package com.netcracker.service.comment;
 
+import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.CommentDTO;
 import com.netcracker.model.entity.Comment;

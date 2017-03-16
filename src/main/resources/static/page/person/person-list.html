@@ -1,0 +1,57 @@
+<div id="wrapper" class="toggled">
+    <side-bar></side-bar>
+    <div id="page-content-wrapper" ng-cloak="">
+        <div class="container-fluid">
+
+            <div class="jumbotron bordered">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form class="form-inline">
+                            <label>Role
+                                <select ng-model="selectedRole" ng-change="roleChange(selectedRole)"
+                                        data-ng-options="role as role.name for role in roles"
+                                        class="form-control">
+                                </select>
+                            </label>
+                        </form>
+                    </div>
+
+                    <div class="col-md-12">
+                        <table st-table="personList" st-safe-src="persons" class="table table-stripped">
+                            <thead>
+                            <th>#</th>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="person in personList" class="task-row">
+                                <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
+                                <td>{{person.firstName}}</td>
+                                <td>{{person.lastName}}</td>
+                                <td>{{person.email}}</td>
+                                <td>{{person.role.name}}</td>
+                                <td>
+                                    <a ng-click="personUpdate(person.id)" class="btn btn-info">Update</a>
+                                    <a ng-click="personDelete(person.id)" class="btn btn-primary">Delete</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" ng-model="pageSize" ng-change="pageChanged()">
+                            </div>
+                            <div class="center-block col-md-10">
+                                <ul uib-pagination total-items="totalItems" ng-model="currentPage"
+                                    max-size="maxSize" class="pagination-sm" boundary-links="true"
+                                    ng-change="pageChanged()" items-per-page="pageSize"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,22 +1,27 @@
 package com.netcracker.util.enums.role;
 
-/**
- * Created by Max on 10.03.2017.
- */
 public enum RoleEnum {
-    ADMINISTRATOR("ROLE_ADMINISTRATOR"),
-    PROJECT_MANAGER("ROLE_OFFICE MANAGER"),
-    EMPLOYEE("ROLE_EMPLOYEE");
+    ADMINISTRATOR(1, "ROLE_ADMINISTRATOR"),
+    PROJECT_MANAGER(2, "ROLE_OFFICE MANAGER"),
+    EMPLOYEE(3, "ROLE_EMPLOYEE");
 
+    private Integer id;
     private String name;
 
-    RoleEnum(String name) {
+
+    RoleEnum(Integer id, String name) {
+        this.id = id;
         this.name = name;
     }
 
+    public Integer getId() {
+        return id;
+    }
 
-    @Override
-    public String toString() {
+
+    public String getName() {
         return name;
     }
+
+
 }

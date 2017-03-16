@@ -32,6 +32,42 @@
                         })
                 };
 
+                requestService.getAvailableRequest = function (priority, pageNumber, pageSize) {
+                    return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.getPageCountByPriority = function (priority) {
+                    return $http.get("/api/request/count/" + priority)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.getRequestsByRequestGroup = function (requestGroupId, pageNumber, pageSize) {
+                    return $http.get("/api/request/request-group/" + requestGroupId + "?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.updateRequest = function (requestId, request) {
+                    return $http.put("/api/request/" + requestId + "/update", request)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 requestService.isCanceled = function (request) {
                     return request.status.name == "CANCELED";
                 };

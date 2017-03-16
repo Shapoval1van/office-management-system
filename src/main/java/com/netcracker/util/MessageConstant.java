@@ -5,13 +5,18 @@ public class MessageConstant {
     public static final String USER_ERROR_NOT_PRESENT ="user.error.not.present";
     public static final String USER_WITH_ID_NOT_PRESENT="user.error.not.present.with.id";
     public static final String USER_WITH_EMAIL_NOT_PRESENT="user.error.email";
+    public static final String USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE = "user.error.update.from.manager.to.employee";
+    public static final String USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE = "user.error.update.from.admin.to.employee";
 
     //REQUEST ERROR
     public static final String REQUEST_ERROR_NOT_EXIST = "request.error.not.exist";
     public static final String REQUEST_ERROR_DELETE_CLOSED = "request.error.delete.closed";
+    public static final String REQUEST_ERROR_DELETE_NOT_PERMISSION = "request.error.delete.not.permission";
+    public static final String REQUEST_ERROR_DELETE_NOT_FREE = "request.error.delete.not.free";
     public static final String REQUEST_ERROR_ALREADY_ASSIGNED = "request.error.already.assigned";
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
-    public static final String REQUEST_ERROR_UPDATE_ALREADY_ASSIGNED = "request.error.update.already.assigned";
+    public static final String REQUEST_ERROR_UPDATE_NOT_PERMISSION = "request.error.update.not.permission";
+    public static final String REQUEST_ERROR_UPDATE_NON_FREE = "request.error.update.non.free";
 
     // SUB REQUEST ERROR
     public static final String SUB_REQUEST_ERROR_PARENT = "subrequest.error.parent";
@@ -41,4 +46,7 @@ public class MessageConstant {
 
     //PRIORITY
     public static final String PRIORITY_ERROR_ID = "priority.error.id";
+
+    //REPORT
+    public static final String NOT_DATA_FOR_THIS_ROLE = "report.not.data.for.this.role";
 }

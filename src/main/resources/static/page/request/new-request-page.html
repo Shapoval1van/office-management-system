@@ -23,19 +23,20 @@
                                         <textarea class="form-control" rows="3" id="textArea" ng-model="requestCredentials.description"></textarea>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputEstimate" class="col-lg-2 control-label">Estimate</label>
-                                    <div class="col-lg-10">
-                                        <input type="date" class="form-control" id="inputEstimate" placeholder="Estimate" ng-model="requestCredentials.estimate">
+                                <div class="form-group" >
+                                    <label for="datetimepicker4" class="col-lg-2 control-label">Estimate</label>
+                                    <div class="col-lg-10" ng-controller="DatepickerPopupCtrl" ng-click="calendarFormClick()">
+                                        <input type="text" class="form-control" id='datetimepicker4' placeholder="Estimate" ng-model="estimateTime">
                                     </div>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="select" class="col-lg-2 control-label">Priority</label>
                                     <div class="col-lg-10">
                                         <select class="form-control" id="select" ng-model="requestCredentials.priority">
-                                            <option value="1" >Low</option>
+                                            <option value="3">Low</option>
                                             <option value="2">Normal</option>
-                                            <option value="3">High</option>
+                                            <option value="1">High</option>
                                         </select>
                                     </div>
                                 </div>
@@ -43,13 +44,13 @@
                                     <div class="col-lg-10 col-lg-offset-2">
                                         <button type="submit" class="btn btn-primary" ng-click="sendRequestCredentials()">Save</button>
                                         <button type="reset" class="btn btn-default">Reset</button>
-                                        <a href="/" class="btn btn-default">Cancel</a>
+                                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                                     </div>
                                 </div>
                                 <div class="form-group" ng-show="update">
                                     <div class="col-lg-10 col-lg-offset-2">
                                         <button type="submit" class="btn btn-primary" ng-click="updateRequestCredentials()">Update</button>
-                                        <a href="/" class="btn btn-default">Cancel</a>
+                                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                                     </div>
                                 </div>
                             </fieldset>

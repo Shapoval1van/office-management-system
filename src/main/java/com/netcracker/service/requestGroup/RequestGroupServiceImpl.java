@@ -47,7 +47,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     @Autowired
     private RoleRepository roleRepository;
 
-
     @Override
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
         return requestGroupRepository.findRequestGroupByAuthorId(authorId, pageable);
@@ -85,7 +84,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
                     .getMessage(USER_WITH_EMAIL_NOT_PRESENT, new Object[]{currentUserEmail}, locale));
         } else
             requestGroup.setAuthor(currentUser.get());
-
 
         return saveRequestGroup(requestGroup);
     }
@@ -154,8 +152,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         Status status = statusOptional.get();
         String statusName = status.getName();
 
-        if (statusName.equalsIgnoreCase(StatusEnum.FREE.toString()) ||
-                statusName.equalsIgnoreCase(StatusEnum.CANCELED.toString())) {
+        if (statusName.equalsIgnoreCase(StatusEnum.FREE.getName()) ||
+                statusName.equalsIgnoreCase(StatusEnum.CANCELED.getName())) {
             LOGGER.error("Can't set status {} for group", statusName);
             throw new IncorrectStatusException(messageSource.getMessage(STATUS_ERROR_NOT_AVAILABLE, null, locale),
                     messageSource.getMessage(STATUS_ERROR_NOT_AVAILABLE_FOR_GROUP, new Object[]{statusName}, locale));
@@ -163,7 +161,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
         List<Request> requestsOfRequestGroup = requestRepository.findRequestsByRequestGroupId(requestGroupId);
 
-        Integer canceledStatusId = statusRepository.findStatusByName(StatusEnum.CANCELED.toString()).get().getId();
+        Integer canceledStatusId = statusRepository.findStatusByName(StatusEnum.CANCELED.getName()).get().getId();
 
         for (Request request :
                 requestsOfRequestGroup) {
@@ -202,7 +200,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             throw new CurrentUserNotPresentException(messageSource
                     .getMessage(USER_ERROR_NOT_PRESENT, null, locale));
         } else if (!currentUser.get().getId().equals(requestGroup.getAuthor().getId())) {
-            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.toString());
+            Optional<Role> adminRole = roleRepository.findRoleByName(RoleEnum.ADMINISTRATOR.getName());
             if (!currentUser.get().getRole().getId().equals(adminRole.get().getId())) {
                 LOGGER.error("Access only for author or administrator");
                 return false;

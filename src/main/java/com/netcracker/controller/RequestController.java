@@ -8,18 +8,19 @@ import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
-import com.netcracker.repository.common.impl.SimplePageable;
 import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,10 +43,7 @@ public class RequestController {
     }
 
 
-
-
     @PostMapping(value = "/updatePriority/{requestId}")
-    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {
@@ -93,30 +91,25 @@ public class RequestController {
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
-    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
+
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
                                                  @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal);
-        if(!result.isPresent()){
+        if (!result.isPresent()) {
             new ResponseEntity<>(currentRequest, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
     @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/delete")
-    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
-        try {
-            Optional<Request> request = requestService.getRequestById(requestId);
-            if (!request.isPresent())
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            requestService.deleteRequestById(requestId);
-        } catch (CannotDeleteRequestException | ResourceNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
+        Optional<Request> request = requestService.getRequestById(requestId);
+        if (!request.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        requestService.deleteRequestById(requestId, principal);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -175,12 +168,12 @@ public class RequestController {
         requestService.removeFromRequestGroup(requestId, principal);
     }
 
-    @GetMapping("/request-group/{requestGroupId}/page/{pageNumber}/size/{pageSize}")
+    @GetMapping("/request-group/{requestGroupId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Request> getRequestByRequestGroup(@PathVariable("requestGroupId") Integer requestGroupId,
-                                                  @PathVariable("pageNumber") Integer pageNumber,
-                                                  @PathVariable("pageSize") Integer pageSize) {
-        Pageable pageable = new SimplePageable(pageSize, pageNumber);
-        return requestService.getRequestsByRequestGroup(requestGroupId, pageable);
+    public List<FullRequestDTO> getRequestByRequestGroup(@PathVariable("requestGroupId") Integer requestGroupId,
+                                                         Pageable pageable) {
+
+        List<Request> requestsByRequestGroup = requestService.getRequestsByRequestGroup(requestGroupId, pageable);
+        return requestsByRequestGroup.stream().map(FullRequestDTO::new).collect(Collectors.toList());
     }
 }

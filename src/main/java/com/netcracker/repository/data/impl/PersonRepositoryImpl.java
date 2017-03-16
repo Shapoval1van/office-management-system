@@ -39,9 +39,23 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.update.password}")
     private String UPDATE_PERSON_PASSWORD;
 
+    @Value("${person.update}")
+    private String UPDATE_PERSON;
+
+    @Value("${person.find.all.available.by.role}")
+    private String GET_AVAILABLE_PERSONS_BY_ROLE;
+
+    @Value("${person.find.all.available}")
+    private String GET_AVAILABLE_PERSONS;
+
+    @Value("${person.count.active.by.role}")
+    private String COUNT_ACTIVE_PERSON_BY_ROLE;
+
+
     public PersonRepositoryImpl() {
         super(Person.TABLE_NAME, Person.ID_COLUMN);
     }
+
 
     @Override
     public Map<String, Object> mapColumns(Person entity) {
@@ -80,17 +94,13 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public Optional<Person> updatePersonPassword(Person person) {
-        if (person.getId() != null) {
-            return super.save(person);
-        }else{
-            return Optional.empty();
-        }
+    public Long getCountActivePersonByRole(Integer roleId) {
+        return getJdbcTemplate().queryForObject(COUNT_ACTIVE_PERSON_BY_ROLE, Long.class, roleId);
     }
 
     @Override
-    public int updatePersonPassword(String newPassword, String email) {
-        return getJdbcTemplate().update(UPDATE_PERSON_PASSWORD, newPassword, email);
+    public int updatePerson(Person person) {
+        return getJdbcTemplate().update(UPDATE_PERSON, person.getFirstName(), person.getLastName(), person.getRole().getId(), person.getId());
     }
 
     @Override
@@ -102,4 +112,12 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public List<Person> getManagers(Pageable pageable) {
         return super.queryForList(FIND_MANAGER, pageable);
     }
+
+    @Override
+    public List<Person> getPersons(Integer roleId, Pageable pageable, Optional<Role> role) {
+        return role.isPresent() ? this.queryForList(
+                GET_AVAILABLE_PERSONS_BY_ROLE, pageable, roleId)
+                : this.queryForList(GET_AVAILABLE_PERSONS, pageable);
+    }
+
 }

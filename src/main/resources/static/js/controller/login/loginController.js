@@ -27,7 +27,7 @@
                 if (!!$routeParams.registrationToken) {
                     RegistrationService.activateUser($routeParams.registrationToken)
                         .then(function (response) {
-                            $scope.personCredentials.username = response.data.email;
+                            $scope.person.username = response.data.email;
                         }, function (response) {
                             window.alert("Activation error.");
                         })

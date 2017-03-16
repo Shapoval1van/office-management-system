@@ -5,6 +5,8 @@
 
                 $scope.pageTitle = "";
                 $scope.update = false;
+                $scope.calendarClick = false;
+                $scope.estimateTime = undefined;
 
                 if (!$routeParams.requestId){
                     $scope.pageTitle = "New request";
@@ -17,6 +19,7 @@
                 } else {
                     $scope.pageTitle = "Update request";
                     $scope.update = true;
+
                     function formatDate(dateVal) {
                         var newDate = new Date(dateVal);
                         var sMonth = padValue(newDate.getMonth() + 1);
@@ -48,21 +51,8 @@
                             .then(function (callback) {
                                 $scope.requestCredentials = callback.data;
                                 if ($scope.requestCredentials.estimate!=null){
-                                    $scope.requestCredentials.estimate = new Date($scope.requestCredentials.estimate);
+                                    $scope.estimateTime = formatDate($scope.requestCredentials.estimate);
                                 }
-                                // if ($scope.requestCredentials.manager == null){
-                                //     $("#input-manager").parents(".col-md-offset-3").fadeOut();
-                                //     $scope.requestCredentials.manager = null;
-                                // }
-                                // else {
-                                //     $scope.selectedManager = $scope.requestCredentials.manager;
-                                // }
-                                // if ($scope.requestCredentials.requestGroup == null) {
-                                //     $("#input-request-group").parents(".col-md-offset-3").fadeOut();
-                                // }
-                                // else {
-                                //     $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.name;
-                                // }
                                 if ($scope.requestCredentials.manager!=null) {
                                     $scope.requestCredentials.manager = $scope.requestCredentials.manager.id;
                                 }
@@ -81,43 +71,48 @@
                             })
                     };
 
+                    $scope.calendarFormClick = function(){
+                        $scope.calendarClick = true;
+                    };
 
                     $scope.getRequestCredential();
+
                 }
 
                 $scope.wrongRequestNameMessage = "Name must contain at least 3 letters";
                 $scope.requestNameRegExp = /^(([a-zA-Z\d]+)\s?\1?){3,}$/;
 
                 $scope.updateRequestCredentials = function () {
-                    /*if ($scope.calendarClick==true) {
-                        $scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
+                    if ($scope.calendarClick==true) {
+                        $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
                     } else if ($scope.estimateTime!=undefined && $scope.calendarClick==false){
                         $scope.requestCredentials.estimate = new Date($scope.estimateTime).getTime();
                     } else if ($scope.estimateTime==undefined){
                         $scope.requestCredentials.estimate = null;
-                    }*/
+                    }
                     $http.put("/api/request/" + $routeParams.requestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
-                            window.location = "/requestListByEmployee";
-                        }, function (callback) {
+
+                            window.location = "javascript:history.back()";
+                        }, function (error) {
+                            swal("Updare Failure!", error.data.errors[0].detail, "error");
                             console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })
                 };
                 
                 $scope.sendRequestCredentials = function () {
-                    //$scope.requestCredentials.estimate = new Date($('#datetimepicker1').data('date')).getTime();
+                    $scope.estimateTime = new Date($('#datetimepicker4').data('date')).getTime();
+                    if ($scope.estimateTime!=undefined)
+                    $scope.requestCredentials.estimate = $scope.estimateTime;
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
-                            window.location = "/requestListByEmployee";
-                        }, function (callback) {
+                            window.location = "javascript:history.back()";
+                        }, function (error) {
+                            swal("New Request Failure!", error.data.message, "error");
                             console.log("Creating request Failure!")
                         })
                 }
-
-
-
-
             }])
 })();

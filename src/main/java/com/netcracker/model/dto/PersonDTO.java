@@ -35,7 +35,7 @@ public class PersonDTO {
     private String email;
     @JsonView(View.Internal.class)
     @Size(max = 70, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
-    @NotNull(groups = CreateValidatorGroup.class)
+    //@NotNull(groups = CreateValidatorGroup.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String password;
@@ -44,7 +44,7 @@ public class PersonDTO {
     private Integer role;
     @JsonView(View.Public.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private boolean enabled;
+    private Boolean enabled;
 
     public PersonDTO() {
     }
@@ -127,7 +127,7 @@ public class PersonDTO {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 }

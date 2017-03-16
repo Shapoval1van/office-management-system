@@ -15,6 +15,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getAllSubRequest(Long parentId);
 
+    //List<Request> getAllAssignedRequest(Long managerId);
+
     Optional<Request> updateRequest(Request request);
 
     int updateRequestPriority(Request request);
@@ -28,6 +30,14 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable);
+
+    List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod);
+
+    List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
+
+    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod);
+
+    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
 
     int updateRequestGroup(Long requestId, Integer requestGroupId);
 

@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="/static/style/request/requestByEmployee.css">
     <link rel="stylesheet" href="/static/style/component/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="/static/style/request/details.css">
+    <link rel="stylesheet" type="text/css" href="/static/style/sweet-alert/sweetalert.css">
     <link rel="stylesheet" href="/static/style/request/request-details.css">
 
 
@@ -56,7 +57,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
+                <li><a class="logout" ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -67,6 +68,7 @@
 </ng-view>
 
 <!--SCRIPT-->
+<script src="/static/js/sweet-alert/sweetalert.min.js"></script>
 <!--JQUERY-->
 <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -90,6 +92,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+<script src="/static/lib/angular-fusioncharts.min.js"></script>
+<script src="/static/lib/fusioncharts.js"></script>
+<script src="/static/lib/fusioncharts.charts.js"></script>
 <!--/WebSocket-->
 
 <!--Smart tables-->
@@ -105,6 +111,9 @@
 <script src="/static/js/controller/login/recoverPasswordController.js"></script>
 <script src="/static/js/controller/demo/demoController.js"></script>
 <script src="/static/js/controller/test/commentController.js"></script>
+<script src="/static/js/controller/person/personList.js"></script>
+<script src="/static/js/controller/person/updatePerson.js"></script>
+<script src="/static/js/controller/report/reportController.js"></script>
 
 <script src="/static/js/service/comment/commentService.js"></script>
 <script src="/static/js/service/sessionService.js"></script>
@@ -112,6 +121,7 @@
 <script src="/static/js/service/person/personService.js"></script>
 <script src="/static/js/service/request/requestService.js"></script>
 <script src="/static/js/service/registration/registrationService.js"></script>
+<script src="/static/js/service/request-group/requestGroupService.js"></script>
 
 <script src="/static/js/controller/component/priority-buttons.js"></script>
 <script src="/static/js/controller/component/calendar.js"></script>
@@ -120,7 +130,8 @@
 <script src="/static/js/controller/request/newRequestController.js"></script>
 <script src="/static/js/controller/request/updateRequestController.js"></script>
 <script src="/static/js/controller/request/requestDetailsController.js"></script>
-<script src="/static/js/controller/request/requestGroupController.js"></script>
+<script src="/static/js/controller/request-group/requestGroupController.js"></script>
+<script src="/static/js/controller/request-group/requestGroupDetailsController.js"></script>
 <script src="/static/js/controller/request/requestListController.js"></script>
 <script src="/static/js/controller/request/requestListByEmployeeController.js"></script>
 <script src="/static/js/controller/request/updateRequestLinkToGroupController.js"></script>
