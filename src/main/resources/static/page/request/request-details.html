@@ -10,30 +10,21 @@
                             <fieldset>
                                 <legend>Request: {{request.name}}</legend>
                                 <div class="row">
+
+                                    <div class="col-md-12 btn-group">
+                                                <add-to-request-group-btn ng-show="isCurrentUserManager()"></add-to-request-group-btn>
+                                        <assign-to-me-btn
+                                                        ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()"></assign-to-me-btn>
+                                        <assign-to-smb-btn ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
+                                        <cancel-request-btn ng-hide="isCanceled()"></cancel-request-btn>
+                                    </div>
+
                                     <div class="form-group col-md-6 col-lg-6">
                                         <label for="author" class="col-lg-1 control-label">Author:</label>
                                         <div class="col-lg-12">
                                         <span class="form-control-static" id="author">
                                             {{request.employee.firstName}} {{request.employee.lastName}}
                                         </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 btn-group">
-                                        <div class="row">
-                                            <div class="col-md-3" ng-hide="isCanceled()">
-                                                <cancel-request-btn></cancel-request-btn>
-                                            </div>
-                                            <div class="col-md-3" ng-show="isCurrentUserManager()">
-                                                <add-to-request-group-btn></add-to-request-group-btn>
-                                            </div>
-                                            <div class="col-md-3"
-                                                 ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()">
-                                                <assign-to-me-btn></assign-to-me-btn>
-                                            </div>
-                                            <div class="col-md-3" ng-show="isCurrentUserAdministrator()">
-                                                <assign-to-smb-btn></assign-to-smb-btn>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -100,6 +91,7 @@
                                         </span>
                                         </div>
                                     </div>
+
                                 </div>
                             </fieldset>
                         </form>
@@ -117,7 +109,7 @@
                                                 <textarea placeholder="Write comment here"
                                                           ng-model="$parent.$parent.comment" id="comment"
                                                           class="form-control"></textarea>
-                                                <button class="btn btn-success" ng-click="sendComment()">Send comment
+                                                <button class="btn btn-success send-comment-btn" ng-click="sendComment()">Send comment
                                                 </button>
                                             </div>
                                         </form>
@@ -147,7 +139,7 @@
                             </uib-tab>
                             <uib-tab index="1" heading="History">
                                 <table st-table="displayedHistory" st-safe-src="historyList"
-                                       class="table table-stripped">
+                                       class="table table-stripped task-row">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -159,7 +151,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="historyItem in displayedHistory">
+                                    <tr class="history-row" ng-repeat="historyItem in displayedHistory">
                                         <td>
                                             {{$index + 1}}
                                         </td>

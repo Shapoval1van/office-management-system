@@ -6,7 +6,6 @@
             <div class="jumbotron bordered">
                 <div class="row">
                     <div class="col-md-12">
-                        Select role:
                         <form class="form-inline">
                             <label>Role
                                 <select ng-model="selectedRole" ng-change="roleChange(selectedRole)"
@@ -27,7 +26,7 @@
                             <th>Role</th>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="person in personList">
+                            <tr ng-repeat="person in personList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td>{{person.firstName}}</td>
                                 <td>{{person.lastName}}</td>

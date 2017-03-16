@@ -48,19 +48,28 @@
                 };
 
                 $scope.requestDelete = function(requestId) {
-                    //$scope.userConfirm = confirm("Do you really want cancel this request?");
-                    //if($scope.userConfirm){
-                        $http({
-                            method: 'DELETE',
-                            url: '/api/request/' + requestId + '/delete'
-                        }).then(function successCallback(response) {
-                            $scope.requests = response.data;
-                        }, function errorCallback(response) {
-                            console.log(response);
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to cancel this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, cancel it!",
+                            closeOnConfirm: false},
+                        function(){
+                            $http({
+                                method: 'DELETE',
+                                url: '/api/request/' + requestId + '/delete'
+                            }).then(function successCallback(response) {
+                                $scope.requests = response.data;
+                            }, function errorCallback(error) {
+                                swal("Cancel Failure!", error.data.errors[0].detail, "error");
+                                console.log(error);
+                            });
+                            swal("Request canceled!", "", "success");
+                            //location.reload();
                         });
-                        //location.reload(true);
-                        //$scope.userConfirm = false;
-                    //}
+
                 };
 
                 $scope.propertyName = 'name';
