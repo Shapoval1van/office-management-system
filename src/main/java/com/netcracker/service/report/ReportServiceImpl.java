@@ -168,7 +168,7 @@ public class ReportServiceImpl implements ReportService {
     private Role getRole(Person person) throws NotDataForThisRoleException {
         Locale locale = LocaleContextHolder.getLocale();
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
-        if (!role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)){
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         }
         return role;

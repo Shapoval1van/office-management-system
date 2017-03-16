@@ -62,8 +62,8 @@
 
                 $scope.areaChart  = {
                     "chart": {
-                        "caption": "The number of requests for a period of time.",
-                        "xAxisName": "Day",
+                        "caption": "The number of requests for a period of time",
+                        "xAxisName": "Data",
                         "yAxisName": "Count of requests",
                         "paletteColors": "#0075c2",
                         "bgColor": "#c7c7c7",
@@ -133,7 +133,7 @@
                 }).then(function successCallback(response) {
                     $scope.requestList = response.data;
                 }, function errorCallback(response) {
-
+                    $scope.requestList = [];
                 });
             }])
 })();
