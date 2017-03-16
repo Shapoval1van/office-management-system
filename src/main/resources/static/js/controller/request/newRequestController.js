@@ -5,6 +5,8 @@
 
                 $scope.pageTitle = "";
                 $scope.update = false;
+                $scope.calendarClick = false;
+                $scope.estimateTime = undefined;
 
                 if (!$routeParams.requestId){
                     $scope.pageTitle = "New request";
@@ -69,15 +71,25 @@
                             })
                     };
 
+                    $scope.calendarFormClick = function(){
+                        $scope.calendarClick = true;
+                    };
+
                     $scope.getRequestCredential();
+
                 }
 
                 $scope.wrongRequestNameMessage = "Name must contain at least 3 letters";
                 $scope.requestNameRegExp = /^(([a-zA-Z\d]+)\s?\1?){3,}$/;
 
                 $scope.updateRequestCredentials = function () {
-                    //if ($scope.requestCredentials.estimate!=null)
-                    $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                    if ($scope.calendarClick==true) {
+                        $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                    } else if ($scope.estimateTime!=undefined && $scope.calendarClick==false){
+                        $scope.requestCredentials.estimate = new Date($scope.estimateTime).getTime();
+                    } else if ($scope.estimateTime==undefined){
+                        $scope.requestCredentials.estimate = null;
+                    }
                     $http.put("/api/request/" + $routeParams.requestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
 
@@ -90,7 +102,9 @@
                 };
                 
                 $scope.sendRequestCredentials = function () {
-                    $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                    $scope.estimateTime = new Date($('#datetimepicker4').data('date')).getTime();
+                    if ($scope.estimateTime!=undefined)
+                    $scope.requestCredentials.estimate = $scope.estimateTime;
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
