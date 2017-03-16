@@ -74,6 +74,8 @@
 }
 .task-row td{
     vertical-align: middle!important;
+    font-size: 14px;
+    padding: 0!important;
 }
 .task-row:nth-of-type(2n+1){
     background-color: #ffffff;
@@ -87,4 +89,7 @@
 }
 textarea{
     resize: none;
+}
+.jumbotron.bordered{
+    padding-top: 30px!important;
 }

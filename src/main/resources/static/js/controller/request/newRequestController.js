@@ -94,7 +94,7 @@
                     $http.post("/api/request/addRequest", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
-                            window.location = "/requestListByEmployee";
+                            window.location = "javascript:history.back()";
                         }, function (error) {
                             swal("New Request Failure!", error.data.message, "error");
                             console.log("Creating request Failure!")

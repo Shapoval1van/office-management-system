@@ -82,3 +82,23 @@ label[for='comment']{
 .history-row td{
     text-align: center;
 }
+.btn-info{
+    float: none!important;
+    margin: 5px 10px!important;
+    -webkit-border-radius: 5px!important;
+    -moz-border-radius: 5px!important;
+    border-radius: 5px!important;
+}
+add-to-request-group-btn{
+    margin: 0!important;
+}
+label{
+    font-size: 16px!important;
+}
+.form-control-static{
+    font-size: 14px!important;
+}
+legend{
+    font-size: 22px;
+    font-weight: 600;
+}

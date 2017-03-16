@@ -73,10 +73,10 @@
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })
-                    .when("/requestListByEmployee", {
-                        templateUrl: "/static/page/request/request-list-by-employee.html",
-                        controller: "RequestListByEmployeeController"
-                    })
+                    // .when("/requestListByEmployee", {
+                    //     templateUrl: "/static/page/request/request-list-by-employee.html",
+                    //     controller: "RequestListByEmployeeController"
+                    // })
                     .when("/users", {
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"

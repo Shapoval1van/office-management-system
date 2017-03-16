@@ -5,6 +5,9 @@
             <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
+                    <div class="col-md-2 col-md-offset-10" ng-show="my">
+                        <a href="/newRequest" class="btn btn-success">Create Request</a>
+                    </div>
                     <div class="col-md-12">
                         <form class="form-inline">
                             <label ng-show="!my">Priority
@@ -49,7 +52,7 @@
                                 </td>
                                 <td>
                                     <assign-to-smb-btn ng-show="!my"></assign-to-smb-btn>
-                                    <a ng-click="requestDelete(request.id)" class="btn btn-primary" ng-show="my">Delete</a>
+                                    <a ng-click="requestDelete(request.id)" class="btn btn-primary" ng-show="my">Cancel</a>
                                     <!--<cancel-request-btn ng-show="my"></cancel-request-btn>-->
                                 </td>
                             </tr>
