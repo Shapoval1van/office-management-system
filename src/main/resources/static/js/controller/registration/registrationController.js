@@ -12,7 +12,8 @@
                     lastName:"",
                     email:"",
                     password:"",
-                    role:-1
+                    role:3,
+                    enabled: false
                 };
 
                 $scope.roles = [
