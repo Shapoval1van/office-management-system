@@ -10,7 +10,7 @@
                             <fieldset>
                                 <legend>Request: {{request.name}}</legend>
                                 <div class="row">
-                                    <div class="form-group col-md-6 col-lg-6">
+                                    <div class="form-group col-md-2 col-lg-2">
                                         <label for="author" class="col-lg-1 control-label">Author:</label>
                                         <div class="col-lg-12">
                                         <span class="form-control-static" id="author">
@@ -19,21 +19,42 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6 btn-group">
+                                    <div class="col-md-10 btn-group">
                                         <div class="row">
-                                            <div class="col-md-3" ng-hide="isCanceled()">
+                                            <div class="col-md-2" ng-hide="isCanceled()">
                                                 <cancel-request-btn></cancel-request-btn>
                                             </div>
-                                            <div class="col-md-3" ng-show="isCurrentUserManager() || isCurrentUserAdministrator()">
+                                            <div class="col-md-2"
+                                                 ng-show="isCurrentUserManager() || isCurrentUserAdministrator()">
                                                 <add-to-request-group-btn></add-to-request-group-btn>
                                             </div>
-                                            <div class="col-md-3"
+                                            <div class="col-md-2"
                                                  ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()">
                                                 <assign-to-me-btn></assign-to-me-btn>
                                             </div>
-                                            <div class="col-md-3" ng-show="isCurrentUserAdministrator()">
+                                            <div class="col-md-2" ng-show="isCurrentUserAdministrator()">
                                                 <assign-to-smb-btn></assign-to-smb-btn>
                                             </div>
+                                            <div class="col-md-2" ng-show="isAssignedManager() && isFree()"
+                                                 ng-click="setInProgressStatus()">
+                                                <button class="btn btn-info">
+                                                    Start request
+                                                </button>
+                                            </div>
+                                            <div class="col-md-2"
+                                                 ng-show="isAssignedManager() && isInProgress()"
+                                                 ng-click="setClosedStatus()">
+                                                <button class="btn btn-info">
+                                                    Finish request
+                                                </button>
+                                            </div>
+                                            <div class="col-md-2" ng-show="isAuthor() && isClosed()"
+                                                 ng-click="setReopen()">
+                                                <button class="btn btn-info">
+                                                    Reopen request
+                                                </button>
+                                            </div>
+
                                         </div>
                                     </div>
 

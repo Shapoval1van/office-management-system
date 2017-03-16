@@ -177,6 +177,39 @@
                         });
                 };
 
+                $scope.updateRequestStatus = function (statusId) {
+                    $scope.request.status = statusId;
+                    $scope.request.priority = $scope.request.priority.id;
+                    if (!!$scope.request.employee)
+                        $scope.request.employee = $scope.request.employee.id;
+                    if (!!$scope.request.manager)
+                        $scope.request.manager = $scope.request.manager.id;
+                    if (!!$scope.request.parent)
+                        $scope.request.parent = $scope.request.parent.id;
+                    if (!!$scope.request.requestGroup)
+                        $scope.request.requestGroup = $scope.request.requestGroup.id;
+
+                    return RequestService.updateRequest($scope.request.id, $scope.request)
+                        .then(function (callback) {
+                            $scope.getRequest();
+                            $scope.getHistoryPage("month", $scope.historyPageNumber);
+                        }, function () {
+
+                        })
+                };
+
+                $scope.setInProgressStatus = function () {
+                    return $scope.updateRequestStatus(2);
+                };
+
+                $scope.setClosedStatus = function () {
+                    return $scope.updateRequestStatus(3);
+                };
+
+                $scope.setReopen = function () {
+                    return $scope.updateRequestStatus(1);
+                };
+
                 $scope.isCanceled = function () {
                     return RequestService.isCanceled($scope.request);
                 };
@@ -184,13 +217,33 @@
                 $scope.isAssigned = function () {
                     return RequestService.isAssigned($scope.request);
                 };
-
+                //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {
                     return currentUser.role == "ROLE_OFFICE MANAGER";
                 };
-
+                //FIXME: Move to service
                 $scope.isCurrentUserAdministrator = function () {
                     return currentUser.role == "ROLE_ADMINISTRATOR";
+                };
+                //FIXME: Move to service
+                $scope.isAuthor = function () {
+                    return currentUser.id === $scope.request.employee.id;
+                };
+                //FIXME: Move to service
+                $scope.isAssignedManager = function () {
+                    return currentUser.id === $scope.request.manager.id;
+                };
+                //FIXME: Move to service
+                $scope.isClosed = function () {
+                    return $scope.request.status.name === "CLOSED";
+                };
+                //FIXME: Move to service
+                $scope.isInProgress = function () {
+                    return $scope.request.status.name === "IN PROGRESS";
+                };
+                //FIXME: Move to service
+                $scope.isFree = function () {
+                    return $scope.request.status.name === "FREE";
                 };
                 // $http({
                 //     method: 'GET',
