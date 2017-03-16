@@ -28,6 +28,17 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(Collections.singletonList(error));
     }
 
+    @ExceptionHandler(NotDataForThisRoleException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO NotDataForThisRoleExceptionHandler(HttpServletRequest request, NotDataForThisRoleException ex){
+        int errorStatus = HttpStatus.NOT_FOUND.value();
+        String title = ex.getMessage();
+        String desc = ex.getDescription();
+        ErrorDTO errorDTO = new ErrorDTO(errorStatus, request.getRequestURL().toString(), title,desc);
+        return new ErrorsDTO(Collections.singletonList(errorDTO));
+    }
+
+
     @ExceptionHandler(CurrentUserNotPresentException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorsDTO currentUserNotPresentExceptionHandler(HttpServletRequest request, CurrentUserNotPresentException e) {

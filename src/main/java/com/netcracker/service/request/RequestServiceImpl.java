@@ -454,7 +454,7 @@ public class RequestServiceImpl implements RequestService {
         request.setParent(parent);
     }
 
-    private void fill(Request request) {
+    public void fill(Request request) {
         Person employee = request.getEmployee();
         if (employee != null) {
             employee = personRepository.findOne(employee.getId()).orElseGet(null);

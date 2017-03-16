@@ -46,4 +46,7 @@ public class MessageConstant {
 
     //PRIORITY
     public static final String PRIORITY_ERROR_ID = "priority.error.id";
+
+    //REPORT
+    public static final String NOT_DATA_FOR_THIS_ROLE = "report.not.data.for.this.role";
 }
