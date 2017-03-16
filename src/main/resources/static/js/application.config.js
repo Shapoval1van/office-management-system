@@ -70,7 +70,7 @@
                         templateUrl: "/static/page/request/request-list-by-employee.html",
                         controller: "RequestListByEmployeeController"
                     })
-                    .when("/report", {
+                    .when("/report/:personId", {
                         templateUrl: "/static/page/report/report.html",
                         controller: "ReportController"
                     })

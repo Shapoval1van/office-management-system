@@ -9,6 +9,7 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -39,6 +40,9 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private RequestService requestService;
+
     @Transactional(readOnly = true)
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -46,9 +50,13 @@ public class ReportServiceImpl implements ReportService {
                 messageSource.getMessage(USER_ERROR_NOT_PRESENT, new Object[]{personId}, locale)));
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
         if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
-            return requestRepository.findRequestByManagerIdForPeriod(personId, period);
+            List<Request> requestArrayList = requestRepository.findRequestByManagerIdForPeriod(personId, period);
+            requestArrayList.forEach(request -> requestService.fill(request));
+            return requestArrayList;
         }
-        return requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+        List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+        requestArrayList.forEach(request -> requestService.fill(request));
+        return requestArrayList;
     }
 
     @Transactional(readOnly = true)
@@ -60,9 +68,13 @@ public class ReportServiceImpl implements ReportService {
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         }
         if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
-            return requestRepository.findRequestByManagerIdForPeriod(personId, period, pageable);
+            List<Request> requestArrayList = requestRepository.findRequestByManagerIdForPeriod(personId, period, pageable);
+            requestArrayList.forEach(request -> requestService.fill(request));
+            return requestArrayList;
         }
-        return requestRepository.findRequestByEmployeeIdForPeriod(personId, period, pageable);
+        List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period, pageable);
+        requestArrayList.forEach(request -> requestService.fill(request));
+        return requestArrayList;
     }
 
     @Override
@@ -161,4 +173,7 @@ public class ReportServiceImpl implements ReportService {
         }
         return role;
     }
+
+
+
 }
