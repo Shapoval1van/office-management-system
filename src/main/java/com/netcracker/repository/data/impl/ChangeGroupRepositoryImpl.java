@@ -2,8 +2,10 @@ package com.netcracker.repository.data.impl;
 
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
+import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.ChangeGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,7 +13,10 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup, Long> implements ChangeGroupRepository{
@@ -21,14 +26,14 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
     public static final String AUTHOR_ID_COLUMN = "author_id";
     public static final String REQUEST_ID_COLUMN = "request_id";
 
-    private String FIND_BY_REQUEST_ID= "SELECT CG.request_id, CG.change_group_id, CG.created, CI.change_item_id, CI.field_id, CI.new_value, CI.old_value, " +
-            "CG.author_id, P.first_name, P.last_name " +
-            "FROM change_group AS CG " +
-            "LEFT JOIN change_item AS CI ON CG.change_group_id = CI.change_group_id " +
-            "JOIN person AS P ON CG.author_id = p.person_id "+
-            "WHERE CG.request_id= ? ";
-    private String PERIOD_DAY= "AND age(CG.created) < '1 day'";
-    private String PERIOD_MONTH= "AND age(CG.created) < '30 day'";
+    @Value("${change.group.find.by.request.id}")
+    private String FIND_BY_REQUEST_ID;
+
+    @Value("${change.group.period.day}")
+    private String PERIOD_DAY;
+
+    @Value("${change.group.period.month}")
+    private String PERIOD_MONTH;
 
     @Autowired
     private ChangeItemRepositoryImpl changeItemRepository;
@@ -37,16 +42,18 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         super(ChangeGroup.TABLE_NAME, ChangeGroup.ID_COLUMN);
     }
 
-    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period){
+    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable){
         switch (period){
             case DAY:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_DAY), new Object[]{id}, resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_DAY).concat(pageable(pageable)), new Object[]{id}, resultSetExtractor());
             case MONTH:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_MONTH), new Object[]{id},resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_MONTH).concat(pageable(pageable)), new Object[]{id},resultSetExtractor());
             default:
-                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID,new Object[]{id},resultSetExtractor());
+                return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(pageable(pageable)),new Object[]{id},resultSetExtractor());
         }
     }
+
+
 
     @Override
     public Map<String, Object> mapColumns(ChangeGroup entity) {
@@ -65,7 +72,7 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
             public ChangeGroup mapRow(ResultSet resultSet, int i) throws SQLException {
                 ChangeGroup changeGroup = new ChangeGroup();
                 changeGroup.setId(resultSet.getLong(CHANGE_GROUP_COLUMN));
-                changeGroup.setCreateDate(resultSet.getDate(CREATED_COLUMN));
+                changeGroup.setCreateDate(resultSet.getTimestamp(CREATED_COLUMN));
                 changeGroup.setAuthor(new Person(resultSet.getLong(AUTHOR_ID_COLUMN)));
                 changeGroup.setRequest(new Request(resultSet.getLong(REQUEST_ID_COLUMN)));
                 return changeGroup;
@@ -97,5 +104,13 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
                 return new HashSet<>(changeGroupMap.values());
             }
         };
+    }
+
+    private String pageable (Pageable pageable){
+        StringBuilder stringBuilder = new StringBuilder();
+        return stringBuilder.append(" LIMIT ")
+                .append(pageable.getPageSize())
+                .append(" OFFSET ")
+                .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
     }
 }

@@ -1,0 +1,64 @@
+<div id="wrapper" class="toggled">
+    <side-bar></side-bar>
+    <!--TODO add pageable-->
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <div class="jumbotron bordered">
+                <legend>{{title}}</legend>
+                <div ng-if="requestList.length!=0">
+                    <div class="row">
+                        <table st-table="displayedList" st-safe-src="requestList"
+                               class="table table-stripped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th st-sort="field.name">Name</th>
+                                <th st-sort="estimate">Estimate</th>
+                                <th st-sort="priority">Priority</th>
+                                <th st-sort="author.lastName">Author</th>
+                                <th st-sort="status">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="requestItem in displayedList">
+                            <td>
+                            {{$index + 1}}
+                            </td>
+                            <td>
+                            {{requestItem.name}}
+                            </td>
+                            <td>
+                            {{requestItem.estimate| date : 'dd.MM.yyyy'}}
+                            </td>
+                            <td>
+                            {{requestItem.priority.name}}
+                            </td>
+                            <td>
+                            <a href="#">
+                            {{requestItem.employee.firstName}}
+                            {{requestItem.employee.lastName}}
+                            </a>
+                            </td>
+                            <td>
+                            {{requestItem.status.name}}
+                            </td>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class = "col-md-6" fusioncharts  type="area2d" dataSource="{{areaChart}}">
+
+                        </div>
+
+                        <div class = "col-md-6" fusioncharts  type="pie2d" dataSource="{{pieChart}}">
+
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="requestList.length==0">
+                    Don't have data for this period
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

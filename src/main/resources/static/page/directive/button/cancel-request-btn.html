@@ -1,0 +1,24 @@
+<div class="modal fade" id="updateRequestStatusModal" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change request status</h4>
+            </div>
+            <div class="modal-body">
+                <h4>Do you want to cancel "{{request.name}}" ?</h4>
+            </div>
+            <div class="modal-footer" ng-controller="UpdateRequestController">
+                <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="cancelRequest()">
+                    Proceed
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-dismiss="modal" data-toggle="modal" data-target="#updateRequestStatusModal">
+    <button type="button" class="btn btn-primary">
+        Cancel
+    </button>
+</div>

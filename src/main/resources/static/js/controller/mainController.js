@@ -1,13 +1,12 @@
-/**
- * Created by Max on 22.02.2017.
- */
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("MainController", ["$scope", "$http", "$cookies", "SessionService",
-            function ($scope, $http, $cookies, SessionService) {
+        .controller("MainController", ["$scope", "$location", "$http", "$cookies", "SessionService",
+            function ($scope, $location, $http, $cookies, SessionService) {
+
+                $scope.Session = SessionService;
 
                 SessionService.loadSession();
-                var anonymOnlyPages = ["login", "resetPassword", "registration", "reset"];
+                var anonymOnlyPages = ["resetPassword", "reset"];
                 var redirectIfTokenExist = "/requestListByEmployee";
                 var loginPageUrl = "/login";
 
@@ -26,13 +25,16 @@
                     if (SessionService.isUserLoggedIn())
                         $http.defaults.headers.common.Authorization =
                             'Bearer ' + SessionService.getAccessToken();
-                    else
-                        window.location = loginPageUrl;
+
                 }
 
                 $scope.logout = function () {
                     SessionService.destroySession();
                     window.location.href = '/login';
+                };
+
+                $scope.goToUrl = function (url) {
+                    $location.path(url);
                 }
             }])
 })();

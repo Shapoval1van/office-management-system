@@ -1,9 +1,6 @@
-/**
- * Created by Max on 27.02.2017.
- */
 (function () {
     angular.module("OfficeManagementSystem")
-        .service("CommentService", ["$q", "$timeout",
+        .service("WebSocketService", ["$q", "$timeout",
             function ($q, $timeout) {
                 var service = {}, listener = $q.defer(), socket = {
                     client: null,

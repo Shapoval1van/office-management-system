@@ -101,12 +101,52 @@
             return false;
         };
 
+        service.performLogin = function (username, password) {
+
+            var personCredentials = {
+                grant_type: "password",
+                username: username,
+                password: password,
+                client_id: "client",
+                scope: "read write"
+            };
+
+            var req = {
+                method: 'POST',
+                url: "/oauth/token",
+                headers: {
+                    "Authorization": "Basic " + btoa("client:"),
+                    "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
+                },
+                data: $httpParamSerializer(personCredentials)
+            };
+
+            var promise = $http(req).then(function (callback) {
+                service.createSession(callback);
+                callback.isError = false;
+                return callback;
+            }, function (callback) {
+                callback.isError = true;
+                return callback;
+            });
+
+            return promise;
+        };
+
         service.getAccessToken = function () {
             return currentSession.accessToken;
         };
 
         service.getCurrentUser = function () {
             return currentUser;
+        };
+
+        service.getUserRole = function () {
+          if (currentUser){
+              return currentUser.role;
+          } else {
+              return null;
+          }
         };
 
         service._isOlderThanNow = function (time) {

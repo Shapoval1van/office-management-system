@@ -1,7 +1,7 @@
 <submit-update-request-status-popup></submit-update-request-status-popup>
 
 <div data-dismiss="modal" data-toggle="modal" data-target="#updateRequestStatusModal">
-    <span ng-hide="request.manager == null && role != null && role != 'ROLE_EMPLOYEE'" style="margin-right: 5%">
+    <span ng-hide="requestStatusButtonsHide(request)" style="margin-right: 5%">
         <button ng-show="request.status.id == 1"
                 type="button" class="btn btn-success" ng-click="newStatus = 'begin'">Begin task</button>
         <button ng-show="request.status.id == 2"
@@ -9,6 +9,6 @@
         <button ng-show="request.status.id == 3 || request.status.id == 4"
                 type="button" class="btn btn-warning" ng-click="newStatus = 'reopen'">Reopen</button>
     </span>
-    <button ng-hide="request.status.id == 3 || request.status.id == 4"
+    <button ng-hide="request.status.id == 3 || request.status.id == 4 || request.status.id == 2"
             type="button" class="btn btn-danger" ng-click="newStatus = 'cancel'">Cancel</button>
 </div>

@@ -1,4 +1,4 @@
-(function () {
+ (function () {
     angular.module("OfficeManagementSystem")
         .config(["$routeProvider", "$locationProvider",
             function ($routeProvider, $locationProvider) {
@@ -42,29 +42,56 @@
                         controller: "NewRequestController"
                     })
                     .when("/request/:requestId/update", {
-                        templateUrl: "/static/page/request/update-request-page.html",
-                        controller: "UpdateRequestController"
-                            ///request/:requestId/
+                        templateUrl: "/static/page/request/new-request-page.html",
+                        controller: "NewRequestController"
                     })
-                    .when("/request/:requestId/",{
-                         templateUrl: "/static/page/request/details.html",
-                         controller: "RequestDetailsController"
-                     })
-                    .when("/requestList",{
-                         templateUrl: "/static/page/request/list.html",
-                         controller: "RequestListController"
-                     })
-                    .when("/requestGroups",{
+                    // .when("/request/:requestId/",{
+                    //      templateUrl: "/static/page/request/details.html",
+                    //      controller: "RequestDetailsController"
+                    //  })
+                    .when("/request/:requestId/details", {
+                        templateUrl: "/static/page/request/request-details.html",
+                        controller: "RequestDetailsController"
+                    })
+                    .when("/request/free", {
+                        templateUrl: "/static/page/request/free-request-page.html",
+                        controller: "RequestListController"
+                    })
+                    .when("/requestList", {
+                        templateUrl: "/static/page/request/list.html",
+                        controller: "RequestListController"
+                    })
+                    .when("/request-group", {
+                        templateUrl: "/static/page/request-group/request-group.html",
+                        controller: "RequestGroupController"
+                    })
+                    .when("/request-group/:requestGroupId/requests", {
+                        templateUrl: "/static/page/request-group/request-by-request-group.html",
+                        controller: "RequestGroupDetailsController"
+                    })
+                    .when("/requestGroups", {
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })
-                    .when("/registrationAdmin", {
-                        templateUrl: "/static/page/registration/admin-registration-page.html",
-                        controller: "AdminRegistrationController"
+                    // .when("/requestListByEmployee", {
+                    //     templateUrl: "/static/page/request/request-list-by-employee.html",
+                    //     controller: "RequestListByEmployeeController"
+                    // })
+                    .when("/users", {
+                        templateUrl: "/static/page/person/person-list.html",
+                        controller: "PersonListController"
                     })
-                    .when("/requestListByEmployee", {
-                        templateUrl: "/static/page/request/request-list-by-employee.html",
-                        controller: "RequestListByEmployeeController"
+                    .when("/request/my", {
+                        templateUrl: "/static/page/request/free-request-page.html",
+                        controller: "RequestListController"
+                    })
+                    .when("/person/:personId/update", {
+                        templateUrl: "/static/page/person/person-update.html",
+                        controller: "UpdatePersonController"
+                    })
+                    .when("/report/:personId", {
+                        templateUrl: "/static/page/report/report.html",
+                        controller: "ReportController"
                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"

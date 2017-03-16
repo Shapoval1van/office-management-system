@@ -4,13 +4,12 @@ import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> implements RequestRepository {
@@ -27,35 +26,66 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public static final String PRIORITY_ID_COLUMN = "priority_id";
     public static final String REQUEST_GROUP_ID_COLUMN = "request_group_id";
 
-    public static final String GET_AVAILABLE_REQUESTS_BY_PRIORITY = "SELECT * FROM request WHERE priority_id = ? AND manager_id IS NULL " +
-            "ORDER BY " + CREATION_TIME_COLUMN;
-    public static final String GET_AVAILABLE_REQUESTS = "SELECT * FROM request WHERE manager_id IS NULL ORDER BY " + CREATION_TIME_COLUMN;
+    @Value("${request.find.all.available.by.priority}")
+    public String GET_AVAILABLE_REQUESTS_BY_PRIORITY;
 
-    public static final String GET_ALL_REQUESTS_BY_EMPLOYEE = "SELECT * FROM request WHERE employee_id = ? " +
-            "AND status_id!=5";
+    @Value("${request.find.all.available}")
+    public String GET_AVAILABLE_REQUESTS;
 
+    @Value("${request.find.all.by.employee}")
+    public String GET_ALL_REQUESTS_BY_EMPLOYEE;
+    //public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
-    private final String UPDATE_REQUEST_STATUS = "UPDATE " + TABLE_NAME + " SET status_id = ? WHERE request_id = ?";
+    @Value("${request.update.status}")
+    private String UPDATE_REQUEST_STATUS;
 
-    private final String UPDATE_REQUEST_PRIORITY = "UPDATE " + TABLE_NAME + " SET priority_id = ? WHERE request_id = ?";
+    @Value("${request.update.priority}")
+    private String UPDATE_REQUEST_PRIORITY;
 
-    private final String FIND_ALL_SUB_REQUEST = "SELECT  request_id, name, description, creation_time, " +
-            "estimate, status_id, employee_id, manager_id, priority_id, request_group_id, parent_id FROM " +
-            TABLE_NAME + " WHERE parent_id = ?";
+    @Value("${request.find.all.sub.request}")
+    private String FIND_ALL_SUB_REQUEST;
 
-    private final String ASSIGN_REQUEST_TO_PERSON = "UPDATE " + TABLE_NAME + " SET manager_id = ?, status_id = ? " +
-            "WHERE request_id = ?";
+    @Value("${request.assign}")
+    private String ASSIGN_REQUEST_TO_PERSON;
 
-    private final String COUNT_WITH_PRIORITY = "SELECT count(request_id) FROM " + TABLE_NAME +
-            " WHERE priority_id = ? AND manager_id IS NULL ";
+    @Value("${request.count.by.priority}")
+    private String COUNT_WITH_PRIORITY;
 
-    private final String GET_REQUESTS_BY_REQUEST_GROUP_ID = "SELECT * FROM request WHERE request_group_id = ?";
+    @Value("${request.find.by.request.group}")
+    private String GET_REQUESTS_BY_REQUEST_GROUP_ID;
 
-    private final String COUNT_ALL_REQUEST_BY_EMPLOYEE = "SELECT count(request_id) FROM " + TABLE_NAME +
-            " WHERE employee_id = ? AND status_id!=5";
+    @Value("${request.count.by.employee}")
+    private String COUNT_ALL_REQUEST_BY_EMPLOYEE;
+
+    @Value("${request.update.group}")
+    private String UPDATE_REQUEST_GROUP;
+
+    @Value("${request.all.per.month}")
+    private String GET_ALL_REQUEST_BY_MONTH;
+
+    @Value("${request.all.per.quarter}")
+    private String GET_ALL_REQUEST_BY_QR;
+
+    @Value("${request.all.per.year}")
+    private String GET_ALL_REQUEST_BY_YEAR;
+
+    @Value("${request.all.per.month.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_MONTH;
+
+    @Value("${request.all.per.quarter.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_QUARTER;
+
+    @Value("${request.all.per.year.by.manager}")
+    private String GET_ALL_BY_MG_REQUEST_BY_YEAR;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
+    }
+
+    public List<Request> getRequests(Integer priorityId, Pageable pageable, Optional<Priority> priority) {
+        return priority.isPresent() ? this.queryForList(
+                GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
+                : this.queryForList(GET_AVAILABLE_REQUESTS, pageable);
     }
 
     @Override
@@ -74,12 +104,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         Person manager = entity.getManager();
         if (manager != null) {
             columns.put(MANAGER_ID_COLUMN, entity.getManager().getId());
+        } else {
+            columns.put(MANAGER_ID_COLUMN, null);
         }
 
         Request parent = entity.getParent();
         if (parent != null) {
             columns.put(PARENT_ID_COLUMN, entity.getParent().getId());
+        } else {
+            columns.put(PARENT_ID_COLUMN, null);
         }
+
 
         RequestGroup requestGroup = entity.getRequestGroup();
         if (requestGroup != null) {
@@ -120,19 +155,27 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         };
     }
 
-    //@Transactional
+
     @Override
     public int changeRequestStatus(Request request, Status status) {
         return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
     }
 
+    public List<Request> getRequestsByEmployee(Pageable pageable, Person employee) {
+        return this.queryForList(GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
+    }
 
     @Override
     public List<Request> getAllSubRequest(Long parentId) {
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
 
-    //@Transactional
+//    @Override
+//    public List<Request> getAllAssignedRequest(Long managerId) {
+//        return super.queryForList(GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER, managerId);
+//    }
+
+
     @Override
     public Optional<Request> updateRequest(Request request) {
         if (request.getId() != null) {
@@ -173,7 +216,67 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod) {
+        Locale locale = LocaleContextHolder.getLocale();
+        if(reportPeriod == null){
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_EMPLOYEE), personId);
+    }
+
+    @Override
+    public int updateRequestGroup(Long requestId, Integer requestGroupId) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, requestGroupId, requestId);
+    }
+
+    @Override
+    public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_EMPLOYEE), pageable, personId);
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER), personId);
+    }
+
+    @Override
+    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+        if (reportPeriod == null) {
+            return new ArrayList<>();
+        }
+        reportPeriod = reportPeriod.toLowerCase();
+        return super.queryForList(getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER),pageable, personId);
+    }
+
+    @Override
+    public int removeRequestFromRequestGroup(Long requestId) {
+        return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, null, requestId);
+    }
+
+    @Override
     public Optional<Request> findOne(Long requestId) {
         return super.findOne(requestId);
+    }
+
+    private String getQueryByPeriod(String period, String role) {
+        switch (period) {
+            case "month":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_MONTH:GET_ALL_REQUEST_BY_MONTH;
+            case "quarter":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_QUARTER:GET_ALL_REQUEST_BY_QR;
+            case "year":
+                return role.equals(Role.ROLE_OFFICE_MANAGER)?GET_ALL_BY_MG_REQUEST_BY_YEAR:GET_ALL_REQUEST_BY_YEAR;
+            default:
+                return "";
+        }
     }
 }

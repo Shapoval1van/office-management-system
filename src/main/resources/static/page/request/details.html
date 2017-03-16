@@ -1,3 +1,4 @@
+<!--TODO: Deprecated-->
 <nav class="nav-top">
     <h1 class="nav-top__brand">Request Details</h1>
 </nav>
@@ -95,13 +96,13 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr  class="animate-repeat" ng-repeat="history in historyList">
+                                <tr  class="animate-repeat" ng-repeat="history in historyList | orderBy:'-createTime'">
                                     <th>{{history.property}}</th>
                                     <td>{{history.newValue}}</td>
                                     <td>{{history.oldValue}}</td>
                                     <!--TODO author id-->
                                     <td><a ng-href="#">{{history.author}}</a></td>
-                                    <td>{{history.createTime}}</td>
+                                    <td>{{history.createTime | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
                                 </tr>
                                 </tbody>
                             </table>

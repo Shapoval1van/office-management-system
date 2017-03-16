@@ -58,7 +58,9 @@ public class FullRequestDTO {
                 this.manager = new PersonDTO(request.getManager());
             if (request.getParent() != null)
                 this.parent = new FullRequestDTO(request.getParent());
-            this.priority = new PriorityDTO(request.getPriority());
+            if(request.getPriority()!=null){
+                this.priority = new PriorityDTO(request.getPriority());
+            }
             if (request.getRequestGroup() != null)
                 this.requestGroup = new RequestGroupDTO(request.getRequestGroup());
         }

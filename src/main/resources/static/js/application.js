@@ -5,6 +5,8 @@
         "ngCookies",
         "ngAnimate",
         "ngTouch",
-        "ui.bootstrap"
+        "ui.bootstrap",
+        "ng-fusioncharts",
+        "smart-table"
     ])
 })();

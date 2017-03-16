@@ -1,9 +1,8 @@
 package com.netcracker.component;
 
-import com.netcracker.model.event.NewPasswordEvent;
-import com.netcracker.model.event.NotificationSendingErrorEvent;
-import com.netcracker.model.event.PersonRegistrationEvent;
-import com.netcracker.model.event.ResetPasswordEvent;
+import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
+import com.netcracker.model.event.*;
 import com.netcracker.service.notification.impls.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -36,5 +35,30 @@ public class NotificationEventListener {
     @EventListener
     public void handleNotificationSendingError(NotificationSendingErrorEvent event){
         notificationService.saveFailedNotification(event.getNotification());
+    }
+
+    @EventListener
+    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
+        notificationService.sendChangeStatusEvent(changeStatus.getPerson());
+    }
+
+    @EventListener
+    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent){
+        notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
+        notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
+        notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleRequestExpiring(RequestExpiringEvent event){
+        notificationService.sendRequestExpiryReminder(event.getExpiringRequests());
     }
 }
