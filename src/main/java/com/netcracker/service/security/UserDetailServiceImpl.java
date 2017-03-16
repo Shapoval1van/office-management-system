@@ -15,10 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
+    private final PersonRepository personRepository;
+
+    private final RoleRepository roleRepository;
+
     @Autowired
-    private PersonRepository personRepository;
-    @Autowired
-    private RoleRepository roleRepository;
+    public UserDetailServiceImpl(PersonRepository personRepository,
+                                 RoleRepository roleRepository) {
+        this.personRepository = personRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Transactional
     @Override

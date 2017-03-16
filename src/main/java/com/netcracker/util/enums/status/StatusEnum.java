@@ -1,20 +1,25 @@
 package com.netcracker.util.enums.status;
 
 public enum StatusEnum {
-    FREE("FREE"),
-    IN_PROGRESS("IN PROGRESS"),
-    CLOSED("CLOSED"),
-    CANCELED("CANCELED");
+    FREE(1, "FREE"),
+    IN_PROGRESS(2, "IN PROGRESS"),
+    CLOSED(3, "CLOSED"),
+    CANCELED(4, "CANCELED");
 
+    private Integer id;
     private String name;
 
-    private StatusEnum(String name) {
+     StatusEnum(Integer id, String name) {
+        this.id = id;
         this.name = name;
     }
 
+    public Integer getId() {
+        return id;
+    }
 
-    @Override
-    public String toString() {
+    public String getName() {
         return name;
     }
+
 }

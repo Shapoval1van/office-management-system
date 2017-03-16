@@ -42,9 +42,8 @@
                         controller: "NewRequestController"
                     })
                     .when("/request/:requestId/update", {
-                        templateUrl: "/static/page/request/update-request-page.html",
-                        controller: "UpdateRequestController"
-                        ///request/:requestId/
+                        templateUrl: "/static/page/request/new-request-page.html",
+                        controller: "NewRequestController"
                     })
                     // .when("/request/:requestId/",{
                     //      templateUrl: "/static/page/request/details.html",
@@ -77,6 +76,18 @@
                     .when("/requestListByEmployee", {
                         templateUrl: "/static/page/request/request-list-by-employee.html",
                         controller: "RequestListByEmployeeController"
+                    })
+                    .when("/users", {
+                        templateUrl: "/static/page/person/person-list.html",
+                        controller: "PersonListController"
+                    })
+                    .when("/request/my", {
+                        templateUrl: "/static/page/request/free-request-page.html",
+                        controller: "RequestListController"
+                    })
+                    .when("/person/:personId/update", {
+                        templateUrl: "/static/page/person/person-update.html",
+                        controller: "UpdatePersonController"
                     })
                     .otherwise({
                         templateUrl: "/static/error/404.html"

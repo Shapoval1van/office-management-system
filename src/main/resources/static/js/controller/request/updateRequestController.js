@@ -72,6 +72,7 @@
                             $scope.requestCredentials.status = $scope.requestCredentials.status.id;
                             $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
                         }, function (callback) {
+                            //swal("Oops...", callback.data.error_description, "error");
                             console.log(callback)
                         })
                 };
@@ -94,7 +95,8 @@
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
                             window.location = "/requestListByEmployee";
-                        }, function (callback) {
+                        }, function (error) {
+                            swal("Oops...", error.data.errors[0].detail, "error");
                             console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })

@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="/static/style/request/requestByEmployee.css">
     <link rel="stylesheet" href="/static/style/component/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="/static/style/request/details.css">
+    <link rel="stylesheet" type="text/css" href="/static/style/sweet-alert/sweetalert.css">
     <link rel="stylesheet" href="/static/style/request/request-details.css">
 
 
@@ -56,7 +57,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
+                <li><a class="logout" ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -67,6 +68,7 @@
 </ng-view>
 
 <!--SCRIPT-->
+<script src="/static/js/sweet-alert/sweetalert.min.js"></script>
 <!--JQUERY-->
 <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -105,6 +107,8 @@
 <script src="/static/js/controller/login/recoverPasswordController.js"></script>
 <script src="/static/js/controller/demo/demoController.js"></script>
 <script src="/static/js/controller/test/commentController.js"></script>
+<script src="/static/js/controller/person/personList.js"></script>
+<script src="/static/js/controller/person/updatePerson.js"></script>
 
 <script src="/static/js/service/comment/commentService.js"></script>
 <script src="/static/js/service/sessionService.js"></script>

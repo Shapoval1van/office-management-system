@@ -61,3 +61,24 @@ h2, h3, .info__try-text{
 	font-size: 14px;
 	font-weight: 200;
 }
+.navbar{
+	background-color: #000;
+	border: none;
+}
+.navbar .navbar-brand{
+	font-family: 'Pacifico', cursive;
+	float: none;
+	line-height: 35px;
+	color: #ffffff;
+	font-size: 18px;
+}
+.navbar .logout{
+	color: #ffffff!important;
+	font-size: 14px;
+}
+.navbar .logout:hover{
+	color: #d9230f!important;
+}
+textarea{
+	resize: none;
+}

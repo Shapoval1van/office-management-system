@@ -36,6 +36,7 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.find.all.by.employee}")
     public String GET_ALL_REQUESTS_BY_EMPLOYEE;
+    //public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
@@ -152,6 +153,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public List<Request> getAllSubRequest(Long parentId) {
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
+
+//    @Override
+//    public List<Request> getAllAssignedRequest(Long managerId) {
+//        return super.queryForList(GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER, managerId);
+//    }
 
 
     @Override

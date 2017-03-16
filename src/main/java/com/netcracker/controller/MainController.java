@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainController {
 
-    @GetMapping(value = {"/*", "/login/*", "/resetPassword/*", "/request/*", "request/{requestId}/*",
+    @GetMapping(value = {"/*", "/login/*", "/resetPassword/*", "/request/*", "request/{requestId}/*", "/person/{personId}/*",
             "/request-group/{requestGroupId}/requests"}, produces = MediaType.TEXT_HTML_VALUE)
     public String goIndex() {
         return "/static/index.html";

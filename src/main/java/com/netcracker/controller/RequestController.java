@@ -44,7 +44,6 @@ public class RequestController {
 
 
     @PostMapping(value = "/updatePriority/{requestId}")
-    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {
@@ -92,7 +91,7 @@ public class RequestController {
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
-    //@PreAuthorize("hasRole('[ROLE_EMPLOYEE,ROLE_ADMINISTRATOR]')")
+
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
                                                  @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
@@ -106,16 +105,11 @@ public class RequestController {
     }
 
     @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/delete")
-    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId) {
-        try {
-            Optional<Request> request = requestService.getRequestById(requestId);
-            if (!request.isPresent())
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            requestService.deleteRequestById(requestId);
-        } catch (CannotDeleteRequestException | ResourceNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
+        Optional<Request> request = requestService.getRequestById(requestId);
+        if (!request.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        requestService.deleteRequestById(requestId, principal);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
