@@ -5,7 +5,6 @@ import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -217,7 +216,6 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Override
     public List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod) {
-        Locale locale = LocaleContextHolder.getLocale();
         if(reportPeriod == null){
             return new ArrayList<>();
         }
@@ -240,7 +238,15 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod) {
+    public Long countRequestByEmployeeIdForPeriod(Long personId, String reportPeriod) {
+        if (reportPeriod == null) return 0L;
+        reportPeriod = reportPeriod.toLowerCase();
+        String countQuery = getQueryByPeriod(reportPeriod, Role.ROLE_EMPLOYEE).replace("*", "count(request_id)");
+        return getJdbcTemplate().queryForObject(countQuery, Long.class, personId);
+    }
+
+    @Override
+    public List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod) {
         if (reportPeriod == null) {
             return new ArrayList<>();
         }
@@ -249,7 +255,15 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable) {
+    public Long countAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod) {
+        if (reportPeriod == null) return 0L;
+        reportPeriod = reportPeriod.toLowerCase();
+        String countQuery = getQueryByPeriod(reportPeriod, Role.ROLE_OFFICE_MANAGER).replace("*", "count(request_id)");
+        return getJdbcTemplate().queryForObject(countQuery, Long.class, personId);
+    }
+
+    @Override
+    public List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod, Pageable pageable) {
         if (reportPeriod == null) {
             return new ArrayList<>();
         }

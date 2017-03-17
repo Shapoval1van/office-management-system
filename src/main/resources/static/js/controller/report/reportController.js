@@ -2,65 +2,114 @@
     angular.module("OfficeManagementSystem")
         .controller("ReportController", ['$scope', '$routeParams', '$location', '$http',
             function ($scope, $routeParams, $location, $http) {
-
+                $scope.currentPage = 1;
+                $scope.pageSize = 10;
+                $scope.totalItems = 0;
+                $scope.title = 'Report by '+$scope.period;
                 var that = this;
                 var personId = $routeParams.personId;
-                var period;
+
+                //fetch period
                 if($location.search().period == undefined){
-                    period = 'month'
+                    $scope.period = 'month'
                 }else{
-                    period = $location.search().period;
+                    $scope.period = $location.search().period;
                 }
-                $scope.title = 'Report by '+period;
+                //chose type of first charts
+                if($scope.period=='year'){
+                    $scope.type = 'column2d';
+                }else {
+                    $scope.type = 'area2d';
+                }
+
+                $scope.pageChanged = function() {
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/allRequest/'+personId+'?period='+$scope.period
+                        +'&page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                    }).then(function successCallback(response) {
+                        $scope.requestList = response.data;
+                    }, function errorCallback(response) {
+                        $scope.requestList = [];
+                    });
+                };
+
+                $scope.chartsForEmployee = function () {
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForEmployee/' + personId + '?period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.reportForTime.data = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForEmployee/' + personId + '?type=pie' + '&period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.pieChart.data = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+                };
+
+                $scope.chartsForManager = function () {
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForManager/' + personId + '?period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.reportForTime.data = response.data;
+                    }, function errorCallback(response) {
+                    });
+
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.pieChart.data = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+                };
+
+                $scope.getTotalPage = function () {
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.totalItems = response.data;
+                    }, function errorCallback(response) {
+                    });
+
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.pieChart.data = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+                };
+
                 $http({
                     method: 'GET',
                     url: 'api/person/'+personId
                 }).then(function successCallback(response){
                     that.person = response.data;
-                        if(that.person.role==3){
-                            $http({
-                                method: 'GET',
-                                url: 'api/report/chartsForEmployee/' + personId + '?period=' + period
-                            }).then(function successCallback(response) {
-                                $scope.areaChart.data = response.data;
-                            }, function errorCallback(response) {
-
-                            });
-                            $http({
-                                method: 'GET',
-                                url: 'api/report/chartsForEmployee/' + personId + '?type=pie' + '&period=' + period
-                            }).then(function successCallback(response) {
-                                $scope.pieChart.data = response.data;
-                            }, function errorCallback(response) {
-
-                            });
-                        } else if (that.person.role == 2) {
-                            $http({
-                                method: 'GET',
-                                url: 'api/report/chartsForManager/' + personId + '?period=' + period
-                            }).then(function successCallback(response) {
-                                $scope.areaChart.data = response.data;
-                            }, function errorCallback(response) {
-                            });
-
-                            $http({
-                                method: 'GET',
-                                url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + period
-                            }).then(function successCallback(response) {
-                                $scope.pieChart.data = response.data;
-                            }, function errorCallback(response) {
-
-                            });
-                        } else if(that.person.role==1){
-                            $scope.administratorMessage="You do not have reports! You are administrator!";
+                        if(that.person.role.id==3){
+                          $scope.chartsForEmployee();
+                        } else if (that.person.role.id == 2) {
+                          $scope.chartsForManager();
+                        } else if(that.person.role.id==1){
+                            window.location = "javascript:history.back()";
                         } else {
-                            $scope.undefinedUserMessage="You are not login!";
+                            window.location = "javascript:history.back()";
                         }
                 }, function errorCallback(response) {
 
                 });
 
-                $scope.areaChart  = {
+                $scope.reportForTime  = {
                     "chart": {
                         "caption": "The number of requests for a period of time",
                         "xAxisName": "Data",
@@ -127,13 +176,10 @@
                     ]
                 };
 
-                $http({
-                    method: 'GET',
-                    url: 'api/report/allRequest/'+personId
-                }).then(function successCallback(response) {
-                    $scope.requestList = response.data;
-                }, function errorCallback(response) {
-                    $scope.requestList = [];
-                });
+                $scope.pageChanged(1);
+
+                $scope.getTotalPage();
+
+
             }])
 })();
