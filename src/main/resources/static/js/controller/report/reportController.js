@@ -6,11 +6,8 @@
                 $scope.pageSize = 10;
                 $scope.totalItems = 0;
                 $scope.maxSize = 5;
-                $scope.title = 'Report by '+$scope.period;
                 var that = this;
                 var personId = $routeParams.personId;
-                $scope.namesOfPeriod = ["quarter", "month", "year"];
-
 
                 //fetch period
                 if($location.search().period == undefined){
@@ -18,8 +15,17 @@
                     $scope.title = 'Report by '+$scope.period;
                 }else{
                     $scope.period = $location.search().period;
+                    if($scope.period!="month"&&$scope.period!="quarter"&&$scope.period!="year"){
+                        $scope.period = 'month';
+                    }
                     $scope.title = 'Report by '+$scope.period;
                 }
+
+                $scope.namesOfPeriod = {
+                    "type": "select",
+                    "value": $scope.period.substr(0,1).toUpperCase()+$scope.period.substr(1).toLocaleLowerCase(),
+                    "values": ["Month", "Quarter", "Year"]
+                };
                 //chose type of first charts
                 if($scope.period=='year'){
                     $scope.type = 'column2d';
@@ -30,7 +36,7 @@
                 $scope.getTotalPage = function () {
                     $http({
                         method: 'GET',
-                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period
+                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period.toLowerCase()
                     }).then(function successCallback(response) {
                         $scope.totalItems = response.data;
                     }, function errorCallback(response) {
@@ -41,7 +47,7 @@
                 $scope.pageChanged = function(currentPage) {
                     $http({
                         method: 'GET',
-                        url: 'api/report/allRequest/'+personId+'?period='+$scope.period
+                        url: 'api/report/allRequest/'+personId+'?period='+$scope.period.toLowerCase()
                         +'&page=' +  currentPage + '&size=' + $scope.pageSize
                     }).then(function successCallback(response) {
                         $scope.requestList = response.data;
@@ -50,13 +56,10 @@
                     });
                 };
 
-                $scope.getTotalPage(); //
-                //$scope.pageChanged(1); // get first page
-
                 $scope.chartsForEmployee = function () {
                     $http({
                         method: 'GET',
-                        url: 'api/report/chartsForEmployee/' + personId + '?period=' + $scope.period
+                        url: 'api/report/chartsForEmployee/' + personId + '?period=' + $scope.period.toLowerCase()
                     }).then(function successCallback(response) {
                         $scope.reportForTime.data = response.data;
                     }, function errorCallback(response) {
@@ -64,7 +67,7 @@
                     });
                     $http({
                         method: 'GET',
-                        url: 'api/report/chartsForEmployee/' + personId + '?type=pie' + '&period=' + $scope.period
+                        url: 'api/report/chartsForEmployee/' + personId + '?type=pie' + '&period=' + $scope.period.toLowerCase()
                     }).then(function successCallback(response) {
                         $scope.pieChart.data = response.data;
                     }, function errorCallback(response) {
@@ -75,7 +78,7 @@
                 $scope.chartsForManager = function () {
                     $http({
                         method: 'GET',
-                        url: 'api/report/chartsForManager/' + personId + '?period=' + $scope.period
+                        url: 'api/report/chartsForManager/' + personId + '?period=' + $scope.period.toLowerCase()
                     }).then(function successCallback(response) {
                         $scope.reportForTime.data = response.data;
                     }, function errorCallback(response) {
@@ -83,7 +86,7 @@
 
                     $http({
                         method: 'GET',
-                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period
+                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period.toLowerCase()
                     }).then(function successCallback(response) {
                         $scope.pieChart.data = response.data;
                     }, function errorCallback(response) {
@@ -115,8 +118,8 @@
                 $scope.getAllData();
 
                 $scope.getPeriodData = function (periodItem) {
-                    $scope.period=periodItem;
-                    window.location = "report/"+ personId +"?period=" + periodItem;
+                    $scope.period=periodItem.toLowerCase();
+                    window.location = "report/"+ personId +"?period=" + periodItem.toLowerCase();
                     // console.log($scope.period);
                     //     if (that.person.role.id == 3) {
                     //         $scope.chartsForEmployee();
@@ -140,7 +143,8 @@
                         "xAxisName": "Data",
                         "yAxisName": "Count of requests",
                         "paletteColors": "#0075c2",
-                        "bgColor": "#c7c7c7",
+                        "bgColor": "#f4f4f4",
+                        "bgAlpha": "100",
                         "showBorder": "0",
                         "showCanvasBorder": "0",
                         "plotBorderAlpha": "10",
@@ -170,7 +174,8 @@
                     "chart": {
                         "caption": "Report on the status of the request",
                         "paletteColors": "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
-                        "bgColor": "#c7c7c7",
+                        "bgColor": "#f4f4f4",
+                        "bgAlpha": "100",
                         "showBorder": "0",
                         "use3DLighting": "0",
                         "showShadow": "0",
@@ -203,8 +208,6 @@
 
                 $scope.pageChanged(1);
 
-                $scope.getTotalPage();
-
-
+                $scope.getTotalPage(); //
             }])
 })();

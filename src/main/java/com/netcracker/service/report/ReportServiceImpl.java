@@ -103,7 +103,7 @@ public class ReportServiceImpl implements ReportService {
         Role role = getRole(person);
         if (chartsType == ChartsType.AREA) {
             List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
-            return buildReportDTOtoAreaCharts(requestList);
+            return period.toLowerCase().equals("year") ? buildReportDTOtoColumnCharts(requestList) : buildReportDTOtoAreaCharts(requestList);
         } else if (chartsType == ChartsType.PIE) {
             List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
             return buildReportDTOtoPieCharts(requestList);
@@ -165,7 +165,7 @@ public class ReportServiceImpl implements ReportService {
         LinkedList<ReportDTO> reportDTOList = new LinkedList<>();
         ReportDTO free = new ReportDTO("Free", (long) freeCount);
         ReportDTO inProgress = new ReportDTO("In progress", (long) inProgressCount);
-        ReportDTO closed = new ReportDTO("closed", (long) closedCount);
+        ReportDTO closed = new ReportDTO("Closed", (long) closedCount);
         reportDTOList.add(free);
         reportDTOList.add(inProgress);
         reportDTOList.add(closed);

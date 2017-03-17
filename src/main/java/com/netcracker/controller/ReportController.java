@@ -37,7 +37,7 @@ public class ReportController {
         return responseList;
     }
 
-     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/allRequest/{personId}")
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/allRequest/{personId}")
     public ResponseEntity<?> countRequestByPersonIdForPeriod(@Pattern(regexp = "(quarter|year|month)")
                                                                @RequestParam(name = "period", defaultValue = "month") String period,
                                                                @PathVariable(name = "personId") Long personId) throws CurrentUserNotPresentException, NotDataForThisRoleException {

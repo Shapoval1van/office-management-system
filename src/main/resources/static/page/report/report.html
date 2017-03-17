@@ -5,39 +5,38 @@
         <div class="container-fluid">
             <div class="jumbotron bordered">
                 <div class="col-md-6">
-                    <span class="label label-info">Select period</span>
-                    <select ng-model="periodData" ng-change="getPeriodData(periodData)">
-                        <option ng-repeat="x in namesOfPeriod" value="{{x}}">{{x}}</option>
+                    <label for="periodSelect">Select period</label>
+                    <select id="periodSelect" class="input-sm" ng-model="namesOfPeriod.value" ng-options="x for x in namesOfPeriod.values"
+                             ng-change="getPeriodData(namesOfPeriod.value)">
                     </select>
                 </div>
                 <legend>{{title}}</legend>
-                <div class="row">
-                    <div class="col-md-6" fusioncharts type="{{type}}" dataSource="{{reportForTime}}">
-
-                    </div>
-
-                    <div class="col-md-6" fusioncharts type="pie2d" dataSource="{{pieChart}}">
-
-                    </div>
-                </div>
                 <div ng-if="requestList.length!=0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div width="100%"  fusioncharts type="{{type}}" dataSource="{{reportForTime}}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div width="100%"  fusioncharts type="pie2d" dataSource="{{pieChart}}"> </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <table st-table="displayedList" st-safe-src="requestList"
                                class="table table-stripped">
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th st-sort="field.name">Name</th>
+                                <th st-sort="name">Name</th>
                                 <th st-sort="estimate">Estimate</th>
-                                <th st-sort="priority">Priority</th>
-                                <th st-sort="author.lastName">Author</th>
-                                <th st-sort="status">Status</th>
+                                <th st-sort="priority.id">Priority</th>
+                                <th>Author</th>
+                                <th st-sort="status.id">Status</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="requestItem in displayedList">
+                            <tr class="animate-repeat" ng-repeat="requestItem in displayedList">
                                 <td class="text-center">
-                                    {{$index + 1}}
+                                    {{(currentPage - 1) * pageSize + $index + 1}}
                                 </td>
                                 <td class="text-center">
                                     {{requestItem.name}}
