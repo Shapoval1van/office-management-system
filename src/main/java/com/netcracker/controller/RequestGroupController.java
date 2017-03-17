@@ -4,6 +4,7 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.dto.StatusDTO;
 import com.netcracker.model.entity.RequestGroup;
@@ -41,7 +42,7 @@ public class RequestGroupController {
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public void createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
-                                   Principal principal) throws CurrentUserNotPresentException {
+                                   Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
         requestGroupService.saveRequestGroup(requestGroupDTO, principal);
     }
 
@@ -49,7 +50,7 @@ public class RequestGroupController {
     @ResponseStatus(HttpStatus.OK)
     public void editRequestGroup(@Validated(UpdateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
                                  @PathVariable("requestGroupId") Integer requestGroupId,
-                                 Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+                                 Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist {
         requestGroupDTO.setId(requestGroupId);
         requestGroupService.updateRequestGroup(requestGroupDTO, principal);
     }

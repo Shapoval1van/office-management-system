@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGroup, Integer> implements RequestGroupRepository {
@@ -31,6 +32,8 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     @Value("${request.group.count.by.author}")
     private String COUNT_REQUEST_GROUP_BY_AUTHOR;
 
+    @Value("${request.group.find.by.name.author}")
+    private String FIND_REQUEST_GROUP_BY_NAME_AND_AUTHOR;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestGroupRepositoryImpl.class);
 
@@ -73,5 +76,10 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     @Override
     public int countRequestGroupByAuthor(Long authorId) {
         return super.jdbcTemplate.queryForObject(COUNT_REQUEST_GROUP_BY_AUTHOR, Integer.class, authorId);
+    }
+
+    @Override
+    public Optional<RequestGroup> findRequestGroupByNameAndAuthor(String name, Long authorId) {
+        return super.queryForObject(FIND_REQUEST_GROUP_BY_NAME_AND_AUTHOR, name, authorId);
     }
 }

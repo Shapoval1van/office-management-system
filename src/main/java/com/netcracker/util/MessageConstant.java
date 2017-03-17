@@ -40,6 +40,7 @@ public class MessageConstant {
     // REQUEST GROUP ERROR
     public static final String REQUEST_GROUP_ILLEGAL_ACCESS = "request.group.error.illegal.access";
     public static final String REQUEST_GROUP_NOT_EXIST = "request.group.error.not.exist";
+    public static final String REQUEST_GROUP_ALREADY_EXIST = "request.group.error.already.exist";
 
     //TOKEN
     public static final String TOKEN_ERROR_EXPIRED = "token.error.expired";

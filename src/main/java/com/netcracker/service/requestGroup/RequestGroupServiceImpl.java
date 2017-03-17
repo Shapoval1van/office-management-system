@@ -4,6 +4,7 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -48,24 +50,38 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     private RoleRepository roleRepository;
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
         return requestGroupRepository.findRequestGroupByAuthorId(authorId, pageable);
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId) {
         String regex = generateRegexByNamePart(namePart);
         return requestGroupRepository.findRequestGroupByNameRegex(regex, authorId);
     }
 
     @Override
-    public Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) {
-        LOGGER.debug("Save request group to db");
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) throws RequestGroupAlreadyExist {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        if (requestGroupRepository
+                .findRequestGroupByNameAndAuthor(requestGroup.getName(), requestGroup.getAuthor().getId()).isPresent()) {
+            LOGGER.error(messageSource
+                    .getMessage(REQUEST_GROUP_ALREADY_EXIST, new Object[]{requestGroup.getName()}, locale));
+
+            throw new RequestGroupAlreadyExist(messageSource
+                    .getMessage(REQUEST_GROUP_ALREADY_EXIST, new Object[]{requestGroup.getName()}, locale));
+        }
+
         return requestGroupRepository.save(requestGroup);
     }
 
     @Override
-    public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
         Locale locale = LocaleContextHolder.getLocale();
 
         RequestGroup requestGroup = requestGroupDTO.toRequestGroup();
@@ -88,7 +104,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
-    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist {
         Locale locale = LocaleContextHolder.getLocale();
 
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
@@ -112,11 +129,13 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public int getRequestGroupCountByAuthor(Long authorId) {
         return requestGroupRepository.countRequestGroupByAuthor(authorId);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal)
             throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();

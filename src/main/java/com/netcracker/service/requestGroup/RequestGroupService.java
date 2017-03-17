@@ -4,6 +4,7 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.repository.common.Pageable;
@@ -17,11 +18,11 @@ public interface RequestGroupService {
 
     List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId);
 
-    Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup);
+    Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) throws RequestGroupAlreadyExist;
 
-    Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException;
+    Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist;
 
-    Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
+    Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist;
 
     int getRequestGroupCountByAuthor(Long authorId);
 
