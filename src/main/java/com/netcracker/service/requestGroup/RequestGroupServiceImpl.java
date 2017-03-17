@@ -4,6 +4,7 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -48,27 +50,40 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     private RoleRepository roleRepository;
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
         return requestGroupRepository.findRequestGroupByAuthorId(authorId, pageable);
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId) {
         String regex = generateRegexByNamePart(namePart);
         return requestGroupRepository.findRequestGroupByNameRegex(regex, authorId);
     }
 
     @Override
-    public Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) {
-        LOGGER.debug("Save request group to db");
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) throws RequestGroupAlreadyExist {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        if (requestGroupRepository
+                .findRequestGroupByNameAndAuthor(requestGroup.getName(), requestGroup.getAuthor().getId()).isPresent()) {
+            LOGGER.error(messageSource
+                    .getMessage(REQUEST_GROUP_ALREADY_EXIST, new Object[]{requestGroup.getName()}, locale));
+
+            throw new RequestGroupAlreadyExist(messageSource
+                    .getMessage(REQUEST_GROUP_ALREADY_EXIST, new Object[]{requestGroup.getName()}, locale));
+        }
+
         return requestGroupRepository.save(requestGroup);
     }
 
     @Override
-    public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Convert dto to entity");
         RequestGroup requestGroup = requestGroupDTO.toRequestGroup();
 
         String currentUserEmail = principal.getName();
@@ -89,10 +104,10 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
-    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.debug("Get request group with id {} from database", requestGroupDTO.getId());
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
 
         if (!requestGroupOptional.isPresent()) {
@@ -103,7 +118,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
         RequestGroup requestGroup = requestGroupOptional.get();
         if (requestGroupDTO.getName() != null) {
-            LOGGER.trace("Change request group name from {} to {}", requestGroup.getName(), requestGroupDTO.getName());
             requestGroup.setName(requestGroupDTO.getName());
         }
 
@@ -111,22 +125,21 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             throw new IllegalAccessException(messageSource
                     .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
-        LOGGER.trace("Update request group");
         return saveRequestGroup(requestGroup);
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public int getRequestGroupCountByAuthor(Long authorId) {
-        LOGGER.debug("Get request grout count by author. Author id: {}", authorId);
         return requestGroupRepository.countRequestGroupByAuthor(authorId);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal)
             throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Getting request group with id {} from database", requestGroupId);
         Optional<RequestGroup> requestGroupOption = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOption.isPresent()) {
@@ -140,7 +153,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
                     .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
 
-        LOGGER.trace("Get status with id {} from database", statusId);
         Optional<Status> statusOptional = statusRepository.findOne(statusId);
 
         if (!statusOptional.isPresent()) {
@@ -169,9 +181,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             Integer currentStatusId = request.getStatus().getId();
 
             if (!currentStatusId.equals(canceledStatusId)) {
-                LOGGER.trace("Set status {} for request with id {}", statusId, request.getId());
                 request.setStatus(status);
-                LOGGER.trace("Save updated request {} to database", request.getId());
                 requestRepository.save(request);
             } else
                 LOGGER.trace("Request {} already canceled", request.getId());
@@ -185,8 +195,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
                 .append(namePart)
                 .append(".*")
                 .toString();
-
-        LOGGER.trace("Build {} regex from {} name part", regex, namePart);
 
         return regex;
     }

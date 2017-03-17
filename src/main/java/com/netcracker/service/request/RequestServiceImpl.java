@@ -20,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,14 +171,14 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
-        if(!oldRequest.isPresent()) return Optional.empty();
-        if (isCurrentUserAdmin(principal)){
+        if (!oldRequest.isPresent()) return Optional.empty();
+        if (isCurrentUserAdmin(principal)) {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
             updateRequestHistory(request, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(request);
-        } else if (!person.get().getId().equals(currentUser.get().getId())){
+        } else if (!person.get().getId().equals(currentUser.get().getId())) {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
+        } else if (oldRequest.get().getStatus().getId() != StatusEnum.FREE.getId()) {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
@@ -231,10 +232,10 @@ public class RequestServiceImpl implements RequestService {
      * @throws IllegalAccessException
      */
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Getting request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
@@ -243,7 +244,6 @@ public class RequestServiceImpl implements RequestService {
                     .getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
         }
 
-        LOGGER.trace("Getting request group with id {} from database");
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOptional.isPresent()) {
@@ -254,7 +254,6 @@ public class RequestServiceImpl implements RequestService {
 
         Request request = requestOptional.get();
 
-        LOGGER.trace("Getting status with id {} from database", request.getStatus().getId());
         Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.getName())) {
@@ -280,10 +279,10 @@ public class RequestServiceImpl implements RequestService {
      * @throws IllegalAccessException
      */
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
@@ -327,7 +326,7 @@ public class RequestServiceImpl implements RequestService {
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
             changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
-            if (request.getParent()==null) {
+            if (request.getParent() == null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty())
                     subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId())));
