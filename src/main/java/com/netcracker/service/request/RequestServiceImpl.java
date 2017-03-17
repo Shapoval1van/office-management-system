@@ -233,7 +233,6 @@ public class RequestServiceImpl implements RequestService {
     public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Getting request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {
@@ -242,7 +241,6 @@ public class RequestServiceImpl implements RequestService {
                     .getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
         }
 
-        LOGGER.trace("Getting request group with id {} from database");
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOptional.isPresent()) {
@@ -253,7 +251,6 @@ public class RequestServiceImpl implements RequestService {
 
         Request request = requestOptional.get();
 
-        LOGGER.trace("Getting status with id {} from database", request.getStatus().getId());
         Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.getName())) {
@@ -282,7 +279,6 @@ public class RequestServiceImpl implements RequestService {
     public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Get request with id {} from database", requestId);
         Optional<Request> requestOptional = requestRepository.findOne(requestId);
 
         if (!requestOptional.isPresent()) {

@@ -68,7 +68,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Convert dto to entity");
         RequestGroup requestGroup = requestGroupDTO.toRequestGroup();
 
         String currentUserEmail = principal.getName();
@@ -92,7 +91,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     public Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.debug("Get request group with id {} from database", requestGroupDTO.getId());
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupDTO.getId());
 
         if (!requestGroupOptional.isPresent()) {
@@ -103,7 +101,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
         RequestGroup requestGroup = requestGroupOptional.get();
         if (requestGroupDTO.getName() != null) {
-            LOGGER.trace("Change request group name from {} to {}", requestGroup.getName(), requestGroupDTO.getName());
             requestGroup.setName(requestGroupDTO.getName());
         }
 
@@ -111,13 +108,11 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             throw new IllegalAccessException(messageSource
                     .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
-        LOGGER.trace("Update request group");
         return saveRequestGroup(requestGroup);
     }
 
     @Override
     public int getRequestGroupCountByAuthor(Long authorId) {
-        LOGGER.debug("Get request grout count by author. Author id: {}", authorId);
         return requestGroupRepository.countRequestGroupByAuthor(authorId);
     }
 
@@ -126,7 +121,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        LOGGER.trace("Getting request group with id {} from database", requestGroupId);
         Optional<RequestGroup> requestGroupOption = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOption.isPresent()) {
@@ -140,7 +134,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
                     .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
 
-        LOGGER.trace("Get status with id {} from database", statusId);
         Optional<Status> statusOptional = statusRepository.findOne(statusId);
 
         if (!statusOptional.isPresent()) {
@@ -169,9 +162,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
             Integer currentStatusId = request.getStatus().getId();
 
             if (!currentStatusId.equals(canceledStatusId)) {
-                LOGGER.trace("Set status {} for request with id {}", statusId, request.getId());
                 request.setStatus(status);
-                LOGGER.trace("Save updated request {} to database", request.getId());
                 requestRepository.save(request);
             } else
                 LOGGER.trace("Request {} already canceled", request.getId());
@@ -185,8 +176,6 @@ public class RequestGroupServiceImpl implements RequestGroupService {
                 .append(namePart)
                 .append(".*")
                 .toString();
-
-        LOGGER.trace("Build {} regex from {} name part", regex, namePart);
 
         return regex;
     }
