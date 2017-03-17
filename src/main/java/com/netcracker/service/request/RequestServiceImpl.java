@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,10 @@ import java.util.stream.Collectors;
 import static com.netcracker.util.MessageConstant.*;
 
 @Service
+@PropertySource("classpath:property/request/schedule.properties")
 public class RequestServiceImpl implements RequestService {
 
-    private static final long REMIND_TIME_BEFORE_EXPIRY = 3_600_000; // 1 hour
+    private final long REMIND_BEFORE = 3_600_000; // 1 hour TODO set 1 day
 
     private ApplicationEventPublisher eventPublisher;
 
@@ -372,18 +374,20 @@ public class RequestServiceImpl implements RequestService {
         return requestsByRequestGroupId;
     }
 
-    @Scheduled(fixedRate = REMIND_TIME_BEFORE_EXPIRY)
+    @Scheduled(cron = "${request.expiry.remind.time}")
     @Override
     public void checkRequestsForExpiry() {
         Long currentTime = System.currentTimeMillis();
 
         List<Request> requests = requestRepository.findAll().stream()
-                .filter(r -> r.getEstimate() != null)
+                .filter(r -> r.getEstimate() != null &&
+                        (r.getStatus().getId() == 1 || r.getStatus().getId() == 2)) // avoid requests without manager and closed/canceled
                 .filter(r ->
                         {
                             Long difference = r.getEstimate().getTime() - currentTime;
+
                             return (difference >= 0) &&
-                                    (difference < REMIND_TIME_BEFORE_EXPIRY);
+                                    (difference < REMIND_BEFORE);
                         }
                 )
                 .collect(Collectors.toList());
