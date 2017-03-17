@@ -21,36 +21,37 @@
                             </thead>
                             <tbody>
                             <tr ng-repeat="requestItem in displayedList">
-                            <td>
-                            {{$index + 1}}
-                            </td>
-                            <td>
-                            {{requestItem.name}}
-                            </td>
-                            <td>
-                            {{requestItem.estimate| date : 'dd.MM.yyyy'}}
-                            </td>
-                            <td>
-                            {{requestItem.priority.name}}
-                            </td>
-                            <td>
-                            <a href="#">
-                            {{requestItem.employee.firstName}}
-                            {{requestItem.employee.lastName}}
-                            </a>
-                            </td>
-                            <td>
-                            {{requestItem.status.name}}
-                            </td>
+                                <td class="text-center">
+                                    {{$index + 1}}
+                                </td>
+                                <td class="text-center">
+                                    {{requestItem.name}}
+                                </td>
+                                <td class="text-center">
+                                     <span ng-if="!!requestItem.estimate">{{requestItem.estimate | date: "dd.MM.yyyy HH:mm"}}</span>
+                                    <span ng-if="!requestItem.estimate">Not specified</span>
+                                </td>
+                                <td class="text-center">
+                                    {{requestItem.priority.name}}
+                                </td>
+                                <td class="text-center">
+                                    <a href="#">
+                                        {{requestItem.employee.firstName}}
+                                        {{requestItem.employee.lastName}}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    {{requestItem.status.name}}
+                                </td>
                             </tbody>
                         </table>
                     </div>
                     <div class="row">
-                        <div class = "col-md-6" fusioncharts  type="area2d" dataSource="{{areaChart}}">
+                        <div class="col-md-6" fusioncharts type="{{type}}" dataSource="{{reportForTime}}">
 
                         </div>
 
-                        <div class = "col-md-6" fusioncharts  type="pie2d" dataSource="{{pieChart}}">
+                        <div class="col-md-6" fusioncharts type="pie2d" dataSource="{{pieChart}}">
 
                         </div>
                     </div>

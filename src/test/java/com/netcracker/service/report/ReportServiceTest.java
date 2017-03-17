@@ -77,7 +77,7 @@ public class ReportServiceTest {
         requestArrayList.add(new Request());
         when(personRepository.findOne(anyLong())).thenReturn(personOpt);
         when(roleRepository.findRoleById(personOpt.get().getRole().getId())).thenReturn(Optional.of(personOpt.get().getRole()));
-        when(requestRepository.findRequestByManagerIdForPeriod(eq(personOpt.get().getId()), anyString())).thenReturn(requestArrayList);
+        when(requestRepository.findAllAssignedRequestToManagerForPeriod(eq(personOpt.get().getId()), anyString())).thenReturn(requestArrayList);
         assertEquals(3,reportService.getAllRequestByPersonIdForPeriod(1L, "month").size());
     }
 

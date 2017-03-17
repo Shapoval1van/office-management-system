@@ -35,9 +35,13 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
 
-    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod);
+    Long countRequestByEmployeeIdForPeriod(Long personId, String reportPeriod);
 
-    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
+    List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod);
+
+    Long countAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod);
+
+    List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod, Pageable pageable);
 
     int updateRequestGroup(Long requestId, Integer requestGroupId);
 

@@ -16,11 +16,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.netcracker.util.MessageConstant.USER_ERROR_NOT_PRESENT;
 import static com.netcracker.util.MessageConstant.NOT_DATA_FOR_THIS_ROLE;
+import static com.netcracker.util.MessageConstant.USER_ERROR_NOT_PRESENT;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -46,11 +47,11 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(readOnly = true)
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
-        Person person =  personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
+        Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
                 messageSource.getMessage(USER_ERROR_NOT_PRESENT, new Object[]{personId}, locale)));
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
-        if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
-            List<Request> requestArrayList = requestRepository.findRequestByManagerIdForPeriod(personId, period);
+        if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)) {
+            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period);
             requestArrayList.forEach(request -> requestService.fill(request));
             return requestArrayList;
         }
@@ -60,15 +61,16 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable) throws CurrentUserNotPresentException, NotDataForThisRoleException {
+    public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable)
+            throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Locale locale = LocaleContextHolder.getLocale();
         Person person = getPerson(personId);
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
-        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)){
+        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)) {
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         }
-        if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
-            List<Request> requestArrayList = requestRepository.findRequestByManagerIdForPeriod(personId, period, pageable);
+        if (role.getName().equals(Role.ROLE_OFFICE_MANAGER)) {
+            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period, pageable);
             requestArrayList.forEach(request -> requestService.fill(request));
             return requestArrayList;
         }
@@ -78,37 +80,50 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException, NotDataForThisRoleException {
+    @Transactional(readOnly = true)
+    public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType)
+            throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
         Role role = getRole(person);
-        if(chartsType == ChartsType.AREA){
-            List<Request> requestList = requestRepository.findRequestByManagerIdForPeriod(personId, period);
-            return buildReportDTOtoAreaCharts(requestList);
-        }
-        else if(chartsType == ChartsType.PIE){
-            List<Request> requestList = requestRepository.findRequestByManagerIdForPeriod(personId, period);
+        if (chartsType == ChartsType.AREA) {
+            List<Request> requestList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period);
+            return period.toLowerCase().equals("year") ? buildReportDTOtoColumnCharts(requestList) : buildReportDTOtoAreaCharts(requestList);
+        } else if (chartsType == ChartsType.PIE) {
+            List<Request> requestList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period);
             return buildReportDTOtoPieCharts(requestList);
         }
         return new ArrayList<>();
     }
 
     @Override
-    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType) throws CurrentUserNotPresentException,  NotDataForThisRoleException {
+    @Transactional(readOnly = true)
+    public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType)
+            throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
         Role role = getRole(person);
-        if(chartsType == ChartsType.AREA){
+        if (chartsType == ChartsType.AREA) {
             List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
             return buildReportDTOtoAreaCharts(requestList);
-        }
-        else if(chartsType == ChartsType.PIE){
+        } else if (chartsType == ChartsType.PIE) {
             List<Request> requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
             return buildReportDTOtoPieCharts(requestList);
         }
         return new ArrayList<>();
     }
 
-    private List<ReportDTO> buildReportDTOtoAreaCharts(List<Request> requestList){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+
+    @Override
+    public Long countRequestByPersonIdForPeriod(Long personId, String reportPeriod) {
+        Person person = personRepository.findOne(personId).get();
+        Role role = roleRepository.findRoleById(person.getRole().getId()).get();
+        if(role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+            return requestRepository.countAllAssignedRequestToManagerForPeriod(personId, reportPeriod);
+        }
+        return requestRepository.countRequestByEmployeeIdForPeriod(personId, reportPeriod);
+    }
+
+    private List<ReportDTO> buildReportDTOtoAreaCharts(List<Request> requestList) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM.dd");
         Collections.sort(requestList, Comparator.comparing(Request::getCreationTime));
         int countRequest = 0;
         LinkedList<ReportDTO> reportDTOList = new LinkedList<>();
@@ -117,26 +132,25 @@ public class ReportServiceImpl implements ReportService {
                 reportDTOList.add(new ReportDTO(dateFormat.format(request.getCreationTime()), (long) ++countRequest));
                 continue;
             }
-            if(dateFormat.format(request.getCreationTime()).equals(reportDTOList.getLast().getLabel())){
+            if (dateFormat.format(request.getCreationTime()).equals(reportDTOList.getLast().getLabel())) {
                 ReportDTO reportDTO = reportDTOList.getLast();
                 reportDTO.setValue((long) ++countRequest);
-                reportDTOList.set(reportDTOList.size()-1,reportDTO);
-            }
-            else{
-                reportDTOList.addLast(new ReportDTO(dateFormat.format(request.getCreationTime()),(long) ++countRequest));
+                reportDTOList.set(reportDTOList.size() - 1, reportDTO);
+            } else {
+                reportDTOList.addLast(new ReportDTO(dateFormat.format(request.getCreationTime()), (long) ++countRequest));
             }
 
         }
-        return  reportDTOList;
+        return reportDTOList;
     }
 
-    private List<ReportDTO> buildReportDTOtoPieCharts(List<Request> requestList){
+    private List<ReportDTO> buildReportDTOtoPieCharts(List<Request> requestList) {
         int freeCount = 0;
         int inProgressCount = 0;
         int closedCount = 0;
-        for (Request request: requestList) {
+        for (Request request : requestList) {
             Status status = statusRepository.findOne(request.getStatus().getId()).get();
-            switch (status.getName()){
+            switch (status.getName()) {
                 case "FREE":
                     freeCount++;
                     break;
@@ -149,18 +163,18 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         LinkedList<ReportDTO> reportDTOList = new LinkedList<>();
-        ReportDTO free = new ReportDTO("Free", (long)freeCount);
-        ReportDTO inProgress = new ReportDTO("In progress", (long)inProgressCount);
-        ReportDTO closed = new ReportDTO("closed", (long)closedCount);
+        ReportDTO free = new ReportDTO("Free", (long) freeCount);
+        ReportDTO inProgress = new ReportDTO("In progress", (long) inProgressCount);
+        ReportDTO closed = new ReportDTO("closed", (long) closedCount);
         reportDTOList.add(free);
         reportDTOList.add(inProgress);
         reportDTOList.add(closed);
         return reportDTOList;
     }
 
-    private Person getPerson(Long personId) throws  CurrentUserNotPresentException{
+    private Person getPerson(Long personId) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
-        Person person =  personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
+        Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
                 messageSource.getMessage(USER_ERROR_NOT_PRESENT, new Object[]{personId}, locale)));
         return person;
     }
@@ -168,12 +182,44 @@ public class ReportServiceImpl implements ReportService {
     private Role getRole(Person person) throws NotDataForThisRoleException {
         Locale locale = LocaleContextHolder.getLocale();
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
-        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)){
+        if (role.getName().equals(Role.ROLE_ADMINISTRATOR)) {
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         }
         return role;
     }
 
+    private List<ReportDTO> buildReportDTOtoColumnCharts(List<Request> requestList) {
+        final long INITIAL_COUNT_REQUEST_PER_MONTH = 1L;
+        Collections.sort(requestList, Comparator.comparing(Request::getCreationTime));
+        Calendar cal = Calendar.getInstance();
+        ArrayList<ReportDTO> reportDTOList = new ArrayList<>();
+        for (Request request: requestList) {
+            int indexOfLast = reportDTOList.size()-1;
+            cal.setTime(request.getCreationTime());
+            String month = getMonthForInt(cal.get(Calendar.MONTH));
+            if(reportDTOList.size()==0){
+                reportDTOList.add(new ReportDTO(month,INITIAL_COUNT_REQUEST_PER_MONTH));
+                continue;
+            }
+            if(month.equals(reportDTOList.get(indexOfLast).getLabel())){
+               ReportDTO reportDTO = reportDTOList.get(indexOfLast);
+               reportDTO.setValue(reportDTO.getValue()+1);
+               reportDTOList.set(indexOfLast,reportDTO);
+            }
+            else {
+                reportDTOList.add(new ReportDTO(month,INITIAL_COUNT_REQUEST_PER_MONTH));
+            }
+        }
+        return reportDTOList;
+    }
 
-
+    private String getMonthForInt(int num) {
+        String month = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols(Locale.UK);
+        String[] months = dfs.getMonths();
+        if (num >= 0 && num <= 11 ) {
+            month = months[num];
+        }
+        return month;
+    }
 }
