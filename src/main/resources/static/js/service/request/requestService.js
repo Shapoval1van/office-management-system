@@ -60,13 +60,14 @@
                 };
 
                 requestService.updateRequest = function (requestId, request) {
-                    return $http.put("/api/request/" + requestId + "/update", request)
+                    return $http.put("/api/request/" + requestId, request)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
                             return callback;
                         })
                 };
+
 
                 requestService.isCanceled = function (request) {
                     return request.status.name == "CANCELED";

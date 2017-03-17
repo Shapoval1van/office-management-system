@@ -33,7 +33,7 @@
                     $scope.pageChanged = function() {
                         $http({
                             method: 'GET',
-                            url: '/api/request/requestListByEmployee/' +
+                            url: '/api/request/list/my' +
                             '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                         }).then(function successCallback(response) {
                             $scope.requests = [];
@@ -142,7 +142,7 @@
                         function(){
                             $http({
                                 method: 'DELETE',
-                                url: '/api/request/' + requestId + '/delete'
+                                url: '/api/request/' + requestId
                             }).then(function successCallback(response) {
                                 $scope.requests = response.data;
                             }, function errorCallback(error) {
@@ -151,8 +151,8 @@
                             });
 
                             swal("Request canceled!", "", "success");
-                            window.setTimeout(function(){
-                                location.reload()}, 1000)
+                            // window.setTimeout(function(){
+                            //     location.reload()}, 1000)
                         });
 
                 };

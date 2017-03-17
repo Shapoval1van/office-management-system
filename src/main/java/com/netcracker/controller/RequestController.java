@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
+
 @RestController
 @RequestMapping("/api/request")
 @Validated
@@ -30,8 +32,6 @@ public class RequestController {
 
     @Autowired
     private RequestService requestService;
-
-    private static final String JSON_MEDIA_TYPE = "application/json;";
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
@@ -75,15 +75,16 @@ public class RequestController {
                 .collect(Collectors.toList())));
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addRequest")
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/add")
     public ResponseEntity<?> addRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                        Principal principal) throws CannotCreateSubRequestException, CannotCreateRequestException {
+                                        Principal principal) throws CannotCreateSubRequestException,
+                                                                    CannotCreateRequestException {
         Request request = requestDTO.toRequest();
         requestService.saveRequest(request, principal.getName());
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/addSubRequest")
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/add/sub")
     public ResponseEntity<?> addSubRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                            Principal principal) throws CannotCreateSubRequestException {
         Request subRequest = requestDTO.toRequest();
@@ -92,20 +93,23 @@ public class RequestController {
     }
 
 
-    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update")
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
-                                                 @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+                                                 @Validated(CreateValidatorGroup.class)
+                                                 @RequestBody RequestDTO requestDTO, Principal principal)
+                                                 throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal);
-        if (!result.isPresent()) {
+        if (!result.isPresent())
             new ResponseEntity<>(currentRequest, HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
-    @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/delete")
-    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class) @PathVariable Long requestId, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
+    @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
+    public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class)
+                                           @PathVariable Long requestId, Principal principal)
+                                           throws CannotDeleteRequestException, ResourceNotFoundException {
         Optional<Request> request = requestService.getRequestById(requestId);
         if (!request.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -114,7 +118,8 @@ public class RequestController {
     }
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
-    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestAssignDTO requestAssignDTO,
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
+                                           @RequestBody RequestAssignDTO requestAssignDTO,
                                            Principal principal) throws CannotAssignRequestException {
         requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
 
@@ -131,8 +136,8 @@ public class RequestController {
                 .collect(Collectors.toList())));
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/requestListByEmployee/")
-    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
+    public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {
         List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
 
         return ResponseEntity.ok((requests
@@ -147,7 +152,7 @@ public class RequestController {
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/countAllRequestByEmployee")
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/my")
     public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal) {
         Long count = requestService.getCountAllRequestByEmployee(principal.getName());
         return ResponseEntity.ok(count);
@@ -157,14 +162,15 @@ public class RequestController {
     @ResponseStatus(HttpStatus.OK)
     public void addRequestToRequestGroup(@RequestBody RequestGroupDTO requestGroupDTO,
                                          @PathVariable("requestId") Long requestId,
-                                         Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
-
+                                         Principal principal) throws ResourceNotFoundException,
+                                                              IncorrectStatusException, IllegalAccessException {
         requestService.addToRequestGroup(requestId, requestGroupDTO.getId(), principal);
     }
 
     @DeleteMapping("/{requestId}/group")
     @ResponseStatus(HttpStatus.OK)
-    public void removeFromRequestGroup(@PathVariable("requestId") Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+    public void removeFromRequestGroup(@PathVariable("requestId") Long requestId, Principal principal)
+                                       throws ResourceNotFoundException, IllegalAccessException {
         requestService.removeFromRequestGroup(requestId, principal);
     }
 
