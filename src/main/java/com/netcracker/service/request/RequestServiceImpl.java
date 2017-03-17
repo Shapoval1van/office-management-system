@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import static com.netcracker.util.MessageConstant.*;
 
 @Service
-@PropertySource("classpath:property/request/schedule.properties")
 public class RequestServiceImpl implements RequestService {
 
     private final long REMIND_BEFORE = 3_600_000; // 1 hour TODO set 1 day
