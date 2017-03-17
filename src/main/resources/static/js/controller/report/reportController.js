@@ -5,15 +5,20 @@
                 $scope.currentPage = 1;
                 $scope.pageSize = 10;
                 $scope.totalItems = 0;
+                $scope.maxSize = 5;
                 $scope.title = 'Report by '+$scope.period;
                 var that = this;
                 var personId = $routeParams.personId;
+                $scope.namesOfPeriod = ["quarter", "month", "year"];
+
 
                 //fetch period
                 if($location.search().period == undefined){
-                    $scope.period = 'month'
+                    $scope.period = 'month';
+                    $scope.title = 'Report by '+$scope.period;
                 }else{
                     $scope.period = $location.search().period;
+                    $scope.title = 'Report by '+$scope.period;
                 }
                 //chose type of first charts
                 if($scope.period=='year'){
@@ -22,17 +27,31 @@
                     $scope.type = 'area2d';
                 }
 
-                $scope.pageChanged = function() {
+                $scope.getTotalPage = function () {
+                    $http({
+                        method: 'GET',
+                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period
+                    }).then(function successCallback(response) {
+                        $scope.totalItems = response.data;
+                    }, function errorCallback(response) {
+                    });
+                };
+
+
+                $scope.pageChanged = function(currentPage) {
                     $http({
                         method: 'GET',
                         url: 'api/report/allRequest/'+personId+'?period='+$scope.period
-                        +'&page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                        +'&page=' +  currentPage + '&size=' + $scope.pageSize
                     }).then(function successCallback(response) {
                         $scope.requestList = response.data;
                     }, function errorCallback(response) {
                         $scope.requestList = [];
                     });
                 };
+
+                $scope.getTotalPage(); //
+                //$scope.pageChanged(1); // get first page
 
                 $scope.chartsForEmployee = function () {
                     $http({
@@ -72,42 +91,48 @@
                     });
                 };
 
-                $scope.getTotalPage = function () {
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period
-                    }).then(function successCallback(response) {
-                        $scope.totalItems = response.data;
-                    }, function errorCallback(response) {
-                    });
 
+                $scope.getAllData = function () {
                     $http({
                         method: 'GET',
-                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period
+                        url: 'api/person/' + personId
                     }).then(function successCallback(response) {
-                        $scope.pieChart.data = response.data;
+                        that.person = response.data;
+                        if (that.person.role.id == 3) {
+                            $scope.chartsForEmployee();
+                        } else if (that.person.role.id == 2) {
+                            $scope.chartsForManager();
+                        } else if (that.person.role.id == 1) {
+                            window.location = "javascript:history.back()";
+                        } else {
+                            window.location = "javascript:history.back()";
+                        }
                     }, function errorCallback(response) {
 
                     });
                 };
 
-                $http({
-                    method: 'GET',
-                    url: 'api/person/'+personId
-                }).then(function successCallback(response){
-                    that.person = response.data;
-                        if(that.person.role.id==3){
-                          $scope.chartsForEmployee();
-                        } else if (that.person.role.id == 2) {
-                          $scope.chartsForManager();
-                        } else if(that.person.role.id==1){
-                            window.location = "javascript:history.back()";
-                        } else {
-                            window.location = "javascript:history.back()";
-                        }
-                }, function errorCallback(response) {
+                $scope.getAllData();
 
-                });
+                $scope.getPeriodData = function (periodItem) {
+                    $scope.period=periodItem;
+                    window.location = "report/"+ personId +"?period=" + periodItem;
+                    // console.log($scope.period);
+                    //     if (that.person.role.id == 3) {
+                    //         $scope.chartsForEmployee();
+                    //         console.log("chartsForEmployee");
+                    //     } else if (that.person.role.id == 2) {
+                    //         $scope.chartsForManager();
+                    //         console.log("chartsForManager");
+                    //     } else if (that.person.role.id == 1) {
+                    //         window.location = "javascript:history.back()";
+                    //         console.log("javascript");
+                    //     } else {
+                    //         window.location = "javascript:history.back()";
+                    //         console.log("back");
+                    //     }
+                };
+
 
                 $scope.reportForTime  = {
                     "chart": {
