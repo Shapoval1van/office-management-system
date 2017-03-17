@@ -5,10 +5,12 @@ import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
+import com.netcracker.model.entity.Status;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.request.RequestService;
+import com.netcracker.service.status.StatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,9 @@ public class RequestController {
 
     @Autowired
     private RequestService requestService;
+
+    @Autowired
+    private StatusService statusService;
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/history/{requestId}")
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
@@ -103,6 +108,21 @@ public class RequestController {
         Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal);
         if (!result.isPresent())
             new ResponseEntity<>(currentRequest, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(currentRequest, HttpStatus.OK);
+    }
+
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update/{statusId}")
+    public ResponseEntity<?> updateRequestStatus(@PathVariable Long requestId,
+                                                       @PathVariable Integer statusId,
+                                                       @Validated(CreateValidatorGroup.class)
+                                                       @RequestBody RequestDTO requestDTO)
+                                                       throws ResourceNotFoundException, IllegalAccessException {
+        Request currentRequest = requestDTO.toRequest();
+        currentRequest.setId(requestId);
+        Optional<Status> status = statusService.getStatusById(statusId);
+        if (!status.isPresent())
+            return new ResponseEntity<>(new MessageDTO("No such status id"), HttpStatus.BAD_REQUEST);
+        requestService.changeRequestStatus(currentRequest, status.get());
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 

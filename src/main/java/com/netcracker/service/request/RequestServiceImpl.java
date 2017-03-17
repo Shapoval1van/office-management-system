@@ -174,12 +174,12 @@ public class RequestServiceImpl implements RequestService {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
-        } else if (currentUser.get().getId().equals(employee.get().getId())
-                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
-                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
-            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(newRequest);
+//        } else if (currentUser.get().getId().equals(employee.get().getId())
+//                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
+//                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
+//            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+//            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+//            return this.requestRepository.updateRequest(newRequest);
         } else if (!employee.get().getId().equals(currentUser.get().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
         } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){

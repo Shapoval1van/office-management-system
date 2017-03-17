@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', '$routeParams', "WebSocketService", "RequestService", "CommentService", "PersonService",
-            function ($scope, $routeParams, WebSocketService, RequestService, CommentService, PersonService) {
+        .controller("RequestDetailsController", ['$scope', '$routeParams', "$http", "WebSocketService", "RequestService", "CommentService", "PersonService",
+            function ($scope, $routeParams, $http, WebSocketService, RequestService, CommentService, PersonService) {
 
                 var PAGE_SIZE = 10;
                 $scope.selectedManager;
@@ -132,13 +132,32 @@
 
                 };
 
-                $scope.cancelRequest = function () {
-                    return RequestService.cancelRequest($scope.request.id)
-                        .then(function (callback) {
-                            window.location.reload();
-                        }, function () {
-                            console.log("Failure cancel");
-                        })
+                $scope.requestDelete = function() {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to cancel this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, cancel it!",
+                            closeOnConfirm: false},
+                        function(){
+                            $http({
+                                method: 'DELETE',
+                                url: '/api/request/' + String($scope.request.id)
+                            }).then(function successCallback(response) {
+                                $scope.request = response.data;
+                                window.location = "javascript:history.back()";
+                            }, function errorCallback(error) {
+                                swal("Cancel Failure!", error.data.errors[0].detail, "error");
+                                console.log(error);
+                            });
+
+                            swal("Request canceled!", "", "success");
+                            // window.setTimeout(function(){
+                            //     location.reload()}, 1000)
+                        });
+
                 };
 
                 $scope.update = function () {
@@ -189,7 +208,7 @@
                     if (!!$scope.request.requestGroup)
                         $scope.request.requestGroup = $scope.request.requestGroup.id;
 
-                    return RequestService.updateRequest($scope.request.id, $scope.request)
+                    return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
                         .then(function (callback) {
                             $scope.getRequest();
                             $scope.getHistoryPage("month", $scope.historyPageNumber);
@@ -199,14 +218,17 @@
                 };
 
                 $scope.setInProgressStatus = function () {
+                    swal("Request start", "Request successful start!", "success");
                     return $scope.updateRequestStatus(2);
                 };
 
                 $scope.setClosedStatus = function () {
+                    swal("Request finished", "Request successful finished!", "success");
                     return $scope.updateRequestStatus(3);
                 };
 
                 $scope.setReopen = function () {
+                    swal("Request reopen", "Request successful reopen!", "success");
                     return $scope.updateRequestStatus(1);
                 };
 

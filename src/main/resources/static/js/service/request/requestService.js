@@ -24,7 +24,7 @@
                 };
 
                 requestService.cancelRequest = function (requestId) {
-                    return $http.delete("/api/request/" + requestId + "/delete")
+                    return $http.delete("/api/request/" + requestId)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
@@ -61,6 +61,15 @@
 
                 requestService.updateRequest = function (requestId, request) {
                     return $http.put("/api/request/" + requestId, request)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.updateRequestStatus = function (requestId, statusId, request) {
+                    return $http.put("/api/request/" + requestId + "/update/" + statusId, request)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

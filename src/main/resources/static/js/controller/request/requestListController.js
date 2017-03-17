@@ -145,14 +145,15 @@
                                 url: '/api/request/' + requestId
                             }).then(function successCallback(response) {
                                 $scope.requests = response.data;
+                                //window.location.reload();
                             }, function errorCallback(error) {
                                 swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                 console.log(error);
                             });
 
                             swal("Request canceled!", "", "success");
-                            // window.setTimeout(function(){
-                            //     location.reload()}, 1000)
+                            window.setTimeout(function(){
+                                location.reload()}, 2000)
                         });
 
                 };
