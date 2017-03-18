@@ -1,14 +1,8 @@
 *{
 	transition: all 0.5s ease;
 }
-body{
-	font-family:'Roboto';
-}
-h1{
-	color: #fff;
-	font-family: 'Pacifico', cursive;
-}
-h2, h3, .info__try-text{
+
+.info__try-text{
 	color: #fff;
 	font-family: 'Viga', sans-serif;
 }

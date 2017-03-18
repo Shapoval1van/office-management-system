@@ -40,15 +40,7 @@
     text-align: left;
     white-space: pre-wrap;
 }
-label{
-    /*color: #0298CD;*/
-    font-weight: 900;
-    /*font-size: 14px;*/
-    text-align: left!important;
-}
-legend{
-    padding-bottom: 10px;
-}
+
 /*.btn-group{*/
     /*text-align: center;*/
 /*}*/
@@ -97,5 +89,5 @@ label[for='comment']{
 /*}*/
 legend{
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 400;
 }
