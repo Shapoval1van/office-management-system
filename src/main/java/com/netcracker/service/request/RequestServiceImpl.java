@@ -165,25 +165,31 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
+    public Optional<Request> updateRequest(Request newRequest, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
-        Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
+        Optional<Person> employee = personRepository.findOne(newRequest.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
-        if (!oldRequest.isPresent()) return Optional.empty();
-        if (isCurrentUserAdmin(principal)) {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
-            updateRequestHistory(request, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(request);
-        } else if (!person.get().getId().equals(currentUser.get().getId())) {
+        if(!oldRequest.isPresent()) return Optional.empty();
+        if (isCurrentUserAdmin(principal)){
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(newRequest);
+//        } else if (currentUser.get().getId().equals(employee.get().getId())
+//                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
+//                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
+//            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+//            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+//            return this.requestRepository.updateRequest(newRequest);
+        } else if (!employee.get().getId().equals(currentUser.get().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (oldRequest.get().getStatus().getId() != StatusEnum.FREE.getId()) {
+        } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(person.get()));
-            updateRequestHistory(request, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(request);
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+            return this.requestRepository.updateRequest(newRequest);
         }
     }
 

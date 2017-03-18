@@ -29,7 +29,6 @@ import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
 @RequestMapping("/api/person")
 public class PersonController {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
     @Autowired
@@ -42,20 +41,19 @@ public class PersonController {
     }
 
 
-    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}/update")
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
                                                @Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO) throws ResourceNotFoundException, IllegalAccessException, CannotUpdatePersonException {
         Person currentUser = personDTO.toPerson();
         currentUser.setId(personId);
         Optional<Person> person = personService.updatePerson(currentUser, personId);
-        if(!person.isPresent()){
+        if(!person.isPresent())
             new ResponseEntity<>(currentUser, HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
 
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/persons/{roleId}")
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/{roleId}")
     public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
         List<Person> personList = personService.getAvailablePersonList(roleId, pageable);
 
