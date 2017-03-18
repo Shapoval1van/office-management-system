@@ -146,6 +146,7 @@ public class RequestController {
         return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
     public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
         List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
@@ -155,6 +156,9 @@ public class RequestController {
                 .map(FullRequestDTO::new)
                 .collect(Collectors.toList())));
     }
+
+
+
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
     public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {

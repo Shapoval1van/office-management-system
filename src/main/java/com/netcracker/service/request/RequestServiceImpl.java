@@ -2,6 +2,7 @@ package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.NotificationChangeStatus;
 import com.netcracker.model.event.NotificationNewRequestEvent;
@@ -425,6 +426,16 @@ public class RequestServiceImpl implements RequestService {
 
         return requestList;
 
+    }
+
+    @Override
+    public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary) {
+        Optional<Priority> priority = priorityRepository.findOne(priorityId);
+        List<Request> requestList = requestRepository.getRequests(priorityId, pageable, priority);
+        Long count = requestRepository.countFree(priorityId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<Request>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     @Override

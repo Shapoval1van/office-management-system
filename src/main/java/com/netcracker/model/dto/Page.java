@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Collection;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PageDTO<T> {
+public class Page<T> {
     private Integer pageSize;
     private Integer pageNumber;
-    private Integer totalElements;
-    private Integer totalPages;
+    private Long totalElements;
+    private Long totalPages;
     private Collection<T> data;
 
-    public PageDTO() {
+    public Page() {
     }
 
-    public PageDTO(Integer pageSize, Integer pageNumber, Integer totalElements, Collection<T> data) {
+    public Page(Integer pageSize, Integer pageNumber, Long totalElements, Collection<T> data) {
         this.pageSize = pageSize;
         this.pageNumber = pageNumber;
         this.totalElements = totalElements;
@@ -31,11 +31,11 @@ public class PageDTO<T> {
         return pageNumber;
     }
 
-    public Integer getTotalElements() {
+    public Long getTotalElements() {
         return totalElements;
     }
 
-    public Integer getTotalPages() {
+    public Long getTotalPages() {
         return totalPages;
     }
 
