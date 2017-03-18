@@ -405,11 +405,13 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
-        Request request = getRequestById(requestId).get();
-        Optional<Person> person = Optional.ofNullable(personRepository.findOne(personId)
-                .orElse((personRepository.findPersonByEmail(principal.getName()).get())));
+        Optional<Request> request = getRequestById(requestId);
+        Optional<Person> person = personRepository.findOne(personId);
+        if (!person.isPresent()){
+            person = personRepository.findPersonByEmail(principal.getName());
+        }
 
-        if (request.getManager() == null) {
+        if (request.isPresent() && person.isPresent()) {
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             return true;
         }
