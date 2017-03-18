@@ -48,11 +48,11 @@
                                 <td ng-show="my">{{request.status.name}}</td>
                                 <td>
                                     <assign-to-me-btn ng-show="!my"></assign-to-me-btn>
-                                    <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Update</a>
+                                    <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
                                 </td>
                                 <td>
                                     <assign-to-smb-btn ng-show="!my"></assign-to-smb-btn>
-                                    <a ng-click="requestDelete(request.id)" class="btn btn-primary" ng-show="my">Cancel</a>
+                                    <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
                                     <!--<cancel-request-btn ng-show="my"></cancel-request-btn>-->
                                 </td>
                             </tr>

@@ -22,7 +22,7 @@
                                             <button class="btn btn-info" ng-show="isAuthor() && isClosed()"
                                                     ng-click="setReopen()">Reopen request</button>
 
-                                            <a ng-click="requestDelete(request.id)" class="btn btn-primary" ng-hide="isCanceled() && isAuthor()">Cancel</a>
+                                            <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-hide="isCanceled() && isAuthor()">Cancel</a>
                                             <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
                                         </div>
 
