@@ -98,7 +98,7 @@
                         controller: "RequestListController"
                     })
                     .otherwise({
-                        templateUrl: "/static/error/404.html"
+                        templateUrl: "/static/page/404.html"
                     });
 
                 $locationProvider.html5Mode({
