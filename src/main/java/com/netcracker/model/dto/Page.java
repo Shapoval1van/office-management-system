@@ -10,6 +10,7 @@ public class Page<T> {
     private Integer pageNumber;
     private Long totalElements;
     private Long totalPages;
+    private Integer realSize;
     private Collection<T> data;
 
     public Page() {
@@ -21,6 +22,7 @@ public class Page<T> {
         this.totalElements = totalElements;
         this.totalPages = (totalElements / pageSize)+1;
         this.data = data;
+        this.realSize = data.size();
     }
 
     public Integer getPageSize() {
@@ -41,5 +43,9 @@ public class Page<T> {
 
     public Collection<T> getData() {
         return data;
+    }
+
+    public Integer getRealSize() {
+        return realSize;
     }
 }
