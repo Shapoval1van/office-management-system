@@ -1,14 +1,8 @@
 *{
 	transition: all 0.5s ease;
 }
-body{
-	font-family:'Roboto';
-}
-h1{
-	color: #fff;
-	font-family: 'Pacifico', cursive;
-}
-h2, h3, .info__try-text{
+
+.info__try-text{
 	color: #fff;
 	font-family: 'Viga', sans-serif;
 }
@@ -61,24 +55,24 @@ h2, h3, .info__try-text{
 	font-size: 14px;
 	font-weight: 200;
 }
-.navbar{
-	background-color: #000;
-	border: none;
-}
-.navbar .navbar-brand{
-	font-family: 'Pacifico', cursive;
-	float: none;
-	line-height: 35px;
-	color: #ffffff;
-	font-size: 18px;
-}
-.navbar .logout{
-	color: #ffffff!important;
-	font-size: 14px;
-}
-.navbar .logout:hover{
-	color: #d9230f!important;
-}
 textarea{
 	resize: none;
 }
+/*.navbar{*/
+	/*background-color: #000;*/
+	/*border: none;*/
+/*}*/
+/*.navbar .navbar-brand{*/
+	/*font-family: 'Pacifico', cursive;*/
+	/*float: none;*/
+	/*line-height: 35px;*/
+	/*color: #ffffff;*/
+	/*font-size: 18px;*/
+/*}*/
+/*.navbar .logout{*/
+	/*color: #ffffff!important;*/
+	/*font-size: 14px;*/
+/*}*/
+/*.navbar .logout:hover{*/
+	/*color: #d9230f!important;*/
+/*}*/

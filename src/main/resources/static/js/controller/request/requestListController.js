@@ -33,7 +33,7 @@
                     $scope.pageChanged = function() {
                         $http({
                             method: 'GET',
-                            url: '/api/request/requestListByEmployee/' +
+                            url: '/api/request/list/my' +
                             '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                         }).then(function successCallback(response) {
                             $scope.requests = [];
@@ -142,9 +142,10 @@
                         function(){
                             $http({
                                 method: 'DELETE',
-                                url: '/api/request/' + requestId + '/delete'
+                                url: '/api/request/' + requestId
                             }).then(function successCallback(response) {
                                 $scope.requests = response.data;
+                                //window.location.reload();
                             }, function errorCallback(error) {
                                 swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                 console.log(error);
@@ -152,7 +153,7 @@
 
                             swal("Request canceled!", "", "success");
                             window.setTimeout(function(){
-                                location.reload()}, 1000)
+                                location.reload()}, 2000)
                         });
 
                 };
@@ -174,6 +175,10 @@
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     $scope.goToUrl("/request/" + requestId + "/details");
-                }
+                };
+
+                $scope.notifyAboutExpiringEstimateTime = function() {
+                    return RequestService.notifyAboutExpiringEstimateTime();
+                };
             }])
 })();

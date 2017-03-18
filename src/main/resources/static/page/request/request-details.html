@@ -21,7 +21,9 @@
                                                     ng-click="setClosedStatus()">Finish request</button>
                                             <button class="btn btn-info" ng-show="isAuthor() && isClosed()"
                                                     ng-click="setReopen()">Reopen request</button>
-                                            <cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>
+
+                                            <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-hide="isCanceled() && isAuthor()">Cancel</a>
+                                            <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
                                         </div>
 
                                     <div class="form-group col-md-6 col-lg-6">

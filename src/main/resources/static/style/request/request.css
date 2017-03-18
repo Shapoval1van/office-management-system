@@ -50,32 +50,32 @@
     border: 1px solid #000;
     box-shadow: inset 0 0 20px rgba(0,0,0,0.2)
 }
-.status-text-wrapper{
-    color: #286090;
-}
+/*.status-text-wrapper{*/
+    /*color: #286090;*/
+/*}*/
 .status-text-wrapper input{
     margin-right: 10px;
 }
-.status-text-wrapper_inprogress{
-    color: #00cc00;
-}
-.status-text-wrapper_closed{
-    color: #ef0000;
-}
-.status-text-wrapper_reopen{
-    color: #6255ff;
-}
+/*.status-text-wrapper_inprogress{*/
+    /*color: #00cc00;*/
+/*}*/
+/*.status-text-wrapper_closed{*/
+    /*color: #ef0000;*/
+/*}*/
+/*.status-text-wrapper_reopen{*/
+    /*color: #6255ff;*/
+/*}*/
 
 .table th, .form-inline label{
     text-align: center;
-    color: #0298CD;
+    /*color: #0298CD;*/
     font-weight: 900;
     font-size: 14px;
 }
 .task-row td{
     vertical-align: middle!important;
     font-size: 14px;
-    padding: 0!important;
+    /*padding: 0!important;*/
 }
 .task-row:nth-of-type(2n+1){
     background-color: #ffffff;
@@ -86,9 +86,6 @@
 }
 .form-inline .form-control{
     margin-left: 10px;
-}
-textarea{
-    resize: none;
 }
 .jumbotron.bordered{
     padding-top: 30px!important;

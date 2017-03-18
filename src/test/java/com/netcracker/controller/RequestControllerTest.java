@@ -83,7 +83,7 @@ public class RequestControllerTest {
         requestDTO.setManager(null);
         requestDTO.setPriority(null);
 
-        mockMvc.perform(post("/api/request/addRequest/")
+        mockMvc.perform(post("/api/request/add/")
                 .content(this.json(requestDTO))
                 .contentType(contentType))
                 .andExpect(status().isBadRequest());
@@ -99,7 +99,7 @@ public class RequestControllerTest {
 
         int size = requestRepository.findAll().size();
 
-        mockMvc.perform(post("/api/request/addRequest/")
+        mockMvc.perform(post("/api/request/add/")
                 .principal(principal)
                 .content(this.json(requestDTO))
                 .contentType(contentType))

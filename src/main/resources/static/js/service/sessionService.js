@@ -141,6 +141,14 @@
             return currentUser;
         };
 
+        service.getUserName = function () {
+            if (currentUser){
+                return currentUser.firstName+" "+currentUser.lastName;
+            } else {
+                return null;
+            }
+        };
+
         service.getUserRole = function () {
           if (currentUser){
               return currentUser.role;
