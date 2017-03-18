@@ -76,6 +76,17 @@
                     return request.manager != null;
                 };
 
+                requestService.notifyAboutExpiringEstimateTime = function () {
+                    return $http.get("/api/test/notification/request/expiring")
+                        .then(function (callback) {
+                            callback.isError = false;
+                            return callback;
+                        }, function (callback) {
+                            callback.isError = true;
+                            return callback;
+                        });
+                };
+
                 return requestService;
             }])
 })();

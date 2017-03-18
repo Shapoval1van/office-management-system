@@ -174,6 +174,10 @@
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     $scope.goToUrl("/request/" + requestId + "/details");
-                }
+                };
+
+                $scope.notifyAboutExpiringEstimateTime = function() {
+                    return RequestService.notifyAboutExpiringEstimateTime();
+                };
             }])
 })();

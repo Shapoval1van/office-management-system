@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +34,8 @@ import static com.netcracker.util.MessageConstant.*;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-    private final long REMIND_BEFORE = 3_600_000; // 1 hour TODO set 1 day
+    private final long REMIND_BEFORE_MIN = 86_400_000; // 24 hours
+    private final long REMIND_BEFORE_MAX = 172_800_000; // 48 hours
 
     private ApplicationEventPublisher eventPublisher;
 
@@ -384,8 +384,8 @@ public class RequestServiceImpl implements RequestService {
                         {
                             Long difference = r.getEstimate().getTime() - currentTime;
 
-                            return (difference >= 0) &&
-                                    (difference < REMIND_BEFORE);
+                            return (difference >= REMIND_BEFORE_MIN) &&
+                                    (difference < REMIND_BEFORE_MAX);
                         }
                 )
                 .collect(Collectors.toList());

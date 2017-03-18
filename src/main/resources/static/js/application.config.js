@@ -93,6 +93,10 @@
                         templateUrl: "/static/page/report/report.html",
                         controller: "ReportController"
                     })
+                    .when("/test/notification/request/expiring", {
+                        templateUrl: "/static/page/request/expiry-request-estimate-notification-page.html",
+                        controller: "RequestListController"
+                    })
                     .otherwise({
                         templateUrl: "/static/error/404.html"
                     });
