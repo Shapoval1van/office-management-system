@@ -420,8 +420,9 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = requestRepository.getRequests(priorityId, pageable, priority);
-
+        List<Request> requestList = priority.isPresent() ?
+                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
+                requestRepository.getFreeRequests(priorityId, pageable);
         requestList.forEach(this::fillRequest);
 
         return requestList;
@@ -431,7 +432,9 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = requestRepository.getRequests(priorityId, pageable, priority);
+        List<Request> requestList = priority.isPresent() ?
+                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
+                requestRepository.getFreeRequests(priorityId, pageable);
         Long count = requestRepository.countFree(priorityId);
         requestList.forEach(this::fillRequest);
 
