@@ -154,79 +154,52 @@
                                                         </div>
                                                     </div>
                                                     <div class="subtask-container">
-                                                        <div class="panel panel-default pull-up">
-                                                            <div class="panel-heading">
+                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs">
+                                                            <div class="panel-heading" ng-show="sub.showEdit">
                                                                 <div class="row">
                                                                     <div class="col-lg-6">
-                                                                        <input type="text" class="form-control">
+                                                                        <input type="text" class="form-control input-sm">
                                                                     </div>
                                                                     <div class="col-lg-6">
                                                                         <div class="pull-right">
-                                                                            <button class="btn btn-primary btn-xs">Save</button>
-                                                                            <button class="btn btn-danger btn-xs">Cancel</button>
+                                                                            <button class="btn btn-primary btn-xs" ng-click="updateSub(sub)" >Save</button>
+                                                                            <button class="btn btn-danger btn-xs" ng-click="resetEdit(sub)">Cancel</button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
+                                                            <div class="panel-heading" ng-show="!sub.showEdit">
+                                                                Subtask name
+                                                                <div class="pull-right">
+                                                                    <button class="btn btn-primary btn-xs" ng-click="goEdit(sub)">Edit</button>
+                                                                    <button class="btn btn-danger btn-xs" ng-click="deleteSub(sub)">Delete</button>
+                                                                </div>
+                                                            </div>
                                                             <div class="panel-body">
                                                                 <form class="form-horizontal">
                                                                     <fieldset>
                                                                         <div class="col-lg-6">
-                                                                            <div class="form-group">
+                                                                            <div class="form-group" ng-show="sub.showEdit">
                                                                                 <label for="inputEditStatus" class="col-lg-2 control-label">Status</label>
                                                                                 <div class="col-lg-10">
                                                                                     <Select type="text" class="form-control" id="inputEditStatus" >
                                                                                     </Select>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="form-group">
-                                                                                <label for="inputEditDetails" class="col-lg-2 control-label">Details</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <textarea type="text" class="form-control" id="inputEditDetails" ></textarea>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group">
-                                                                                <label for="inputEditPriority" class="col-lg-2 control-label">Priority</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputEditPriority" placeholder="Title">
-                                                                                    </Select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="inputEditEstimate" class="col-lg-2 control-label">Estimate</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <input type="date" class="form-control" id="inputEditEstimate">
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </fieldset>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="panel panel-default pull-up">
-                                                            <div class="panel-heading">
-                                                                Subtask name
-                                                                <div class="pull-right">
-                                                                    <button class="btn btn-primary btn-xs">Edit</button>
-                                                                    <button class="btn btn-danger btn-xs">Delete</button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <form class="form-horizontal">
-                                                                    <fieldset>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group">
+                                                                            <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputStatus" class="col-lg-2 control-label">Status</label>
                                                                                 <div class="col-lg-10">
                                                                                     <Select type="text" class="form-control" id="outputStatus" placeholder="Title">
                                                                                     </Select>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="form-group">
+                                                                            <div class="form-group" ng-show="sub.showEdit">
+                                                                                <label for="inputEditDetails" class="col-lg-2 control-label">Details</label>
+                                                                                <div class="col-lg-10">
+                                                                                    <textarea type="text" class="form-control" id="inputEditDetails" ></textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputDetails" class="col-lg-2 control-label">Details</label>
                                                                                 <div class="form-control-static col-lg-10">
                                                                                     <span id="outputDetails">
@@ -236,7 +209,14 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-6">
-                                                                            <div class="form-group">
+                                                                            <div class="form-group" ng-show="sub.showEdit">
+                                                                                <label for="inputEditPriority" class="col-lg-2 control-label">Priority</label>
+                                                                                <div class="col-lg-10">
+                                                                                    <Select type="text" class="form-control" id="inputEditPriority" placeholder="Title">
+                                                                                    </Select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputPriority" class="col-lg-2 control-label">Priority</label>
                                                                                 <div class="form-control-static col-lg-10">
                                                                                     <span id="outputPriority">
@@ -244,7 +224,13 @@
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="form-group">
+                                                                            <div class="form-group" ng-show="sub.showEdit">
+                                                                                <label for="inputEditEstimate" class="col-lg-2 control-label">Estimate</label>
+                                                                                <div class="col-lg-10">
+                                                                                    <input type="date" class="form-control" id="inputEditEstimate">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputEstimate" class="col-lg-2 control-label">Estimate</label>
                                                                                 <div class="form-control-static col-lg-10">
                                                                                     <span id="outputEstimate">
