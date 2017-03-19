@@ -14,7 +14,7 @@
                 };
 
                 requestService.getRequestHistory = function (requestId, period, pageSize, pageNumber) {
-                    return $http.get("/api/request/history/" + requestId + "?period=" + period +
+                    return $http.get("/api/request/history/" + requestId + "?period=" + period.toLowerCase() +
                         "&page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
@@ -79,7 +79,7 @@
 
 
                 requestService.isCanceled = function (request) {
-                    return request.status.name == "CANCELED";
+                    return !!request.status && request.status.name == "CANCELED";
                 };
 
                 requestService.isAssigned = function (request) {

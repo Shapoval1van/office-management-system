@@ -22,11 +22,9 @@
                 $scope.comments = [];
                 $scope.comment = "";
 
-                $scope.periodList = {
-                    type: "select",
-                    value: "Day",
-                    values: ["Day", "Month", "All"]
-                };
+                $scope.periodList = ["Day", "Month", "All"];
+                $scope.chosenPeriod = "Month";
+
                 var requestId = $routeParams.requestId;
 
                 $scope.getRequest = function () {
@@ -58,7 +56,15 @@
                         });
                 };
 
-                $scope.getHistoryPage("month", $scope.historyPageNumber);
+                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+
+                $scope.changeHistoryPeriod = function () {
+                    $scope.historyPageNumber = 1;
+                    $scope.historyList = [];
+                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                    console.log($scope.chosenPeriod);
+                    console.log($scope.historyPageNumber);
+                };
 
                 $scope.getNextHistoryPage = function (period) {
                     $scope.historyPageNumber++;
@@ -132,7 +138,7 @@
 
                 };
 
-                $scope.requestDelete = function() {
+                $scope.requestDelete = function () {
                     swal({
                             title: "Are you sure?",
                             text: "Do you really want to cancel this request",
@@ -140,8 +146,9 @@
                             showCancelButton: true,
                             confirmButtonColor: "#DD6B55",
                             confirmButtonText: "Yes, cancel it!",
-                            closeOnConfirm: false},
-                        function(){
+                            closeOnConfirm: false
+                        },
+                        function () {
                             $http({
                                 method: 'DELETE',
                                 url: '/api/request/' + String($scope.request.id)
@@ -211,7 +218,7 @@
                     return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
                         .then(function (callback) {
                             $scope.getRequest();
-                            $scope.getHistoryPage("month", $scope.historyPageNumber);
+                            $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
                         }, function () {
 
                         })
@@ -249,7 +256,7 @@
                 };
                 //FIXME: Move to service
                 $scope.isAuthor = function () {
-                    return currentUser.id === $scope.request.employee.id;
+                    return !!$scope.request.employee && currentUser.id === $scope.request.employee.id;
                 };
                 //FIXME: Move to service
                 $scope.isAssignedManager = function () {
