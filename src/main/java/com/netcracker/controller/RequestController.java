@@ -156,10 +156,24 @@ public class RequestController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
-    public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {
-        Page<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
+        Page<Request> requestPage = requestService.getAllRequestByEmployee(principal.getName(), pageable);
 
-        return ResponseEntity.ok(requests);
+        return ResponseEntity.ok(requestPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/user/{userId}")
+    public ResponseEntity<?> getRequestListByUser(@PathVariable Long userId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllRequestByUser(userId, pageable);
+
+        return ResponseEntity.ok(requestPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/assigned/{managerId}")
+    public ResponseEntity<?> getAssignedRequestListByManager(@PathVariable Long managerId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllAssignedRequestByManager(managerId, pageable);
+
+        return ResponseEntity.ok(requestPage);
     }
 
     @PutMapping("/{requestId}/grouping")

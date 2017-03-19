@@ -40,6 +40,10 @@ public interface RequestService {
 
     Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
 
+    Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
+
+    Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
+
     Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);

@@ -1,6 +1,7 @@
 package com.netcracker.service.person;
 
 import com.netcracker.exception.CannotUpdatePersonException;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
@@ -90,13 +91,14 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
+    public Page<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
         Optional<Role> role = roleRepository.findOne(roleId);
         List<Person> personList = personRepository.getPersons(roleId, pageable, role);
+        Long count = personRepository.getCountActivePersonByRole(roleId);
 
         personList.forEach(this::fillPerson);
 
-        return personList;
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
     public void fillPerson(Person person){

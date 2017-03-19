@@ -1,6 +1,7 @@
 package com.netcracker.service.person;
 
 import com.netcracker.exception.CannotUpdatePersonException;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.common.Pageable;
 
@@ -18,5 +19,5 @@ public interface PersonService {
 
     Optional<Person> findPersonByEmail(String email);
 
-    List<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
+    Page<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
 }

@@ -437,6 +437,24 @@ public class RequestServiceImpl implements RequestService {
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
+    @Override
+    public Page<Request> getAllRequestByUser(Long userId, Pageable pageable) {
+        List<Request> requestList = requestRepository.getAllRequestByUser(userId, pageable);
+        Long count = requestRepository.countAllByUser(userId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
+    public Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
+        List<Request> requestList = requestRepository.getAllAssignedRequest(managerId, pageable);
+        Long count = requestRepository.countAllAssignedByManager(managerId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
     private void fillRequest(Request request) {
         fill(request);
 

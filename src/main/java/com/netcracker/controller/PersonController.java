@@ -5,6 +5,7 @@ import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullPersonDTO;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
@@ -55,12 +56,9 @@ public class PersonController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/{roleId}")
     public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
-        List<Person> personList = personService.getAvailablePersonList(roleId, pageable);
+        Page<Person> personPage = personService.getAvailablePersonList(roleId, pageable);
 
-        return ResponseEntity.ok((personList
-                .stream()
-                .map(FullPersonDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(personPage);
     }
 
     @GetMapping("/{personId}")
@@ -82,10 +80,5 @@ public class PersonController {
 
     }
 
-//    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
-//    public ResponseEntity<?> getCountActivePerson(@PathVariable Integer roleId) {
-//        Long count = personService.getCountActivePersonByRole(roleId);
-//        return ResponseEntity.ok(count);
-//
-//    }
+
 }
