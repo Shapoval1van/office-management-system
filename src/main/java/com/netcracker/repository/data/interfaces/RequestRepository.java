@@ -47,7 +47,9 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     int removeRequestFromRequestGroup(Long requestId);
 
-    List<Request> getRequests(Integer priorityId, Pageable pageable, Optional<Priority> priority);
-
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
+
+    List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
+
+    List<Request> getFreeRequests(Integer priorityId, Pageable pageable);
 }

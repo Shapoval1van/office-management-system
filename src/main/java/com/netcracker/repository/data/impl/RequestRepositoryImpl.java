@@ -81,12 +81,6 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         super(Request.TABLE_NAME, Request.ID_COLUMN);
     }
 
-    public List<Request> getRequests(Integer priorityId, Pageable pageable, Optional<Priority> priority) {
-        return priority.isPresent() ? this.queryForList(
-                GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId)
-                : this.queryForList(GET_AVAILABLE_REQUESTS, pageable);
-    }
-
     @Override
     public Map<String, Object> mapColumns(Request entity) {
         Map<String, Object> columns = new HashMap<>();
@@ -274,6 +268,16 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public int removeRequestFromRequestGroup(Long requestId) {
         return getJdbcTemplate().update(UPDATE_REQUEST_GROUP, null, requestId);
+    }
+
+    @Override
+    public List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority) {
+        return this.queryForList(GET_AVAILABLE_REQUESTS_BY_PRIORITY, pageable, priorityId);
+    }
+
+    @Override
+    public List<Request> getFreeRequests(Integer priorityId, Pageable pageable) {
+        return this.queryForList(GET_AVAILABLE_REQUESTS, pageable, priorityId);
     }
 
     @Override

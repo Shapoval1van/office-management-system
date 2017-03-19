@@ -11,7 +11,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @Configuration
-@PropertySource("classpath:property/sql/sql.properties")
+@PropertySource(value = {"classpath:property/sql/sql.properties", "classpath:property/request/schedule.properties"})
 public class PropertyConfig {
     @Bean
     public LocaleResolver localeResolver() {
@@ -28,6 +28,7 @@ public class PropertyConfig {
 
         return messageSource;
     }
+
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {

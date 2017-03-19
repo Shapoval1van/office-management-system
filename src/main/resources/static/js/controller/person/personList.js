@@ -33,7 +33,7 @@
                 $scope.pageChanged = function() {
                     $http({
                         method: 'GET',
-                        url: '/api/person/persons/' + $scope.selectedRole.roleId +
+                        url: '/api/person/list/' + $scope.selectedRole.roleId +
                         '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                     }).then(function successCallback(response) {
                         $scope.persons = [];
@@ -45,8 +45,8 @@
                 $scope.getTotalPage(); //
                 $scope.pageChanged(1); // get first page
 
-                $scope.isSelected = function(requestId) {
-                    return requestId === $scope.selectedRole.roleId;
+                $scope.isSelected = function(roleId) {
+                    return roleId === $scope.selectedRole.roleId;
                 };
 
                 $scope.roleChange = function(roleId) {
@@ -62,7 +62,7 @@
                 $scope.personDelete = function(personId) {
                     $http({
                         method: 'DELETE',
-                        url: '/api/person/' + personId + '/delete'
+                        url: '/api/person/' + personId
                     }).then(function successCallback(response) {
                         $scope.persons = response.data;
                     }, function errorCallback(response) {
