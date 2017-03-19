@@ -28,6 +28,7 @@
                     values: ["Day", "Month", "All"]
                 };
                 var requestId = $routeParams.requestId;
+                $scope.requestId = $routeParams.requestId;
 
                 $scope.getRequest = function () {
                     RequestService.getRequestById(requestId)
