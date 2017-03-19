@@ -81,4 +81,11 @@ public class PersonController {
         return ResponseEntity.ok(count);
 
     }
+
+//    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
+//    public ResponseEntity<?> getCountActivePerson(@PathVariable Integer roleId) {
+//        Long count = personService.getCountActivePersonByRole(roleId);
+//        return ResponseEntity.ok(count);
+//
+//    }
 }

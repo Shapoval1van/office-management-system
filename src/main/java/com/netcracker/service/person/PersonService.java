@@ -12,8 +12,6 @@ public interface PersonService {
 
     Long getCountActivePersonByRole(Integer roleId);
 
-    //Long getCountPassivePersons(Integer priorityId);
-
     Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
 
     List<Person> getManagers(Pageable pageable, String namePattern);

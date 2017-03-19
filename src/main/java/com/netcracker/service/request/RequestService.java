@@ -36,15 +36,9 @@ public interface RequestService {
 
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 
-    List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
 
-    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary);
-
-    List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
-
-    Long getCountFree(Integer priorityId);
-
-    Long getCountAllRequestByEmployee(String employeeEmail);
+    Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 

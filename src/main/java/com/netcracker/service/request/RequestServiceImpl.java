@@ -177,12 +177,6 @@ public class RequestServiceImpl implements RequestService {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
-//        } else if (currentUser.get().getId().equals(employee.get().getId())
-//                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
-//                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
-//            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
-//            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-//            return this.requestRepository.updateRequest(newRequest);
         } else if (!employee.get().getId().equals(currentUser.get().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
         } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
@@ -402,7 +396,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -421,21 +415,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
-        Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = priority.isPresent() ?
-                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
-                requestRepository.getFreeRequests(priorityId, pageable);
-        requestList.forEach(this::fillRequest);
-
-        return requestList;
-
-    }
-
-    @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary) {
+    //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
         List<Request> requestList = priority.isPresent() ?
                 requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
@@ -443,28 +424,17 @@ public class RequestServiceImpl implements RequestService {
         Long count = requestRepository.countFree(priorityId);
         requestList.forEach(this::fillRequest);
 
-        return new Page<Request>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     @Override
-    public List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
+    public Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
         List<Request> requestList = requestRepository.getRequestsByEmployee(pageable, employee);
-
+        Long count = requestRepository.countAllRequestByEmployee(employee.getId());
         requestList.forEach(this::fillRequest);
 
-        return requestList;
-    }
-
-    @Override
-    public Long getCountFree(Integer priorityId) {
-        return requestRepository.countFree(priorityId);
-    }
-
-    @Override
-    public Long getCountAllRequestByEmployee(String employeeEmail) {
-        Person employee = personRepository.findPersonByEmail(employeeEmail).get();
-        return requestRepository.countAllRequestByEmployee(employee.getId());
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     private void fillRequest(Request request) {

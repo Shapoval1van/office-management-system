@@ -53,7 +53,6 @@ public class PersonServiceImpl implements PersonService {
         return personRepository.getCountActivePersonByRole(roleId);
     }
 
-
     @Override
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
         Locale locale = LocaleContextHolder.getLocale();

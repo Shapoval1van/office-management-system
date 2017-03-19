@@ -149,37 +149,17 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
     public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
-        List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
+        Page<Request> requestPage = requestService.getAvailableRequestList(priorityId, pageable);
 
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(requestPage);
     }
-
-
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
     public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {
-        List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+        Page<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
 
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
-    }
-
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
-        Long count = requestService.getCountFree(priorityId);
-        return ResponseEntity.ok(count);
-    }
-
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/my")
-    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal) {
-        Long count = requestService.getCountAllRequestByEmployee(principal.getName());
-        return ResponseEntity.ok(count);
+        return ResponseEntity.ok(requests);
     }
 
     @PutMapping("/{requestId}/grouping")
