@@ -1,6 +1,5 @@
 package com.netcracker.controller;
 
-import com.netcracker.model.dto.RequestAssignDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.junit.Before;
@@ -25,11 +24,14 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Arrays;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 
 @RunWith(SpringRunner.class)
@@ -139,31 +141,31 @@ public class RequestControllerTest {
 //                .andExpect(status().isOk());
 //    }
 
-    @Test
-    public void successRequestAssignToSmb() throws Exception {
-        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
-        requestAssignDTO.setRequestId(4L);
-        requestAssignDTO.setPersonId(2L);
-
-        mockMvc.perform(post("/api/request/assignRequest")
-                .principal(principal)
-                .content(this.json(requestAssignDTO))
-                .contentType(contentType))
-                .andExpect(status().isOk());
-
-        assertEquals(2L, (long)requestRepository.findOne(4L).get().getManager().getId());
-    }
-
-    @Test
-    public void successRequestAssignToMe() throws Exception {
-        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
-        requestAssignDTO.setRequestId(4L);
-
-        mockMvc.perform(post("/api/request/assignRequest")
-                .principal(principal)
-                .content(this.json(requestAssignDTO))
-                .contentType(contentType))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    public void successRequestAssignToSmb() throws Exception {
+//        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
+//        requestAssignDTO.setRequestId(4L);
+//        requestAssignDTO.setPersonId(2L);
+//
+//        mockMvc.perform(post("/api/request/assignRequest")
+//                .principal(principal)
+//                .content(this.json(requestAssignDTO))
+//                .contentType(contentType))
+//                .andExpect(status().isOk());
+//
+//        assertEquals(2L, (long)requestRepository.findOne(4L).get().getManager().getId());
+//    }
+//
+//    @Test
+//    public void successRequestAssignToMe() throws Exception {
+//        RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
+//        requestAssignDTO.setRequestId(4L);
+//
+//        mockMvc.perform(post("/api/request/assignRequest")
+//                .principal(principal)
+//                .content(this.json(requestAssignDTO))
+//                .contentType(contentType))
+//                .andExpect(status().isOk());
+//    }
 
 }

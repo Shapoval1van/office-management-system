@@ -7,6 +7,7 @@ import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.JdbcRepository;
 import com.netcracker.repository.common.Pageable;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     int removeRequestFromRequestGroup(Long requestId);
 
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
+
+    List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee);
 
     List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
 
