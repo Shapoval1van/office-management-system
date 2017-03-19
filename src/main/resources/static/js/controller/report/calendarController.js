@@ -7,25 +7,18 @@
                 $('#calendar').fullCalendar({
                     events: function(start, end, timezone, callback) {
                         CalendarService.loadData(start, end, timezone, callback);
+                    },
+
+                    nowIndicator: true,
+
+                    header: {
+                        left: 'month,agendaWeek,agendaDay',
+                        center: 'title',
+                        right: 'prevYear,prev,today,next,nextYear'
                     }
+
                 });
             });
-
-            $scope.nextMonth = function () {
-                $('#calendar').fullCalendar('next');
-            };
-
-            $scope.prevMonth = function () {
-                $('#calendar').fullCalendar('prev');
-            };
-
-            $scope.nextYear = function () {
-                $('#calendar').fullCalendar('nextYear');
-            };
-
-            $scope.prevYear = function () {
-                $('#calendar').fullCalendar('prevYear');
-            };
 
         }]);
 })();
