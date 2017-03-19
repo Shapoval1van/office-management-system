@@ -114,10 +114,11 @@ public class NotificationService implements NotificationSender {
 
 
     @Override
-    public void sendChangeStatusEvent(Person person){
+    public void sendChangeStatusEvent(Person person, String link){
         Notification notification = NotificationBuilder.build(person,
                 REQUEST_STATUS_CHANGE_SUBJECT,
-                STATUS_CHANGE_MESSAGE_SRC);
+                STATUS_CHANGE_MESSAGE_SRC,
+                link);
         mailService.send(notification);
     }
 
