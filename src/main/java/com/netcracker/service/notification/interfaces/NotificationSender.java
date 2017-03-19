@@ -5,7 +5,6 @@ import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 
 import java.util.List;
-import java.util.Map;
 
 public interface NotificationSender {
     void sendPasswordReminder(Person person, String link);
@@ -18,7 +17,7 @@ public interface NotificationSender {
 
     void sendPasswordForNewManager(Person person);
 
-    void sendChangeStatusEvent(Person person);
+    void sendChangeStatusEvent(Person person, String link);
 
     void sendNewRequestEvent(Person person);
 

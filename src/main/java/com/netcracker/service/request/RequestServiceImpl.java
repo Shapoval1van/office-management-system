@@ -320,6 +320,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_ADMINISTRATOR')")
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -332,30 +334,43 @@ public class RequestServiceImpl implements RequestService {
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()));
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()),principal.getName());
             if (request.getParent() == null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty())
-                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId())));
+                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()),principal.getName()));
             }
         }
     }
 
     @Override
-    public int changeRequestStatus(Request request, Status status) {
+    @Transactional(rollbackFor = Exception.class)
+    public int changeRequestStatus(Request request, Status status, String authorName) {
         if (request.getEmployee() != null) {
             Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
-            eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
+            Optional<Request> requestDB = requestRepository.findOne(request.getId());
+            //history
+            Request newRequest = new Request(requestDB.get());
+            newRequest.setStatus(status);
+            updateRequestHistory(requestDB.get(), newRequest, authorName);
+
+            eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), request.getId()));
             return requestRepository.changeRequestStatus(request, status);
         }
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
-        eventPublisher.publishEvent(new NotificationChangeStatus(person.get()));
+        //history
+        Request newRequest = new Request(requestDB.get());
+        newRequest.setStatus(status);
+        updateRequestHistory(requestDB.get(), newRequest, authorName);
+
+        eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), request.getId()));
         return requestRepository.changeRequestStatus(request, status);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
             Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,

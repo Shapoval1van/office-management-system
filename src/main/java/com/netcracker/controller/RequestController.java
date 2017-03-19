@@ -115,14 +115,15 @@ public class RequestController {
     public ResponseEntity<?> updateRequestStatus(@PathVariable Long requestId,
                                                        @PathVariable Integer statusId,
                                                        @Validated(CreateValidatorGroup.class)
-                                                       @RequestBody RequestDTO requestDTO)
+                                                       @RequestBody RequestDTO requestDTO,
+                                                       Principal principal)
                                                        throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Status> status = statusService.getStatusById(statusId);
         if (!status.isPresent())
             return new ResponseEntity<>(new MessageDTO("No such status id"), HttpStatus.BAD_REQUEST);
-        requestService.changeRequestStatus(currentRequest, status.get());
+        requestService.changeRequestStatus(currentRequest, status.get(), principal.getName());
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
