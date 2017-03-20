@@ -82,8 +82,8 @@
                         controller: "PersonListController"
                     })
                     .when("/request/my", {
-                        templateUrl: "/static/page/request/free-request-page.html",
-                        controller: "RequestListController"
+                        templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
                     })
                     .when("/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
