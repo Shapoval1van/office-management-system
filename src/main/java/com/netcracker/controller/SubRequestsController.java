@@ -1,9 +1,11 @@
 package com.netcracker.controller;
 
+import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PriorityDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.dto.StatusDTO;
+import com.netcracker.model.entity.Request;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.service.sub.SubRequestServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,9 @@ public class SubRequestsController {
     @PostMapping("/api/request/{requestId}/subrequests")
     public RequestDTO createSubrequest(@PathVariable Long requestId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                       Principal principal){
-        return null;
+                                       Principal principal) throws CannotCreateSubRequestException {
+        Request sub = requestDTO.toRequest();
+        return new RequestDTO(service.createRequest(requestId, sub, principal.getName()));
     }
 
     @GetMapping("/api/request/{requestId}/subrequests")
