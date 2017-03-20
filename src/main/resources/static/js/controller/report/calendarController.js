@@ -9,6 +9,10 @@
                         CalendarService.loadData(start, end, timezone, callback);
                     },
 
+                    eventClick: function(calEvent, jsEvent, view) {
+                        window.location.href = "/request/" + calEvent.id + "/details";
+                    },
+
                     nowIndicator: true,
 
                     header: {

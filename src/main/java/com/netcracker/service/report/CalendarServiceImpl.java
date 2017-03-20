@@ -1,13 +1,14 @@
 package com.netcracker.service.report;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
-import com.netcracker.model.dto.CalendarItemDto;
+import com.netcracker.model.dto.CalendarItemDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -32,14 +33,15 @@ public class CalendarServiceImpl implements CalendarService {
     private PersonRepository personRepository;
 
     @Override
-    public List<CalendarItemDto> getDataByPeriod(Timestamp start, Timestamp end, String email) throws CurrentUserNotPresentException {
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public List<CalendarItemDTO> getDataByPeriod(Timestamp start, Timestamp end, String email) throws CurrentUserNotPresentException {
         Locale locale =  LocaleContextHolder.getLocale();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale)));
 
         return requestRepository.getRequestsByEmployeeAndPeriod(start, end, person)
                 .stream()
-                .map(CalendarItemDto::new)
+                .map(CalendarItemDTO::new)
                 .collect(Collectors.toList());
     }
 }

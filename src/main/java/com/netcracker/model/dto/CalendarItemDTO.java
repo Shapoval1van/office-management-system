@@ -9,24 +9,32 @@ import com.netcracker.model.view.View;
 
 import java.sql.Timestamp;
 
-public class CalendarItemDto {
+public class CalendarItemDTO {
     @JsonView(View.Public.class)
     private String title;
+    @JsonView(View.Public.class)
+    private Long id;
     @JsonView(View.Public.class)
     private Timestamp start;
     @JsonView(View.Public.class)
     private Timestamp end;
 
-    public CalendarItemDto(String title, Timestamp start, Timestamp end) {
-        this.title = title;
-        this.start = start;
-        this.end = end;
+    public CalendarItemDTO() {
     }
 
-    public CalendarItemDto(Request request) {
+    public CalendarItemDTO(Request request) {
         this.title = request.getName();
+        this.id = request.getId();
         this.start = request.getCreationTime();
         this.end = request.getEstimate();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

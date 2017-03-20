@@ -2,7 +2,7 @@ package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.NotDataForThisRoleException;
-import com.netcracker.model.dto.CalendarItemDto;
+import com.netcracker.model.dto.CalendarItemDTO;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.entity.ChartsType;
@@ -72,7 +72,7 @@ public class ReportController {
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/calendar")
-    public List<CalendarItemDto> getCalendarDataByPeriod(@RequestParam("start") String start,
+    public List<CalendarItemDTO> getCalendarDataByPeriod(@RequestParam("start") String start,
                                                          @RequestParam("end") String end,
                                                          Principal principal) throws CurrentUserNotPresentException, ParseException {
 
