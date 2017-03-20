@@ -67,6 +67,24 @@ public class SubRequestServiceImpl {
                 .orElseThrow(() -> new CannotCreateSubRequestException("Server error."));
     }
 
+    public List<Request> getAllSubRequest(Long parentId){
+        return requestRepository.getAllSubRequest(parentId);
+    }
+
+    public void deleteSubRequest(Long parentId, Long subId) throws CannotCreateSubRequestException {
+        Request parent = requestRepository.findOne(parentId)
+                .orElseThrow(() -> new CannotCreateSubRequestException("Parent not found."));
+
+        Request sub = requestRepository.findOne(subId)
+                .orElseThrow(() -> new CannotCreateSubRequestException("Subrequest not found."));
+
+        if (sub.getParent().getId() == parent.getId()){
+            requestRepository.delete(subId);
+        } else {
+            throw new CannotCreateSubRequestException("Subrequest not found.");
+        }
+    }
+
     public List<Status> getStatuses(){
         return statusRepository.findAll();
     }

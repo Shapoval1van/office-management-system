@@ -32,16 +32,15 @@ public class SubRequestsController {
     }
 
     @GetMapping("/api/request/{requestId}/subrequests")
-    public Page<RequestDTO> getSubrequests(@PathVariable Long requestId,
-                                           Principal principal){
-        return null;
+    public List<RequestDTO> getSubrequests(@PathVariable Long requestId){
+        return service.getAllSubRequest(requestId).stream()
+                .map(request -> new RequestDTO(request)).collect(Collectors.toList());
     }
 
     @DeleteMapping("/api/request/{requestId}/subrequests/{subId}")
     public void deleteSubrequest(@PathVariable Long requestId,
-                                 @PathVariable Long subId,
-                                 Principal principal){
-
+                                 @PathVariable Long subId) throws CannotCreateSubRequestException {
+        service.deleteSubRequest(requestId, subId);
     }
 
     @PutMapping("/api/request/{requestId}/subrequests/{subId}")
