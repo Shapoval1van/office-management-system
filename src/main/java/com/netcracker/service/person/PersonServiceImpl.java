@@ -3,6 +3,7 @@ package com.netcracker.service.person;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
@@ -23,6 +24,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.netcracker.util.MessageConstant.*;
 
@@ -143,7 +145,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<Person> getPersonsBySubscribingRequest(Long requestId) throws ResourceNotFoundException {
+    public List<PersonDTO> getPersonsBySubscribingRequest(Long requestId) throws ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
         if (!requestRepository.findOne(requestId).isPresent()) {
@@ -152,7 +154,10 @@ public class PersonServiceImpl implements PersonService {
                     messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
         }
 
-        return personRepository.findPersonsBySubscribingRequest(requestId);
+        return personRepository.findPersonsBySubscribingRequest(requestId)
+                .stream()
+                .map(PersonDTO::new)
+                .collect(Collectors.toList());
     }
 
     public void fillPerson(Person person) {

@@ -86,19 +86,22 @@ public class PersonController {
 
     @PutMapping("/subscribe")
     @ResponseStatus(HttpStatus.OK)
-    public int subscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO, Principal principal) throws ResourceNotFoundException {
+    public int subscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO,
+                         Principal principal) throws ResourceNotFoundException {
         return personService.subscribe(subscribeDTO.getRequestId(), principal);
     }
 
     @PutMapping("/unsubscribe")
     @ResponseStatus(HttpStatus.OK)
-    public int unsubscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO, Principal principal) throws ResourceNotFoundException {
+    public int unsubscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO,
+                           Principal principal) throws ResourceNotFoundException {
         return personService.unsubscribe(subscribeDTO.getRequestId(), principal);
     }
 
     @GetMapping("/subscribers/request/{requestId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Person> getPersonsBySubscribingRequest(@PathVariable("requestId") Long id) throws ResourceNotFoundException {
+    @JsonView(View.Public.class)
+    public List<PersonDTO> getPersonsBySubscribingRequest(@PathVariable("requestId") Long id) throws ResourceNotFoundException {
         return personService.getPersonsBySubscribingRequest(id);
     }
 }

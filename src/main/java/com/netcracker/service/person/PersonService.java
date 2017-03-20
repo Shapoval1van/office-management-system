@@ -3,6 +3,7 @@ package com.netcracker.service.person;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.common.Pageable;
 
@@ -29,5 +30,5 @@ public interface PersonService {
 
     int unsubscribe(Long requestId, Principal principal) throws ResourceNotFoundException;
 
-    List<Person> getPersonsBySubscribingRequest(Long requestId) throws ResourceNotFoundException;
+    List<PersonDTO> getPersonsBySubscribingRequest(Long requestId) throws ResourceNotFoundException;
 }
