@@ -2,10 +2,12 @@ package com.netcracker.controller;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.NotDataForThisRoleException;
+import com.netcracker.model.dto.CalendarItemDTO;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.entity.ChartsType;
 import com.netcracker.repository.common.Pageable;
+import com.netcracker.service.report.CalendarService;
 import com.netcracker.service.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +30,9 @@ public class ReportController {
 
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private CalendarService calendarService;
 
     private static final String JSON_MEDIA_TYPE = "application/json;";
 
@@ -61,6 +69,16 @@ public class ReportController {
                                                @Pattern(regexp = "(pie|area)")
                                                @RequestParam(name = "type", defaultValue = "area") String type) throws CurrentUserNotPresentException, NotDataForThisRoleException {
         return reportService.getDataForChartsToEmployee(personId,period, ChartsType.valueOf(type.toUpperCase()));
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/calendar")
+    public List<CalendarItemDTO> getCalendarDataByPeriod(@RequestParam("start") String start,
+                                                         @RequestParam("end") String end,
+                                                         Principal principal) throws CurrentUserNotPresentException, ParseException {
+
+        long startTime = Long.parseLong(start);
+        long endTime = Long.parseLong(end);
+        return calendarService.getDataByPeriod(new Timestamp(startTime*1000), new Timestamp(endTime*1000), principal.getName());
     }
 
 
