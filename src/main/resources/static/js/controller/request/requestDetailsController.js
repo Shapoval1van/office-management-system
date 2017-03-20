@@ -39,8 +39,8 @@
 
                 $scope.getRequest();
 
-                $scope.getHistoryPage = function (period, pageNumber) {
-                    return RequestService.getRequestHistory(requestId, period, PAGE_SIZE, pageNumber)
+                $scope.getHistoryPage = function (period, pageNumber, pageSize) {
+                    return RequestService.getRequestHistory(requestId, period, pageSize, pageNumber)
                         .then(function (callback) {
                             callback.data.forEach(function (historyItem) {
                                 historyItem.changeItems.forEach(function (changeItem) {
@@ -56,19 +56,19 @@
                         });
                 };
 
-                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
 
                 $scope.changeHistoryPeriod = function () {
                     $scope.historyPageNumber = 1;
                     $scope.historyList = [];
-                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
                     console.log($scope.chosenPeriod);
                     console.log($scope.historyPageNumber);
                 };
 
                 $scope.getNextHistoryPage = function (period) {
                     $scope.historyPageNumber++;
-                    $scope.getHistoryPage(period, $scope.historyPageNumber);
+                    $scope.getHistoryPage(period, $scope.historyPageNumber, PAGE_SIZE);
                 };
 
                 $scope.getPageSize = function () {
@@ -218,7 +218,7 @@
                     return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
                         .then(function (callback) {
                             $scope.getRequest();
-                            $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                            // $scope.getHistoryPage($scope.chosenPeriod, 1, 1);
                         }, function () {
 
                         })
