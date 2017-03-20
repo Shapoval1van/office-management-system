@@ -17,6 +17,8 @@ public interface PersonService {
 
     List<Person> getManagers(Pageable pageable, String namePattern);
 
+    List<Person> getUsersByNamePattern(Pageable pageable, String namePattern);
+
     Optional<Person> findPersonByEmail(String email);
 
     Page<Person> getPersonListByRole(Integer roleId, Pageable pageable);

@@ -22,6 +22,8 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
 
     List<Person> getManagers(Pageable pageable);
 
+    List<Person> getUsersByNamePattern(Pageable pageable, String namePattern);
+
     List<Person> getPersonListByRole(Integer roleId, Pageable pageable, Optional<Role> role);
 
     List<Person> getPersonList(Pageable pageable);

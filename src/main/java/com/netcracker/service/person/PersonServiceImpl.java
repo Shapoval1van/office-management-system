@@ -86,6 +86,15 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
+        if(namePattern == null) {
+            return this.personRepository.getPersonList(pageable);
+        }
+        return this.personRepository.getUsersByNamePattern(pageable, namePattern);
+
+    }
+
+    @Override
     public Optional<Person> findPersonByEmail(String email) {
         return this.personRepository.findPersonByEmail(email);
     }

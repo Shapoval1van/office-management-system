@@ -21,6 +21,7 @@
                 $scope.selectedPriority = $scope.priorities[0];
                 $scope.assignedMessage = '';
                 $scope.selectedRequest = -1;
+                $scope.requestListVisibility = true;
 
                 $scope.my = false;
                 var path = $location.path();
@@ -35,6 +36,9 @@
                                 $scope.requests = [];
                                 $scope.requests = response.data.data;
                                 $scope.totalItems = response.data.totalElements;
+                                if(!$scope.requests.length){
+                                    $scope.requestListVisibility = false;
+                                }
                             }, function errorCallback(response) {
                             });
                     };
@@ -92,6 +96,7 @@
                     };
 
                 }
+
 
 
                 $scope.isUndefined = function (thing) {

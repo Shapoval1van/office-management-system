@@ -39,6 +39,12 @@ public class PersonController {
         return ResponseEntity.ok(personService.getManagers(pageable, namePattern));
     }
 
+    @GetMapping("/users/{namePattern}")
+    public ResponseEntity<?> getUsersByNamePattern(@PathVariable(required = false) String namePattern,
+                                         Pageable pageable) {
+        return ResponseEntity.ok(personService.getUsersByNamePattern(pageable, namePattern));
+    }
+
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,

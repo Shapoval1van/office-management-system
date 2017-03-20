@@ -90,3 +90,7 @@
 .jumbotron.bordered{
     padding-top: 30px!important;
 }
+.empty-request-title{
+    text-align: center;
+    font-size: 26px!important;
+}

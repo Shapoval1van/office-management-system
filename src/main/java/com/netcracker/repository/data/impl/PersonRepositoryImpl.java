@@ -33,6 +33,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.find.by.name.pattern}")
     private String FIND_MANAGER_NAME_PATTERN;
 
+    @Value("${person.find.user.by.name.pattern}")
+    private String FIND_USER_BY_NAME_PATTERN;
+
     @Value("${person.find.manager}")
     private String FIND_MANAGER;
 
@@ -119,6 +122,11 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Override
     public List<Person> getManagers(Pageable pageable) {
         return super.queryForList(FIND_MANAGER, pageable);
+    }
+
+    @Override
+    public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
+        return super.queryForList(FIND_USER_BY_NAME_PATTERN, pageable, namePattern);
     }
 
     @Override

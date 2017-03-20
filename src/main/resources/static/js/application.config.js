@@ -85,6 +85,14 @@
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
+                    .when("/request/user", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
+                    })
+                    .when("/request/assigned", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
+                    })
                     .when("/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
