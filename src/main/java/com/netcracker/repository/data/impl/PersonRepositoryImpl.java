@@ -51,6 +51,14 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.count.active.by.role}")
     private String COUNT_ACTIVE_PERSON_BY_ROLE;
 
+    @Value("${subscribe}")
+    private String SUBSCRIBE;
+
+    @Value("${unsubscribe}")
+    private String UNSUBSCRIBE;
+
+    @Value("${find.subscribers.by.request}")
+    private String FIND_SUBSCRIBERS_BY_REQUEST;
 
     public PersonRepositoryImpl() {
         super(Person.TABLE_NAME, Person.ID_COLUMN);
@@ -120,4 +128,18 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
                 : this.queryForList(GET_AVAILABLE_PERSONS, pageable);
     }
 
+    @Override
+    public int subscribe(Long requestId, Long personId) {
+        return getJdbcTemplate().update(SUBSCRIBE, requestId, personId);
+    }
+
+    @Override
+    public int unsubscribe(Long requestId, Long personId) {
+        return getJdbcTemplate().update(UNSUBSCRIBE, requestId, personId);
+    }
+
+    @Override
+    public List<Person> findPersonsBySubscribingRequest(Long requestId) {
+        return queryForList(FIND_SUBSCRIBERS_BY_REQUEST, requestId);
+    }
 }

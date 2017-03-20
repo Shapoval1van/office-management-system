@@ -6,6 +6,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullPersonDTO;
 import com.netcracker.model.dto.PersonDTO;
+import com.netcracker.model.dto.SubscribeDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
@@ -19,8 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
@@ -47,7 +49,7 @@ public class PersonController {
         Person currentUser = personDTO.toPerson();
         currentUser.setId(personId);
         Optional<Person> person = personService.updatePerson(currentUser, personId);
-        if(!person.isPresent())
+        if (!person.isPresent())
             new ResponseEntity<>(currentUser, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
@@ -80,5 +82,23 @@ public class PersonController {
         Long count = personService.getCountActivePersonByRole(roleId);
         return ResponseEntity.ok(count);
 
+    }
+
+    @PutMapping("/subscribe")
+    @ResponseStatus(HttpStatus.OK)
+    public int subscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO, Principal principal) throws ResourceNotFoundException {
+        return personService.subscribe(subscribeDTO.getRequestId(), principal);
+    }
+
+    @PutMapping("/unsubscribe")
+    @ResponseStatus(HttpStatus.OK)
+    public int unsubscribe(@Validated(CreateValidatorGroup.class) @RequestBody SubscribeDTO subscribeDTO, Principal principal) throws ResourceNotFoundException {
+        return personService.unsubscribe(subscribeDTO.getRequestId(), principal);
+    }
+
+    @GetMapping("/subscribers/request/{requestId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Person> getPersonsBySubscribingRequest(@PathVariable("requestId") Long id) throws ResourceNotFoundException {
+        return personService.getPersonsBySubscribingRequest(id);
     }
 }

@@ -6,6 +6,7 @@ import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.JdbcRepository;
 import com.netcracker.repository.common.Pageable;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,5 +22,11 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
     List<Person> getManagers(Pageable pageable);
 
     List<Person> getPersons(Integer roleId, Pageable pageable, Optional<Role> role);
+
+    int subscribe(Long requestId, Long personId);
+
+    int unsubscribe(Long requestId, Long personId);
+
+    List<Person> findPersonsBySubscribingRequest(Long requestId);
 
 }
