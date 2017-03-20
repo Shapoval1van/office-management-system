@@ -21,8 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
 
@@ -55,8 +53,15 @@ public class PersonController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/{roleId}")
-    public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
-        Page<Person> personPage = personService.getAvailablePersonList(roleId, pageable);
+    public ResponseEntity<?> getPersonListByRole(@PathVariable Integer roleId, Pageable pageable) {
+        Page<Person> personPage = personService.getPersonListByRole(roleId, pageable);
+
+        return ResponseEntity.ok(personPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list")
+    public ResponseEntity<?> getPersonList(Pageable pageable) {
+        Page<Person> personPage = personService.getPersonList(pageable);
 
         return ResponseEntity.ok(personPage);
     }
@@ -72,13 +77,5 @@ public class PersonController {
         } else
             return new FullPersonDTO(personOptional.get());
     }
-
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
-    public ResponseEntity<?> getCountActivePersonByRole(@PathVariable Integer roleId) {
-        Long count = personService.getCountActivePersonByRole(roleId);
-        return ResponseEntity.ok(count);
-
-    }
-
 
 }

@@ -11,10 +11,10 @@
                 $scope.personType = "";
                 $scope.pageSize = 10;
                 $scope.requests = {};
-                $scope.priorities = [{priorityId: 1, name: 'HIGH'},
+                $scope.priorities = [{priorityId: 4, name: 'ALL'},
+                    {priorityId: 1, name: 'HIGH'},
                     {priorityId: 2, name: 'NORMAL'},
-                    {priorityId: 3, name: 'LOW'},
-                    {priorityId: 4, name: 'ALL'}]; // TODO need controller for priorities
+                    {priorityId: 3, name: 'LOW'}]; // TODO need controller for priorities
                 $scope.maxSize = 5;
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
@@ -58,13 +58,25 @@
                     $scope.personType = "Employee";
 
                     $scope.pageChanged = function() {
-                        RequestService.getAvailableRequest($scope.selectedPriority.priorityId, $scope.currentPage, $scope.pageSize)
-                            .then(function (response) {
-                                $scope.requests = [];
-                                $scope.requests = response.data.data;
-                                $scope.totalItems = response.data.totalElements;
-                            }, function errorCallback(response) {
-                            });
+                        if($scope.selectedPriority.priorityId==4){
+                            RequestService.getAvailableRequest($scope.currentPage, $scope.pageSize)
+                                .then(function (response) {
+                                    $scope.requests = [];
+                                    $scope.requests = response.data.data;
+                                    $scope.totalItems = response.data.totalElements;
+                                }, function errorCallback(response) {
+                                });
+                        }
+                        else {
+                            RequestService.getAvailableRequestByPriority($scope.selectedPriority.priorityId,
+                                $scope.currentPage, $scope.pageSize)
+                                .then(function (response) {
+                                    $scope.requests = [];
+                                    $scope.requests = response.data.data;
+                                    $scope.totalItems = response.data.totalElements;
+                                }, function errorCallback(response) {
+                                });
+                        }
                     };
 
                     $scope.getTotalPage = function(){

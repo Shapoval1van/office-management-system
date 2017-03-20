@@ -25,7 +25,9 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     int assignRequest(Long requestId, Long personId, Status status);
 
-    Long countFree(Integer priorityId);
+    Long countFreeByPriority(Integer priorityId);
+
+    Long countFree();
 
     Long countAllByUser(Long userId);
 
@@ -57,5 +59,5 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
 
-    List<Request> getFreeRequests(Integer priorityId, Pageable pageable);
+    List<Request> getFreeRequests(Pageable pageable);
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface PersonService {
     Optional<Person> getPersonById(Long id);
 
-    Long getCountActivePersonByRole(Integer roleId);
+    //Long getCountActivePersonByRole(Integer roleId);
 
     Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
 
@@ -19,5 +19,7 @@ public interface PersonService {
 
     Optional<Person> findPersonByEmail(String email);
 
-    Page<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
+    Page<Person> getPersonListByRole(Integer roleId, Pageable pageable);
+
+    Page<Person> getPersonList(Pageable pageable);
 }

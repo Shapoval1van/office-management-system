@@ -49,10 +49,10 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
-    @Override
-    public Long getCountActivePersonByRole(Integer roleId) {
-        return personRepository.getCountActivePersonByRole(roleId);
-    }
+//    @Override
+//    public Long getCountActivePersonByRole(Integer roleId) {
+//        return personRepository.getCountActivePersonByRole(roleId);
+//    }
 
     @Override
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
@@ -91,10 +91,20 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Page<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
+    public Page<Person> getPersonListByRole(Integer roleId, Pageable pageable) {
         Optional<Role> role = roleRepository.findOne(roleId);
-        List<Person> personList = personRepository.getPersons(roleId, pageable, role);
+        List<Person> personList = personRepository.getPersonListByRole(roleId, pageable, role);
         Long count = personRepository.getCountActivePersonByRole(roleId);
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    public Page<Person> getPersonList(Pageable pageable) {
+        List<Person> personList = personRepository.getPersonList(pageable);
+        Long count = personRepository.getCountActivePerson();
 
         personList.forEach(this::fillPerson);
 

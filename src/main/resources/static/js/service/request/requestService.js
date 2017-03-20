@@ -32,7 +32,16 @@
                         })
                 };
 
-                requestService.getAvailableRequest = function (priority, pageNumber, pageSize) {
+                requestService.getAvailableRequest = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/available?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
                     return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;

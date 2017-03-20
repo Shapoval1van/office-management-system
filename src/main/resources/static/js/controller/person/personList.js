@@ -19,55 +19,50 @@
                     return (typeof thing === "undefined");
                 };
 
-
-                $scope.getTotalPage = function() {
-                    $http({
-                        method: 'GET',
-                        url: '/api/person/count/' + $scope.selectedRole.roleId
-                    }).then(function successCallback(response) {
-                        $scope.totalItems = response.data;
-                    }, function errorCallback(response) {
-                    });
+                $scope.pageChanged = function () {
+                    if ($scope.selectedRole.roleId==4){
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/list' +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function successCallback(response) {
+                            $scope.persons = [];
+                            $scope.persons = response.data.data;
+                            $scope.totalItems = response.data.totalElements;
+                        }, function errorCallback(response) {
+                        });
+                    } else {
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/list/' + $scope.selectedRole.roleId +
+                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function successCallback(response) {
+                            $scope.persons = [];
+                            $scope.persons = response.data.data;
+                            $scope.totalItems = response.data.totalElements;
+                        }, function errorCallback(response) {
+                        });
+                    }
+                };
+                $scope.getTotalPage = function () {
+                    return $scope.totalItems;
                 };
 
-                $scope.pageChanged = function() {
-                    $http({
-                        method: 'GET',
-                        url: '/api/person/list/' + $scope.selectedRole.roleId +
-                        '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                    }).then(function successCallback(response) {
-                        $scope.persons = [];
-                        $scope.persons = response.data;
-                    }, function errorCallback(response) {
-                    });
+                $scope.getTotalPage();
+                $scope.pageChanged(1);
+
+                $scope.roleChange = function(roleId) {
+                    $scope.getTotalPage();
+                    $scope.pageChanged(1);
                 };
 
-                $scope.getTotalPage(); //
-                $scope.pageChanged(1); // get first page
 
                 $scope.isSelected = function(roleId) {
                     return roleId === $scope.selectedRole.roleId;
                 };
 
-                $scope.roleChange = function(roleId) {
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
-                };
-
                 $scope.personUpdate = function(personId) {
                     window.location = personDetails + personId + '/update';
-                };
-
-
-                $scope.personDelete = function(personId) {
-                    $http({
-                        method: 'DELETE',
-                        url: '/api/person/' + personId
-                    }).then(function successCallback(response) {
-                        $scope.persons = response.data;
-                    }, function errorCallback(response) {
-                        console.log(response);
-                    });
                 };
 
             }])

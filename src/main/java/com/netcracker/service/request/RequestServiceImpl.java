@@ -416,12 +416,21 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
+    public Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = priority.isPresent() ?
-                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
-                requestRepository.getFreeRequests(priorityId, pageable);
-        Long count = requestRepository.countFree(priorityId);
+        List<Request> requestList = requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get());
+
+        Long count = requestRepository.countFreeByPriority(priorityId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
+    public Page<Request> getAvailableRequestList(Pageable pageable) {
+        List<Request> requestList = requestRepository.getFreeRequests(pageable);
+
+        Long count = requestRepository.countFree();
         requestList.forEach(this::fillRequest);
 
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);

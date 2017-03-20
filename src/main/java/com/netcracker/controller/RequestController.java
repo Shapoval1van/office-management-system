@@ -148,8 +148,15 @@ public class RequestController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
-        Page<Request> requestPage = requestService.getAvailableRequestList(priorityId, pageable);
+    public ResponseEntity<?> getRequestListByPriority(@PathVariable Integer priorityId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestListByPriority(priorityId, pageable);
+
+        return ResponseEntity.ok(requestPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available")
+    public ResponseEntity<?> getRequestList(Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestList(pageable);
 
         return ResponseEntity.ok(requestPage);
     }

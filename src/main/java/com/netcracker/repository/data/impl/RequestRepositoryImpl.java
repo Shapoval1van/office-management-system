@@ -61,6 +61,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.count.by.priority}")
     private String COUNT_WITH_PRIORITY;
 
+    @Value("${request.count.free}")
+    private String COUNT_FREE;
+
     @Value("${request.find.by.request.group}")
     private String GET_REQUESTS_BY_REQUEST_GROUP_ID;
 
@@ -205,8 +208,13 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public Long countFree(Integer priorityId) {
+    public Long countFreeByPriority(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
+    }
+
+    @Override
+    public Long countFree() {
+        return getJdbcTemplate().queryForObject(COUNT_FREE, Long.class);
     }
 
     @Override
@@ -302,8 +310,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> getFreeRequests(Integer priorityId, Pageable pageable) {
-        return this.queryForList(GET_AVAILABLE_REQUESTS, pageable, priorityId);
+    public List<Request> getFreeRequests(Pageable pageable) {
+        return this.queryForList(GET_AVAILABLE_REQUESTS, pageable);
     }
 
     @Override

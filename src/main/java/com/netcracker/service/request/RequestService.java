@@ -36,7 +36,9 @@ public interface RequestService {
 
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 
-    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+    Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
+
+    Page<Request> getAvailableRequestList(Pageable pageable);
 
     Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
 
