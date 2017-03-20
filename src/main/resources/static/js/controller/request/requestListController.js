@@ -24,42 +24,24 @@
                 $scope.selectedRequest = -1;
 
                 $scope.my = false;
-                var path = $location.path();
-                if (path.toString()=="/request/my"){
 
-                    $scope.my = true;
-                    $scope.personType = "Manager";
-
-                    $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/list/my' +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.requests = [];
-                            $scope.requests = response.data;
-
+                $scope.getTotalPage = function () {
+                    RequestService.getPageCountByPriority($scope.selectedPriority.priorityId)
+                        .then(function successCallback(response) {
+                            $scope.totalItems = response.data;
                         }, function errorCallback(response) {
                         });
-                    };
-                } else {
-                    $scope.personType = "Employee";
+                };
 
-                    $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/available/' + $scope.selectedPriority.priorityId +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
+                $scope.pageChanged = function () {
+                    RequestService.getAvailableRequest($scope.selectedPriority.priorityId, $scope.currentPage, $scope.pageSize)
+                        .then(function (callback) {
                             $scope.requests = [];
-                            $scope.requests = response.data;
-                        }, function errorCallback(response) {
-                        });
-                    };
-                }
+                            $scope.requests = callback.data;
+                        }, function () {
 
-
-
+                        })
+                };
 
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");

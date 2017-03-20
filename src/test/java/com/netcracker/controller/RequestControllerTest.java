@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -25,11 +26,14 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Arrays;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 
 @RunWith(SpringRunner.class)
@@ -140,6 +144,7 @@ public class RequestControllerTest {
 //    }
 
     @Test
+    @WithMockUser(roles = "ADMINISTRATOR", password = "test2", username = "test2@test.com")
     public void successRequestAssignToSmb() throws Exception {
         RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
         requestAssignDTO.setRequestId(4L);
@@ -154,7 +159,10 @@ public class RequestControllerTest {
         assertEquals(2L, (long)requestRepository.findOne(4L).get().getManager().getId());
     }
 
+
+
     @Test
+    @WithMockUser(roles = "ADMINISTRATOR", password = "test2", username = "test2@test.com")
     public void successRequestAssignToMe() throws Exception {
         RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
         requestAssignDTO.setRequestId(4L);

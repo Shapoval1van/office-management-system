@@ -32,7 +32,7 @@ public interface RequestService {
 
     void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException;
 
-    int changeRequestStatus(Request request, Status status);
+    int changeRequestStatus(Request request, Status status, String authorName);
 
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 
