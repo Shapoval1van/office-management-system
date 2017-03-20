@@ -1,31 +1,31 @@
 (function () {
     angular.module("OfficeManagementSystem")
         .controller("UpdatePersonController", ["$scope", "$http", "$routeParams", "PersonService",
-            function ($scope, $http, $routeParams, PersonService) {
+            function ($scope, $http, $routeParams) {
                 $scope.person = {};
 
                 var personId = $routeParams.personId;
 
                 $scope.getPersonCredential = function () {
-                    PersonService.getPersonById(personId)
+                    $http.get("/api/person/" + personId )
                         .then(function (callback) {
                             $scope.person = callback.data;
-                            $scope.person.role = $scope.person.role.id;
-                        }, function (error) {
-                            console.log(error)
+                            $scope.person.role = String($scope.person.role.id);
+                        }, function (callback) {
+                            //swal("Oops...", callback.data.error_description, "error");
+                            console.log(callback)
                         })
                 };
 
                 $scope.getPersonCredential();
 
                 $scope.sendPersonCredentials = function () {
-
-                    $http.put("/api/person/" + personId + "/update", $scope.person)
+                    $http.put("/api/person/" + personId, $scope.person)
                         .then(function (callback) {
-                            window.location = "/users";
+                            window.location = "javascript:history.back()"
                         }, function (error) {
                             console.log(error);
-                            swal("Updare Failure!", error.data.message, "error");
+                            swal("Update Failure!", error.data.message, "error");
                             console.log($scope.person)
                         })
                 };

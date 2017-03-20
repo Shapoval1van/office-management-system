@@ -2,6 +2,7 @@ package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
@@ -31,11 +32,13 @@ public interface RequestService {
 
     void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException;
 
-    int changeRequestStatus(Request request, Status status);
+    int changeRequestStatus(Request request, Status status, String authorName);
 
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 
     List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+
+    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary);
 
     List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
 

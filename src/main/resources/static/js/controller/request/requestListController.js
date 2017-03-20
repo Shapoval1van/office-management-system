@@ -24,42 +24,24 @@
                 $scope.selectedRequest = -1;
 
                 $scope.my = false;
-                var path = $location.path();
-                if (path.toString()=="/request/my"){
 
-                    $scope.my = true;
-                    $scope.personType = "Manager";
-
-                    $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/requestListByEmployee/' +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.requests = [];
-                            $scope.requests = response.data;
-
+                $scope.getTotalPage = function () {
+                    RequestService.getPageCountByPriority($scope.selectedPriority.priorityId)
+                        .then(function successCallback(response) {
+                            $scope.totalItems = response.data;
                         }, function errorCallback(response) {
                         });
-                    };
-                } else {
-                    $scope.personType = "Employee";
+                };
 
-                    $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/available/' + $scope.selectedPriority.priorityId +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
+                $scope.pageChanged = function () {
+                    RequestService.getAvailableRequest($scope.selectedPriority.priorityId, $scope.currentPage, $scope.pageSize)
+                        .then(function (callback) {
                             $scope.requests = [];
-                            $scope.requests = response.data;
-                        }, function errorCallback(response) {
-                        });
-                    };
-                }
+                            $scope.requests = callback.data;
+                        }, function () {
 
-
-
+                        })
+                };
 
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");
@@ -142,9 +124,10 @@
                         function(){
                             $http({
                                 method: 'DELETE',
-                                url: '/api/request/' + requestId + '/delete'
+                                url: '/api/request/' + requestId
                             }).then(function successCallback(response) {
                                 $scope.requests = response.data;
+                                //window.location.reload();
                             }, function errorCallback(error) {
                                 swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                 console.log(error);
@@ -152,7 +135,7 @@
 
                             swal("Request canceled!", "", "success");
                             window.setTimeout(function(){
-                                location.reload()}, 1000)
+                                location.reload()}, 2000)
                         });
 
                 };
@@ -174,6 +157,10 @@
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     $scope.goToUrl("/request/" + requestId + "/details");
-                }
+                };
+
+                $scope.notifyAboutExpiringEstimateTime = function() {
+                    return RequestService.notifyAboutExpiringEstimateTime();
+                };
             }])
 })();

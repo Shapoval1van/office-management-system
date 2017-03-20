@@ -9,20 +9,28 @@
                         <form class="form-horizontal">
                             <fieldset>
                                 <legend>Request: {{request.name}}</legend>
-                                    <div class="form-group col-md-12 col-lg-12">
+                                <div class="form-group col-md-12 col-lg-12">
 
-                                        <div class="col-md-12 btn-group">
-                                            <add-to-request-group-btn ng-show="isCurrentUserManager() || isCurrentUserAdministrator()"></add-to-request-group-btn>
-                                            <assign-to-me-btn ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()"></assign-to-me-btn>
-                                            <assign-to-smb-btn ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
-                                            <button class="btn btn-info" ng-show="isAssignedManager() && isFree()"
-                                                    ng-click="setInProgressStatus()">Start request</button>
-                                            <button class="btn btn-info" ng-show="isAssignedManager() && isInProgress()"
-                                                    ng-click="setClosedStatus()">Finish request</button>
-                                            <button class="btn btn-info" ng-show="isAuthor() && isClosed()"
-                                                    ng-click="setReopen()">Reopen request</button>
-                                            <cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>
-                                        </div>
+                                    <div class="col-md-12 btn-group">
+                                        <add-to-request-group-btn
+                                                ng-show="isCurrentUserManager() || isCurrentUserAdministrator()"></add-to-request-group-btn>
+                                        <assign-to-me-btn
+                                                ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()"></assign-to-me-btn>
+                                        <assign-to-smb-btn ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
+                                        <button class="btn btn-info" ng-show="isAssignedManager() && isFree()"
+                                                ng-click="setInProgressStatus()">Start request
+                                        </button>
+                                        <button class="btn btn-info" ng-show="isAssignedManager() && isInProgress()"
+                                                ng-click="setClosedStatus()">Finish request
+                                        </button>
+                                        <button class="btn btn-info" ng-show="isAuthor() && isClosed()"
+                                                ng-click="setReopen()">Reopen request
+                                        </button>
+
+                                        <a ng-click="requestDelete(request.id)" class="btn btn-danger"
+                                           ng-hide="isCanceled() && isAuthor()">Cancel</a>
+                                        <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
+                                    </div>
 
                                     <div class="form-group col-md-6 col-lg-6">
                                         <label for="author" class="col-lg-1 control-label">Author:</label>
@@ -32,7 +40,6 @@
                                         </span>
                                         </div>
                                     </div>
-
 
 
                                     <div class="form-group col-md-6 col-lg-6">
@@ -115,7 +122,8 @@
                                                 <textarea placeholder="Write comment here"
                                                           ng-model="$parent.$parent.comment" id="comment"
                                                           class="form-control"></textarea>
-                                                <button class="btn btn-success send-comment-btn" ng-click="sendComment()">Send comment
+                                                <button class="btn btn-success send-comment-btn"
+                                                        ng-click="sendComment()">Send comment
                                                 </button>
                                             </div>
                                         </form>
@@ -144,14 +152,21 @@
                                 </div>
                             </uib-tab>
                             <uib-tab index="1" heading="History">
+                                <select ng-model="$parent.$parent.chosenPeriod"
+                                        ng-change="changeHistoryPeriod()" class="input-sm">
+                                    <option ng-repeat="period in periodList" ng-value="period"
+                                            ng-selected="$parent.$parent.period === chosenPeriod">
+                                        {{period}}
+                                    </option>
+                                </select>
                                 <table st-table="displayedHistory" st-safe-src="historyList"
                                        class="table table-stripped task-row">
                                     <thead>
                                     <tr>
                                         <th>#</th>
                                         <th st-sort="field.name">Property</th>
-                                        <th st-sort="newVal">New value</th>
                                         <th st-sort="oldVal">Old value</th>
+                                        <th st-sort="newVal">New value</th>
                                         <th st-sort="author.lastName">Author</th>
                                         <th st-sort="createDate">Change time</th>
                                     </tr>
@@ -165,10 +180,10 @@
                                             {{historyItem.field.name}}
                                         </td>
                                         <td>
-                                            {{historyItem.newVal}}
+                                            {{historyItem.oldVal}}
                                         </td>
                                         <td>
-                                            {{historyItem.oldVal}}
+                                            {{historyItem.newVal}}
                                         </td>
                                         <td>
                                             <a href="#">

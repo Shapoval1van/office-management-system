@@ -3,6 +3,7 @@ package com.netcracker.controller;
 
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.ErrorDTO;
 import com.netcracker.model.dto.ErrorsDTO;
 import org.springframework.http.HttpStatus;
@@ -30,11 +31,11 @@ public class GlobalExceptionHandlerController {
 
     @ExceptionHandler(NotDataForThisRoleException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorsDTO NotDataForThisRoleExceptionHandler(HttpServletRequest request, NotDataForThisRoleException ex){
+    public ErrorsDTO NotDataForThisRoleExceptionHandler(HttpServletRequest request, NotDataForThisRoleException ex) {
         int errorStatus = HttpStatus.NOT_FOUND.value();
         String title = ex.getMessage();
         String desc = ex.getDescription();
-        ErrorDTO errorDTO = new ErrorDTO(errorStatus, request.getRequestURL().toString(), title,desc);
+        ErrorDTO errorDTO = new ErrorDTO(errorStatus, request.getRequestURL().toString(), title, desc);
         return new ErrorsDTO(Collections.singletonList(errorDTO));
     }
 
@@ -78,6 +79,18 @@ public class GlobalExceptionHandlerController {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorsDTO illegalAccessExceptionHandler(HttpServletRequest request, BaseException e) {
         int errorStatus = HttpStatus.FORBIDDEN.value();
+        String source = request.getRequestURL().toString();
+        String title = e.getMessage();
+        String description = e.getDescription();
+
+        ErrorDTO errorDTO = new ErrorDTO(errorStatus, source, title, description);
+        return new ErrorsDTO(Collections.singletonList(errorDTO));
+    }
+
+    @ExceptionHandler(RequestGroupAlreadyExist.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO requestGroupAlreadyExistHandler(HttpServletRequest request, BaseException e) {
+        int errorStatus = HttpStatus.BAD_REQUEST.value();
         String source = request.getRequestURL().toString();
         String title = e.getMessage();
         String description = e.getDescription();

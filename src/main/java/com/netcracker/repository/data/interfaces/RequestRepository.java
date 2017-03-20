@@ -35,15 +35,21 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> findRequestByEmployeeIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
 
-    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod);
+    Long countRequestByEmployeeIdForPeriod(Long personId, String reportPeriod);
 
-    List<Request> findRequestByManagerIdForPeriod(Long personId, String reportPeriod, Pageable pageable);
+    List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod);
+
+    Long countAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod);
+
+    List<Request> findAllAssignedRequestToManagerForPeriod(Long personId, String reportPeriod, Pageable pageable);
 
     int updateRequestGroup(Long requestId, Integer requestGroupId);
 
     int removeRequestFromRequestGroup(Long requestId);
 
-    List<Request> getRequests(Integer priorityId, Pageable pageable, Optional<Priority> priority);
-
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
+
+    List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
+
+    List<Request> getFreeRequests(Integer priorityId, Pageable pageable);
 }

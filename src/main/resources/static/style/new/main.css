@@ -12,3 +12,15 @@
     overflow:hidden;
     text-overflow: ellipsis;
 }
+
+.form-sign-wrapper label{
+    text-align: left!important;
+}
+
+.center-down {
+    margin-top: 20vh;
+}
+
+.center-down h2 {
+    text-align: center;
+}

@@ -40,45 +40,34 @@
     text-align: left;
     white-space: pre-wrap;
 }
-textarea{
-    resize: none;
-}
-label{
-    color: #0298CD;
-    font-weight: 900;
-    font-size: 14px;
-    text-align: left!important;
-}
-legend{
-    padding-bottom: 10px;
-}
-.btn-group{
-    text-align: center;
-}
-add-to-request-group-btn, cancel-request-btn{
-    display: inline-block;
-    margin: 5px 10px 10px 10px;
-}
+
+/*.btn-group{*/
+    /*text-align: center;*/
+/*}*/
+/*add-to-request-group-btn, cancel-request-btn{*/
+    /*display: inline-block;*/
+    /*margin: 5px 10px 10px 10px;*/
+/*}*/
 label[for='comment']{
     margin: 10px 0;
 }
 .send-comment-btn{
     margin: 10px 0;
 }
-.comment-wrapper{
-    box-shadow: none;
-    border: 1px solid #494949;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-.comment-body{
-    margin: 5px 0;
-    color: #323232;
-}
-.comment-header, .comment-body{
-    text-indent: 10px;
-}
+/*.comment-wrapper{*/
+    /*box-shadow: none;*/
+    /*border: 1px solid #494949;*/
+    /*-webkit-border-radius: 5px;*/
+    /*-moz-border-radius: 5px;*/
+    /*border-radius: 5px;*/
+/*}*/
+/*.comment-body{*/
+    /*margin: 5px 0;*/
+    /*color: #323232;*/
+/*}*/
+/*.comment-header, .comment-body{*/
+    /*text-indent: 10px;*/
+/*}*/
 .history-row td{
     text-align: center;
 }
@@ -89,16 +78,16 @@ label[for='comment']{
     -moz-border-radius: 5px!important;
     border-radius: 5px!important;
 }
-add-to-request-group-btn{
-    margin: 0!important;
-}
-label{
-    font-size: 16px!important;
-}
-.form-control-static{
-    font-size: 14px!important;
-}
+/*add-to-request-group-btn{*/
+    /*margin: 0!important;*/
+/*}*/
+/*label{*/
+    /*font-size: 16px!important;*/
+/*}*/
+/*.form-control-static{*/
+    /*font-size: 14px!important;*/
+/*}*/
 legend{
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 400;
 }

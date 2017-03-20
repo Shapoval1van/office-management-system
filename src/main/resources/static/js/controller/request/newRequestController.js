@@ -62,7 +62,7 @@
                                 if ($scope.requestCredentials.requestGroup!=null) {
                                     $scope.requestCredentials.requestGroup = $scope.requestCredentials.requestGroup.id;
                                 }
-                                $scope.requestCredentials.priority = $scope.requestCredentials.priority.id;
+                                $scope.requestCredentials.priority = String($scope.requestCredentials.priority.id);
                                 $scope.requestCredentials.status = $scope.requestCredentials.status.id;
                                 $scope.requestCredentials.employee = $scope.requestCredentials.employee.id;
                                 console.dir($scope.requestCredentials);
@@ -90,9 +90,8 @@
                     } else if ($scope.estimateTime==undefined){
                         $scope.requestCredentials.estimate = null;
                     }
-                    $http.put("/api/request/" + $routeParams.requestId + "/update/", $scope.requestCredentials)
+                    $http.put("/api/request/" + $routeParams.requestId, $scope.requestCredentials)
                         .then(function (callback) {
-
                             window.location = "javascript:history.back()";
                         }, function (error) {
                             swal("Updare Failure!", error.data.errors[0].detail, "error");
@@ -105,7 +104,7 @@
                     $scope.estimateTime = new Date($('#datetimepicker4').data('date')).getTime();
                     if ($scope.estimateTime!=undefined)
                     $scope.requestCredentials.estimate = $scope.estimateTime;
-                    $http.post("/api/request/addRequest", $scope.requestCredentials)
+                    $http.post("/api/request/add", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;
                             window.location = "javascript:history.back()";

@@ -22,6 +22,7 @@
 
                 $scope.username = "";
                 $scope.password = "";
+                $scope.hasError = false;
 
 
                 if (!!$routeParams.registrationToken) {
@@ -34,6 +35,12 @@
                 }
 
                 $scope.performLogin = function () {
+                    if ($scope.username=="" || $scope.password==""){
+                        $scope.hasError = true;
+                        return;
+                    } else{
+                        $scope.hasError = false;
+                    }
                     $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
                         if(response.isError){
                             window.alert(response.data.error_description);

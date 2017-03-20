@@ -34,7 +34,8 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="group in displayedGroups" ng-click="goToRequestGroupPage(group.id)">
+                            <tr ng-repeat="group in displayedGroups" ng-click="goToRequestGroupPage(group.id)"
+                                class="animate-repeat">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td>{{group.name}}</td>
                             </tr>

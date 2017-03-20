@@ -8,6 +8,8 @@ import com.netcracker.model.entity.ChartsType;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,13 @@ public class ReportController {
         List<FullRequestDTO> responseList = new ArrayList<>();
         reportService.getAllRequestByPersonIdForPeriod(personId, period, pageable).forEach(request -> responseList.add(new FullRequestDTO(request)));
         return responseList;
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/allRequest/{personId}")
+    public ResponseEntity<?> countRequestByPersonIdForPeriod(@Pattern(regexp = "(quarter|year|month)")
+                                                               @RequestParam(name = "period", defaultValue = "month") String period,
+                                                               @PathVariable(name = "personId") Long personId) throws CurrentUserNotPresentException, NotDataForThisRoleException {
+        return new ResponseEntity<>(reportService.countRequestByPersonIdForPeriod(personId,period), HttpStatus.OK);
     }
 
 

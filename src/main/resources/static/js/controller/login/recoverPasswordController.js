@@ -10,8 +10,15 @@
                 $scope.password = "";
                 $scope.confirmPassword = "";
                 $scope.recoverEmail = "";
+                $scope.hasError = false;
 
                 $scope.sendRecoverRequest = function () {
+                    if ($scope.recoverEmail==""){
+                        $scope.hasError = true;
+                        return;
+                    } else {
+                        $scope.hasError = false;
+                    }
                     $http({
                         method: "POST",
                         url: "/api/v1/resetPassword",

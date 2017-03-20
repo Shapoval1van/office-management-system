@@ -82,8 +82,8 @@
                         controller: "PersonListController"
                     })
                     .when("/request/my", {
-                        templateUrl: "/static/page/request/free-request-page.html",
-                        controller: "RequestListController"
+                        templateUrl: "/static/page/request/request-list-by-employee.html",
+                        controller: "RequestListByEmployeeController"
                     })
                     .when("/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
@@ -93,8 +93,12 @@
                         templateUrl: "/static/page/report/report.html",
                         controller: "ReportController"
                     })
+                    .when("/test/notification/request/expiring", {
+                        templateUrl: "/static/page/request/expiry-request-estimate-notification-page.html",
+                        controller: "RequestListController"
+                    })
                     .otherwise({
-                        templateUrl: "/static/error/404.html"
+                        templateUrl: "/static/page/404.html"
                     });
 
                 $locationProvider.html5Mode({

@@ -11,7 +11,7 @@
                     Selected manager: <p ng-show="!!selectedManager">{{selectedManager.firstName + ' ' +
                     selectedManager.lastName }}</p>
                     <div class="col-md-10">
-                        <input ng-change="update()" type="text" ng-model="selectedManager"
+                        <input ng-change="update()" type="text" ng-model="$parent.selectedManager"
                                uib-typeahead="manager as manager.firstName + ' ' +  manager.lastName for manager in managers"
                                class="form-control col-md-10" typeahead-show-hint="true" typeahead-min-length="3">
                     </div>
@@ -28,5 +28,5 @@
     </div>
 </div>
 <button class="btn btn-info" data-toggle="modal"
-        ng-click="selectRequest(request.id)" data-target="#modalSearch">Assign to somebody
+        ng-click="selectRequest(request.id)" data-target="#modalSearch">Assign to smb
 </button>
