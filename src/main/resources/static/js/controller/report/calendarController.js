@@ -14,6 +14,7 @@
                     },
 
                     nowIndicator: true,
+                    firstDay: 1, // Monday
 
                     header: {
                         left: 'month,agendaWeek,agendaDay',
