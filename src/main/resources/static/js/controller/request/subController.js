@@ -9,12 +9,22 @@
                     {}
                 ];
 
+                var tempSub = {};
+
                 angular.forEach($scope.employees, function (obj) {
                     obj["showEdit"] = false;
                 });
 
                 $scope._toggleEdit = function (sub) {
                     sub.showEdit = sub.showEdit ? false : true;
+                };
+
+                $scope._toTempSub = function (sub) {
+                  tempSub.showEdit = sub.showEdit;
+                };
+
+                $scope._fromTempSub = function (sub) {
+                    sub.showEdit = tempSub.showEdit;
                 };
 
                 $scope.updateSub = function (sub) {
@@ -25,25 +35,22 @@
                 $scope.deleteSub = function (sub) {
 
                 };
-                
+
                 $scope.goEdit = function (sub) {
+                    $scope._toTempSub(sub);
 
                     $scope._toggleEdit(sub);
                 };
 
                 $scope.resetEdit = function (sub) {
-
+                    $scope._toTempSub(sub);
                     $scope._toggleEdit(sub);
                 };
 
-                $scope.formMode = "showing";
+                $scope.showNewSubForm = false;
 
-                $scope.showNewSubtaskForm = function () {
-                    $scope.formMode = "adding";
-                };
-
-                $scope.closeNewSubtaskForm = function () {
-                    $scope.formMode = "showing";
+                $scope.toggleNewSub = function () {
+                    $scope.showNewSubForm =  $scope.showNewSubForm?false:true;
                 };
 
             }])

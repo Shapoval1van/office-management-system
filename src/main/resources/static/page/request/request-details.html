@@ -106,8 +106,8 @@
                                                     <uib-accordion-heading>
                                                         Subtasks <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                                     </uib-accordion-heading>
-                                                    <button class="btn btn-success pull-up" ng-show="formMode=='showing'" ng-click="showNewSubtaskForm()">Add new subtask</button>
-                                                    <div class="subtask-form" ng-show = "formMode=='adding'">
+                                                    <button class="btn btn-success pull-up" ng-show="!showNewSubForm" ng-click="toggleNewSub()">Add new subtask</button>
+                                                    <div class="subtask-form" ng-show = "showNewSubForm">
                                                         <div class="panel panel-default">
                                                             <div class="panel-heading">New subtask</div>
                                                             <div class="panel-body">
@@ -145,7 +145,7 @@
                                                                         <div class="col-lg-12">
                                                                             <div class="pull-right">
                                                                                 <button class="btn btn-primary">Add</button>
-                                                                                <button class="btn btn-default" ng-click="closeNewSubtaskForm()">Cancel</button>
+                                                                                <button class="btn btn-default" ng-click="toggleNewSub()">Cancel</button>
                                                                             </div>
                                                                         </div>
                                                                     </fieldset>
