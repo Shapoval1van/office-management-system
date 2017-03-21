@@ -67,6 +67,56 @@ public class SubRequestServiceImpl {
                 .orElseThrow(() -> new CannotCreateSubRequestException("Server error."));
     }
 
+    public Request updateRequest(Long subId, Long parenId, Request sub) throws CannotCreateSubRequestException {
+
+        Request subRequest = requestRepository.findOne(subId)
+                .orElseThrow(() -> new CannotCreateSubRequestException("Subrequest not found."));
+
+        if (subRequest.getParent()==null){
+            throw new CannotCreateSubRequestException("This request is not a subrequest.");
+        }
+
+        Request parent = requestRepository.findOne(parenId)
+                .orElseThrow(() -> new CannotCreateSubRequestException("Parent not found."));
+
+        if (subRequest.getParent().getId() != parent.getId()){
+            throw new CannotCreateSubRequestException("This request is not a subrequest.");
+        }
+
+        if (sub.getName()!=null&&sub.getName().length()>3){
+            subRequest.setName(sub.getName());
+        }
+
+        subRequest.setDescription(sub.getDescription());
+
+        if (sub.getStatus()!=null){
+            Status newStatus = statusRepository.findOne(sub.getStatus().getId())
+                    .orElseThrow(() -> new CannotCreateSubRequestException("Invalid status."));
+            subRequest.setStatus(newStatus);
+        }
+
+        if (sub.getPriority()!=null){
+            Priority newPriority = priorityRepository.findOne(sub.getPriority().getId())
+                    .orElseThrow(() -> new CannotCreateSubRequestException("Invalid priority."));
+            subRequest.setPriority(newPriority);
+        }
+
+        if (sub.getEstimate()!=null){
+            Timestamp newEstimate = sub.getEstimate();
+            if (subRequest.getCreationTime().after(newEstimate)){
+                throw new CannotCreateSubRequestException("Invalid estimate.");
+            }
+            if (parent.getEstimate()!=null&&parent.getEstimate().before(newEstimate)){
+                throw new CannotCreateSubRequestException("Invalid estimate.");
+            }
+            subRequest.setEstimate(newEstimate);
+        } else {
+            subRequest.setEstimate(null);
+        }
+        return requestRepository.updateRequest(subRequest)
+                .orElseThrow(() -> new CannotCreateSubRequestException("Server error."));
+    }
+
     public List<Request> getAllSubRequest(Long parentId){
         return requestRepository.getAllSubRequest(parentId);
     }

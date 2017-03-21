@@ -109,7 +109,11 @@
                             }
                         }
                     });
-                    $scope._toggleEdit(sub);
+                    SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
+                        if (response.isError == false){
+                            $scope.subs[$scope.subs.indexOf(sub)]=response.sub;
+                        }
+                    });
                 };
 
                 $scope.goEdit = function (sub) {

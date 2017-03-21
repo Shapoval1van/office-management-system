@@ -57,6 +57,20 @@
                         })
                 };
 
+                service.updateSubRequest = function (id, sub, parent) {
+                    return $http.put("/api/request/"+parent+"/subrequests/"+id, sub)
+                        .then(function (callback) {
+                            callback.isError = false;
+                            callback.data["showEdit"] = false;
+                            callback.data["estimate"] = transformEstimate(callback.data["estimate"]);
+                            callback.sub = callback.data;
+                            return callback;
+                        }, function (callback) {
+                            callback.isError = true;
+                            return callback;
+                        })
+                };
+
                 service.deleteSubRequest = function (id, parent) {
                     return $http.delete("/api/request/"+parent+"/subrequests/"+id)
                         .then(function (callback) {
@@ -68,13 +82,8 @@
                         })
                 };
 
-                service.updateSubRequest = function (id, sub) {
 
-                };
 
-                service.finishSubRequest = function (id) {
-
-                };
 
                 var transformEstimate = function (timestamp) {
                     return new Date(timestamp);

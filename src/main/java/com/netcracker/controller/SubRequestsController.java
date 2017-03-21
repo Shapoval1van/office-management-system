@@ -47,8 +47,8 @@ public class SubRequestsController {
     public RequestDTO updateSubrequest(@PathVariable Long requestId,
                                        @PathVariable Long subId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                       Principal principal){
-        return null;
+                                       Principal principal) throws CannotCreateSubRequestException {
+        return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest()));
     }
 
     @GetMapping("/api/priorities")
