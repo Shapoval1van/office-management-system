@@ -4,19 +4,34 @@
             function ($scope, $routeParams, SubService) {
                 var requestId = $routeParams.requestId;
 
-                $scope.subs = [
-                    {},
-                    {}
-                ];
+                $scope.subs = [];
+                $scope.statuses = [];
+                $scope.priorities = [];
 
                 var tempSub = {};
 
-                angular.forEach($scope.employees, function (obj) {
-                    obj["showEdit"] = false;
+                SubService.getStatuses().then(function (response) {
+                    if (response.isError == false){
+                        $scope.statuses = response.data;
+                    }
                 });
 
+                SubService.getPriorities().then(function (response) {
+                    if (response.isError == false){
+                        $scope.priorities = response.data;
+                    }
+                });
+
+                SubService.getSubRequests(requestId).then(function (data) {
+                    if (data.isError == false){
+                        $scope.subs = data.data;
+                    }
+                });
+
+
                 $scope._toggleEdit = function (sub) {
-                    sub.showEdit = sub.showEdit ? false : true;
+                    sub.showEdit = !sub.showEdit;
+                    console.log(sub);
                 };
 
                 $scope._toTempSub = function (sub) {
