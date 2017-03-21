@@ -34,7 +34,7 @@ public class CalendarServiceImpl implements CalendarService {
     private PersonRepository personRepository;
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<CalendarItemDTO> getDataByPeriod(Timestamp start, Timestamp end, Principal principal) throws CurrentUserNotPresentException {
         Locale locale =  LocaleContextHolder.getLocale();
         String email = principal.getName();

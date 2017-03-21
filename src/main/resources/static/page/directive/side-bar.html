@@ -14,9 +14,6 @@
             <li ng-class="{'sidebar-active': isActive('')}">
                 <a href="#">Closed requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/calendar')}">
-                <a href="/calendar">Calendar</a>
-            </li>
         </div>
         <!--For manager (also fo admin)-->
         <div ng-show="hasManagerPermission()">
@@ -28,6 +25,9 @@
             </li>
             <li ng-class="{'sidebar-active': isActive('/request-group')}">
                 <a ng-href="/request-group">Request groups</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/calendar')}">
+                <a href="/calendar">Calendar</a>
             </li>
         </div>
         <!--For admin only-->
