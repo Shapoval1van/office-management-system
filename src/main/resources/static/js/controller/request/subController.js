@@ -7,7 +7,9 @@
                 $scope.subs = [];
                 $scope.statuses = [];
                 $scope.priorities = [];
-                $scope.newSub = {};
+                $scope.newSub = {
+                    priority: 1
+                };
 
                 var tempSub = {};
 
@@ -45,7 +47,9 @@
                   SubService.addSubRequest($scope.newSub, requestId).then(function (response) {
                       if (response.isError == false){
                           $scope.subs.push(response.sub);
-                          $scope.newSub = {};
+                          $scope.newSub = {
+                              priority: 1
+                          };
                       }
                   });
                 };
