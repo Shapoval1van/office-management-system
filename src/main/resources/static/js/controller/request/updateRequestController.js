@@ -94,7 +94,7 @@
                     }
                     $http.put("/api/request/" + reguestId + "/update/", $scope.requestCredentials)
                         .then(function (callback) {
-                            window.location = "/requestListByEmployee";
+                            window.location = "/secured/requestListByEmployee";
                         }, function (error) {
                             swal("Oops...", error.data.errors[0].detail, "error");
                             console.log("Updating request Failure!");

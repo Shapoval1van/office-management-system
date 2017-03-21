@@ -8,8 +8,8 @@
         </li>
         <!--For employee (also for manager and admin)-->
         <div ng-show="hasEmployeePermission()">
-            <li ng-class="{'sidebar-active': isActive('/request/my')}">
-                <a href="/request/my">My requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
+                <a href="/secured/request/my">My requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('')}">
                 <a href="#">Closed requests</a>
@@ -17,17 +17,17 @@
         </div>
         <!--For manager (also fo admin)-->
         <div ng-show="hasManagerPermission()">
-            <li ng-class="{'sidebar-active': isActive('/request/free')}">
-                <a href="/request/free">Free requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
+                <a href="/secured/request/free">Free requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('')}">
                 <a href="#">Asigned requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/request-group')}">
-                <a ng-href="/request-group">Request groups</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
+                <a ng-href="/secured/request-group">Request groups</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/calendar')}">
-                <a href="/calendar">Calendar</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/calendar')}">
+                <a href="/secured/calendar">Calendar</a>
             </li>
         </div>
         <!--For admin only-->
@@ -35,8 +35,8 @@
             <li ng-class="{'sidebar-active': isActive('/')}">
                 <a href="#">All requests by user</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/users')}">
-                <a href="/users">Users</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/users')}">
+                <a href="/secured/users">Users</a>
             </li>
         </div>
     </ul>

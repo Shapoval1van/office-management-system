@@ -6,7 +6,6 @@ package com.netcracker.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Request;
-import com.netcracker.model.entity.Status;
 import com.netcracker.model.view.View;
 
 import java.sql.Timestamp;
@@ -21,7 +20,9 @@ public class CalendarItemDTO {
     @JsonView(View.Public.class)
     private Timestamp end;
     @JsonView(View.Public.class)
-    private Status status;
+    private StatusDTO status;
+    @JsonView(View.Public.class)
+    private PriorityDTO priority;
 
     public CalendarItemDTO() {
     }
@@ -31,7 +32,8 @@ public class CalendarItemDTO {
         this.id = request.getId();
         this.start = request.getCreationTime();
         this.end = request.getEstimate();
-        this.status = request.getStatus();
+        this.status = new StatusDTO(request.getStatus());
+        this.priority = new PriorityDTO(request.getPriority());
     }
 
     public Long getId() {
@@ -66,11 +68,11 @@ public class CalendarItemDTO {
         this.end = end;
     }
 
-    public Status getStatus() {
+    public StatusDTO getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(StatusDTO status) {
         this.status = status;
     }
 }

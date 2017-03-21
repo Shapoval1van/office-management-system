@@ -466,6 +466,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<Request> getAllRequestByEmployee(Principal principal, Pageable pageable) {
         String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
@@ -477,11 +478,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Long getCountFree(Integer priorityId) {
         return requestRepository.countFree(priorityId);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Long getCountAllRequestByEmployee(Principal principal) {
         String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();

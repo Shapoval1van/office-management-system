@@ -5,13 +5,13 @@
 
                 $scope._relocateUser = function () {
                     if ($scope.Session.getUserRole()=="ROLE_EMPLOYEE"){
-                        window.location.href = "/request/my"
+                        window.location.href = "/secured/request/my"
                     }
                     if ($scope.Session.getUserRole()=="ROLE_OFFICE MANAGER"){
-                        window.location.href = "/request/my"
+                        window.location.href = "/secured/request/my"
                     }
                     if ($scope.Session.getUserRole()=="ROLE_ADMINISTRATOR"){
-                        window.location.href = "/request/my"
+                        window.location.href = "/secured/request/my"
                     }
                 };
 

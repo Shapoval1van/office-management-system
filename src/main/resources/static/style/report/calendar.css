@@ -24,3 +24,15 @@
 .canceled {
     background: rgba(255, 0, 8, 0.21) !important;
 }
+
+.low {
+    background: rgba(0, 182, 44, 0.9) !important;
+}
+
+.normal {
+    background: rgba(255, 158, 0, 0.9) !important;
+}
+
+.high {
+    background: rgba(215, 40, 40, 0.9) !important;
+}

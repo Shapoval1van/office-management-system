@@ -3,11 +3,11 @@
         .controller("RequestListByEmployeeController", ["$scope", "$http", "$location", "$routeParams", "PersonService", "RequestService",
             function ($scope, $http, $location, $routeParams, PersonService, RequestService) {
 
-                $scope.selectedManager;
+                $scope.selectedManager = {};
                 $scope.managers = [];
 
 
-                var requestDetails = "/request/";
+                var requestDetails = "/secured/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
@@ -25,7 +25,7 @@
 
                 $scope.my = false;
                 var path = $location.path();
-                if (path.toString() == "/request/my") {
+                if (path.toString() == "/secured/request/my") {
 
                     $scope.my = true;
                     $scope.personType = "Manager";
@@ -111,8 +111,8 @@
                         });
                 };
 
-                $scope.assignToSmb = function () {
-                    return PersonService.assign($scope.request.id, $scope.selectedManager.id)
+                $scope.assignToSmb = function (requestId) {
+                    return PersonService.assign(requestId, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
                         }, function (response) {
@@ -174,7 +174,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/request/" + requestId + "/details");
+                    $scope.goToUrl("/secured/request/" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function () {

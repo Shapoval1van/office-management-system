@@ -7,7 +7,7 @@
 
                 SessionService.loadSession();
                 var anonymOnlyPages = ["resetPassword", "reset"];
-                var redirectIfTokenExist = "/requestListByEmployee";
+                var redirectIfTokenExist = "/secured/requestListByEmployee";
                 var loginPageUrl = "/login";
 
                 //FIXME: Rewrite it. Check only URL.
@@ -42,12 +42,12 @@
                 };
 
                 $scope.hasManagerPermission = function (url) {
-                    return SessionService.getUserRole() == 'ROLE_ADMIN'
+                    return SessionService.getUserRole() == 'ROLE_ADMINISTRATOR'
                         || SessionService.getUserRole() == 'ROLE_OFFICE MANAGER';
                 };
 
                 $scope.hasAdminPermission = function (url) {
-                    return SessionService.getUserRole() == 'ROLE_ADMIN';
+                    return SessionService.getUserRole() == 'ROLE_ADMINISTRATOR';
                 };
 
                 $scope.isActive = function (path) {
