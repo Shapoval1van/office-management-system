@@ -131,7 +131,7 @@
                                                                             <div class="form-group">
                                                                                 <label for="inputEstimate" class="col-lg-2 control-label">Estimate</label>
                                                                                 <div class="col-lg-10">
-                                                                                    <input type="date" class="form-control" id="inputEstimate" ng-model="newSub.estimate">
+                                                                                    <input type="datetime-local" class="form-control" id="inputEstimate" ng-model="newSub.estimate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group">
@@ -227,13 +227,14 @@
                                                                             <div class="form-group" ng-show="sub.showEdit">
                                                                                 <label for="inputEditEstimate" class="col-lg-2 control-label">Estimate</label>
                                                                                 <div class="col-lg-10">
-                                                                                    <input type="date" class="form-control" id="inputEditEstimate" ng-model="sub.estimate">
+                                                                                    <input type="datetime-local" class="form-control" id="inputEditEstimate" ng-model="sub.estimate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputEstimate" class="col-lg-2 control-label">Estimate</label>
                                                                                 <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputEstimate" ng-bind="sub.estimate">
+                                                                                    <span id="outputEstimate">
+                                                                                        {{sub.estimate | date: "dd.MM.yyyy HH:mm"}}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>

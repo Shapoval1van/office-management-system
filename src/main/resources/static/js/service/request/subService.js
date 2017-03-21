@@ -86,6 +86,9 @@
 
 
                 var transformEstimate = function (timestamp) {
+                    if (timestamp == null){
+                        return '';
+                    }
                     return new Date(timestamp);
                 };
 

@@ -17,6 +17,16 @@
                     editSubTittle:false
                 };
 
+                $scope.getStatusName = function (id) {
+                    var status = "";
+                    angular.forEach($scope.statuses, function (obj) {
+                        if (obj.id == id){
+                            status = obj.name;
+                        }
+                    });
+                    return status;
+                };
+
                 SubService.getStatuses().then(function (response) {
                     if (response.isError == false){
                         $scope.statuses = response.data;
