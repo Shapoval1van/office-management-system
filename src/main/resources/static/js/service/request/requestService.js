@@ -27,7 +27,8 @@
                     return $http.delete("/api/request/" + requestId)
                         .then(function (callback) {
                             return callback;
-                        }, function (callback) {
+                        }, function (error) {
+                            swal("Cancel Failure!", error.data.errors[0].detail, "error");
                             return callback;
                         })
                 };

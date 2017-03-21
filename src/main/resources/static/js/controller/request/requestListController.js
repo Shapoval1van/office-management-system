@@ -149,7 +149,6 @@
                         .then(function (callback) {
                             $scope.requests = callback.data;
                         }, function (error) {
-                            swal("Cancel Failure!", error.data.errors[0].detail, "error");
                             console.log(error);
                         });
 
