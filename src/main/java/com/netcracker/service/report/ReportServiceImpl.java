@@ -13,6 +13,7 @@ import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class ReportServiceImpl implements ReportService {
     private RequestService requestService;
 
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
         Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
@@ -61,6 +63,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -81,6 +84,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
@@ -97,6 +101,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);

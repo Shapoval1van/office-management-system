@@ -1,27 +1,27 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListController", ["$scope", "$http", "$location", "$routeParams", "PersonService", "RequestService",
-            function ($scope, $http, $location,  $routeParams, PersonService, RequestService) {
+        .controller("RequestListController", ["$scope", "$location", "PersonService", "RequestService",
+            function ($scope, $location, PersonService, RequestService) {
 
                 $scope.selectedManager;
                 $scope.managers = [];
-
 
                 var requestDetails = "/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
                 $scope.requests = {};
-                $scope.priorities = [{priorityId: 1, name: 'HIGH'},
+                $scope.priorities = [{priorityId: 4, name: 'ALL'},
+                    {priorityId: 1, name: 'HIGH'},
                     {priorityId: 2, name: 'NORMAL'},
-                    {priorityId: 3, name: 'LOW'},
-                    {priorityId: 4, name: 'ALL'}]; // TODO need controller for priorities
+                    {priorityId: 3, name: 'LOW'}]; // TODO need controller for priorities
                 $scope.maxSize = 5;
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
                 $scope.selectedPriority = $scope.priorities[0];
                 $scope.assignedMessage = '';
                 $scope.selectedRequest = -1;
+                $scope.requestListVisibility = true;
 
                 $scope.my = false;
                 var path = $location.path();
@@ -31,33 +31,71 @@
                     $scope.personType = "Manager";
 
                     $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/list/my' +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.requests = [];
-                            $scope.requests = response.data;
-
-                        }, function errorCallback(response) {
-                        });
+                        RequestService.getAllRequestByEmployee($scope.currentPage, $scope.pageSize)
+                            .then(function (response) {
+                                $scope.requests = [];
+                                $scope.requests = response.data.data;
+                                $scope.totalItems = response.data.totalElements;
+                                if(!$scope.requests.length){
+                                    $scope.requestListVisibility = false;
+                                }
+                            }, function errorCallback(response) {
+                            });
                     };
+
+                    $scope.requestUpdate = function(requestId) {
+                        window.location = requestDetails + requestId + '/update';
+                    };
+
+                    $scope.requestDetails = function (requestId) {
+                        window.location = requestDetails + requestId;
+                    };
+
+                    $scope.getTotalPage = function(){
+                        return $scope.totalItems;
+                    };
+
+                    $scope.getTotalPage(); //
+                    $scope.pageChanged(1); // get first page
+
                 } else {
                     $scope.personType = "Employee";
 
                     $scope.pageChanged = function() {
-                        $http({
-                            method: 'GET',
-                            url: '/api/request/available/' + $scope.selectedPriority.priorityId +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
-                        }).then(function successCallback(response) {
-                            $scope.requests = [];
-                            $scope.requests = response.data;
-                        }, function errorCallback(response) {
-                        });
+                        if($scope.selectedPriority.priorityId==4){
+                            RequestService.getAvailableRequest($scope.currentPage, $scope.pageSize)
+                                .then(function (response) {
+                                    $scope.requests = [];
+                                    $scope.requests = response.data.data;
+                                    $scope.totalItems = response.data.totalElements;
+                                }, function errorCallback(response) {
+                                });
+                        }
+                        else {
+                            RequestService.getAvailableRequestByPriority($scope.selectedPriority.priorityId,
+                                $scope.currentPage, $scope.pageSize)
+                                .then(function (response) {
+                                    $scope.requests = [];
+                                    $scope.requests = response.data.data;
+                                    $scope.totalItems = response.data.totalElements;
+                                }, function errorCallback(response) {
+                                });
+                        }
                     };
-                }
 
+                    $scope.getTotalPage = function(){
+                        return $scope.totalItems;
+                    };
+
+                    $scope.getTotalPage(); //
+                    $scope.pageChanged(1); // get first page
+
+                    $scope.priorityChange = function (priorityId) {
+                        $scope.getTotalPage(); //
+                        $scope.pageChanged(1); // get first page
+                    };
+
+                }
 
 
 
@@ -69,36 +107,6 @@
                     return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
 
-                $scope.getTotalPage = function() {
-                    $http({
-                        method: 'GET',
-                        url: '/api/request/count/' + $scope.selectedPriority.priorityId
-                    }).then(function successCallback(response) {
-                        $scope.totalItems = response.data;
-                    }, function errorCallback(response) {
-                    });
-                };
-
-                $scope.requestUpdate = function(requestId) {
-                    window.location = requestDetails + requestId + '/update';
-                };
-
-
-                $scope.getTotalPage(); //
-                $scope.pageChanged(1); // get first page
-
-                $scope.requestDetails = function (requestId) {
-                    window.location = requestDetails + requestId;
-                };
-
-                $scope.isSelected = function (requestId) {
-                    return requestId === $scope.selectedPriority.priorityId;
-                };
-
-                $scope.priorityChange = function (priorityId) {
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
-                };
 
                 $scope.assignToMe = function (requestId) {
                     return PersonService.assign(requestId, currentUser.id)
@@ -126,38 +134,29 @@
                         });
                 };
 
-                // $scope.requestDelete = function(requestId) {
-                //     RequestService.cancelRequest(requestId)
-                // };
-
                 $scope.requestDelete = function(requestId) {
                     swal({
-                            title: "Are you sure?",
-                            text: "Do you really want to cancel this request",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes, cancel it!",
-                            closeOnConfirm: false},
+                        title: "Are you sure?",
+                        text: "Do you really want to cancel this request",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, cancel it!",
+                        closeOnConfirm: false
+                    },
                         function(){
-                            $http({
-                                method: 'DELETE',
-                                url: '/api/request/' + requestId
-                            }).then(function successCallback(response) {
-                                $scope.requests = response.data;
-                                //window.location.reload();
-                            }, function errorCallback(error) {
-                                swal("Cancel Failure!", error.data.errors[0].detail, "error");
-                                console.log(error);
-                            });
-
-                            swal("Request canceled!", "", "success");
-                            window.setTimeout(function(){
-                                location.reload()}, 2000)
+                        RequestService.cancelRequest(requestId)
+                        .then(function (callback) {
+                            $scope.requests = callback.data;
+                        }, function (error) {
+                            console.log(error);
                         });
 
+                        swal("Request canceled!", "", "success");
+                        window.setTimeout(function(){
+                            location.reload();}, 2000)
+                    });
                 };
-
 
                 $scope.update = function () {
                     //TODO: Change page number and page size

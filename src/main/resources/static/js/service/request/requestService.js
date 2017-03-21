@@ -14,7 +14,7 @@
                 };
 
                 requestService.getRequestHistory = function (requestId, period, pageSize, pageNumber) {
-                    return $http.get("/api/request/history/" + requestId + "?period=" + period +
+                    return $http.get("/api/request/history/" + requestId + "?period=" + period.toLowerCase() +
                         "&page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
@@ -27,12 +27,22 @@
                     return $http.delete("/api/request/" + requestId)
                         .then(function (callback) {
                             return callback;
+                        }, function (error) {
+                            swal("Cancel Failure!", error.data.errors[0].detail, "error");
+                            return callback;
+                        })
+                };
+
+                requestService.getAvailableRequest = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/available?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
                         }, function (callback) {
                             return callback;
                         })
                 };
 
-                requestService.getAvailableRequest = function (priority, pageNumber, pageSize) {
+                requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
                     return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
@@ -41,8 +51,8 @@
                         })
                 };
 
-                requestService.getPageCountByPriority = function (priority) {
-                    return $http.get("/api/request/count/" + priority)
+                requestService.getAllRequestByEmployee = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/list/my?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
@@ -79,7 +89,7 @@
 
 
                 requestService.isCanceled = function (request) {
-                    return request.status.name == "CANCELED";
+                    return !!request.status && request.status.name == "CANCELED";
                 };
 
                 requestService.isAssigned = function (request) {

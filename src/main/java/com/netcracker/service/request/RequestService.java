@@ -32,19 +32,19 @@ public interface RequestService {
 
     void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException;
 
-    int changeRequestStatus(Request request, Status status);
+    int changeRequestStatus(Request request, Status status, String authorName);
 
     boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
 
-    List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+    Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
 
-    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary);
+    Page<Request> getAvailableRequestList(Pageable pageable);
 
-    List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
+    Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
 
-    Long getCountFree(Integer priorityId);
+    Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
 
-    Long getCountAllRequestByEmployee(String employeeEmail);
+    Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 

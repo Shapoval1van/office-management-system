@@ -1,6 +1,7 @@
 package com.netcracker.service.person;
 
 import com.netcracker.exception.CannotUpdatePersonException;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,13 +50,13 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
-    @Override
-    public Long getCountActivePersonByRole(Integer roleId) {
-        return personRepository.getCountActivePersonByRole(roleId);
-    }
+//    @Override
+//    public Long getCountActivePersonByRole(Integer roleId) {
+//        return personRepository.getCountActivePersonByRole(roleId);
+//    }
 
-
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -78,6 +80,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getManagers(Pageable pageable, String namePattern) {
         if(namePattern == null) {
             return this.personRepository.getManagers(pageable);
@@ -86,18 +89,41 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
+        if(namePattern == null) {
+            return this.personRepository.getPersonList(pageable);
+        }
+        return this.personRepository.getUsersByNamePattern(pageable, namePattern);
+
+    }
+
+    @Override
     public Optional<Person> findPersonByEmail(String email) {
         return this.personRepository.findPersonByEmail(email);
     }
 
     @Override
-    public List<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Person> getPersonListByRole(Integer roleId, Pageable pageable) {
         Optional<Role> role = roleRepository.findOne(roleId);
-        List<Person> personList = personRepository.getPersons(roleId, pageable, role);
+        List<Person> personList = personRepository.getPersonListByRole(roleId, pageable, role);
+        Long count = personRepository.getCountActivePersonByRole(roleId);
 
         personList.forEach(this::fillPerson);
 
-        return personList;
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Person> getPersonList(Pageable pageable) {
+        List<Person> personList = personRepository.getPersonList(pageable);
+        Long count = personRepository.getCountActivePerson();
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
     public void fillPerson(Person person){

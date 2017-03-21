@@ -1,4 +1,4 @@
 
 Hello $name, status of your request was changed.
 Please click on the link to view the notification.
-Link to go: https://management-office.herokuapp.com
+Link to go: $link

@@ -115,14 +115,15 @@ public class RequestController {
     public ResponseEntity<?> updateRequestStatus(@PathVariable Long requestId,
                                                        @PathVariable Integer statusId,
                                                        @Validated(CreateValidatorGroup.class)
-                                                       @RequestBody RequestDTO requestDTO)
+                                                       @RequestBody RequestDTO requestDTO,
+                                                       Principal principal)
                                                        throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Status> status = statusService.getStatusById(statusId);
         if (!status.isPresent())
             return new ResponseEntity<>(new MessageDTO("No such status id"), HttpStatus.BAD_REQUEST);
-        requestService.changeRequestStatus(currentRequest, status.get());
+        requestService.changeRequestStatus(currentRequest, status.get(), principal.getName());
         return new ResponseEntity<>(currentRequest, HttpStatus.OK);
     }
 
@@ -148,38 +149,39 @@ public class RequestController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
-        List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
+    public ResponseEntity<?> getRequestListByPriority(@PathVariable Integer priorityId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestListByPriority(priorityId, pageable);
 
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(requestPage);
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available")
+    public ResponseEntity<?> getRequestList(Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestList(pageable);
 
+        return ResponseEntity.ok(requestPage);
+    }
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
-    public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {
-        List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
+        Page<Request> requestPage = requestService.getAllRequestByEmployee(principal.getName(), pageable);
 
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(requestPage);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
-        Long count = requestService.getCountFree(priorityId);
-        return ResponseEntity.ok(count);
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/user/{userId}")
+    public ResponseEntity<?> getRequestListByUser(@PathVariable Long userId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllRequestByUser(userId, pageable);
+
+        return ResponseEntity.ok(requestPage);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/my")
-    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal) {
-        Long count = requestService.getCountAllRequestByEmployee(principal.getName());
-        return ResponseEntity.ok(count);
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/assigned/{managerId}")
+    public ResponseEntity<?> getAssignedRequestListByManager(@PathVariable Long managerId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllAssignedRequestByManager(managerId, pageable);
+
+        return ResponseEntity.ok(requestPage);
     }
 
     @PutMapping("/{requestId}/grouping")

@@ -21,6 +21,11 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
+                    // registration by admin
+                    .when("/admin/registration", {
+                        templateUrl: "/static/page/registration/registration-page.html",
+                        controller: "RegistrationController"
+                    })
                     .when("/reset", {
                         templateUrl: "/static/page/reset/recover-page.html",
                         controller: "RecoverPasswordController"
@@ -45,20 +50,12 @@
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
-                    // .when("/request/:requestId/",{
-                    //      templateUrl: "/static/page/request/details.html",
-                    //      controller: "RequestDetailsController"
-                    //  })
                     .when("/request/:requestId/details", {
                         templateUrl: "/static/page/request/request-details.html",
                         controller: "RequestDetailsController"
                     })
                     .when("/request/free", {
                         templateUrl: "/static/page/request/free-request-page.html",
-                        controller: "RequestListController"
-                    })
-                    .when("/requestList", {
-                        templateUrl: "/static/page/request/list.html",
                         controller: "RequestListController"
                     })
                     .when("/request-group", {
@@ -73,10 +70,6 @@
                         templateUrl: "/static/page/request/requestGroups.html",
                         controller: "RequestGroupController"
                     })
-                    // .when("/requestListByEmployee", {
-                    //     templateUrl: "/static/page/request/request-list-by-employee.html",
-                    //     controller: "RequestListByEmployeeController"
-                    // })
                     .when("/users", {
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"
@@ -84,6 +77,18 @@
                     .when("/request/my", {
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
+                    })
+                    .when("/calendar", {
+                        templateUrl: "/static/page/report/calendar.html",
+                        controller: "CalendarController"
+                    })
+                    .when("/request/user", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
+                    })
+                    .when("/request/assigned", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
                     })
                     .when("/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",

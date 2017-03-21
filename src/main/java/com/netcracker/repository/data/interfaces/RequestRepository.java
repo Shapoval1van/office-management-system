@@ -7,6 +7,7 @@ import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.JdbcRepository;
 import com.netcracker.repository.common.Pageable;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,9 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getAllSubRequest(Long parentId);
 
-    //List<Request> getAllAssignedRequest(Long managerId);
+    List<Request> getAllAssignedRequest(Long managerId, Pageable pageable);
+
+    List<Request> getAllRequestByUser(Long userId, Pageable pageable);
 
     Optional<Request> updateRequest(Request request);
 
@@ -23,7 +26,13 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     int assignRequest(Long requestId, Long personId, Status status);
 
-    Long countFree(Integer priorityId);
+    Long countFreeByPriority(Integer priorityId);
+
+    Long countFree();
+
+    Long countAllByUser(Long userId);
+
+    Long countAllAssignedByManager(Long managerId);
 
     Long countAllRequestByEmployee(Long employeeId);
 
@@ -49,7 +58,9 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
 
+    List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee);
+
     List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
 
-    List<Request> getFreeRequests(Integer priorityId, Pageable pageable);
+    List<Request> getFreeRequests(Pageable pageable);
 }

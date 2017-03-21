@@ -46,6 +46,16 @@ INSERT INTO public.person (person_id, first_name, last_name, email, password, ro
     TRUE
   );
 
+INSERT INTO public.person (person_id, first_name, last_name, email, password, role_id, enabled) VALUES
+  (
+    3,
+    'MANAGER-  2',
+    'SMITH-  2',
+    'test4@test.com',
+    'test2',
+    1,
+    TRUE
+  );
 
 INSERT INTO public.request_group (request_group_id, name, author_id) VALUES (1, 'Request group   1', 2);
 

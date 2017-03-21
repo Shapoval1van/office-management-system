@@ -36,7 +36,7 @@
                 <div class="form-group" ng-show = "Session.getUserRole()=='ROLE_ADMINISTRATOR'" >
                     <label for="select" class="col-lg-3 control-label" >User type</label>
                     <div class="col-lg-9">
-                        <select class="form-control" id="select" ng-model="personCredentials.role" >
+                        <select class="form-control" id="select" ng-model="person.role" >
                             <option value="" disabled selected>Select type</option>
                             <option ng-repeat="option in roles" value="{{option.id}}">{{option.name}}</option>
                         </select>
