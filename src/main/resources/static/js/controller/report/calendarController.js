@@ -10,7 +10,7 @@
                     },
 
                     eventClick: function(calEvent, jsEvent, view) {
-                        window.location.href = "/request/" + calEvent.id + "/details";
+                        window.open("/request/" + calEvent.id + "/details", '_blank');
                     },
 
                     nowIndicator: true,
