@@ -99,8 +99,10 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException {
+    public Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException {
         Locale locale = LocaleContextHolder.getLocale();
+        String email = principal.getName();
+
         if (subRequest.getParent() == null) {
             throw new CannotCreateSubRequestException(messageSource
                     .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{"null"}, locale));
@@ -147,8 +149,9 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException {
+    public Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException {
         Locale locale = LocaleContextHolder.getLocale();
+        String email = principal.getName();
 
         Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CannotCreateRequestException(messageSource
@@ -196,7 +199,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
+    public Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal) {
+        String authorName = principal.getName();
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
         if (!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
@@ -462,7 +466,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
+    public List<Request> getAllRequestByEmployee(Principal principal, Pageable pageable) {
+        String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
         List<Request> requestList = requestRepository.getRequestsByEmployee(pageable, employee);
 
@@ -477,7 +482,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Long getCountAllRequestByEmployee(String employeeEmail) {
+    public Long getCountAllRequestByEmployee(Principal principal) {
+        String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
         return requestRepository.countAllRequestByEmployee(employee.getId());
     }
