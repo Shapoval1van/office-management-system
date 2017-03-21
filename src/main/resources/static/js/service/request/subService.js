@@ -47,6 +47,7 @@
                             callback.isError = false;
                             callback.data["showEdit"] = false;
                             callback.data["estimate"] = transformEstimate(callback.data["estimate"]);
+                            callback.sub = callback.data;
                             return callback;
                         }, function (callback) {
                             callback.isError = true;
@@ -54,8 +55,15 @@
                         })
                 };
 
-                service.deleteSubRequest = function (id) {
-
+                service.deleteSubRequest = function (id, parent) {
+                    return $http.delete("/api/request/"+parent+"/subrequests/"+id)
+                        .then(function (callback) {
+                            callback.isError = false;
+                            return callback;
+                        }, function (callback) {
+                            callback.isError = true;
+                            return callback;
+                        })
                 };
 
                 service.updateSubRequest = function (id, sub) {

@@ -32,13 +32,23 @@
 
                 $scope.addSub = function () {
                   console.log($scope.newSub) ;
-
                   SubService.addSubRequest($scope.newSub, requestId).then(function (response) {
                       if (response.isError == false){
-                          $scope.subs.push(response.data);
+                          $scope.subs.push(response.sub);
                           $scope.newSub = {};
                       }
                   });
+                };
+
+                $scope.deleteSub = function (sub) {
+                    SubService.deleteSubRequest(sub.id, requestId).then(function (response) {
+                        if (response.isError == false){
+                            var i = $scope.subs.indexOf(sub);
+                            if(i != -1) {
+                                $scope.subs.splice(i, 1);
+                            }
+                        }
+                    });
                 };
 
 
@@ -58,10 +68,6 @@
                 $scope.updateSub = function (sub) {
 
                     $scope._toggleEdit(sub);
-                };
-
-                $scope.deleteSub = function (sub) {
-
                 };
 
                 $scope.goEdit = function (sub) {
