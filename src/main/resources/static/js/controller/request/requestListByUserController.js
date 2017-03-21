@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListByUserController", ["$scope", "$location", "$http", "PersonService", "RequestService",
-            function ($scope, $location, $http, PersonService, RequestService) {
+        .controller("RequestListByUserController", ["$scope", "$location", "$window", "$http", "PersonService", "RequestService",
+            function ($scope, $location, $window,  $http, PersonService, RequestService) {
 
-                $scope.selectedManager = undefined;
+                $scope.selectedCurrentManager = undefined;
                 $scope.selectedUser = undefined;
                 $scope.managers = [];
                 $scope.users = [];
@@ -24,6 +24,8 @@
                 $scope.assignedMessage = '';
                 $scope.selectedRequest = -1;
                 $scope.placeholder = '';
+                $scope.title= '';
+                $scope.requestListByUserVisibility = true;
 
 
                 $scope.assigned = false;
@@ -33,13 +35,14 @@
                     $scope.assigned = true;
                     $scope.personType = "Employee";
                     $scope.placeholder = "Find assigned requests by manager name";
+                    $scope.title = "Enter manager name to get all assigned requests";
 
                     $scope.updateManager = function() {
-                        if($scope.selectedManager.length >= 2) {
-                            console.log($scope.selectedManager);
+                        if($scope.selectedCurrentManager.length >= 2) {
+                            console.log($scope.selectedCurrentManager);
                             $http({
                                 method: 'GET',
-                                url: '/api/person/managers/' +  $scope.selectedManager +
+                                url: '/api/person/managers/' +  $scope.selectedCurrentManager +
                                 '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                             }).then(function successCallback(response) {
                                 $scope.managers = response.data;
@@ -50,20 +53,21 @@
                     };
 
                     $scope.pageChanged = function() {
-                        if ($scope.selectedManager!=undefined)
+                        if ($scope.selectedCurrentManager!=undefined)
                             $http({
                                 method: 'GET',
-                                url: '/api/request/list/assigned/' +  $scope.selectedManager.id
+                                url: '/api/request/list/assigned/' +  $scope.selectedCurrentManager.id +
+                                '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
                             }).then(function (response) {
                                 $scope.requests = [];
                                 $scope.requests = response.data.data;
                                 $scope.totalItems = response.data.totalElements;
-                            }, function errorCallback(response) {
-                            });
-                    };
+                                $scope.requestListByUserVisibility = false;
 
-                    $scope.requestDetails = function (requestId) {
-                        window.location = requestDetails + requestId;
+
+                            }, function errorCallback(response) {
+                                swal("Wrong manager name", "Manager with this name no exist", "error");
+                            });
                     };
 
                     $scope.getTotalPage = function(){
@@ -77,6 +81,8 @@
 
                     $scope.personType = "Manager";
                     $scope.placeholder = "Find all requests by user name";
+                    $scope.title = "Enter user name to get all user requests";
+
                     $scope.updateUser = function() {
                         if($scope.selectedUser.length >= 2) {
                             console.log($scope.selectedUser);
@@ -93,16 +99,20 @@
                     };
 
                     $scope.pageChanged = function() {
-                        if ($scope.selectedUser!=undefined)
-                            $http({
-                                method: 'GET',
-                                url: '/api/request/list/user/' +  $scope.selectedUser.id
-                            }).then(function (response) {
-                                $scope.requests = [];
-                                $scope.requests = response.data.data;
-                                $scope.totalItems = response.data.totalElements;
-                            }, function errorCallback(response) {
-                            });
+                        if ($scope.selectedUser != undefined)
+                        $http({
+                            method: 'GET',
+                            url: '/api/request/list/user/' + $scope.selectedUser.id +
+                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function (response) {
+                            $scope.requests = [];
+                            $scope.requests = response.data.data;
+                            $scope.totalItems = response.data.totalElements;
+
+                            $scope.requestListByUserVisibility = false;
+                        }, function errorCallback(response) {
+                            swal("Wrong user name", "User with this name no exist", "error");
+                        });
                     };
 
                     $scope.requestDetails = function (requestId) {
@@ -134,65 +144,39 @@
                     return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
 
-                $scope.assignToMe = function (requestId) {
-                    return PersonService.assign(requestId, currentUser.id)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
-                        });
-                };
+                // $scope.assignToMe = function (requestId) {
+                //     return PersonService.assign(requestId, currentUser.id)
+                //         .then(function (response) {
+                //             $scope.assignedMessage = response.data.message;
+                //         }, function (response) {
+                //             $scope.assignedMessage = response.data.errors
+                //                 .map(function (e) {
+                //                     return e.detail
+                //                 })
+                //                 .join('. ');
+                //         });
+                // };
 
-                $scope.assignToSmb = function () {
-                    return PersonService.assign($scope.request.id, $scope.selectedManager.id)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
-                        });
-                };
-
-                $scope.requestDelete = function(requestId) {
-                    swal({
-                            title: "Are you sure?",
-                            text: "Do you really want to cancel this request",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes, cancel it!",
-                            closeOnConfirm: false
-                        },
-                        function(){
-                            RequestService.cancelRequest(requestId)
-                                .then(function (callback) {
-                                    $scope.requests = callback.data;
-                                }, function (error) {
-                                    swal("Cancel Failure!", error.data.errors[0].detail, "error");
-                                    console.log(error);
-                                });
-
-                            swal("Request canceled!", "", "success");
-                            window.setTimeout(function(){
-                                location.reload();}, 2000)
-                        });
-                };
-
-
+                // $scope.assignToSmb = function () {
+                //     return PersonService.assign($scope.request.id, $scope.selectedManager.id)
+                //         .then(function (response) {
+                //             $scope.assignedMessage = response.data.message;
+                //         }, function (response) {
+                //             $scope.assignedMessage = response.data.errors
+                //                 .map(function (e) {
+                //                     return e.detail
+                //                 })
+                //                 .join('. ');
+                //         });
+                // };
 
                 $scope.selectRequest = function (requestId) {
                     $scope.selectedRequest = requestId;
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/request/" + requestId + "/details");
+                    $window.open("/request/" + requestId + "/details", '_blank');
+                    //$scope.goToUrl("/request/" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {
