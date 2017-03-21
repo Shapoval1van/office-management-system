@@ -3,8 +3,10 @@ package com.netcracker.model.dto;
 /**
  * Created by nuts on 3/19/17.
  */
+
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Request;
+import com.netcracker.model.entity.Status;
 import com.netcracker.model.view.View;
 
 import java.sql.Timestamp;
@@ -18,6 +20,8 @@ public class CalendarItemDTO {
     private Timestamp start;
     @JsonView(View.Public.class)
     private Timestamp end;
+    @JsonView(View.Public.class)
+    private Status status;
 
     public CalendarItemDTO() {
     }
@@ -27,6 +31,7 @@ public class CalendarItemDTO {
         this.id = request.getId();
         this.start = request.getCreationTime();
         this.end = request.getEstimate();
+        this.status = request.getStatus();
     }
 
     public Long getId() {
@@ -59,5 +64,13 @@ public class CalendarItemDTO {
 
     public void setEnd(Timestamp end) {
         this.end = end;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

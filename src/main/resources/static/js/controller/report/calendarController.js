@@ -15,9 +15,10 @@
 
                     nowIndicator: true,
                     firstDay: 1, // Monday
+                    timeFormat: 'hh:mm',
 
                     header: {
-                        left: 'month,agendaWeek,agendaDay',
+                        left: 'month,listWeek,listDay',
                         center: 'title',
                         right: 'prevYear,prev,today,next,nextYear'
                     }

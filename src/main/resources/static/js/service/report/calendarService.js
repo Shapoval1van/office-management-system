@@ -13,8 +13,11 @@
                     })
                     .then(function (data) {
                         data.data.forEach(function(element) {
-                            element.start = new Date(element.start).toISOString();
+                            element.start = new Date(element.end).toISOString();
                             element.end = new Date(element.end).toISOString();
+                            if (element.status.id == 4){
+                                element.color = "rgba(255, 0, 8, 0.11)";
+                            }
                         });
                         callback(data.data);
                     }, function (data) {
