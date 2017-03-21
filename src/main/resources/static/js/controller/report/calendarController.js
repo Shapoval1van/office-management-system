@@ -15,7 +15,7 @@
 
                     nowIndicator: true,
                     firstDay: 1, // Monday
-                    timeFormat: 'hh:mm',
+                    timeFormat: 'H(:mm)',
 
                     header: {
                         left: 'month,listWeek,listDay',

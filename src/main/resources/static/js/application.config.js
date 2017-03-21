@@ -1,6 +1,20 @@
  (function () {
-    angular.module("OfficeManagementSystem")
-        .config(["$routeProvider", "$locationProvider",
+     angular.module("OfficeManagementSystem")
+        .run(["$rootScope", "$location", "$injector", "SessionService",
+            function($rootScope, $location, $injector, SessionService) {
+                $rootScope.$on('$routeChangeStart', function (event, next) {
+                    if(!SessionService.isUserLoggedIn() && !next.$$route.templateUrl.includes('/login')) {
+                        window.location.href = '/login';
+                    }
+                });
+                $rootScope.$on( "$locationChangeStart", function(angularEvent, next, current) {
+                    if(!SessionService.isUserLoggedIn() && !next.includes('/login') && !current.includes('/login')) {
+                        window.location.href = '/login';
+                    }
+                });
+                $injector.get('$route');
+     }])
+     .config(["$routeProvider", "$locationProvider",
             function ($routeProvider, $locationProvider) {
                 $routeProvider
                 // home page:
@@ -109,5 +123,5 @@
                     enabled: true,
                     requireBase: false
                 }).hashPrefix("!");
-            }]);
-})();
+            }])
+ })();

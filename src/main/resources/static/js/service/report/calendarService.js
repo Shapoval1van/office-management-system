@@ -13,8 +13,13 @@
                     })
                     .then(function (data) {
                         data.data.forEach(function(element) {
-                            element.start = new Date(element.end).toISOString();
-                            element.end = new Date(element.end).toISOString();
+                            var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+
+                            // element.start = new Date(element.end).toISOString();
+                            // element.end = new Date(element.end).toISOString();
+
+                            element.start = (new Date(element.end - tzoffset)).toISOString();
+                            element.end = (new Date(element.end - tzoffset)).toISOString();
                             if (element.status.id == 4){
                                 element.color = "rgba(255, 0, 8, 0.11)";
                             }

@@ -35,6 +35,23 @@
 
                 $scope.goToUrl = function (url) {
                     $location.path(url);
+                };
+
+                $scope.hasEmployeePermission = function (url) {
+                    return SessionService.isUserLoggedIn();
+                };
+
+                $scope.hasManagerPermission = function (url) {
+                    return SessionService.getUserRole() == 'ROLE_ADMIN'
+                        || SessionService.getUserRole() == 'ROLE_OFFICE MANAGER';
+                };
+
+                $scope.hasAdminPermission = function (url) {
+                    return SessionService.getUserRole() == 'ROLE_ADMIN';
+                };
+
+                $scope.isActive = function (path) {
+                    return $location.path() === path;
                 }
             }])
 })();

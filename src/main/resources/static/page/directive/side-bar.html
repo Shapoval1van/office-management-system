@@ -7,28 +7,37 @@
             <a href="#">Dashboard</a>
         </li>
         <!--For employee (also for manager and admin)-->
-        <li>
-            <a href="/request/my">My requests</a>
-        </li>
-        <li>
-            <a href="#">Closed requests</a>
-        </li>
+        <div ng-show="hasEmployeePermission()">
+            <li ng-class="{'sidebar-active': isActive('/request/my')}">
+                <a href="/request/my">My requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('')}">
+                <a href="#">Closed requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/calendar')}">
+                <a href="/calendar">Calendar</a>
+            </li>
+        </div>
         <!--For manager (also fo admin)-->
-        <li>
-            <a href="/request/free">Free requests</a>
-        </li>
-        <li>
-            <a href="#">Asigned requests</a>
-        </li>
-        <li>
-            <a ng-href="/request-group">Request groups</a>
-        </li>
+        <div ng-show="hasManagerPermission()">
+            <li ng-class="{'sidebar-active': isActive('/request/free')}">
+                <a href="/request/free">Free requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('')}">
+                <a href="#">Asigned requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/request-group')}">
+                <a ng-href="/request-group">Request groups</a>
+            </li>
+        </div>
         <!--For admin only-->
-        <li>
-            <a href="#">All requests by user</a>
-        </li>
-        <li>
-            <a href="/users">Users</a>
-        </li>
+        <div ng-show="hasAdminPermission()">
+            <li ng-class="{'sidebar-active': isActive('/')}">
+                <a href="#">All requests by user</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/users')}">
+                <a href="/users">Users</a>
+            </li>
+        </div>
     </ul>
 </div>
