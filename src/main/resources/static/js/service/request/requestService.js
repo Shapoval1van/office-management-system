@@ -32,7 +32,16 @@
                         })
                 };
 
-                requestService.getAvailableRequest = function (priority, pageNumber, pageSize) {
+                requestService.getAvailableRequest = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/available?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
                     return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
@@ -41,8 +50,8 @@
                         })
                 };
 
-                requestService.getPageCountByPriority = function (priority) {
-                    return $http.get("/api/request/count/" + priority)
+                requestService.getAllRequestByEmployee = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/list/my?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

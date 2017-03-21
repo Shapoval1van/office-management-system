@@ -138,7 +138,7 @@
 
                 };
 
-                $scope.requestDelete = function () {
+                $scope.requestDelete = function(requestId) {
                     swal({
                             title: "Are you sure?",
                             text: "Do you really want to cancel this request",
@@ -148,23 +148,19 @@
                             confirmButtonText: "Yes, cancel it!",
                             closeOnConfirm: false
                         },
-                        function () {
-                            $http({
-                                method: 'DELETE',
-                                url: '/api/request/' + String($scope.request.id)
-                            }).then(function successCallback(response) {
-                                $scope.request = response.data;
-                                window.location = "javascript:history.back()";
-                            }, function errorCallback(error) {
-                                swal("Cancel Failure!", error.data.errors[0].detail, "error");
-                                console.log(error);
-                            });
+                        function(){
+                            RequestService.cancelRequest(requestId)
+                                .then(function (callback) {
+                                    $scope.requests = callback.data;
+                                }, function (error) {
+                                    swal("Cancel Failure!", error.data.errors[0].detail, "error");
+                                    console.log(error);
+                                });
 
                             swal("Request canceled!", "", "success");
-                            // window.setTimeout(function(){
-                            //     location.reload()}, 1000)
+                            window.setTimeout(function(){
+                                window.location = "javascript:history.back()"}, 2000)
                         });
-
                 };
 
                 $scope.update = function () {
@@ -273,6 +269,10 @@
                 //FIXME: Move to service
                 $scope.isFree = function () {
                     return $scope.request.status.name === "FREE";
+                };
+
+                $scope.requestUpdate = function(requestId) {
+                    window.location = "/request/" + requestId + '/update';
                 };
                 // $http({
                 //     method: 'GET',

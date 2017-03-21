@@ -14,12 +14,18 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
 
     Long getCountActivePersonByRole(Integer roleId);
 
+    Long getCountActivePerson();
+
     int updatePerson(Person person);
 
     List<Person> getManagers(Pageable pageable, String namePattern);
 
     List<Person> getManagers(Pageable pageable);
 
-    List<Person> getPersons(Integer roleId, Pageable pageable, Optional<Role> role);
+    List<Person> getUsersByNamePattern(Pageable pageable, String namePattern);
+
+    List<Person> getPersonListByRole(Integer roleId, Pageable pageable, Optional<Role> role);
+
+    List<Person> getPersonList(Pageable pageable);
 
 }

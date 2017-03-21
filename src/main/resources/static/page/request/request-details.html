@@ -27,10 +27,10 @@
                                                 ng-click="setReopen()">Reopen request
                                         </button>
 
-                                        <a ng-click="requestDelete(request.id)" class="btn btn-danger"
-                                           ng-hide="isCanceled() && isAuthor()">Cancel</a>
-                                        <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
-                                    </div>
+                                            <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-hide="isCanceled()">Cancel</a>
+                                            <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-hide="isCanceled()">Edit</a>
+                                            <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
+                                        </div>
 
                                     <div class="form-group col-md-6 col-lg-6">
                                         <label for="author" class="col-lg-1 control-label">Author:</label>
