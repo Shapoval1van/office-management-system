@@ -55,7 +55,8 @@
                       if (response.isError == false){
                           $scope.subs.push(response.sub);
                           $scope.newSub = {
-                              priority: 1
+                              name: "",
+                              priority: 2
                           };
                       }
                   });
@@ -96,6 +97,10 @@
                 };
 
                 $scope.updateSub = function (sub) {
+                    if (sub.name==""||sub.name.length<3){
+                        $scope.validationError.editSubTittle = true;
+                        return;
+                    }
                     angular.forEach($scope.tempSubs, function (obj) {
                         if (obj.id == sub.id){
                             var i = $scope.tempSubs.indexOf(obj);
