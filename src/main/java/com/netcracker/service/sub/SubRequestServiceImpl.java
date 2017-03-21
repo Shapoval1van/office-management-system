@@ -33,6 +33,9 @@ public class SubRequestServiceImpl {
 
         Request parent = requestRepository.findOne(parenId)
                 .orElseThrow(() -> new CannotCreateSubRequestException("Parent not found."));
+        if (parent.getParent()!=null){
+            throw new CannotCreateSubRequestException("Subrequest can not have subrequests.");
+        }
 
         if (principalEmail == null){
             throw new CannotCreateSubRequestException("Person not found.");
@@ -56,6 +59,12 @@ public class SubRequestServiceImpl {
         sub.setEmployee(person);
         sub.setStatus(statusFree);
         sub.setCreationTime(new Timestamp(new Date().getTime()));
+
+        if (sub.getEstimate()!=null){
+            if (sub.getEstimate().before(sub.getCreationTime())){
+                throw new CannotCreateSubRequestException("Invalid estimate.");
+            }
+        }
 
         if (parent.getEstimate()!=null && sub.getEstimate()!=null){
             if (parent.getEstimate().before(sub.getEstimate()));{
