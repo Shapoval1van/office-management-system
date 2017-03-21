@@ -1,6 +1,8 @@
 package com.netcracker.controller;
 
+import com.netcracker.exception.BadRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
+import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PriorityDTO;
 import com.netcracker.model.dto.RequestDTO;
@@ -26,7 +28,7 @@ public class SubRequestsController {
     @PostMapping("/api/request/{requestId}/subrequests")
     public RequestDTO createSubrequest(@PathVariable Long requestId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                       Principal principal) throws CannotCreateSubRequestException {
+                                       Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException {
         Request sub = requestDTO.toRequest();
         return new RequestDTO(service.createRequest(requestId, sub, principal.getName()));
     }
@@ -39,7 +41,7 @@ public class SubRequestsController {
 
     @DeleteMapping("/api/request/{requestId}/subrequests/{subId}")
     public void deleteSubrequest(@PathVariable Long requestId,
-                                 @PathVariable Long subId) throws CannotCreateSubRequestException {
+                                 @PathVariable Long subId) throws CannotCreateSubRequestException, ResourceNotFoundException {
         service.deleteSubRequest(requestId, subId);
     }
 
@@ -47,7 +49,7 @@ public class SubRequestsController {
     public RequestDTO updateSubrequest(@PathVariable Long requestId,
                                        @PathVariable Long subId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                       Principal principal) throws CannotCreateSubRequestException {
+                                       Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
         return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest()));
     }
 
