@@ -7,6 +7,7 @@
                 $scope.subs = [];
                 $scope.statuses = [];
                 $scope.priorities = [];
+                $scope.newSub = {};
 
                 var tempSub = {};
 
@@ -27,6 +28,18 @@
                         $scope.subs = data.data;
                     }
                 });
+
+
+                $scope.addSub = function () {
+                  console.log($scope.newSub) ;
+
+                  SubService.addSubRequest($scope.newSub, requestId).then(function (response) {
+                      if (response.isError == false){
+                          $scope.subs.push(response.data);
+                          $scope.newSub = {};
+                      }
+                  });
+                };
 
 
                 $scope._toggleEdit = function (sub) {

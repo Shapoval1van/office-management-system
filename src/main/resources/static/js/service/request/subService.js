@@ -41,6 +41,19 @@
                         })
                 };
 
+                service.addSubRequest = function (sub, parent) {
+                    return $http.post("/api/request/"+parent+"/subrequests", sub)
+                        .then(function (callback) {
+                            callback.isError = false;
+                            callback.data["showEdit"] = false;
+                            callback.data["estimate"] = transformEstimate(callback.data["estimate"]);
+                            return callback;
+                        }, function (callback) {
+                            callback.isError = true;
+                            return callback;
+                        })
+                };
+
                 service.deleteSubRequest = function (id) {
 
                 };
