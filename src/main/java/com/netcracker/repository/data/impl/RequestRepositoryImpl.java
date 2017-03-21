@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Repository
@@ -76,6 +77,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.all.per.year.by.manager}")
     private String GET_ALL_BY_MG_REQUEST_BY_YEAR;
+
+    @Value("${request.all.by.manager.and.period}")
+    private String GET_ALL_BY_MG_REQUEST_BY_PERIOD;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -156,6 +160,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     public List<Request> getRequestsByEmployee(Pageable pageable, Person employee) {
         return this.queryForList(GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
+    }
+
+    @Override
+    public List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee) {
+        return this.queryForList(GET_ALL_BY_MG_REQUEST_BY_PERIOD, start, end, start, end, employee.getId());
     }
 
     @Override
