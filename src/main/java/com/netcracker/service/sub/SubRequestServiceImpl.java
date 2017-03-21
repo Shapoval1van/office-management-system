@@ -13,7 +13,9 @@ import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.StatusRepository;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -31,6 +33,8 @@ public class SubRequestServiceImpl {
     @Autowired
     private PersonRepository personRepository;
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Request createRequest(Long parenId, Request sub, String principalEmail) throws CannotCreateSubRequestException, ResourceNotFoundException {
 
         Request parent = requestRepository.findOne(parenId)
@@ -78,6 +82,8 @@ public class SubRequestServiceImpl {
                 .orElseThrow(() -> new CannotCreateSubRequestException("Server error."));
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Request updateRequest(Long subId, Long parenId, Request sub) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
 
         Request subRequest = requestRepository.findOne(subId)
@@ -128,10 +134,14 @@ public class SubRequestServiceImpl {
                 .orElseThrow(() -> new BadRequestException("Server error."));
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<Request> getAllSubRequest(Long parentId){
         return requestRepository.getAllSubRequest(parentId);
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void deleteSubRequest(Long parentId, Long subId) throws ResourceNotFoundException {
         Request parent = requestRepository.findOne(parentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found."));
@@ -146,10 +156,14 @@ public class SubRequestServiceImpl {
         }
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<Status> getStatuses(){
         return statusRepository.findAll();
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<Priority> getPriorities(){
         return priorityRepository.findAll();
     }

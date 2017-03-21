@@ -99,8 +99,8 @@
                                             {{request.description}}
                                         </span>
                                         </div>
-                                    </div>
-                                        <div class="col-md-12 col-lg-12" ng-controller="SubController">
+                                    </div  >
+                                        <div class="col-md-12 col-lg-12" ng-controller="SubController" ng-show = "Session.getUserRole()=='ROLE_ADMINISTRATOR'||Session.getUserRole()=='ROLE_OFFICE MANAGER'">
                                             <uib-accordion class = "subtask-accordion">
                                                 <div uib-accordion-group class="panel-default" is-open="status.open">
                                                     <uib-accordion-heading>
