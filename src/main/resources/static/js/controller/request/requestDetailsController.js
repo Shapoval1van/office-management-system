@@ -274,6 +274,10 @@
                 $scope.isFree = function () {
                     return $scope.request.status.name === "FREE";
                 };
+
+                $scope.requestUpdate = function(requestId) {
+                    window.location = "/request/" + requestId + '/update';
+                };
                 // $http({
                 //     method: 'GET',
                 //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'

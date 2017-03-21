@@ -5,6 +5,7 @@ import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullPersonDTO;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
@@ -20,8 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
 
@@ -40,6 +39,12 @@ public class PersonController {
         return ResponseEntity.ok(personService.getManagers(pageable, namePattern));
     }
 
+    @GetMapping("/users/{namePattern}")
+    public ResponseEntity<?> getUsersByNamePattern(@PathVariable(required = false) String namePattern,
+                                         Pageable pageable) {
+        return ResponseEntity.ok(personService.getUsersByNamePattern(pageable, namePattern));
+    }
+
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
@@ -54,13 +59,17 @@ public class PersonController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/{roleId}")
-    public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
-        List<Person> personList = personService.getAvailablePersonList(roleId, pageable);
+    public ResponseEntity<?> getPersonListByRole(@PathVariable Integer roleId, Pageable pageable) {
+        Page<Person> personPage = personService.getPersonListByRole(roleId, pageable);
 
-        return ResponseEntity.ok((personList
-                .stream()
-                .map(FullPersonDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(personPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list")
+    public ResponseEntity<?> getPersonList(Pageable pageable) {
+        Page<Person> personPage = personService.getPersonList(pageable);
+
+        return ResponseEntity.ok(personPage);
     }
 
     @GetMapping("/{personId}")
@@ -75,10 +84,4 @@ public class PersonController {
             return new FullPersonDTO(personOptional.get());
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
-    public ResponseEntity<?> getCountActivePersonByRole(@PathVariable Integer roleId) {
-        Long count = personService.getCountActivePersonByRole(roleId);
-        return ResponseEntity.ok(count);
-
-    }
 }

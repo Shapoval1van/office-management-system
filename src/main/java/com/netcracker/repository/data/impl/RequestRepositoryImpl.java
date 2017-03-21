@@ -29,12 +29,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.available.by.priority}")
     public String GET_AVAILABLE_REQUESTS_BY_PRIORITY;
 
+    @Value("${request.find.all.by.user}")
+    public String FIND_ALL_BY_USER;
+
+    @Value("${request.find.all.assigned.by.manager}")
+    public String FIND_ALL_ASSIGNED_BY_MANAGER;
+
     @Value("${request.find.all.available}")
     public String GET_AVAILABLE_REQUESTS;
 
     @Value("${request.find.all.by.employee}")
     public String GET_ALL_REQUESTS_BY_EMPLOYEE;
-    //public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
@@ -48,8 +53,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.assign}")
     private String ASSIGN_REQUEST_TO_PERSON;
 
+    @Value("${request.count.all.by.user}")
+    private String COUNT_ALL_BY_USER;
+
+    @Value("${request.count.all.assigned.by.manager}")
+    private String COUNT_ALL_ASSIGNED_BY_MANAGER;
+
     @Value("${request.count.by.priority}")
     private String COUNT_WITH_PRIORITY;
+
+    @Value("${request.count.free}")
+    private String COUNT_FREE;
 
     @Value("${request.find.by.request.group}")
     private String GET_REQUESTS_BY_REQUEST_GROUP_ID;
@@ -172,10 +186,15 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.queryForList(FIND_ALL_SUB_REQUEST, parentId);
     }
 
-//    @Override
-//    public List<Request> getAllAssignedRequest(Long managerId) {
-//        return super.queryForList(GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER, managerId);
-//    }
+    @Override
+    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+        return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, pageable, managerId);
+    }
+
+    @Override
+    public List<Request> getAllRequestByUser(Long userId,Pageable pageable) {
+        return super.queryForList(FIND_ALL_BY_USER, pageable, userId);
+    }
 
 
     @Override
@@ -198,8 +217,23 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public Long countFree(Integer priorityId) {
+    public Long countFreeByPriority(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
+    }
+
+    @Override
+    public Long countFree() {
+        return getJdbcTemplate().queryForObject(COUNT_FREE, Long.class);
+    }
+
+    @Override
+    public Long countAllByUser(Long userId) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_BY_USER, Long.class, userId);
+    }
+
+    @Override
+    public Long countAllAssignedByManager(Long managerId) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_ASSIGNED_BY_MANAGER, Long.class, managerId);
     }
 
     @Override
@@ -285,8 +319,8 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> getFreeRequests(Integer priorityId, Pageable pageable) {
-        return this.queryForList(GET_AVAILABLE_REQUESTS, pageable, priorityId);
+    public List<Request> getFreeRequests(Pageable pageable) {
+        return this.queryForList(GET_AVAILABLE_REQUESTS, pageable);
     }
 
     @Override

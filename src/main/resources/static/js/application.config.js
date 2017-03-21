@@ -89,6 +89,14 @@
                         templateUrl: "/static/page/report/calendar.html",
                         controller: "CalendarController"
                     })
+                    .when("/request/user", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
+                    })
+                    .when("/request/assigned", {
+                        templateUrl: "/static/page/request/request-list-by-user.html",
+                        controller: "RequestListByUserController"
+                    })
                     .when("/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
