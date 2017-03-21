@@ -21,6 +21,11 @@
                         templateUrl: "/static/page/registration/registration-page.html",
                         controller: "RegistrationController"
                     })
+                    // registration by admin
+                    .when("/admin/registration", {
+                        templateUrl: "/static/page/registration/registration-page.html",
+                        controller: "RegistrationController"
+                    })
                     .when("/reset", {
                         templateUrl: "/static/page/reset/recover-page.html",
                         controller: "RecoverPasswordController"
