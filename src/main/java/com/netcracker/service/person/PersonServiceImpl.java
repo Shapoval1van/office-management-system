@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class PersonServiceImpl implements PersonService {
 //    }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -78,6 +80,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getManagers(Pageable pageable, String namePattern) {
         if(namePattern == null) {
             return this.personRepository.getManagers(pageable);
@@ -86,6 +89,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
         if(namePattern == null) {
             return this.personRepository.getPersonList(pageable);
@@ -100,6 +104,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Person> getPersonListByRole(Integer roleId, Pageable pageable) {
         Optional<Role> role = roleRepository.findOne(roleId);
         List<Person> personList = personRepository.getPersonListByRole(roleId, pageable, role);
@@ -111,6 +116,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Person> getPersonList(Pageable pageable) {
         List<Person> personList = personRepository.getPersonList(pageable);
         Long count = personRepository.getCountActivePerson();

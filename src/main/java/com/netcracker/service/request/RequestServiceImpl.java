@@ -147,6 +147,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -166,6 +168,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Optional<Request> updateRequest(Request newRequest, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -188,8 +192,9 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
         if (!futureNewRequest.isPresent()) return Optional.empty();
@@ -315,7 +320,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -339,6 +344,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int changeRequestStatus(Request request, Status status, String authorName) {
         if (request.getEmployee() != null) {
             Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
@@ -411,7 +417,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    //@PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -430,7 +436,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
         List<Request> requestList = requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get());
@@ -442,6 +448,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Page<Request> getAvailableRequestList(Pageable pageable) {
         List<Request> requestList = requestRepository.getFreeRequests(pageable);
 
@@ -452,6 +459,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
         List<Request> requestList = requestRepository.getRequestsByEmployee(pageable, employee);
@@ -462,6 +470,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllRequestByUser(Long userId, Pageable pageable) {
         List<Request> requestList = requestRepository.getAllRequestByUser(userId, pageable);
         Long count = requestRepository.countAllByUser(userId);
@@ -471,6 +480,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
         List<Request> requestList = requestRepository.getAllAssignedRequest(managerId, pageable);
         Long count = requestRepository.countAllAssignedByManager(managerId);

@@ -62,7 +62,7 @@
                     RegistrationService.loadRoles()
                         .then(function (response) {
                             if (response.isError){
-                                alert("Load role error!");
+                                swal("Load role error!", "", "error");
                             } else {
                                 $scope.roles = response.roles;
                             }
@@ -77,18 +77,22 @@
                         RegistrationService.registerAnyUser($scope.person)
                             .then(function (response) {
                                 if (response.isError){
-                                    window.alert("Registration Failure!")
+                                    swal("Registration Failure!", "", "error")
                                 } else {
-                                    window.alert("To verify the data provided we have sent you a message to your email : "+response.responseEmail)
+                                    swal("Registration successful", "To verify the data provided we have " +
+                                        "sent you a message to your email : " + response.data.email, "success");
+                                    //window.alert("To verify the data provided we have sent you a message to your email : "+response.responseEmail)
                                 }
                             })
                     } else {
                         RegistrationService.registerEmployee($scope.person)
                             .then(function (response) {
                                 if (response.isError){
-                                    window.alert("Registration Failure!")
+                                    swal("Registration Failure!", "", "error")
                                 } else {
-                                    window.alert("To verify the data provided we have sent you a message to your email : "+response.responseEmail)
+                                    swal("Registration successful", "To verify the data provided we have " +
+                                        "sent you a message to your email : " + response.data.email, "success");
+                                    //window.alert("To verify the data provided we have sent you a message to your email : "+response.responseEmail)
                                 }
                             })
                     }
