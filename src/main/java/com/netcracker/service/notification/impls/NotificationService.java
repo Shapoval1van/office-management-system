@@ -40,6 +40,10 @@ public class NotificationService implements NotificationSender {
     private String REQUEST_UPDATE_SUBJECT;
     @Value("${update.user.message.subject}")
     private String USER_UPDATE_SUBJECT;
+    @Value("${delete.user.message.subject}")
+    private String USER_DELETE_SUBJECT;
+    @Value("${recover.user.message.subject}")
+    private String USER_RECOVER_SUBJECT;
     @Value("${request.expiry.reminder.message.subject}")
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
 
@@ -62,6 +66,10 @@ public class NotificationService implements NotificationSender {
     private String USER_UPDATE_MESSAGE_SRC;
     @Value("${request.expiry.reminder.message.src}")
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_SRC;
+    @Value("${delete.user.message.src}")
+    private String USER_DELETE_MESSAGE_SRC;
+    @Value("${recover.deleted.user.message.src}")
+    private String USER_RECOVER_MESSAGE_SRC;
 
     @Autowired
     private MailService mailService;
@@ -143,6 +151,22 @@ public class NotificationService implements NotificationSender {
         Notification notification = NotificationBuilder.build(person,
                 USER_UPDATE_SUBJECT,
                 USER_UPDATE_MESSAGE_SRC);
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendDeleteUserEvent(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                USER_DELETE_SUBJECT,
+                USER_DELETE_MESSAGE_SRC);
+        mailService.send(notification);
+    }
+
+    @Override
+    public void sendRecoverUserEvent(Person person) {
+        Notification notification = NotificationBuilder.build(person,
+                USER_RECOVER_SUBJECT,
+                USER_RECOVER_MESSAGE_SRC);
         mailService.send(notification);
     }
 

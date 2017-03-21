@@ -35,6 +35,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     public String GET_ALL_REQUESTS_BY_EMPLOYEE;
     //public static final String GET_ALL_ASSIGNED_REQUESTS_BY_MANAGER = "SELECT * FROM request WHERE manager_id = ?";
 
+    @Value("${request.find.all.by.manager}")
+    public String GET_ALL_REQUESTS_BY_MANAGER;
+
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
 
@@ -55,6 +58,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.count.by.employee}")
     private String COUNT_ALL_REQUEST_BY_EMPLOYEE;
+
+    @Value("${request.count.by.manager}")
+    private String COUNT_ALL_REQUEST_BY_MANAGER;
 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
@@ -196,6 +202,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countAllRequestByEmployee(Long employeeID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_EMPLOYEE, Long.class, employeeID);
+    }
+
+    @Override
+    public Long countAllRequestByManager(Long managerID) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_MANAGER, Long.class, managerID);
     }
 
     @Override

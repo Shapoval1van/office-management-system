@@ -1,6 +1,6 @@
 package com.netcracker.util.enums.role;
 
-public enum RoleEnum {
+public enum RoleEnum{
     ADMINISTRATOR(1, "ROLE_ADMINISTRATOR"),
     PROJECT_MANAGER(2, "ROLE_OFFICE MANAGER"),
     EMPLOYEE(3, "ROLE_EMPLOYEE");

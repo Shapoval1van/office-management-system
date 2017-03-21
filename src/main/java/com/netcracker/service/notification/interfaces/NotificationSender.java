@@ -25,6 +25,10 @@ public interface NotificationSender {
 
     void sendUpdateUserEvent(Person person);
 
+    void sendDeleteUserEvent(Person person);
+
+    void sendRecoverUserEvent(Person person);
+
     void resendNotification();
 
     void saveFailedNotification(Notification notification);

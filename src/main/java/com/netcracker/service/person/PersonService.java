@@ -1,9 +1,11 @@
 package com.netcracker.service.person;
 
+import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.common.Pageable;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +16,8 @@ public interface PersonService {
 
     //Long getCountPassivePersons(Integer priorityId);
 
+    Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException;
+
     Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
 
     List<Person> getManagers(Pageable pageable, String namePattern);
@@ -21,4 +25,8 @@ public interface PersonService {
     Optional<Person> findPersonByEmail(String email);
 
     List<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
+
+    List<Person> getDeletedPersonList(Integer roleId, Pageable pegeable);
+
+    Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException;
 }

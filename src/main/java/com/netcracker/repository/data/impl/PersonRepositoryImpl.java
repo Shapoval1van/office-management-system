@@ -42,6 +42,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.update}")
     private String UPDATE_PERSON;
 
+    @Value("${person.update.delete.enable}")
+    private String UPDATE_PERSON_AVAILABLE;
+
     @Value("${person.find.all.available.by.role}")
     private String GET_AVAILABLE_PERSONS_BY_ROLE;
 
@@ -102,6 +105,12 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public int updatePerson(Person person) {
         return getJdbcTemplate().update(UPDATE_PERSON, person.getFirstName(), person.getLastName(), person.getRole().getId(), person.getId());
     }
+
+    @Override
+    public int updatePersonAvailable(Person person) {
+        return getJdbcTemplate().update(UPDATE_PERSON_AVAILABLE, person.isEnabled(), person.isDeleted(), person.getId());
+    }
+
 
     @Override
     public List<Person> getManagers(Pageable pageable, String namePattern) {

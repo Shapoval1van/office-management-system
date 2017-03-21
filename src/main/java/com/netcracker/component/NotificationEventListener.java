@@ -51,6 +51,16 @@ public class NotificationEventListener {
     }
 
     @EventListener
+    public void handleDeleteUser(DeleteUserEvent deleteUserEvent){
+        notificationService.sendDeleteUserEvent(deleteUserEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleRecoverUser(RecoverUserEvent recoverUserEvent){
+        notificationService.sendRecoverUserEvent(recoverUserEvent.getPerson());
+    }
+
+    @EventListener
     public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
         notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
     }

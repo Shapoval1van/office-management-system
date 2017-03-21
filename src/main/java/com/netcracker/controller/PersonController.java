@@ -8,6 +8,7 @@ import com.netcracker.model.dto.FullPersonDTO;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.DeleteUserValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.person.PersonService;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +43,17 @@ public class PersonController {
         return ResponseEntity.ok(personService.getManagers(pageable, namePattern));
     }
 
+    @PostMapping(value = "/deletePerson", produces = JSON_MEDIA_TYPE)
+    public ResponseEntity<?> deletePerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email, Principal principal,
+                                  HttpServletRequest request) throws Exception {
+        return new ResponseEntity<>(personService.deletePersonByEmail(email, principal), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/recoverPerson", produces = JSON_MEDIA_TYPE)
+    public ResponseEntity<?> recoverPerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email,
+                                          HttpServletRequest request) throws Exception {
+        return new ResponseEntity<>(personService.recoverDeletedPerson(email), HttpStatus.OK);
+    }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,

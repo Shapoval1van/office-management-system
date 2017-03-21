@@ -16,6 +16,8 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
 
     int updatePerson(Person person);
 
+    int updatePersonAvailable(Person person);
+
     List<Person> getManagers(Pageable pageable, String namePattern);
 
     List<Person> getManagers(Pageable pageable);

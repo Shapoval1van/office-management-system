@@ -1,11 +1,15 @@
 package com.netcracker.service.person;
 
+import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
+import com.netcracker.model.event.DeleteUserEvent;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
+import com.netcracker.model.event.RecoverUserEvent;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
+import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.util.enums.role.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -31,15 +36,19 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
 
+    private final RequestRepository requestRepository;
+
     @Autowired
     public PersonServiceImpl(MessageSource messageSource,
                              RoleRepository roleRepository,
                              PersonRepository personRepository,
-                             ApplicationEventPublisher eventPublisher) {
+                             ApplicationEventPublisher eventPublisher,
+                             RequestRepository requestRepository) {
         this.messageSource = messageSource;
         this.roleRepository = roleRepository;
         this.personRepository = personRepository;
         this.eventPublisher = eventPublisher;
+        this.requestRepository = requestRepository;
     }
 
     public Optional<Person> getPersonById(Long id) {
@@ -48,11 +57,56 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
+
     @Override
     public Long getCountActivePersonByRole(Integer roleId) {
         return personRepository.getCountActivePersonByRole(roleId);
     }
 
+    @Override
+    public Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
+                new CannotDeleteUserException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
+
+        if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())){
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+            }
+            else if (principal.getName().equals(person.getEmail())){
+                throw new CannotDeleteUserException(messageSource.getMessage(ADMINISTRATOR_REMOVING_ERROR, null, locale));
+            }
+            else{
+                publishOnDeleteUserEvent(person);
+                return Optional.of(disablePerson(person));
+            }
+        }
+        else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())) {
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+            }
+            else{
+                publishOnDeleteUserEvent(person);
+                return Optional.of(disablePerson(person));
+            }
+        }
+        else {
+            publishOnDeleteUserEvent(person);
+            return Optional.of(disablePerson(person));
+        }
+
+    }
+
+
+    private void publishOnDeleteUserEvent(Person person) {
+        DeleteUserEvent event = new DeleteUserEvent(person);
+        eventPublisher.publishEvent(event);
+    }
+
+    private void publishOnRecoverUserEvent(Person person) {
+        RecoverUserEvent event = new RecoverUserEvent(person);
+        eventPublisher.publishEvent(event);
+    }
 
     @Override
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
@@ -98,6 +152,30 @@ public class PersonServiceImpl implements PersonService {
         personList.forEach(this::fillPerson);
 
         return personList;
+    }
+
+    @Override
+    public List<Person> getDeletedPersonList(Integer roleId, Pageable pegeable) {
+        return null;
+    }
+
+    @Override
+    public Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
+                new CannotUpdatePersonException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
+        person.setEnabled(true);
+        person.setDeleted(false);
+        publishOnRecoverUserEvent(person);
+        personRepository.updatePersonAvailable(person);
+        return Optional.of(person);
+    }
+
+    private Person disablePerson(Person person){
+        person.setEnabled(false);
+        person.setDeleted(true);
+        personRepository.updatePersonAvailable(person);
+        return person;
     }
 
     public void fillPerson(Person person){

@@ -27,6 +27,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     Long countAllRequestByEmployee(Long employeeId);
 
+    Long countAllRequestByManager(Long managerId);
+
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable);

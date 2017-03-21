@@ -14,7 +14,7 @@
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
                 $scope.selectedRole = $scope.roles[0];
-
+                $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");
                 };
@@ -59,12 +59,11 @@
                 };
 
 
-                $scope.personDelete = function(personId) {
-                    $http({
-                        method: 'DELETE',
-                        url: '/api/person/' + personId
-                    }).then(function successCallback(response) {
-                        $scope.persons = response.data;
+                $scope.personDelete = function(person) {
+                    $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
+                    then(function successCallback(response) {
+                        $scope.pageChanged();
+                        console.log(response);
                     }, function errorCallback(response) {
                         console.log(response);
                     });
