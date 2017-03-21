@@ -17,6 +17,16 @@
                     }
                 });
 
+                $scope.getPriorityName = function (id) {
+                    var priority = "";
+                    angular.forEach($scope.priorities, function (obj) {
+                        if (obj.id == id){
+                            priority = obj.name;
+                        }
+                    });
+                    return priority;
+                };
+
                 SubService.getPriorities().then(function (response) {
                     if (response.isError == false){
                         $scope.priorities = response.data;
