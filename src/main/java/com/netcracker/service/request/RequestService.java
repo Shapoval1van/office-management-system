@@ -2,6 +2,7 @@ package com.netcracker.service.request;
 
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.Request;
@@ -20,7 +21,7 @@ public interface RequestService {
 
     Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
 
-    int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;
+    int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException, RequestNotAssignedException;
 
     int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 

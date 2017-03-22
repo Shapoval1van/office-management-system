@@ -17,6 +17,7 @@ public class MessageConstant {
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
     public static final String REQUEST_ERROR_UPDATE_NOT_PERMISSION = "request.error.update.not.permission";
     public static final String REQUEST_ERROR_UPDATE_NON_FREE = "request.error.update.non.free";
+    public static final String REQUEST_NOT_ASSIGNED = "request.error.not.assigned";
 
     // SUB REQUEST ERROR
     public static final String SUB_REQUEST_ERROR_PARENT = "subrequest.error.parent";

@@ -3,6 +3,7 @@ package com.netcracker.controller;
 
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.ErrorDTO;
 import com.netcracker.model.dto.ErrorsDTO;
@@ -98,9 +99,9 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(Collections.singletonList(errorDTO));
     }
 
-    @ExceptionHandler(RequestGroupAlreadyExist.class)
+    @ExceptionHandler({RequestGroupAlreadyExist.class, RequestNotAssignedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorsDTO requestGroupAlreadyExistHandler(HttpServletRequest request, BaseException e) {
+    public ErrorsDTO requestGroupExceptionsHandler(HttpServletRequest request, BaseException e) {
         int errorStatus = HttpStatus.BAD_REQUEST.value();
         String source = request.getRequestURL().toString();
         String title = e.getMessage();
