@@ -23,8 +23,19 @@
                             })
                 };
 
+                personService.assignToMe = function (requestId) {
+                    return $http.post("/api/request/assign/request/" + requestId, {
+                        requestId: requestId
+                    })
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 personService.assign = function (requestId, personId) {
-                  return $http.post("/api/request/assignRequest", {
+                  return $http.post("/api/request/assign/request", {
                       requestId: requestId,
                       personId: personId
                   })

@@ -52,7 +52,7 @@ public class RequestController {
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {
-        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal.getName());
+        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal);
         if (!newRequest.isPresent()) {
             return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
         }
@@ -85,7 +85,7 @@ public class RequestController {
                                         Principal principal) throws CannotCreateSubRequestException,
                                                                     CannotCreateRequestException {
         Request request = requestDTO.toRequest();
-        requestService.saveRequest(request, principal.getName());
+        requestService.saveRequest(request, principal);
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
@@ -93,7 +93,7 @@ public class RequestController {
     public ResponseEntity<?> addSubRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                            Principal principal) throws CannotCreateSubRequestException {
         Request subRequest = requestDTO.toRequest();
-        requestService.saveSubRequest(subRequest, principal.getName());
+        requestService.saveSubRequest(subRequest, principal);
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
@@ -138,15 +138,23 @@ public class RequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request/{requestId}")
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
-                                           @RequestBody RequestAssignDTO requestAssignDTO,
+                                           @PathVariable Long requestId,
                                            Principal principal) throws CannotAssignRequestException {
-        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
+        requestService.assignRequest(requestId, principal);
 
         return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
+                                           @RequestBody RequestAssignDTO requestAssignDTO)
+            throws CannotAssignRequestException {
+        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId());
+
+        return ResponseEntity.ok(new MessageDTO("Assigned"));
+    }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
     public ResponseEntity<?> getRequestListByPriority(@PathVariable Integer priorityId, Pageable pageable) {
@@ -165,7 +173,7 @@ public class RequestController {
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
     public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
-        Page<Request> requestPage = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+        Page<Request> requestPage = requestService.getAllRequestByEmployee(principal, pageable);
 
         return ResponseEntity.ok(requestPage);
     }

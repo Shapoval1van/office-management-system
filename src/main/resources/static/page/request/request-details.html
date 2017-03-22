@@ -104,9 +104,9 @@
                                             {{request.description}}
                                         </span>
                                         </div>
-                                    </div  >
-                                        <div class="col-md-12 col-lg-12" ng-controller="SubController" ng-show = "Session.getUserRole()=='ROLE_ADMINISTRATOR'||Session.getUserRole()=='ROLE_OFFICE MANAGER'">
-                                            <uib-accordion class = "subtask-accordion">
+                                    </div >
+                                        <div class="col-md-12 col-lg-12" ng-controller="SubController" >
+                                            <uib-accordion class = "subtask-accordion" ng-show = "((Session.getUserRole()=='ROLE_ADMINISTRATOR')||(Session.getUserRole()=='ROLE_OFFICE MANAGER'&&request.manager.id == Session.getCurrentUser().id))">
                                                 <div uib-accordion-group class="panel-default" is-open="status.open">
                                                     <uib-accordion-heading>
                                                         Subtasks <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>

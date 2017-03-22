@@ -116,3 +116,14 @@ body {
         margin-right: 0;
     }
 }
+
+.sidebar-active {
+    background: #5f5f5f;
+    color: white !important;
+}
+
+.sidebar-active > a {
+    background: #5f5f5f;
+    color: white !important;
+}
+
