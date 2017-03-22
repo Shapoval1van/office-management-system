@@ -42,8 +42,6 @@ public class NotificationEventListener {
     @EventListener
     public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
         frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
-    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus) {
-        notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
     }
 
     @EventListener
