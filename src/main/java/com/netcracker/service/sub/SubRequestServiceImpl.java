@@ -11,6 +11,7 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.PriorityRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.util.enums.role.RoleEnum;
 import com.netcracker.util.enums.status.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,12 @@ public class SubRequestServiceImpl {
         Person person = personRepository.findPersonByEmail(principalEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Person not found."));
 
+        if (!person.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
+            if (parent.getManager()==null||parent.getManager().getId()!=person.getId()){
+                throw new CannotCreateSubRequestException("You can not create subrequest.");
+            }
+        }
+
         if (sub.getPriority()!=null){
             priorityRepository.findOne(sub.getPriority().getId())
                     .orElseThrow(() -> new CannotCreateSubRequestException("Invalid priority."));
@@ -84,7 +91,7 @@ public class SubRequestServiceImpl {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Request updateRequest(Long subId, Long parenId, Request sub) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
+    public Request updateRequest(Long subId, Long parenId, Request sub, String principalEmail) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
 
         Request subRequest = requestRepository.findOne(subId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subrequest not found."));
@@ -98,6 +105,17 @@ public class SubRequestServiceImpl {
 
         if (subRequest.getParent().getId() != parent.getId()){
             throw new BadRequestException("This request is not a subrequest.");
+        }
+
+        if (principalEmail == null){
+            throw new ResourceNotFoundException("Person not found.");
+        }
+        Person person = personRepository.findPersonByEmail(principalEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found."));
+        if (!person.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
+            if (parent.getManager() == null || parent.getManager().getId() != person.getId()) {
+                throw new BadRequestException("You can not update subrequest.");
+            }
         }
 
         if (sub.getName()!=null&&sub.getName().length()>3){
@@ -136,18 +154,42 @@ public class SubRequestServiceImpl {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public List<Request> getAllSubRequest(Long parentId){
+    public List<Request> getAllSubRequest(Long parentId, String principalEmail) throws ResourceNotFoundException, BadRequestException {
+        Request parent = requestRepository.findOne(parentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Parent not found."));
+        if (principalEmail == null){
+            throw new ResourceNotFoundException("Person not found.");
+        }
+        Person person = personRepository.findPersonByEmail(principalEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found."));
+        if (!person.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
+            if (parent.getManager() == null || parent.getManager().getId() != person.getId()) {
+                throw new BadRequestException("You can not read subrequest.");
+            }
+        }
         return requestRepository.getAllSubRequest(parentId);
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public void deleteSubRequest(Long parentId, Long subId) throws ResourceNotFoundException {
+    public void deleteSubRequest(Long parentId, Long subId, String principalEmail) throws ResourceNotFoundException, BadRequestException {
         Request parent = requestRepository.findOne(parentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found."));
 
         Request sub = requestRepository.findOne(subId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subrequest not found."));
+
+        if (principalEmail == null){
+            throw new ResourceNotFoundException("Person not found.");
+        }
+        Person person = personRepository.findPersonByEmail(principalEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found."));
+
+        if (!person.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
+            if (parent.getManager() == null || parent.getManager().getId() != person.getId()) {
+                throw new BadRequestException("You can not delete subrequest.");
+            }
+        }
 
         if (sub.getParent().getId() == parent.getId()){
             requestRepository.delete(subId);

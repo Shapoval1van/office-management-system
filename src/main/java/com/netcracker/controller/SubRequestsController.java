@@ -34,15 +34,16 @@ public class SubRequestsController {
     }
 
     @GetMapping("/api/request/{requestId}/subrequests")
-    public List<RequestDTO> getSubrequests(@PathVariable Long requestId){
-        return service.getAllSubRequest(requestId).stream()
+    public List<RequestDTO> getSubrequests(@PathVariable Long requestId, Principal principal) throws ResourceNotFoundException, BadRequestException {
+        return service.getAllSubRequest(requestId, principal.getName()).stream()
                 .map(request -> new RequestDTO(request)).collect(Collectors.toList());
     }
 
     @DeleteMapping("/api/request/{requestId}/subrequests/{subId}")
     public void deleteSubrequest(@PathVariable Long requestId,
-                                 @PathVariable Long subId) throws CannotCreateSubRequestException, ResourceNotFoundException {
-        service.deleteSubRequest(requestId, subId);
+                                 @PathVariable Long subId,
+                                 Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
+        service.deleteSubRequest(requestId, subId,principal.getName());
     }
 
     @PutMapping("/api/request/{requestId}/subrequests/{subId}")
@@ -50,7 +51,7 @@ public class SubRequestsController {
                                        @PathVariable Long subId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                        Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
-        return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest()));
+        return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest(),principal.getName()));
     }
 
     @GetMapping("/api/priorities")
