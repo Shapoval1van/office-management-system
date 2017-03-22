@@ -25,7 +25,7 @@
 
                 $scope.my = false;
                 var path = $location.path();
-                if (path.toString()=="/request/my"){
+                if (path.toString()=="/secured/request/my"){
 
                     $scope.my = true;
                     $scope.personType = "Manager";
@@ -121,8 +121,8 @@
                         });
                 };
 
-                $scope.assignToSmb = function () {
-                    return PersonService.assign($scope.request.id, $scope.selectedManager.id)
+                $scope.assignToSmb = function (requestId) {
+                    return PersonService.assign(requestId, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
                         }, function (response) {

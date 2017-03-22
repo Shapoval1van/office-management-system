@@ -273,7 +273,7 @@
                 };
 
                 $scope.requestUpdate = function(requestId) {
-                    window.location = "/request/" + requestId + '/update';
+                    window.location = "/secured/request/" + requestId + '/update';
                 };
                 // $http({
                 //     method: 'GET',
