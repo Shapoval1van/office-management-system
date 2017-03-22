@@ -22,6 +22,8 @@ public class NotificationTextBuilder {
             context.put("link", notification.getLink());
         }
         if (notification.getRequest() != null) {
+            context.put("requestId", notification.getRequest().getId());
+            context.put("requestStatus", notification.getRequest().getId());
             context.put("requestName", notification.getRequest().getName());
             context.put("requestEstimate", notification.getRequest().getEstimate());
             context.put("requestDescription", notification.getRequest().getDescription());
