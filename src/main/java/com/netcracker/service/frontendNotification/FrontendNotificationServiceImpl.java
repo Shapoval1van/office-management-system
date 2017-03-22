@@ -1,13 +1,13 @@
 package com.netcracker.service.frontendNotification;
 
 
+import com.netcracker.exception.CannotDeleteNotificationException;
 import com.netcracker.model.dto.FrontendNotificationDTO;
 import com.netcracker.model.entity.FrontendNotification;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.repository.data.interfaces.FrontendNotificationRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.method.P;
@@ -32,9 +32,6 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
     @Autowired
     private PersonRepository personRepository;
 
-    @Autowired
-    private RequestRepository requestRepository;
-
     @Override
     @Transactional
     @PreAuthorize("isAuthenticated()")
@@ -48,11 +45,24 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
     @Override
     @Transactional
     @PreAuthorize("isAuthenticated() and @customExpressionServiceImpl.isNotificationBelongToPerson(#id, #name)")
-    public int deleteNotificationById(@P("id") Long id, @P("name") String personName) {
-        return frontendNotificationRepository.deleteNotificationById(id);
+    public int deleteNotificationById(@P("id") Long id, @P("name") String personName) throws CannotDeleteNotificationException {
+        int result = frontendNotificationRepository.deleteNotificationById(id);
+        if(result<=0) throw new CannotDeleteNotificationException("Notification by  id: " + id+" has not deleted");
+        return result;
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("isAuthenticated()")
+    public int deleteNotificationByPersonId(Long id) throws CannotDeleteNotificationException {
+        int result  = frontendNotificationRepository.deleteAllNotificationByPersonId(id);
+        if(result<=0) throw new CannotDeleteNotificationException("Notification by person id: " + id+" has not deleted" );
+        return result;
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("isAuthenticated()")
     public void sendNotificationToAllSubscribed(Long id, String subject) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         List<Person> people = personRepository.findPersonsBySubscribingRequest(id);
@@ -63,9 +73,7 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
         for (FrontendNotification notification : notifications) {
             frontendNotificationRepository.save(notification);
         }
-        FrontendNotification baseNotification = notifications.get(1);
-        baseNotification.setRequest(requestRepository.findOne(id).get());
-        FrontendNotificationDTO notificationDTO = new FrontendNotificationDTO();
+        FrontendNotificationDTO notificationDTO = new FrontendNotificationDTO(notifications.get(1));
         people.forEach(person -> simpMessagingTemplate.convertAndSendToUser(person.getEmail(), "/queue/notification", notificationDTO));
     }
 

@@ -67,6 +67,17 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(errors);
     }
 
+    @ExceptionHandler(CannotDeleteNotificationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO cannotDeleteNotificationException(HttpServletRequest request, CurrentUserNotPresentException e) {
+        int errorStatus = HttpStatus.NOT_FOUND.value();
+        String title = e.getMessage();
+        String source = request.getRequestURL().toString();
+        String description = e.getDescription();
+        ErrorDTO errorDTO = new ErrorDTO(errorStatus, source, title, description);
+        return new ErrorsDTO(Collections.singletonList(errorDTO));
+    }
+
     @ExceptionHandler({CannotCreateRequestException.class, CannotAssignRequestException.class,
             CannotDeleteRequestException.class, CannotCreateSubRequestException.class, IncorrectStatusException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

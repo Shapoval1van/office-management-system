@@ -1,6 +1,7 @@
 package com.netcracker.controller;
 
 
+import com.netcracker.exception.CannotDeleteNotificationException;
 import com.netcracker.model.dto.FrontendNotificationDTO;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,14 @@ public class FrontendNotificationController {
     }
 
     @DeleteMapping("/api/notification/delete")
-    public ResponseEntity<?> deleteNotificationById(@RequestParam(name = "id",required=true) Long id, Principal principal){
+    public ResponseEntity<?> deleteNotificationById(@RequestParam(name = "id",required=true) Long id, Principal principal) throws CannotDeleteNotificationException {
         frontendNotificationService.deleteNotificationById(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/allNotification/delete")
+    public ResponseEntity<?> deleteAllNotificationByPerson(@RequestParam(name = "id",required=true) Long id, Principal principal) throws CannotDeleteNotificationException {
+        frontendNotificationService.deleteNotificationByPersonId(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

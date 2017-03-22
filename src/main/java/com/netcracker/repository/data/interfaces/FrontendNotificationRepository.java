@@ -10,4 +10,5 @@ public interface FrontendNotificationRepository extends JdbcRepository<FrontendN
 
     List<FrontendNotification> getAllNotificationToPerson(Long personId);
     int deleteNotificationById(Long notificationId);
+    int deleteAllNotificationByPersonId(Long personId);
 }
