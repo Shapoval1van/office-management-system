@@ -16,9 +16,9 @@ import java.util.Set;
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
 
-    Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException;
+    Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException;
 
-    Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
+    Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CannotCreateSubRequestException;
 
     int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;
 
@@ -26,7 +26,7 @@ public interface RequestService {
 
     Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
-    Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
+    Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal);
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 
@@ -42,7 +42,7 @@ public interface RequestService {
 
     Page<Request> getAvailableRequestList(Pageable pageable);
 
-    Page<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
+    Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable);
 
     Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
 

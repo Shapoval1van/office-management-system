@@ -7,31 +7,40 @@
             <a href="#">Dashboard</a>
         </li>
         <!--For employee (also for manager and admin)-->
-        <li>
-            <a href="/request/my">My requests</a>
-        </li>
-        <li>
-            <a href="#">Closed requests</a>
-        </li>
+        <div ng-show="hasEmployeePermission()">
+            <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
+                <a href="/secured/request/my">My requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('')}">
+                <a href="#">Closed requests</a>
+            </li>
+        </div>
         <!--For manager (also fo admin)-->
-        <li>
-            <a href="/request/free">Free requests</a>
-        </li>
-        <li>
-            <a href="#">Asigned requests</a>
-        </li>
-        <li>
-            <a ng-href="/request-group">Request groups</a>
-        </li>
+        <div ng-show="hasManagerPermission()">
+            <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
+                <a href="/secured/request/free">Free requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('')}">
+                <a href="#">Asigned requests</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
+                <a ng-href="/secured/request-group">Request groups</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/secured/calendar')}">
+                <a href="/secured/calendar">Calendar</a>
+            </li>
+        </div>
         <!--For admin only-->
-        <li>
-            <a href="/request/user">Requests by user</a>
-        </li>
-        <li>
-            <a href="/request/assigned">Assig. by manager</a>
-        </li>
-        <li>
-            <a href="/users">Users</a>
-        </li>
+        <div ng-show="hasAdminPermission()">
+            <li ng-class="{'sidebar-active': isActive('/secured/request/user')}">
+                <a href="/secured/request/user">Requests by user</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/assigned')}">
+                <a href="/secured/request/assigned">Assig. by manager</a>
+            </li>
+            <li ng-class="{'sidebar-active': isActive('/secured/users')}">
+                <a href="/secured/users">Users</a>
+            </li>
+        </div>
     </ul>
 </div>

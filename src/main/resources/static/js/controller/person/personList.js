@@ -3,7 +3,7 @@
         .controller("PersonListController", ["$scope", "$http",
             function ($scope, $http) {
 
-                var personDetails = "/person/";
+                var personDetails = "/secured/person/";
                 $scope.pageSize = 10;
                 $scope.persons = {};
                 $scope.roles = [{roleId: 4, name: 'ALL'},

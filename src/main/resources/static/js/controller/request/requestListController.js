@@ -6,7 +6,7 @@
                 $scope.selectedManager;
                 $scope.managers = [];
 
-                var requestDetails = "/request/";
+                var requestDetails = "/secured/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
@@ -173,7 +173,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/request/" + requestId + "/details");
+                    $scope.goToUrl("/secured/request/" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {

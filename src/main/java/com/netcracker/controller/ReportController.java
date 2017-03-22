@@ -27,7 +27,6 @@ import java.util.List;
 @Validated
 public class ReportController {
 
-
     @Autowired
     private ReportService reportService;
 
@@ -78,7 +77,7 @@ public class ReportController {
 
         long startTime = Long.parseLong(start);
         long endTime = Long.parseLong(end);
-        return calendarService.getDataByPeriod(new Timestamp(startTime*1000), new Timestamp(endTime*1000), principal.getName());
+        return calendarService.getDataByPeriod(new Timestamp(startTime*1000), new Timestamp(endTime*1000), principal);
     }
 
 
