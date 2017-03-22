@@ -22,6 +22,9 @@ public class FrontendNotificationRepositoryImp  extends GenericJdbcRepository<Fr
     private String GET_ALL_NOTIFICATION_TO_PERSON;
     @Value("${delete.notification.by.id}")
     private String DELETE_NOTIFICATION_BY_ID;
+    @Value("${delete.all.notification.to.person}")
+    private String DELETE_NOTIFICATION_BY_PERSON;
+
 
     public static final String PERSON_ID_COLUMN = "person_id";
     public static final String SUBJECT_COLUMN = "subject";
@@ -64,5 +67,10 @@ public class FrontendNotificationRepositoryImp  extends GenericJdbcRepository<Fr
     @Override
     public int deleteNotificationById(Long notificationId) {
         return super.getJdbcTemplate().update(DELETE_NOTIFICATION_BY_ID, notificationId);
+    }
+
+    @Override
+    public int deleteAllNotificationByPersonId(Long personId) {
+        return super.getJdbcTemplate().update(DELETE_NOTIFICATION_BY_PERSON, personId);
     }
 }

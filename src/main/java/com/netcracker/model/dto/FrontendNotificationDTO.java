@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 
 public class FrontendNotificationDTO {
 
+    private Long id;
     private String subject = "";
     private Timestamp creationTime;
     private Request request;
@@ -16,7 +17,8 @@ public class FrontendNotificationDTO {
     public FrontendNotificationDTO() {
     }
 
-    public FrontendNotificationDTO(String subject, Timestamp creationTime, Request request) {
+    public FrontendNotificationDTO(Long id, String subject, Timestamp creationTime, Request request) {
+        this.id = id;
         this.subject = subject;
         this.creationTime = creationTime;
         this.request = request;
@@ -24,6 +26,7 @@ public class FrontendNotificationDTO {
 
 
     public FrontendNotificationDTO(FrontendNotification frontendNotification){
+        this.id = frontendNotification.getId();
         this.subject = frontendNotification.getSubject();
         this.creationTime = frontendNotification.getCreationTime();
         this.request = frontendNotification.getRequest();
@@ -52,6 +55,12 @@ public class FrontendNotificationDTO {
     public void setRequest(Request request) {
         this.request = request;
     }
-    
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

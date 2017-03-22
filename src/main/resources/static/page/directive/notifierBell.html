@@ -8,13 +8,13 @@
             </a>
                 <div ng-if="notifications.length!=0" class="dropdown-container">
                     <div class="dropdown-toolbar">
-                        <a href="#">Mark all as read</a>
+                        <a href="#" ng-click="deleteAllNotification()" class="animate-repeat">Mark all as read</a>
                     </div>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li ng-repeat="notification in notifications"  class="notification">
-                            <strong class="notification-title"><a href="#">{{notification.subject}}</a> commented on
-                                <a href="#">DWARF-13 - Maintenance</a></strong>
-                                <div class="notification-meta">
+                        <li ng-repeat="notification in notifications" ng-click="deleteNotification(notification.id)" class="notification">
+                            <strong class="notification-title">{{notification.subject}} check changes on
+                                <a ng-href="/request/{{notification.request.id}}/details">page</a></strong>
+                            <div class="notification-meta">
                                     <small class="timestamp">{{notification.creationTime | date: "dd.MM.yyyy HH:mm"}}</small>
                                 </div>
                         </li>
