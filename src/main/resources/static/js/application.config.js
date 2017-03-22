@@ -48,9 +48,13 @@
                         templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
-                    .when("/secured/demo", {
-                        templateUrl: "/static/page/demo/secured.html",
-                        controller: "DemoController"
+                    // .when("/secured/demo", {
+                    //     templateUrl: "/static/page/demo/secured.html",
+                    //     controller: "DemoController"
+                    // })
+                    .when("/secured/dashboard", {
+                        templateUrl: "/static/page/dashboard/dashboard.html",
+                        controller: "DashboardController"
                     })
                     .when("/secured/comment/:requestId", {
                         templateUrl: "/static/page/test/test-comment.html",
