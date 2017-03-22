@@ -106,10 +106,10 @@ public class PersonController {
 
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
+  /*  @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
     public ResponseEntity<?> getCountDeletedPersonByRole(@PathVariable Integer roleId) {
         Long count = personService.getCountDeletedPersonByRole(roleId);
         return ResponseEntity.ok(count);
+    }*/
 
-    }
 }

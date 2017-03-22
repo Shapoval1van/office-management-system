@@ -60,8 +60,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.count.active.by.role}")
     private String COUNT_ACTIVE_PERSON_BY_ROLE;
 
-    @Value("${person.count.deleted.by.role}")
-    private String COUNT_DELETED_PERSON_BY_ROLE;
+ //   @Value("${person.count.deleted.by.role}")
+ //   private String COUNT_DELETED_PERSON_BY_ROLE;
 
 
     public PersonRepositoryImpl() {
@@ -112,7 +112,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     @Override
     public Long getCountDeletedPersonByRole(Integer roleId) {
-        return getJdbcTemplate().queryForObject(COUNT_DELETED_PERSON_BY_ROLE, Long.class, roleId);
+        return null;//getJdbcTemplate().queryForObject(COUNT_DELETED_PERSON_BY_ROLE, Long.class, roleId);
     }
 
     @Override
