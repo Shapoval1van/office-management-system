@@ -51,8 +51,17 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.find.all.available}")
     private String GET_AVAILABLE_PERSONS;
 
+    @Value("${person.find.all.deleted}")
+    private String GET_DELETED_PERSONS;
+
+    @Value("${person.find.all.deleted.by.role}")
+    private String  GET_DELETED_PERSONS_BY_ROLE;
+
     @Value("${person.count.active.by.role}")
     private String COUNT_ACTIVE_PERSON_BY_ROLE;
+
+    @Value("${person.count.deleted.by.role}")
+    private String COUNT_DELETED_PERSON_BY_ROLE;
 
 
     public PersonRepositoryImpl() {
@@ -102,6 +111,11 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
+    public Long getCountDeletedPersonByRole(Integer roleId) {
+        return getJdbcTemplate().queryForObject(COUNT_DELETED_PERSON_BY_ROLE, Long.class, roleId);
+    }
+
+    @Override
     public int updatePerson(Person person) {
         return getJdbcTemplate().update(UPDATE_PERSON, person.getFirstName(), person.getLastName(), person.getRole().getId(), person.getId());
     }
@@ -127,6 +141,13 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         return role.isPresent() ? this.queryForList(
                 GET_AVAILABLE_PERSONS_BY_ROLE, pageable, roleId)
                 : this.queryForList(GET_AVAILABLE_PERSONS, pageable);
+    }
+
+    @Override
+    public List<Person> getDeletedPersons(Integer roleId, Pageable pageable, Optional<Role> role) {
+        return role.isPresent() ? this.queryForList(
+                GET_DELETED_PERSONS_BY_ROLE, pageable, roleId)
+                : this.queryForList(GET_DELETED_PERSONS, pageable);
     }
 
 }

@@ -64,6 +64,11 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public Long getCountDeletedPersonByRole(Integer roleId) {
+        return personRepository.getCountDeletedPersonByRole(roleId);
+    }
+
+    @Override
     public Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
         Locale locale = LocaleContextHolder.getLocale();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
@@ -155,8 +160,12 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<Person> getDeletedPersonList(Integer roleId, Pageable pegeable) {
-        return null;
+    public List<Person> getDeletedPersonList(Integer roleId, Pageable pageable) {
+        Optional<Role> role = roleRepository.findOne(roleId);
+        List<Person> personList = personRepository.getDeletedPersons(roleId, pageable, role);
+        personList.forEach(this::fillPerson);
+
+        return personList;
     }
 
     @Override

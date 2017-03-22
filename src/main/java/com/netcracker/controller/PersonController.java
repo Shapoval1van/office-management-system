@@ -77,6 +77,16 @@ public class PersonController {
                 .collect(Collectors.toList())));
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted_list/{roleId}")
+    public ResponseEntity<?> getDeletedPersonList(@PathVariable Integer roleId, Pageable pageable) {
+        List<Person> personList = personService.getDeletedPersonList(roleId, pageable);
+
+        return ResponseEntity.ok((personList
+                .stream()
+                .map(FullPersonDTO::new)
+                .collect(Collectors.toList())));
+    }
+
     @GetMapping("/{personId}")
     @JsonView(View.Public.class)
     @ResponseStatus(HttpStatus.OK)
@@ -92,6 +102,13 @@ public class PersonController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
     public ResponseEntity<?> getCountActivePersonByRole(@PathVariable Integer roleId) {
         Long count = personService.getCountActivePersonByRole(roleId);
+        return ResponseEntity.ok(count);
+
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{roleId}")
+    public ResponseEntity<?> getCountDeletedPersonByRole(@PathVariable Integer roleId) {
+        Long count = personService.getCountDeletedPersonByRole(roleId);
         return ResponseEntity.ok(count);
 
     }

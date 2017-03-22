@@ -13,6 +13,7 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
     Optional<Person> findPersonByEmail(String email);
 
     Long getCountActivePersonByRole(Integer roleId);
+    Long getCountDeletedPersonByRole(Integer roleId);
 
     int updatePerson(Person person);
 
@@ -23,5 +24,6 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
     List<Person> getManagers(Pageable pageable);
 
     List<Person> getPersons(Integer roleId, Pageable pageable, Optional<Role> role);
+    List<Person> getDeletedPersons(Integer roleId, Pageable pageable, Optional<Role> role);
 
 }

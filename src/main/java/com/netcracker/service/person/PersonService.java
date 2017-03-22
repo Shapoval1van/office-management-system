@@ -13,6 +13,7 @@ public interface PersonService {
     Optional<Person> getPersonById(Long id);
 
     Long getCountActivePersonByRole(Integer roleId);
+    Long getCountDeletedPersonByRole(Integer roleId);
 
     //Long getCountPassivePersons(Integer priorityId);
 
@@ -26,7 +27,7 @@ public interface PersonService {
 
     List<Person> getAvailablePersonList(Integer roleId, Pageable pageable);
 
-    List<Person> getDeletedPersonList(Integer roleId, Pageable pegeable);
+    List<Person> getDeletedPersonList(Integer roleId, Pageable pageable);
 
     Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException;
 }

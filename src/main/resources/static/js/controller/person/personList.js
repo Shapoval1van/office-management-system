@@ -60,13 +60,20 @@
 
 
                 $scope.personDelete = function(person) {
-                    $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
-                    then(function successCallback(response) {
-                        $scope.pageChanged();
-                        console.log(response);
-                    }, function errorCallback(response) {
-                        console.log(response);
-                    });
+                    if (person.email === $scope.currentUser.email)
+                        window.alert("You cannot delete yourself")
+                    else{
+                        $scope.person = person;
+                        $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
+                        then(function successCallback(response) {
+                            $scope.persons =$scope.persons.filter(function(person) {
+                                return person.email !== $scope.person.email;
+                            });
+                        }, function errorCallback(response) {
+                            console.log(response);
+                        });
+                    }
+
                 };
 
             }])
