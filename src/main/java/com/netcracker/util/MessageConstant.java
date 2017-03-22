@@ -2,9 +2,9 @@ package com.netcracker.util;
 
 public class MessageConstant {
     //USER ERROR
-    public static final String USER_ERROR_NOT_PRESENT ="user.error.not.present";
-    public static final String USER_WITH_ID_NOT_PRESENT="user.error.not.present.with.id";
-    public static final String USER_WITH_EMAIL_NOT_PRESENT="user.error.email";
+    public static final String USER_ERROR_NOT_PRESENT = "user.error.not.present";
+    public static final String USER_WITH_ID_NOT_PRESENT = "user.error.not.present.with.id";
+    public static final String USER_WITH_EMAIL_NOT_PRESENT = "user.error.email";
     public static final String USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE = "user.error.update.from.manager.to.employee";
     public static final String USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE = "user.error.update.from.admin.to.employee";
 
@@ -50,4 +50,9 @@ public class MessageConstant {
 
     //REPORT
     public static final String NOT_DATA_FOR_THIS_ROLE = "report.not.data.for.this.role";
+
+    //UPDATE REQUEST HIGHLIGHTING
+    public static final String REQUEST_UPDATE_MESSAGE_SUBJECT = "request.update.message.subject";
+    public static final String REQUEST_UPDATE_MESSAGE_BODY = "request.update.message.body";
+
 }

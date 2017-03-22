@@ -4,10 +4,7 @@ import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
-import com.netcracker.model.event.NotificationChangeStatus;
-import com.netcracker.model.event.NotificationNewRequestEvent;
-import com.netcracker.model.event.NotificationRequestUpdateEvent;
-import com.netcracker.model.event.RequestExpiringEvent;
+import com.netcracker.model.event.*;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.util.ChangeTracker;
@@ -24,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.support.RequestHandledEvent;
 
 import java.security.Principal;
 import java.sql.Timestamp;
@@ -189,6 +187,7 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+            eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest.get(), newRequest, new Date()));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
         }

@@ -31,32 +31,38 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleNotificationSendingError(NotificationSendingErrorEvent event){
+    public void handleNotificationSendingError(NotificationSendingErrorEvent event) {
         notificationService.saveFailedNotification(event.getNotification());
     }
 
     @EventListener
-    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
+    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus) {
         notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
     }
 
     @EventListener
-    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent){
+    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
         notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
     }
 
     @EventListener
-    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
+    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent) {
         notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
     }
 
     @EventListener
-    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
+    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent) {
         notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
     }
 
     @EventListener
-    public void handleRequestExpiring(RequestExpiringEvent event){
+    public void handleRequestExpiring(RequestExpiringEvent event) {
         notificationService.sendRequestExpiryReminder(event.getExpiringRequests());
+    }
+
+    @EventListener
+    public void handleChangeRequest(ChangeRequestEvent changeRequestEvent) {
+        notificationService.sendRequestUpdateNotification(changeRequestEvent.getOldRequest(),
+                changeRequestEvent.getNewRequest(), changeRequestEvent.getChangeTime());
     }
 }
