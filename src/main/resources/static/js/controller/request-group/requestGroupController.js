@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestGroupController", ['$scope', '$routeParams', 'RequestGroupService',
-            function ($scope, $routeParams, RequestGroupService) {
+        .controller("RequestGroupController", ['$scope', '$routeParams', "$rootScope", 'RequestGroupService',
+            function ($scope, $routeParams, $rootScope, RequestGroupService) {
 
                 $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.groups = [];
@@ -9,6 +9,8 @@
                 $scope.pageSize = 20;
                 $scope.requestGroupNamePattern = "";
                 $scope.maxPageSize = 20;
+
+                $rootScope.sideBarActiveElem = "request-group";
 
                 $scope.getPageMaxCount = function () {
                     return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)

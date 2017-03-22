@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("PersonListController", ["$scope", "$http",
-            function ($scope, $http) {
+        .controller("PersonListController", ["$scope", "$http", "$rootScope",
+            function ($scope, $http, $rootScope) {
 
                 var personDetails = "/person/";
                 $scope.pageSize = 10;
@@ -14,6 +14,8 @@
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
                 $scope.selectedRole = $scope.roles[0];
+
+                $rootScope.sideBarActiveElem = "users";
 
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");

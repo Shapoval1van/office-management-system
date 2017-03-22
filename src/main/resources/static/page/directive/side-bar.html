@@ -1,37 +1,37 @@
 <div id="sidebar-wrapper">
-    <ul class="sidebar-nav">
+    <ul class="sidebar-nav" ng-controller="SideBarController">
         <li class="sidebar-brand">
             Menu
         </li>
-        <li>
-            <a href="#">Dashboard</a>
-        </li>
         <!--For employee (also for manager and admin)-->
         <li>
-            <a href="/request/my">My requests</a>
+            <a class="side-bar-dashboard" href="/dashboard">Dashboard</a>
         </li>
         <li>
-            <a href="#">Closed requests</a>
+            <a class="side-bar-my-requests" class="side-bar-my-requests" href="/request/my">My requests</a>
+        </li>
+        <li>
+            <a href="#" ng-click="sideBarItemClick()">Closed requests</a>
         </li>
         <!--For manager (also fo admin)-->
         <li>
-            <a href="/request/free">Free requests</a>
+            <a class="side-bar-free-requests" href="/request/free" ng-click="sideBarItemClick()">Free requests</a>
         </li>
         <li>
-            <a href="#">Asigned requests</a>
+            <a href="#" ng-click="sideBarItemClick()">Asigned requests</a>
         </li>
         <li>
-            <a ng-href="/request-group">Request groups</a>
+            <a class="side-bar-request-group" ng-href="/request-group" ng-click="sideBarItemClick()">Request groups</a>
         </li>
         <!--For admin only-->
         <li>
-            <a href="/request/user">Requests by user</a>
+            <a class="side-bar-request-user" href="/request/user" ng-click="sideBarItemClick()">Requests by user</a>
         </li>
         <li>
-            <a href="/request/assigned">Assig. by manager</a>
+            <a class="side-bar-request-assigned" href="/request/assigned" ng-click="sideBarItemClick()">Assig. by manager</a>
         </li>
         <li>
-            <a href="/users">Users</a>
+            <a class="side-bar-users" href="/users" ng-click="sideBarItemClick()">Users</a>
         </li>
     </ul>
 </div>

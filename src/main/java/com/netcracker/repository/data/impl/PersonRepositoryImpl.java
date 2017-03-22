@@ -139,4 +139,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         return super.queryForList(GET_AVAILABLE_PERSONS, pageable);
     }
 
+    @Override
+    public List<Person> getPersonList() {
+        return super.queryForList(GET_AVAILABLE_PERSONS);
+    }
+
 }

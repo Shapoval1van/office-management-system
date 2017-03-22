@@ -32,6 +32,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.by.user}")
     public String FIND_ALL_BY_USER;
 
+    @Value("${request.find.all}")
+    public String FIND_ALL_REQUEST;
+
     @Value("${request.find.all.assigned.by.manager}")
     public String FIND_ALL_ASSIGNED_BY_MANAGER;
 
@@ -172,6 +175,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
     }
 
+    @Override
+    public List<Request> getAllRequests() {
+        return this.queryForList(FIND_ALL_REQUEST);
+    }
+
     public List<Request> getRequestsByEmployee(Pageable pageable, Person employee) {
         return this.queryForList(GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
     }
@@ -192,8 +200,18 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public List<Request> getAllAssignedRequest(Long managerId) {
+        return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, managerId);
+    }
+
+    @Override
     public List<Request> getAllRequestByUser(Long userId,Pageable pageable) {
         return super.queryForList(FIND_ALL_BY_USER, pageable, userId);
+    }
+
+    @Override
+    public List<Request> getAllRequestByUser(Long userId) {
+        return super.queryForList(FIND_ALL_BY_USER, userId);
     }
 
 
@@ -321,6 +339,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public List<Request> getFreeRequests(Pageable pageable) {
         return this.queryForList(GET_AVAILABLE_REQUESTS, pageable);
+    }
+
+    @Override
+    public List<Request> getFreeRequests() {
+        return this.queryForList(GET_AVAILABLE_REQUESTS);
     }
 
     @Override

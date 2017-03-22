@@ -34,10 +34,14 @@
                         templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
-                    .when("/demo", {
-                        templateUrl: "/static/page/demo/secured.html",
-                        controller: "DemoController"
+                    .when("/dashboard", {
+                        templateUrl: "/static/page/dashboard/dashboard.html",
+                        controller: "DashboardController"
                     })
+                    // .when("/demo", {
+                    //     templateUrl: "/static/page/demo/secured.html",
+                    //     controller: "DemoController"
+                    // })
                     .when("/comment/:requestId", {
                         templateUrl: "/static/page/test/test-comment.html",
                         controller: "CommentController"

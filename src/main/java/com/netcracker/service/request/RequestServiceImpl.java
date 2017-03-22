@@ -183,7 +183,7 @@ public class RequestServiceImpl implements RequestService {
             return this.requestRepository.updateRequest(newRequest);
         } else if (!employee.get().getId().equals(currentUser.get().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
+        } else if (!oldRequest.get().getStatus().getId().equals(StatusEnum.FREE.getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));

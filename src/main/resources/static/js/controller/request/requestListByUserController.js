@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListByUserController", ["$scope", "$location", "$window", "$http", "PersonService", "RequestService",
-            function ($scope, $location, $window,  $http, PersonService, RequestService) {
+        .controller("RequestListByUserController", ["$scope", "$location", "$rootScope", "$window", "$http", "PersonService", "RequestService",
+            function ($scope, $location, $rootScope, $window,  $http, PersonService, RequestService) {
 
                 $scope.selectedCurrentManager = undefined;
                 $scope.selectedUser = undefined;
@@ -36,6 +36,8 @@
                     $scope.personType = "Employee";
                     $scope.placeholder = "Find assigned requests by manager name";
                     $scope.title = "Enter manager name to get all assigned requests";
+
+                    $rootScope.sideBarActiveElem = "request-assigned";
 
                     $scope.updateManager = function() {
                         if($scope.selectedCurrentManager.length >= 2) {
@@ -82,6 +84,8 @@
                     $scope.personType = "Manager";
                     $scope.placeholder = "Find all requests by user name";
                     $scope.title = "Enter user name to get all user requests";
+
+                    $rootScope.sideBarActiveElem = "request-user";
 
                     $scope.updateUser = function() {
                         if($scope.selectedUser.length >= 2) {

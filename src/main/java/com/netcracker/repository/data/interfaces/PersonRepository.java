@@ -28,4 +28,6 @@ public interface PersonRepository extends JdbcRepository<Person, Long> {
 
     List<Person> getPersonList(Pageable pageable);
 
+    List<Person> getPersonList();
+
 }

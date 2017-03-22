@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListController", ["$scope", "$location", "PersonService", "RequestService",
-            function ($scope, $location, PersonService, RequestService) {
+        .controller("RequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService",
+            function ($scope, $location, $rootScope, PersonService, RequestService) {
 
                 $scope.selectedManager;
                 $scope.managers = [];
@@ -26,6 +26,8 @@
                 $scope.my = false;
                 var path = $location.path();
                 if (path.toString()=="/request/my"){
+
+                    $rootScope.sideBarActiveElem = "my-requests";
 
                     $scope.my = true;
                     $scope.personType = "Manager";
@@ -60,6 +62,8 @@
 
                 } else {
                     $scope.personType = "Employee";
+
+                    $rootScope.sideBarActiveElem = "free-requests";
 
                     $scope.pageChanged = function() {
                         if($scope.selectedPriority.priorityId==4){

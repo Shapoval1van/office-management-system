@@ -1,5 +1,6 @@
 package com.netcracker.repository.data.interfaces;
 
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -14,11 +15,17 @@ import java.util.Optional;
 public interface RequestRepository extends JdbcRepository<Request, Long> {
     int changeRequestStatus(Request request, Status status);
 
+    List<Request> getAllRequests();
+
     List<Request> getAllSubRequest(Long parentId);
 
     List<Request> getAllAssignedRequest(Long managerId, Pageable pageable);
 
+    List<Request> getAllAssignedRequest(Long managerId);
+
     List<Request> getAllRequestByUser(Long userId, Pageable pageable);
+
+    List<Request> getAllRequestByUser(Long userId);
 
     Optional<Request> updateRequest(Request request);
 
@@ -63,4 +70,6 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
 
     List<Request> getFreeRequests(Pageable pageable);
+
+    List<Request> getFreeRequests();
 }
