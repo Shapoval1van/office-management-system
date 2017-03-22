@@ -419,20 +419,40 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
+    public boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> request = getRequestById(requestId);
-        Optional<Person> person = personRepository.findOne(personId);
-        if (!person.isPresent()){
-            person = personRepository.findPersonByEmail(principal.getName());
-        }
+        Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
 
-        if (request.isPresent() && person.isPresent()) {
+        if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             return true;
         }
 
         throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
+    }
+
+    /**
+     * Method for assign another person to request
+     * @param requestId
+     * @param personId
+     * @return true in case success operation
+     * @throws CannotAssignRequestException
+     */
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Optional<Request> request = getRequestById(requestId);
+        Optional<Request> person = getRequestById(personId);
+
+        if (request.isPresent() && person.isPresent()){
+            requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            return true;
+        }
+
+        throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST_PERSON_OR_REQUEST, null, locale));
     }
 
     @Override

@@ -109,7 +109,7 @@
 
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assign(requestId, currentUser.id)
+                    return PersonService.assignToMe(requestId)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
                         }, function (response) {

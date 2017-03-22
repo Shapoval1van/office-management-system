@@ -138,15 +138,23 @@ public class RequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request/{requestId}")
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
-                                           @RequestBody RequestAssignDTO requestAssignDTO,
+                                           @PathVariable Long requestId,
                                            Principal principal) throws CannotAssignRequestException {
-        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
+        requestService.assignRequest(requestId, principal);
 
         return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
+                                           @RequestBody RequestAssignDTO requestAssignDTO)
+            throws CannotAssignRequestException {
+        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId());
+
+        return ResponseEntity.ok(new MessageDTO("Assigned"));
+    }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
     public ResponseEntity<?> getRequestListByPriority(@PathVariable Integer priorityId, Pageable pageable) {

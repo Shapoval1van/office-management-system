@@ -34,7 +34,9 @@ public interface RequestService {
 
     int changeRequestStatus(Request request, Status status, String authorName);
 
-    boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
+    boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException;
+
+    boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException; // Assign to somebody
 
     Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
 
