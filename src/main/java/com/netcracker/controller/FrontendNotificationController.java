@@ -1,10 +1,7 @@
 package com.netcracker.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.entity.FrontendNotification;
-import com.netcracker.model.view.View;
+import com.netcracker.model.dto.FrontendNotificationDTO;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,15 +25,8 @@ public class FrontendNotificationController {
 
     //TODO add inspection current user to, or change to principal
     @RequestMapping("/api/notification/{personId}")
-    public List<FrontendNotification> getAllNotificationToPerson(@PathVariable("personId") Long personId){
+    public List<FrontendNotificationDTO> getAllNotificationToPerson(@PathVariable("personId") Long personId){
         return frontendNotificationService.getNotificationToPerson(personId);
-    }
-
-
-    @JsonView(View.Public.class)
-    @GetMapping("/test/test")
-    public void addAndSendComment() throws ResourceNotFoundException {
-        simpMessagingTemplate.convertAndSendToUser("person@gmail.com","/queue/notification", System.currentTimeMillis());
     }
 
     @DeleteMapping("/api/notification/delete")

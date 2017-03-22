@@ -174,7 +174,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if(!oldRequest.isPresent()) return Optional.empty();
         if (isCurrentUserAdmin(principal)){
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(),new Request(oldRequest.get().getId())));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
 //        } else if (currentUser.get().getId().equals(employee.get().getId())
@@ -188,7 +188,7 @@ public class RequestServiceImpl implements RequestService {
         } else if (oldRequest.get().getStatus().getId()!=StatusEnum.FREE.getId()){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
+            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(),new Request(oldRequest.get().getId())));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
         }
@@ -354,7 +354,7 @@ public class RequestServiceImpl implements RequestService {
             newRequest.setStatus(status);
             updateRequestHistory(requestDB.get(), newRequest, authorName);
 
-            eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), request.getId()));
+            eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
             return requestRepository.changeRequestStatus(request, status);
         }
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
@@ -364,7 +364,7 @@ public class RequestServiceImpl implements RequestService {
         newRequest.setStatus(status);
         updateRequestHistory(requestDB.get(), newRequest, authorName);
 
-        eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), request.getId()));
+        eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
         return requestRepository.changeRequestStatus(request, status);
     }
 

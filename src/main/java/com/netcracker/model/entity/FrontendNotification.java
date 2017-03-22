@@ -17,6 +17,15 @@ public class FrontendNotification implements Persistable<Long> {
     private Timestamp creationTime;
     private Request request;
 
+    public FrontendNotification() {
+    }
+
+    public FrontendNotification(Person person, String subject, Timestamp creationTime, Request request) {
+        this.person = person;
+        this.subject = subject;
+        this.creationTime = creationTime;
+        this.request = request;
+    }
 
     public Long getId() {
         return id;
