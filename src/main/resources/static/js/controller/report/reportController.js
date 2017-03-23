@@ -99,7 +99,9 @@
                             $scope.SimpleChartForManager();
                             $scope.PieChartForManager();
                         } else if (that.person.role.id == 1) {
-                            window.location = "javascript:history.back()";
+                            $scope.SimpleChartForManager();
+                            $scope.PieChartForManager();
+                            //window.location = "javascript:history.back()";
                         } else {
                             window.location = "javascript:history.back()";
                         }
@@ -112,7 +114,7 @@
 
                 $scope.getPeriodData = function (periodItem) {
                     $scope.period=periodItem.toLowerCase();
-                    window.location = "report/"+ personId +"?period=" + periodItem.toLowerCase();
+                    window.location = "/secured/report/"+ personId +"?period=" + periodItem.toLowerCase();
                 };
 
 
