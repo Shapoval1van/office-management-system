@@ -86,6 +86,7 @@
                         })
                 };
 
+                //FIXME
                 $scope.getAllData = function () {
                     $http({
                         method: 'GET',
