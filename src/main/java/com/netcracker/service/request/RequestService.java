@@ -16,9 +16,9 @@ import java.util.Set;
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
 
-    Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException;
+    Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException;
 
-    Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException, CannotCreateSubRequestException;
+    Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CannotCreateSubRequestException;
 
     int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;
 
@@ -26,7 +26,7 @@ public interface RequestService {
 
     Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
-    Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName);
+    Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal);
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 
@@ -34,17 +34,19 @@ public interface RequestService {
 
     int changeRequestStatus(Request request, Status status, String authorName);
 
-    boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException;
+    boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException;
 
-    List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable);
+    boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException; // Assign to somebody
 
-    Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary);
+    Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
 
-    List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable);
+    Page<Request> getAvailableRequestList(Pageable pageable);
 
-    Long getCountFree(Integer priorityId);
+    Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable);
 
-    Long getCountAllRequestByEmployee(String employeeEmail);
+    Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
+
+    Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 

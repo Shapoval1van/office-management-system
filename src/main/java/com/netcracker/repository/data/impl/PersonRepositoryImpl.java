@@ -33,6 +33,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     @Value("${person.find.by.name.pattern}")
     private String FIND_MANAGER_NAME_PATTERN;
 
+    @Value("${person.find.user.by.name.pattern}")
+    private String FIND_USER_BY_NAME_PATTERN;
+
     @Value("${person.find.manager}")
     private String FIND_MANAGER;
 
@@ -50,6 +53,9 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     @Value("${person.find.all.available}")
     private String GET_AVAILABLE_PERSONS;
+
+    @Value("${person.count.active}")
+    private String COUNT_ACTIVE_PERSON;
 
     @Value("${person.find.all.deleted}")
     private String GET_DELETED_PERSONS;
@@ -111,8 +117,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public Long getCountDeletedPersonByRole(Integer roleId) {
-        return null;//getJdbcTemplate().queryForObject(COUNT_DELETED_PERSON_BY_ROLE, Long.class, roleId);
+    public Long getCountActivePerson() {
+        return getJdbcTemplate().queryForObject(COUNT_ACTIVE_PERSON, Long.class);
     }
 
     @Override
@@ -137,10 +143,23 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public List<Person> getPersons(Integer roleId, Pageable pageable, Optional<Role> role) {
-        return role.isPresent() ? this.queryForList(
-                GET_AVAILABLE_PERSONS_BY_ROLE, pageable, roleId)
-                : this.queryForList(GET_AVAILABLE_PERSONS, pageable);
+    public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
+        return super.queryForList(FIND_USER_BY_NAME_PATTERN, pageable, namePattern);
+    }
+
+    @Override
+    public List<Person> getPersonListByRole(Integer roleId, Pageable pageable, Optional<Role> role) {
+        return this.queryForList(GET_AVAILABLE_PERSONS_BY_ROLE, pageable, roleId);
+    }
+
+    @Override
+    public List<Person> getPersonList(Pageable pageable) {
+        return super.queryForList(GET_AVAILABLE_PERSONS, pageable);
+    }
+
+    @Override
+    public List<Person> getPersonList() {
+        return super.queryForList(GET_AVAILABLE_PERSONS);
     }
 
     @Override
