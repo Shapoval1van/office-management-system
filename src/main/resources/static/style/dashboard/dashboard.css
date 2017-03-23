@@ -1,0 +1,35 @@
+.text__special{
+    color: #779e3c;
+    font-weight: 900;
+}
+.text__special .digit{
+    color: #187500;
+}
+.block{
+    border-bottom: 1px solid #e5e5e5;
+}
+.top-article__text{
+    font-size: 16px;
+    text-align: center;
+    margin: 20px 0;
+}
+.article-text{
+    text-align: center;
+    font-size: 26px;
+    margin: 30px 0 15px 0;
+    color: #777777;
+    font-weight: 900;
+}
+.list-outer-wrapper{
+    text-align: center;
+}
+.list-inner-wrapper{
+    display: inline-block;
+}
+.request-list li{
+    text-align: left;
+    font-size: 18px;
+    margin: 20px 0;
+    word-spacing: 5px;
+    letter-spacing: 1px;
+}

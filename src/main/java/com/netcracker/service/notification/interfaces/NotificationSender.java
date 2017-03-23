@@ -4,6 +4,7 @@ import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 
+import java.util.Date;
 import java.util.List;
 
 public interface NotificationSender {
@@ -25,9 +26,15 @@ public interface NotificationSender {
 
     void sendUpdateUserEvent(Person person);
 
+    void sendDeleteUserEvent(Person person);
+
+    void sendRecoverUserEvent(Person person);
+
     void resendNotification();
 
     void saveFailedNotification(Notification notification);
 
     void sendRequestExpiryReminder(List<Request> expiringRequests);
+
+    void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime);
 }

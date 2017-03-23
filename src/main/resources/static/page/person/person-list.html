@@ -5,6 +5,9 @@
 
             <div class="jumbotron bordered">
                 <div class="row">
+                    <div class="col-md-2">
+                        <a href="/secured/admin/registration" class="btn btn-default">Register user</a>
+                    </div>
                     <div class="col-md-12">
                         <form class="form-inline">
                             <label>Role
@@ -34,7 +37,7 @@
                                 <td>{{person.role.name}}</td>
                                 <td>
                                     <a ng-click="personUpdate(person.id)" class="btn btn-info">Edit</a>
-                                    <a ng-click="personDelete(person.id)" class="btn btn-danger">Delete</a>
+                                    <a ng-click="personDelete(person)" class="btn btn-danger">Delete</a>
                                 </td>
                             </tr>
                             </tbody>

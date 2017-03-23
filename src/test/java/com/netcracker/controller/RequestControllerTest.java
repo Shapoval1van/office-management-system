@@ -150,8 +150,7 @@ public class RequestControllerTest {
         requestAssignDTO.setRequestId(4L);
         requestAssignDTO.setPersonId(2L);
 
-        mockMvc.perform(post("/api/request/assignRequest")
-                .principal(principal)
+        mockMvc.perform(post("/api/request/assign/request")
                 .content(this.json(requestAssignDTO))
                 .contentType(contentType))
                 .andExpect(status().isOk());
@@ -159,17 +158,14 @@ public class RequestControllerTest {
         assertEquals(2L, (long)requestRepository.findOne(4L).get().getManager().getId());
     }
 
-
-
     @Test
     @WithMockUser(roles = "ADMINISTRATOR", password = "test2", username = "test2@test.com")
     public void successRequestAssignToMe() throws Exception {
         RequestAssignDTO requestAssignDTO = new RequestAssignDTO();
         requestAssignDTO.setRequestId(4L);
 
-        mockMvc.perform(post("/api/request/assignRequest")
+        mockMvc.perform(post("/api/request/assign/request/{requestId}", 1)
                 .principal(principal)
-                .content(this.json(requestAssignDTO))
                 .contentType(contentType))
                 .andExpect(status().isOk());
     }

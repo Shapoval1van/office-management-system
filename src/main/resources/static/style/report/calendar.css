@@ -1,3 +1,38 @@
 .fc-sat, .fc-sun {
     background-color: rgba(186, 214, 255, 0.06);
 }
+
+.calendar-legend {
+    list-style: none;
+}
+.calendar-legend li {
+    float: left;
+    margin-right: 10px;
+}
+
+.calendar-legend span {
+    width: 10px;
+    height: 10px;
+    float: left;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 4px;
+    background: rgba(0, 64, 255, 0.81);
+}
+
+.canceled {
+    background: rgba(255, 0, 8, 0.21) !important;
+}
+
+.low {
+    background: rgba(0, 182, 44, 0.9) !important;
+}
+
+.normal {
+    background: rgba(255, 158, 0, 0.9) !important;
+}
+
+.high {
+    background: rgba(215, 40, 40, 0.9) !important;
+}

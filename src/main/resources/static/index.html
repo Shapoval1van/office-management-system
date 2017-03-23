@@ -35,6 +35,8 @@
     <link rel="stylesheet" href="/static/style/report/report.css">
     <link rel="stylesheet" href="/static/style/request/request-details.css">
     <link rel="stylesheet" href="/static/style/report/calendar.css">
+    <link rel="stylesheet" href="/static/style/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/static/style/bootstrap-notifications.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.print.css"
@@ -61,10 +63,7 @@
             <a class="navbar-brand" href="/">Office management system</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-bind="Session.getUserName()"></a></li>
-                <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
-            </ul>
+            <notifier></notifier>
         </div>
     </div>
 </nav>
@@ -118,17 +117,24 @@
 <script src="/static/js/controller/login/recoverPasswordController.js"></script>
 <script src="/static/js/controller/demo/demoController.js"></script>
 <script src="/static/js/controller/test/commentController.js"></script>
-<script src="/static/js/controller/person/personList.js"></script>
-<script src="/static/js/controller/person/updatePerson.js"></script>
+<script src="/static/js/controller/person/personListController.js"></script>
+<script src="/static/js/controller/person/deletedPersonListController.js"></script>
+<script src="/static/js/controller/person/updatePersonController.js"></script>
 <script src="/static/js/controller/report/reportController.js"></script>
+<script src="/static/js/controller/request/subController.js"></script>
+<script src="/static/js/controller/dashboard/dashboardController.js"></script>
+<script src="/static/js/controller/sidebar/sideBarController.js"></script>
+<script src="/static/js/controller/notifier/notifierBellController.js"></script>
 
 <script src="/static/js/service/comment/commentService.js"></script>
 <script src="/static/js/service/sessionService.js"></script>
 <script src="/static/js/service/webSocketService.js"></script>
 <script src="/static/js/service/person/personService.js"></script>
 <script src="/static/js/service/request/requestService.js"></script>
+<script src="/static/js/service/request/subService.js"></script>
 <script src="/static/js/service/registration/registrationService.js"></script>
 <script src="/static/js/service/request-group/requestGroupService.js"></script>
+<script src="/static/js/service/notificationWebSocketService.js"></script>
 <script src="/static/js/service/report/calendarService.js"></script>
 <script src="/static/js/service/report/reportService.js"></script>
 
@@ -159,6 +165,7 @@
 <script src="/static/js/directive/button/addToRequestGroupBtn.js"></script>
 <script src="/static/js/directive/button/assignToMeBtn.js"></script>
 <script src="/static/js/directive/button/assignToSmbBtn.js"></script>
+<script src="/static/js/directive/notifierBell.js"></script>
 <!--/SCRIPT-->
 </body>
 </html>
