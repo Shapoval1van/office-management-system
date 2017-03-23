@@ -66,15 +66,20 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
     public void sendNotificationToAllSubscribed(Long id, String subject) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         List<Person> people = personRepository.findPersonsBySubscribingRequest(id);
+        if(people.size()==0) return;
         List<FrontendNotification> notifications = new ArrayList<>();
         for (Person person : people) {
             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(id)));
         }
+
+        List<FrontendNotification> savedNotification = new ArrayList<>();
         for (FrontendNotification notification : notifications) {
-            frontendNotificationRepository.save(notification);
+            savedNotification.add(frontendNotificationRepository.save(notification).get());
         }
-        FrontendNotificationDTO notificationDTO = new FrontendNotificationDTO(notifications.get(1));
-        people.forEach(person -> simpMessagingTemplate.convertAndSendToUser(person.getEmail(), "/queue/notification", notificationDTO));
+
+        for (int i = 0; i< people.size(); i++) {
+            simpMessagingTemplate.convertAndSendToUser(people.get(i).getEmail(), "/queue/notification", new FrontendNotificationDTO(savedNotification.get(i)));
+        }
     }
 
 

@@ -364,8 +364,8 @@ public class RequestServiceImpl implements RequestService {
             //history
             Request newRequest = new Request(requestDB.get());
             newRequest.setStatus(status);
-            // FIXME: 23.03.2017 Check history params
-            updateRequestHistory(requestDB.get(), newRequest, authorName);
+
+            updateRequestHistory(newRequest, requestDB.get(), authorName);
 
             eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
 
@@ -378,8 +378,8 @@ public class RequestServiceImpl implements RequestService {
         //history
         Request newRequest = new Request(requestDB.get());
         newRequest.setStatus(status);
-        // FIXME: 23.03.2017 Check history params
-        updateRequestHistory(requestDB.get(), newRequest, authorName);
+
+        updateRequestHistory(newRequest, requestDB.get(), authorName);
 
         eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
 

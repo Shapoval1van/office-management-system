@@ -38,6 +38,11 @@
                     });
                 };
 
+                $scope.toRequest = function(itemId) {
+                    //TODO add url
+                    window.location = "request/"+itemId+"/details";
+                };
+
                 $scope.getNotification();
 
                 //Subscribe to topic /topic/request/{requestId}

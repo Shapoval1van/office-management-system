@@ -13,7 +13,7 @@
                     <ul class="dropdown-menu scrollable-menu">
                         <li ng-repeat="notification in notifications" ng-click="deleteNotification(notification.id)" class="notification">
                             <strong class="notification-title">{{notification.subject}} check changes on
-                                <a ng-href="/request/{{notification.request.id}}/details">page</a></strong>
+                                <a ng-href="/request/{{notification.request.id}}/details" ng-click="toRequest(notification.id)">page</a></strong>
                             <div class="notification-meta">
                                     <small class="timestamp">{{notification.creationTime | date: "dd.MM.yyyy HH:mm"}}</small>
                                 </div>
