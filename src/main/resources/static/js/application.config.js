@@ -92,6 +92,10 @@
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"
                     })
+                    .when("/secured/deleted-users", {
+                        templateUrl: "/static/page/person/deleted-person-list.html",
+                        controller: "DeletedPersonListController"
+                    })
                     .when("/secured/request/my", {
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"

@@ -63,7 +63,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Long getCountDeletedPersonByRole(Integer roleId) {
-        return personRepository.getCountDeletedPersonByRole(roleId);
+        return 1l;//personRepository.getCountDeletedPersonByRole(roleId);
     }
 
     @Override
@@ -172,6 +172,17 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public Page<Person> getDeletedPersonListByRole(Integer roleId, Pageable pageable) {
+        Optional<Role> role = roleRepository.findOne(roleId);
+        List<Person> personList = personRepository.getDeletedPersonListByRole(roleId, pageable, role);
+        Long count = personRepository.getCountDeletedPersonByRole(roleId);
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Person> getPersonList(Pageable pageable) {
         List<Person> personList = personRepository.getPersonList(pageable);
@@ -183,12 +194,13 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<Person> getDeletedPersonList(Integer roleId, Pageable pageable) {
-        Optional<Role> role = roleRepository.findOne(roleId);
-        List<Person> personList = personRepository.getDeletedPersons(roleId, pageable, role);
+    public Page<Person> getDeletedPersonList(Pageable pageable) {
+        List<Person> personList = personRepository.getDeletedPersonList(pageable);
+        Long count = personRepository.getCountDeletedPerson();
+
         personList.forEach(this::fillPerson);
 
-        return personList;
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
     @Override

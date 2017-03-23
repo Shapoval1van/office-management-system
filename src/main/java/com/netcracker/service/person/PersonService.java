@@ -29,11 +29,10 @@ public interface PersonService {
     Optional<Person> findPersonByEmail(String email);
 
 
-
-    List<Person> getDeletedPersonList(Integer roleId, Pageable pageable);
+    Page<Person> getDeletedPersonList(Pageable pageable);
 
     Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException;
     Page<Person> getPersonListByRole(Integer roleId, Pageable pageable);
-
+    Page<Person> getDeletedPersonListByRole(Integer roleId, Pageable pageable);
     Page<Person> getPersonList(Pageable pageable);
 }

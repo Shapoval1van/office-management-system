@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
 
@@ -79,6 +81,13 @@ public class PersonController {
         return ResponseEntity.ok(personPage);
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted-list/{roleId}")
+    public ResponseEntity<?> getDeletedPersonListByRole(@PathVariable Integer roleId, Pageable pageable) {
+        Page<Person> personPage = personService.getDeletedPersonListByRole(roleId, pageable);
+
+        return ResponseEntity.ok(personPage);
+    }
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list")
     public ResponseEntity<?> getPersonList(Pageable pageable) {
         Page<Person> personPage = personService.getPersonList(pageable);
@@ -86,15 +95,14 @@ public class PersonController {
         return ResponseEntity.ok(personPage);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted_list/{roleId}")
-    public ResponseEntity<?> getDeletedPersonList(@PathVariable Integer roleId, Pageable pageable) {
-        List<Person> personList = personService.getDeletedPersonList(roleId, pageable);
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted-list")
+    public ResponseEntity<?> getDeletedPersonList(Pageable pageable) {
+        Page<Person> personPage = personService.getDeletedPersonList(pageable);
 
-        return ResponseEntity.ok((personList
-                .stream()
-                .map(FullPersonDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(personPage);
     }
+
+
 
     @GetMapping("/{personId}")
     @JsonView(View.Public.class)
