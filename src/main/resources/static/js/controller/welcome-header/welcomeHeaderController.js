@@ -1,3 +1,4 @@
+// TODO: Deprecated
 (function () {
     angular.module("OfficeManagementSystem").controller("welcomeHeadController", ["$scope", function($scope){
 

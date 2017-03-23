@@ -1,14 +1,14 @@
 package com.netcracker.service.request;
 
 import com.netcracker.exception.CannotCreateSubRequestException;
-import com.netcracker.exception.CannotDeleteRequestException;
-import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -17,7 +17,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.sql.Timestamp;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -30,10 +33,17 @@ public class RequestServiceTest {
     private Request request;
     private String managerEmail;
 
+    @Mock
+    Principal principal;
+
+
     @Before
     public void init() {
         managerEmail = "test2@test.com";
+        principal = Mockito.mock(Principal.class);
+        when(principal.getName()).thenReturn(managerEmail);
     }
+
 
     @Test
     @Transactional
@@ -49,7 +59,7 @@ public class RequestServiceTest {
         subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
         subRequest.setPriority(new Priority(1));
 
-        Request saveSubRequest = requestService.saveSubRequest(subRequest, managerEmail).get();
+        Request saveSubRequest = requestService.saveSubRequest(subRequest, principal).get();
 
         //Assert.assertEquals(saveSubRequest.getId(), new Long(5));
         Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
@@ -72,7 +82,7 @@ public class RequestServiceTest {
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
         subRequest.setPriority(new Priority(-1));
 
-        requestService.saveSubRequest(subRequest, managerEmail).get();
+        requestService.saveSubRequest(subRequest, principal).get();
     }
 
     @Test(expected = CannotCreateSubRequestException.class)
@@ -87,7 +97,7 @@ public class RequestServiceTest {
         subRequest.setDescription("Test Description of sub request");
         subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
 
-        requestService.saveSubRequest(subRequest, managerEmail).get();
+        requestService.saveSubRequest(subRequest, principal).get();
     }
 
 //    @Test

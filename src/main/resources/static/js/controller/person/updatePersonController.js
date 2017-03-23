@@ -12,7 +12,6 @@
                             $scope.person = callback.data;
                             $scope.person.role = String($scope.person.role.id);
                         }, function (callback) {
-                            //swal("Oops...", callback.data.error_description, "error");
                             console.log(callback)
                         })
                 };

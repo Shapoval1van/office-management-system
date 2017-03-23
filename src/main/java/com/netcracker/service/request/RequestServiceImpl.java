@@ -97,8 +97,10 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> saveSubRequest(Request subRequest, String email) throws CannotCreateSubRequestException {
+    public Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException {
         Locale locale = LocaleContextHolder.getLocale();
+        String email = principal.getName();
+
         if (subRequest.getParent() == null) {
             throw new CannotCreateSubRequestException(messageSource
                     .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{"null"}, locale));
@@ -145,8 +147,11 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Optional<Request> saveRequest(Request request, String email) throws CannotCreateRequestException {
+    @Transactional(rollbackFor = Exception.class)
+    //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException {
         Locale locale = LocaleContextHolder.getLocale();
+        String email = principal.getName();
 
         Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CannotCreateRequestException(messageSource
@@ -167,6 +172,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Optional<Request> updateRequest(Request newRequest, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -196,9 +203,11 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+
     @Override
-    public Optional<Request> updateRequestPriority(Long requestId, String priority, String authorName) {
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal) {
+        String authorName = principal.getName();
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
         if (!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
@@ -333,7 +342,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -357,6 +366,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int changeRequestStatus(Request request, Status status, String authorName) {
         if (request.getEmployee() != null) {
             Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
@@ -439,15 +449,12 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
+    public boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> request = getRequestById(requestId);
-        Optional<Person> person = personRepository.findOne(personId);
-        if (!person.isPresent()) {
-            person = personRepository.findPersonByEmail(principal.getName());
-        }
+        Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
 
-        if (request.isPresent() && person.isPresent()) {
+        if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
@@ -457,51 +464,82 @@ public class RequestServiceImpl implements RequestService {
         throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
     }
 
+    /**
+     * Method for assign another person to request
+     * @param requestId
+     * @param personId
+     * @return true in case success operation
+     * @throws CannotAssignRequestException
+     */
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public List<Request> getAvailableRequestList(Integer priorityId, Pageable pageable) {
-        Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = priority.isPresent() ?
-                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
-                requestRepository.getFreeRequests(priorityId, pageable);
-        requestList.forEach(this::fillRequest);
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Optional<Request> request = getRequestById(requestId);
+        Optional<Request> person = getRequestById(personId);
 
-        return requestList;
+        if (request.isPresent() && person.isPresent()){
+            requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            return true;
+        }
 
+        throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST_PERSON_OR_REQUEST, null, locale));
     }
 
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Page<Request> getAvailableRequestList(Integer priorityId, Pageable pageable, Integer temporary) {
+    public Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
-        List<Request> requestList = priority.isPresent() ?
-                requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get()) :
-                requestRepository.getFreeRequests(priorityId, pageable);
-        Long count = requestRepository.countFree(priorityId);
+        List<Request> requestList = requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get());
+
+        Long count = requestRepository.countFreeByPriority(priorityId);
         requestList.forEach(this::fillRequest);
 
-        return new Page<Request>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     @Override
-    public List<Request> getAllRequestByEmployee(String employeeEmail, Pageable pageable) {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Page<Request> getAvailableRequestList(Pageable pageable) {
+        List<Request> requestList = requestRepository.getFreeRequests(pageable);
+
+        Long count = requestRepository.countFree();
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable) {
+        String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();
         List<Request> requestList = requestRepository.getRequestsByEmployee(pageable, employee);
-
+        Long count = requestRepository.countAllRequestByEmployee(employee.getId());
         requestList.forEach(this::fillRequest);
 
-        return requestList;
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     @Override
-    public Long getCountFree(Integer priorityId) {
-        return requestRepository.countFree(priorityId);
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Request> getAllRequestByUser(Long userId, Pageable pageable) {
+        List<Request> requestList = requestRepository.getAllRequestByUser(userId, pageable);
+        Long count = requestRepository.countAllByUser(userId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     @Override
-    public Long getCountAllRequestByEmployee(String employeeEmail) {
-        Person employee = personRepository.findPersonByEmail(employeeEmail).get();
-        return requestRepository.countAllRequestByEmployee(employee.getId());
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
+        List<Request> requestList = requestRepository.getAllAssignedRequest(managerId, pageable);
+        Long count = requestRepository.countAllAssignedByManager(managerId);
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
     }
 
     private void fillRequest(Request request) {

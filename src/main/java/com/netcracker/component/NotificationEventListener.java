@@ -42,6 +42,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
         frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
+        notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
     }
 
     @EventListener
@@ -53,6 +54,16 @@ public class NotificationEventListener {
     public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
         frontendNotificationService.sendNotificationToAllSubscribed(requestUpdateEvent.getRequest().getId(), "Request updated");
         notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleDeleteUser(DeleteUserEvent deleteUserEvent){
+        notificationService.sendDeleteUserEvent(deleteUserEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleRecoverUser(RecoverUserEvent recoverUserEvent){
+        notificationService.sendRecoverUserEvent(recoverUserEvent.getPerson());
     }
 
     @EventListener

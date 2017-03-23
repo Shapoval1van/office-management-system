@@ -5,10 +5,12 @@ import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.FullPersonDTO;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.dto.SubscribeDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.DeleteUserValidatorGroup;
 import com.netcracker.model.view.View;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.person.PersonService;
@@ -20,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +46,23 @@ public class PersonController {
         return ResponseEntity.ok(personService.getManagers(pageable, namePattern));
     }
 
+    @GetMapping("/users/{namePattern}")
+    public ResponseEntity<?> getUsersByNamePattern(@PathVariable(required = false) String namePattern,
+                                         Pageable pageable) {
+        return ResponseEntity.ok(personService.getUsersByNamePattern(pageable, namePattern));
+    }
+
+    @PostMapping(value = "/deletePerson", produces = JSON_MEDIA_TYPE)
+    public ResponseEntity<?> deletePerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email, Principal principal,
+                                  HttpServletRequest request) throws Exception {
+        return new ResponseEntity<>(personService.deletePersonByEmail(email, principal), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/recoverPerson", produces = JSON_MEDIA_TYPE)
+    public ResponseEntity<?> recoverPerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email,
+                                          HttpServletRequest request) throws Exception {
+        return new ResponseEntity<>(personService.recoverDeletedPerson(email), HttpStatus.OK);
+    }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
@@ -56,14 +77,34 @@ public class PersonController {
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/{roleId}")
-    public ResponseEntity<?> getPersonList(@PathVariable Integer roleId, Pageable pageable) {
-        List<Person> personList = personService.getAvailablePersonList(roleId, pageable);
+    public ResponseEntity<?> getPersonListByRole(@PathVariable Integer roleId, Pageable pageable) {
+        Page<Person> personPage = personService.getPersonListByRole(roleId, pageable);
 
-        return ResponseEntity.ok((personList
-                .stream()
-                .map(FullPersonDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(personPage);
     }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted-list/{roleId}")
+    public ResponseEntity<?> getDeletedPersonListByRole(@PathVariable Integer roleId, Pageable pageable) {
+        Page<Person> personPage = personService.getDeletedPersonListByRole(roleId, pageable);
+
+        return ResponseEntity.ok(personPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list")
+    public ResponseEntity<?> getPersonList(Pageable pageable) {
+        Page<Person> personPage = personService.getPersonList(pageable);
+
+        return ResponseEntity.ok(personPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/deleted-list")
+    public ResponseEntity<?> getDeletedPersonList(Pageable pageable) {
+        Page<Person> personPage = personService.getDeletedPersonList(pageable);
+
+        return ResponseEntity.ok(personPage);
+    }
+
+
 
     @GetMapping("/{personId}")
     @JsonView(View.Public.class)

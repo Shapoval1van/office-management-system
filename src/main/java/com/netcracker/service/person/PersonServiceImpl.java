@@ -1,12 +1,16 @@
 package com.netcracker.service.person;
 
+import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.PersonDTO;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
+import com.netcracker.model.event.DeleteUserEvent;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
+import com.netcracker.model.event.RecoverUserEvent;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -62,13 +67,60 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
+
+
     @Override
-    public Long getCountActivePersonByRole(Integer roleId) {
-        return personRepository.getCountActivePersonByRole(roleId);
+    public Long getCountDeletedPersonByRole(Integer roleId) {
+        return 1l;//personRepository.getCountDeletedPersonByRole(roleId);
+    }
+
+    @Override
+    public Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
+                new CannotDeleteUserException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
+
+        if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())){
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+            }
+            else if (principal.getName().equals(person.getEmail())){
+                throw new CannotDeleteUserException(messageSource.getMessage(ADMINISTRATOR_REMOVING_ERROR, null, locale));
+            }
+            else{
+                publishOnDeleteUserEvent(person);
+                return Optional.of(disablePerson(person));
+            }
+        }
+        else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())) {
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+            }
+            else{
+                publishOnDeleteUserEvent(person);
+                return Optional.of(disablePerson(person));
+            }
+        }
+        else {
+            publishOnDeleteUserEvent(person);
+            return Optional.of(disablePerson(person));
+        }
+
     }
 
 
+    private void publishOnDeleteUserEvent(Person person) {
+        DeleteUserEvent event = new DeleteUserEvent(person);
+        eventPublisher.publishEvent(event);
+    }
+
+    private void publishOnRecoverUserEvent(Person person) {
+        RecoverUserEvent event = new RecoverUserEvent(person);
+        eventPublisher.publishEvent(event);
+    }
+
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -92,11 +144,27 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getManagers(Pageable pageable, String namePattern) {
         if (namePattern == null) {
             return this.personRepository.getManagers(pageable);
         }
         return this.personRepository.getManagers(pageable, namePattern);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
+        if(namePattern == null) {
+            return this.personRepository.getPersonList(pageable);
+        }
+        return this.personRepository.getUsersByNamePattern(pageable, namePattern);
+
+    }
+
+    @Override
+    public Long getCountActivePersonByRole(Integer roleId) {
+        return personRepository.getCountActivePersonByRole(roleId);
     }
 
     @Override
@@ -112,6 +180,69 @@ public class PersonServiceImpl implements PersonService {
         personList.forEach(this::fillPerson);
 
         return personList;
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Person> getPersonListByRole(Integer roleId, Pageable pageable) {
+        Optional<Role> role = roleRepository.findOne(roleId);
+        List<Person> personList = personRepository.getPersonListByRole(roleId, pageable, role);
+        Long count = personRepository.getCountActivePersonByRole(roleId);
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    public Page<Person> getDeletedPersonListByRole(Integer roleId, Pageable pageable) {
+        Optional<Role> role = roleRepository.findOne(roleId);
+        List<Person> personList = personRepository.getDeletedPersonListByRole(roleId, pageable, role);
+        Long count = personRepository.getCountDeletedPersonByRole(roleId);
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Page<Person> getPersonList(Pageable pageable) {
+        List<Person> personList = personRepository.getPersonList(pageable);
+        Long count = personRepository.getCountActivePerson();
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    public Page<Person> getDeletedPersonList(Pageable pageable) {
+        List<Person> personList = personRepository.getDeletedPersonList(pageable);
+        Long count = personRepository.getCountDeletedPerson();
+
+        personList.forEach(this::fillPerson);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
+    }
+
+    @Override
+    public Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
+                new CannotUpdatePersonException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
+        person.setEnabled(true);
+        person.setDeleted(false);
+        publishOnRecoverUserEvent(person);
+        personRepository.updatePersonAvailable(person);
+        return Optional.of(person);
+    }
+
+    private Person disablePerson(Person person){
+        person.setEnabled(false);
+        person.setDeleted(true);
+        personRepository.updatePersonAvailable(person);
+        return person;
     }
 
     @Override

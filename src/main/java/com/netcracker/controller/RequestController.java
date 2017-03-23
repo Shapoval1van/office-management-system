@@ -53,7 +53,7 @@ public class RequestController {
     public ResponseEntity<?> updateRequestPriority(@Pattern(regexp = "(high|low|normal)")
                                                    @RequestParam(name = "priority") String priority,
                                                    @PathVariable(name = "requestId") Long id, Principal principal) {
-        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal.getName());
+        Optional<Request> newRequest = requestService.updateRequestPriority(id, priority, principal);
         if (!newRequest.isPresent()) {
             return new ResponseEntity<>(new MessageDTO("Request not Updated"), HttpStatus.BAD_REQUEST);
         }
@@ -86,7 +86,7 @@ public class RequestController {
                                         Principal principal) throws CannotCreateSubRequestException,
                                                                     CannotCreateRequestException {
         Request request = requestDTO.toRequest();
-        requestService.saveRequest(request, principal.getName());
+        requestService.saveRequest(request, principal);
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
@@ -94,7 +94,7 @@ public class RequestController {
     public ResponseEntity<?> addSubRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                            Principal principal) throws CannotCreateSubRequestException {
         Request subRequest = requestDTO.toRequest();
-        requestService.saveSubRequest(subRequest, principal.getName());
+        requestService.saveSubRequest(subRequest, principal);
         return ResponseEntity.ok(new MessageDTO("Added"));
     }
 
@@ -139,49 +139,58 @@ public class RequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assignRequest")
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request/{requestId}")
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
-                                           @RequestBody RequestAssignDTO requestAssignDTO,
+                                           @PathVariable Long requestId,
                                            Principal principal) throws CannotAssignRequestException {
-        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
+        requestService.assignRequest(requestId, principal);
 
         return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
+    @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request")
+    public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
+                                           @RequestBody RequestAssignDTO requestAssignDTO)
+            throws CannotAssignRequestException {
+        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId());
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
-    public ResponseEntity<?> getRequestList(@PathVariable Integer priorityId, Pageable pageable) {
-        List<Request> requests = requestService.getAvailableRequestList(priorityId, pageable);
-
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(new MessageDTO("Assigned"));
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available/{priorityId}")
+    public ResponseEntity<?> getRequestListByPriority(@PathVariable Integer priorityId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestListByPriority(priorityId, pageable);
 
+        return ResponseEntity.ok(requestPage);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available")
+    public ResponseEntity<?> getRequestList(Pageable pageable) {
+        Page<Request> requestPage = requestService.getAvailableRequestList(pageable);
+
+        return ResponseEntity.ok(requestPage);
+    }
 
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my")
-    public ResponseEntity<?> getRequestListByUser(Pageable pageable, Principal principal) {
-        List<Request> requests = requestService.getAllRequestByEmployee(principal.getName(), pageable);
+    public ResponseEntity<?> getRequestListByEmployee(Pageable pageable, Principal principal) {
+        Page<Request> requestPage = requestService.getAllRequestByEmployee(principal, pageable);
 
-        return ResponseEntity.ok((requests
-                .stream()
-                .map(FullRequestDTO::new)
-                .collect(Collectors.toList())));
+        return ResponseEntity.ok(requestPage);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/{priorityId}")
-    public ResponseEntity<?> getCountFree(@PathVariable Integer priorityId) {
-        Long count = requestService.getCountFree(priorityId);
-        return ResponseEntity.ok(count);
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/user/{userId}")
+    public ResponseEntity<?> getRequestListByUser(@PathVariable Long userId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllRequestByUser(userId, pageable);
+
+        return ResponseEntity.ok(requestPage);
     }
 
-    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/count/my")
-    public ResponseEntity<?> getCountAllRequestByEmployee(Principal principal) {
-        Long count = requestService.getCountAllRequestByEmployee(principal.getName());
-        return ResponseEntity.ok(count);
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/assigned/{managerId}")
+    public ResponseEntity<?> getAssignedRequestListByManager(@PathVariable Long managerId, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllAssignedRequestByManager(managerId, pageable);
+
+        return ResponseEntity.ok(requestPage);
     }
 
     @PutMapping("/{requestId}/grouping")

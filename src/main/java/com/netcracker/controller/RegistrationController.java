@@ -14,6 +14,7 @@ import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.*;
 import com.netcracker.model.view.View;
 import com.netcracker.service.registration.RegistrationService;
+import com.netcracker.util.enums.role.RoleEnum;
 import com.sun.org.apache.xpath.internal.SourceTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class RegistrationController {
     public RegistrationMessageDTO registerEmployee(@Validated(CreateValidatorGroup.class) @RequestBody PersonDTO personDTO,
                                                    HttpServletRequest request) throws Exception {
         Person person = personDTO.toPerson();
-        Token token = registrationService.registerPerson(person, this.buildRequestLink(request), RegistrationService.EMPLOYEEID);
+        Token token = registrationService.registerPerson(person, this.buildRequestLink(request), RoleEnum.EMPLOYEE.getId());
         return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }
 
@@ -58,7 +59,7 @@ public class RegistrationController {
         return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }
 
-    @RequestMapping(value="/roleData", method=RequestMethod.GET, produces=JSON_MEDIA_TYPE)
+    @GetMapping(value="/roles", produces=JSON_MEDIA_TYPE)
     @ResponseStatus(HttpStatus.FOUND)
     public @ResponseBody ResponseEntity<RolesDTO> getAllRoles() throws Exception{
         List<Role> roleList = this.registrationService.findAllRolesForAdminRegistration();

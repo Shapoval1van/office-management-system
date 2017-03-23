@@ -28,6 +28,7 @@
                 $scope.subscribers = [];
 
                 var requestId = $routeParams.requestId;
+                $scope.requestId = $routeParams.requestId;
 
                 $scope.getRequest = function () {
                     RequestService.getRequestById(requestId)
@@ -141,7 +142,7 @@
 
                 };
 
-                $scope.requestDelete = function () {
+                $scope.requestDelete = function(requestId) {
                     swal({
                             title: "Are you sure?",
                             text: "Do you really want to cancel this request",
@@ -151,23 +152,19 @@
                             confirmButtonText: "Yes, cancel it!",
                             closeOnConfirm: false
                         },
-                        function () {
-                            $http({
-                                method: 'DELETE',
-                                url: '/api/request/' + String($scope.request.id)
-                            }).then(function successCallback(response) {
-                                $scope.request = response.data;
-                                window.location = "javascript:history.back()";
-                            }, function errorCallback(error) {
-                                swal("Cancel Failure!", error.data.errors[0].detail, "error");
-                                console.log(error);
-                            });
+                        function(){
+                            RequestService.cancelRequest(requestId)
+                                .then(function (callback) {
+                                    $scope.requests = callback.data;
+                                }, function (error) {
+                                    swal("Cancel Failure!", error.data.errors[0].detail, "error");
+                                    console.log(error);
+                                });
 
                             swal("Request canceled!", "", "success");
-                            // window.setTimeout(function(){
-                            //     location.reload()}, 1000)
+                            window.setTimeout(function(){
+                                window.location = "javascript:history.back()"}, 2000)
                         });
-
                 };
 
                 $scope.update = function () {
@@ -308,6 +305,37 @@
                 $scope.isFree = function () {
                     return $scope.request.status.name === "FREE";
                 };
+
+                $scope.requestUpdate = function(requestId) {
+                    window.location = "/secured/request/" + requestId + '/update';
+                };
+                // $http({
+                //     method: 'GET',
+                //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'
+                // }).then(function successCallback(response) {
+                //     $scope.historyList = buildHistoryList(response.data);
+                // }, function errorCallback(response) {
+                //
+                // });
+                //
+                // $scope.historyForPeriod = function (item_selected) {
+                //     var period = item_selected.toLowerCase();
+                //     $http({
+                //         method: 'GET',
+                //         url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
+                //     }).then(function successCallback(response) {
+                //         $scope.historyList = buildHistoryList(response.data);
+                //     }, function errorCallback(response) {
+                //
+                //     });
+                // };
+
+                // $http({
+                //     method: 'GET',
+                //     url: '/api/request/sub/' + $routeParams.requestId
+                // }).then(function successCallback(response) {
+                //     $scope.subRequest = response.data;
+                // }, function errorCallback(response) {
 
             }])
 })();

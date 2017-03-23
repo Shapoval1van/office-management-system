@@ -34,8 +34,13 @@
     <link rel="stylesheet" type="text/css" href="/static/style/sweet-alert/sweetalert.css">
     <link rel="stylesheet" href="/static/style/report/report.css">
     <link rel="stylesheet" href="/static/style/request/request-details.css">
+    <link rel="stylesheet" href="/static/style/report/calendar.css">
+    <link rel="stylesheet" href="/static/style/dashboard/dashboard.css">
     <link rel="stylesheet" href="/static/style/bootstrap-notifications.css">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.print.css"
+          media="print">
 
     <!--/STYLES-->
     <!--[if lt IE 9]>
@@ -88,6 +93,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.9/ngStorage.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-cookies.min.js"></script>
 
+
 <!--WebSocket-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -111,9 +117,13 @@
 <script src="/static/js/controller/login/recoverPasswordController.js"></script>
 <script src="/static/js/controller/demo/demoController.js"></script>
 <script src="/static/js/controller/test/commentController.js"></script>
-<script src="/static/js/controller/person/personList.js"></script>
-<script src="/static/js/controller/person/updatePerson.js"></script>
+<script src="/static/js/controller/person/personListController.js"></script>
+<script src="/static/js/controller/person/deletedPersonListController.js"></script>
+<script src="/static/js/controller/person/updatePersonController.js"></script>
 <script src="/static/js/controller/report/reportController.js"></script>
+<script src="/static/js/controller/request/subController.js"></script>
+<script src="/static/js/controller/dashboard/dashboardController.js"></script>
+<script src="/static/js/controller/sidebar/sideBarController.js"></script>
 <script src="/static/js/controller/notifier/notifierBellController.js"></script>
 
 <script src="/static/js/service/comment/commentService.js"></script>
@@ -121,22 +131,26 @@
 <script src="/static/js/service/webSocketService.js"></script>
 <script src="/static/js/service/person/personService.js"></script>
 <script src="/static/js/service/request/requestService.js"></script>
+<script src="/static/js/service/request/subService.js"></script>
 <script src="/static/js/service/registration/registrationService.js"></script>
 <script src="/static/js/service/request-group/requestGroupService.js"></script>
 <script src="/static/js/service/notificationWebSocketService.js"></script>
+<script src="/static/js/service/report/calendarService.js"></script>
 
 <script src="/static/js/controller/component/priority-buttons.js"></script>
 <script src="/static/js/controller/component/calendar.js"></script>
 <script src="/static/js/controller/component/moment.js"></script>
+<!--Task Calendar-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
 <script src="/static/js/controller/component/bootstrap-datetimepicker.js"></script>
 <script src="/static/js/controller/request/newRequestController.js"></script>
-<script src="/static/js/controller/request/updateRequestController.js"></script>
 <script src="/static/js/controller/request/requestDetailsController.js"></script>
 <script src="/static/js/controller/request-group/requestGroupController.js"></script>
 <script src="/static/js/controller/request-group/requestGroupDetailsController.js"></script>
 <script src="/static/js/controller/request/requestListController.js"></script>
-<script src="/static/js/controller/request/requestListByEmployeeController.js"></script>
+<script src="/static/js/controller/request/requestListByUserController.js"></script>
 <script src="/static/js/controller/request/updateRequestLinkToGroupController.js"></script>
+<script src="/static/js/controller/report/calendarController.js"></script>
 
 <script src="/static/js/directive/sideBar.js"></script>
 <script src="/static/js/directive/welcomeHeader.js"></script>

@@ -40,7 +40,7 @@
 
                 $scope.toRequest = function(itemId) {
                     //TODO add url
-                    window.location = "request/"+itemId+"/details";
+                    window.location = "/secured/request/"+itemId+"/details";
                 };
 
                 $scope.getNotification();
