@@ -5,21 +5,24 @@
             <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
-                    <div class="col-md-2 col-md-offset-10" ng-show="my">
-                        <a href="/newRequest" class="btn btn-success">Create Request</a>
-                    </div>
-                    <div class="col-md-12">
-                        <form class="form-inline">
-                            <label ng-show="!my">Priority
-                                <select ng-model="selectedPriority" ng-change="priorityChange(selectedPriority)"
-                                        data-ng-options="priority as priority.name for priority in priorities"
-                                        class="form-control">
-                                </select>
-                            </label>
-                        </form>
+                    <div class="col-md-8" ng-show="assigned">
+                        <input ng-model="selectedCurrentManager" type="text" placeholder="{{placeholder}}"
+                               ng-change="updateManager()" uib-typeahead="manager as manager.firstName + ' '
+                               +  manager.lastName for manager in managers"
+                               class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-8" ng-show="!assigned">
+                        <input ng-model="selectedUser" type="text" placeholder="{{placeholder}}"
+                               ng-change="updateUser()" uib-typeahead="user as user.firstName + ' '
+                               +  user.lastName for user in users"
+                               class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
+                    </div>
+                    <div class="col-md-10" ng-show="requestListByUserVisibility">
+                        <p class="empty-request-title-2">{{title}}</p>
+                    </div>
+                    <a ng-click="pageChanged()" class="btn btn-default">Get request</a>
+                    <div class="col-md-12" ng-show="!requestListByUserVisibility">
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
@@ -28,33 +31,29 @@
                             <th st-sort="estimate">Estimate</th>
                             <th st-sort="priority.name">Priority</th>
                             <th st-sort="creationTime">Created</th>
-                            <th ng-show="my">Status</th>
-                            <th></th>
-                            <th></th>
+                            <th>Status</th>
+                            <!--<th></th>-->
                             </thead>
                             <tbody>
                             <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td ng-show="!my">
+                                <td ng-show="assigned">
                                     {{request.employee.firstName}} {{request.employee.lastName}}
                                 </td>
-                                <td ng-show="my">
+                                <td ng-show="!assigned">
                                     {{request.manager.firstName}} {{request.manager.lastName}}
                                 </td>
                                 <td>{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td>{{request.priority.name}}</td>
                                 <td>{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td ng-show="my">{{request.status.name}}</td>
-                                <td>
-                                    <assign-to-me-btn ng-show="!my"></assign-to-me-btn>
-                                    <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
-                                </td>
-                                <td>
-                                    <assign-to-smb-btn ng-show="!my"></assign-to-smb-btn>
-                                    <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
-                                    <!--<cancel-request-btn ng-show="my"></cancel-request-btn>-->
-                                </td>
+                                <td>{{request.status.name}}</td>
+                                <!--<td>-->
+                                    <!--<assign-to-me-btn ng-show="assigned"></assign-to-me-btn>-->
+                                    <!--<a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="!assigned">Edit</a>-->
+                                    <!--<assign-to-smb-btn ng-show="assigned"></assign-to-smb-btn>-->
+                                    <!--<a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="!assigned">Cancel</a>-->
+                                <!--</td>-->
                             </tr>
                             </tbody>
                         </table>

@@ -17,6 +17,19 @@
     text-align: left!important;
 }
 
+.subtask-form label{
+    text-align: left!important;
+}
+.subtask-form {
+    margin-bottom: 10px;
+}
+.pull-up {
+    margin-bottom: 10px;
+}
+.subtask-accordion * {
+    transition: 0s;
+}
+
 .center-down {
     margin-top: 20vh;
 }

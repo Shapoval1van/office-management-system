@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
@@ -28,7 +27,7 @@ public class MailServiceConfig {
     private String MAIL_SMTP_PORT;
 
     @Bean
-    public MailSender getMailSender(){
+    public JavaMailSender getMailSender(){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         mailSender.setHost(MAIL_SMTP_HOST);
@@ -37,6 +36,7 @@ public class MailServiceConfig {
         mailSender.setPassword(MAIL_PASSWORD);
         mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", MAIL_SMTP_AUTH);
         mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", MAIL_STARTTLS_ENABLE);
+        mailSender.setDefaultEncoding("UTF-8");
 
         return mailSender;
     }

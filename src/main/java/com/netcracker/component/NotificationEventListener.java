@@ -1,6 +1,7 @@
 package com.netcracker.component;
 
 import com.netcracker.model.event.*;
+import com.netcracker.service.frontendNotification.FrontendNotificationService;
 import com.netcracker.service.notification.impls.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -11,6 +12,9 @@ public class NotificationEventListener {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private FrontendNotificationService frontendNotificationService;
 
     @EventListener
     public void handlePersonRegistration(PersonRegistrationEvent event) {
@@ -31,32 +35,50 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleNotificationSendingError(NotificationSendingErrorEvent event){
+    public void handleNotificationSendingError(NotificationSendingErrorEvent event) {
         notificationService.saveFailedNotification(event.getNotification());
     }
 
     @EventListener
     public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
+        frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
         notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
     }
 
     @EventListener
-    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent){
+    public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
         notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
     }
 
     @EventListener
     public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
+        frontendNotificationService.sendNotificationToAllSubscribed(requestUpdateEvent.getRequest().getId(), "Request updated");
         notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
     }
 
     @EventListener
-    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent){
+    public void handleDeleteUser(DeleteUserEvent deleteUserEvent){
+        notificationService.sendDeleteUserEvent(deleteUserEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleRecoverUser(RecoverUserEvent recoverUserEvent){
+        notificationService.sendRecoverUserEvent(recoverUserEvent.getPerson());
+    }
+
+    @EventListener
+    public void handleUpdateUser(NotificationPersonUpdateEvent userUpdateEvent) {
         notificationService.sendUpdateUserEvent(userUpdateEvent.getPerson());
     }
 
     @EventListener
-    public void handleRequestExpiring(RequestExpiringEvent event){
+    public void handleRequestExpiring(RequestExpiringEvent event) {
         notificationService.sendRequestExpiryReminder(event.getExpiringRequests());
+    }
+
+    @EventListener
+    public void handleChangeRequest(ChangeRequestEvent changeRequestEvent) {
+        notificationService.sendRequestUpdateNotification(changeRequestEvent.getOldRequest(),
+                changeRequestEvent.getNewRequest(), changeRequestEvent.getChangeTime());
     }
 }

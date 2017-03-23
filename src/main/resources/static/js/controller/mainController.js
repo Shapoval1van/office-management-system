@@ -4,10 +4,11 @@
             function ($scope, $location, $http, $cookies, SessionService) {
 
                 $scope.Session = SessionService;
+                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
                 SessionService.loadSession();
                 var anonymOnlyPages = ["resetPassword", "reset"];
-                var redirectIfTokenExist = "/requestListByEmployee";
+                var redirectIfTokenExist = "/secured/requestListByEmployee";
                 var loginPageUrl = "/login";
 
                 //FIXME: Rewrite it. Check only URL.
@@ -35,6 +36,27 @@
 
                 $scope.goToUrl = function (url) {
                     $location.path(url);
+                };
+
+                $scope.getReportUrl = function () {
+                    return "/secured/report/" + currentUser.id;
+                };
+
+                $scope.hasEmployeePermission = function (url) {
+                    return SessionService.isUserLoggedIn();
+                };
+
+                $scope.hasManagerPermission = function (url) {
+                    return SessionService.getUserRole() == 'ROLE_ADMINISTRATOR'
+                        || SessionService.getUserRole() == 'ROLE_OFFICE MANAGER';
+                };
+
+                $scope.hasAdminPermission = function (url) {
+                    return SessionService.getUserRole() == 'ROLE_ADMINISTRATOR';
+                };
+
+                $scope.isActive = function (path) {
+                    return $location.path() === path;
                 }
             }])
 })();

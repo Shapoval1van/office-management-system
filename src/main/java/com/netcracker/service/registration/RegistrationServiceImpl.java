@@ -13,14 +13,20 @@ import com.netcracker.model.event.ResetPasswordEvent;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.repository.data.interfaces.TokenRepository;
+import com.netcracker.util.MessageConstant;
+import com.netcracker.util.enums.role.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.*;
+
+import static com.netcracker.util.MessageConstant.USER_ALREADY_DELETED;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
@@ -35,6 +41,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final MessageSource messageSource;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
@@ -42,23 +50,29 @@ public class RegistrationServiceImpl implements RegistrationService {
                                    RoleRepository roleRepository,
                                    TokenRepository tokenRepository,
                                    PasswordEncoder passwordEncoder,
+                                   MessageSource messageSource,
                                    ApplicationEventPublisher eventPublisher) {
         this.personRepository = personRepository;
         this.roleRepository = roleRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.messageSource = messageSource;
         this.eventPublisher = eventPublisher;
     }
 
     @Transactional
     @Override
     public Token registerPerson(Person person, String requestLink, int roleId) throws Exception {
-
+        Locale locale = LocaleContextHolder.getLocale();
         Optional<Person> savedOptional = this.personRepository.findPersonByEmail(person.getEmail());
         if (savedOptional.isPresent()) {
             if (savedOptional.get().isEnabled()) {
                 throw new ResourceAlreadyExistsException(Person.TABLE_NAME);
-            } else {
+            }
+            else if(savedOptional.get().isDeleted()){
+                throw new BadEmployeeException(messageSource.getMessage(USER_ALREADY_DELETED, null, locale));
+            }
+            else {
                 Optional<Token> oldTokenOptional = this.tokenRepository.findRegistrationTokenByPerson(savedOptional.get().getId());
                 if (oldTokenOptional.isPresent()) {
                     oldTokenOptional.get().setDateExpired(this.calculateDateExpired());
@@ -75,7 +89,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         person.setRole(this.loadRoleById(roleId));
-        if (person.getRole().getId()!= EMPLOYEEID )
+        if (!person.getRole().getId().equals(RoleEnum.EMPLOYEE.getId()))
             person.setEnabled(true);
         else
             person.setEnabled(false);
@@ -96,7 +110,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         List<Role> allRoles = this.roleRepository.findAllRoles();
         List<Role> allRolesForAdminRegistration = new ArrayList<>();
         for (Role role : allRoles){
-            if (role.getId()!= EMPLOYEEID){
+            if (!role.getId().equals(RoleEnum.EMPLOYEE.getId())){
                 allRolesForAdminRegistration.add(role);
             }
         }
@@ -116,13 +130,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         person.setEnabled(true);
 
         return personRepository.save(person).orElse(null);
-    }
-
-
-
-    private Role loadRoleByName(String roleName) throws ResourceNotFoundException {
-        return this.roleRepository.findRoleByName(roleName)
-                .orElseThrow(() -> new ResourceNotFoundException(Role.TABLE_NAME));
     }
 
     private Role loadRoleById(int roleId) throws ResourceNotFoundException {
@@ -152,7 +159,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void publishOnRegistrationCompleteEvent(Person person, Optional<Token> verificationToken, String requestLink) {
         verificationToken.ifPresent((token) -> {
-            if (person.getRole().getId() == EMPLOYEEID) {
+            if (person.getRole().getId().equals(RoleEnum.EMPLOYEE.getId())) {
                 PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
                 eventPublisher.publishEvent(event);
             }else{

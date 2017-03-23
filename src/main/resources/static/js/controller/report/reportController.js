@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("ReportController", ['$scope', '$routeParams', '$location', '$http',
-            function ($scope, $routeParams, $location, $http) {
+        .controller("ReportController", ["$scope", "$routeParams", "$location", "$http", "ReportService",
+            function ($scope, $routeParams, $location, $http, ReportService) {
                 $scope.currentPage = 1;
                 $scope.pageSize = 10;
                 $scope.totalItems = 0;
@@ -26,6 +26,8 @@
                     "value": $scope.period.substr(0,1).toUpperCase()+$scope.period.substr(1).toLocaleLowerCase(),
                     "values": ["Month", "Quarter", "Year"]
                 };
+
+
                 //chose type of first charts
                 if($scope.period=='year'){
                     $scope.type = 'column2d';
@@ -33,68 +35,58 @@
                     $scope.type = 'area2d';
                 }
 
+
                 $scope.getTotalPage = function () {
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/count/allRequest/' + personId + '?period=' + $scope.period.toLowerCase()
-                    }).then(function successCallback(response) {
-                        $scope.totalItems = response.data;
-                    }, function errorCallback(response) {
-                    });
+                    return ReportService.getTotalPage(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.totalItems = response.data;
+                        }, function (response) {
+                        })
                 };
 
 
                 $scope.pageChanged = function(currentPage) {
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/allRequest/'+personId+'?period='+$scope.period.toLowerCase()
-                        +'&page=' +  currentPage + '&size=' + $scope.pageSize
-                    }).then(function successCallback(response) {
-                        $scope.requestList = response.data;
-                    }, function errorCallback(response) {
-                        $scope.requestList = [];
-                    });
+                    return ReportService.pageChanged(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize)
+                        .then(function (response) {
+                            $scope.requestList =  response.data;
+                        }, function (response) {
+                            $scope.requestList = [];
+                        })
                 };
 
-                $scope.chartsForEmployee = function () {
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/chartsForEmployee/' + personId + '?period=' + $scope.period.toLowerCase()
-                    }).then(function successCallback(response) {
-                        $scope.reportForTime.data = response.data;
-                    }, function errorCallback(response) {
-
-                    });
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/chartsForEmployee/' + personId + '?type=pie' + '&period=' + $scope.period.toLowerCase()
-                    }).then(function successCallback(response) {
-                        $scope.pieChart.data = response.data;
-                    }, function errorCallback(response) {
-
-                    });
+                $scope.SimpleChartForManager = function () {
+                    return ReportService.getSimpleChartForManager(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.reportForTime.data = response.data;
+                        }, function (callback) {
+                        })
                 };
 
-                $scope.chartsForManager = function () {
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/chartsForManager/' + personId + '?period=' + $scope.period.toLowerCase()
-                    }).then(function successCallback(response) {
-                        $scope.reportForTime.data = response.data;
-                    }, function errorCallback(response) {
-                    });
-
-                    $http({
-                        method: 'GET',
-                        url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + $scope.period.toLowerCase()
-                    }).then(function successCallback(response) {
-                        $scope.pieChart.data = response.data;
-                    }, function errorCallback(response) {
-
-                    });
+                $scope.PieChartForManager = function () {
+                    return ReportService.getPieChartForManager(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.pieChart.data = response.data;
+                        }, function (callback) {
+                        })
                 };
 
+                $scope.SimpleChartForEmployee = function () {
+                    return ReportService.getSimpleChartEmployee(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.reportForTime.data = response.data;
+                        }, function (callback) {
+                        })
+                };
 
+                $scope.PieChartForEmployee = function () {
+                    return ReportService.getPieChartEmployee(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.pieChart.data = response.data;
+                        }, function (callback) {
+                        })
+                };
+
+                //FIXME
                 $scope.getAllData = function () {
                     $http({
                         method: 'GET',
@@ -102,11 +94,15 @@
                     }).then(function successCallback(response) {
                         that.person = response.data;
                         if (that.person.role.id == 3) {
-                            $scope.chartsForEmployee();
+                            $scope.SimpleChartForEmployee();
+                            $scope.PieChartForEmployee();
                         } else if (that.person.role.id == 2) {
-                            $scope.chartsForManager();
+                            $scope.SimpleChartForManager();
+                            $scope.PieChartForManager();
                         } else if (that.person.role.id == 1) {
-                            window.location = "javascript:history.back()";
+                            $scope.SimpleChartForManager();
+                            $scope.PieChartForManager();
+                            //window.location = "javascript:history.back()";
                         } else {
                             window.location = "javascript:history.back()";
                         }
@@ -119,21 +115,7 @@
 
                 $scope.getPeriodData = function (periodItem) {
                     $scope.period=periodItem.toLowerCase();
-                    window.location = "report/"+ personId +"?period=" + periodItem.toLowerCase();
-                    // console.log($scope.period);
-                    //     if (that.person.role.id == 3) {
-                    //         $scope.chartsForEmployee();
-                    //         console.log("chartsForEmployee");
-                    //     } else if (that.person.role.id == 2) {
-                    //         $scope.chartsForManager();
-                    //         console.log("chartsForManager");
-                    //     } else if (that.person.role.id == 1) {
-                    //         window.location = "javascript:history.back()";
-                    //         console.log("javascript");
-                    //     } else {
-                    //         window.location = "javascript:history.back()";
-                    //         console.log("back");
-                    //     }
+                    window.location = "/secured/report/"+ personId +"?period=" + periodItem.toLowerCase();
                 };
 
 
@@ -208,6 +190,6 @@
 
                 $scope.pageChanged(1);
 
-                $scope.getTotalPage(); //
+                $scope.getTotalPage(personId, $scope.period.toLowerCase()); //
             }])
 })();

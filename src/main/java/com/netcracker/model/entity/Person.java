@@ -20,6 +20,7 @@ public class Person implements Persistable<Long>, UserDetails {
     private String password;
     private Role role;
     private boolean enabled;
+    private boolean deleted;
 
     public Person() {
     }
@@ -116,6 +117,15 @@ public class Person implements Persistable<Long>, UserDetails {
         return this.firstName +" "+this.getLastName();
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -124,6 +134,7 @@ public class Person implements Persistable<Long>, UserDetails {
         Person person = (Person) o;
 
         if (enabled != person.enabled) return false;
+        if (deleted != person.deleted) return false;
         if (id != null ? !id.equals(person.id) : person.id != null) return false;
         if (firstName != null ? !firstName.equals(person.firstName) : person.firstName != null) return false;
         if (lastName != null ? !lastName.equals(person.lastName) : person.lastName != null) return false;
@@ -141,6 +152,7 @@ public class Person implements Persistable<Long>, UserDetails {
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + (deleted ? 1 : 0);
         return result;
     }
 }

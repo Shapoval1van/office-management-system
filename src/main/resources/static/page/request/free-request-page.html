@@ -5,10 +5,15 @@
             <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
+                    <div class="col-md-10" ng-show="!requestListVisibility">
+                        <p class="empty-request-title">Request list is empty. To create new one - click following button:</p>
+                    </div>
+                    <div class="col-md-2 " ng-show="my">
+                        <a href="/secured/newRequest" class="btn btn-success">Create Request</a>
+                    </div>
                     <div class="col-md-12">
-                        Select priority:
                         <form class="form-inline">
-                            <label>Priority
+                            <label ng-show="!my">Priority
                                 <select ng-model="selectedPriority" ng-change="priorityChange(selectedPriority)"
                                         data-ng-options="priority as priority.name for priority in priorities"
                                         class="form-control">
@@ -17,33 +22,38 @@
                         </form>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-12" ng-show="requestListVisibility">
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
                             <th st-sort="name">Name</th>
-                            <th st-sort="manager.firstName">Employee</th>
+                            <th>{{personType}}</th>
                             <th st-sort="estimate">Estimate</th>
                             <th st-sort="priority.name">Priority</th>
                             <th st-sort="creationTime">Created</th>
-                            <th></th>
+                            <th ng-show="my">Status</th>
                             <th></th>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="request in requestList">
+                            <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td>
+                                <td ng-show="!my">
+                                    {{request.employee.firstName}} {{request.employee.lastName}}
+                                </td>
+                                <td ng-show="my">
                                     {{request.manager.firstName}} {{request.manager.lastName}}
                                 </td>
                                 <td>{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td>{{request.priority.name}}</td>
                                 <td>{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-show="my">{{request.status.name}}</td>
                                 <td>
-                                    <assign-to-me-btn></assign-to-me-btn>
-                                </td>
-                                <td>
-                                    <assign-to-smb-btn></assign-to-smb-btn>
+                                    <assign-to-me-btn ng-show="!my"></assign-to-me-btn>
+                                    <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
+                                    <assign-to-smb-btn ng-show="!my"></assign-to-smb-btn>
+                                    <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
+                                    <!--<cancel-request-btn ng-show="my"></cancel-request-btn>-->
                                 </td>
                             </tr>
                             </tbody>
@@ -58,7 +68,6 @@
                                     ng-change="pageChanged()" items-per-page="pageSize"></ul>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
