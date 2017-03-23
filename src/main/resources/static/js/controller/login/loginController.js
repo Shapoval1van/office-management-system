@@ -20,6 +20,7 @@
                     $scope._relocateUser();
                 }
 
+                $scope.person = {};
                 $scope.username = "";
                 $scope.password = "";
                 $scope.hasError = false;
@@ -29,6 +30,7 @@
                     RegistrationService.activateUser($routeParams.registrationToken)
                         .then(function (response) {
                             $scope.person.username = response.data.email;
+                            $scope.username = response.data.email;
                         }, function (response) {
                             window.alert("Activation error.");
                         })

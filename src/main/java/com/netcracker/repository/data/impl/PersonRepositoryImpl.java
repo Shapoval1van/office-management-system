@@ -5,6 +5,8 @@ import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.repository.data.interfaces.PersonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -26,6 +28,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String PASSWORD_COLUMN = "password";
     public static final String ROLE_ID_COLUMN = "role_id";
     public static final String ENABLED_COLUMN = "enabled";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 
     @Value("${person.find.by.email}")
     private String FIND_PERSON_BY_EMAIL;
@@ -64,7 +68,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     private String GET_DELETED_PERSONS;
 
     @Value("${person.find.all.deleted.by.role}")
-    private String  GET_DELETED_PERSONS_BY_ROLE;
+    private String GET_DELETED_PERSONS_BY_ROLE;
 
     @Value("${person.count.active.by.role}")
     private String COUNT_ACTIVE_PERSON_BY_ROLE;
@@ -80,7 +84,6 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     @Value("${person.count.deleted.by.role}")
     private String COUNT_DELETED_PERSON_BY_ROLE;
-
 
 
     public PersonRepositoryImpl() {
@@ -140,7 +143,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
     @Override
-    public Long getCountDeletedPerson()  {
+    public Long getCountDeletedPerson() {
         return getJdbcTemplate().queryForObject(COUNT_DELETED_PERSON, Long.class);
     }
 
@@ -203,9 +206,17 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     }
 
 
-
     @Override
     public int subscribe(Long requestId, Long personId) {
+//        Don't do like that
+        List<Person> subscribers = findPersonsBySubscribingRequest(requestId);
+        for (Person subscriber : subscribers) {
+            if (subscriber.getId().equals(personId)) {
+                LOGGER.info("Person {} already subscribing on request {}", personId, requestId);
+                return 1;
+            }
+        }
+
         return getJdbcTemplate().update(SUBSCRIBE, requestId, personId);
     }
 

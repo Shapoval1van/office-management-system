@@ -142,7 +142,7 @@
 
                 };
 
-                $scope.requestDelete = function(requestId) {
+                $scope.requestDelete = function (requestId) {
                     swal({
                             title: "Are you sure?",
                             text: "Do you really want to cancel this request",
@@ -152,7 +152,7 @@
                             confirmButtonText: "Yes, cancel it!",
                             closeOnConfirm: false
                         },
-                        function(){
+                        function () {
                             RequestService.cancelRequest(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
@@ -162,8 +162,9 @@
                                 });
 
                             swal("Request canceled!", "", "success");
-                            window.setTimeout(function(){
-                                window.location = "javascript:history.back()"}, 2000)
+                            window.setTimeout(function () {
+                                window.location = "javascript:history.back()"
+                            }, 2000)
                         });
                 };
 
@@ -178,9 +179,10 @@
                 };
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assign(requestId, currentUser.id)
+                    return PersonService.assignToMe(requestId)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
+                            $scope.getRequest();
                         }, function (response) {
                             $scope.assignedMessage = response.data.errors
                                 .map(function (e) {
@@ -194,6 +196,7 @@
                     return PersonService.assign($scope.request.id, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
+                            $scope.getRequest();
                         }, function (response) {
                             $scope.assignedMessage = response.data.errors
                                 .map(function (e) {
@@ -306,7 +309,7 @@
                     return $scope.request.status.name === "FREE";
                 };
 
-                $scope.requestUpdate = function(requestId) {
+                $scope.requestUpdate = function (requestId) {
                     window.location = "/secured/request/" + requestId + '/update';
                 };
                 // $http({

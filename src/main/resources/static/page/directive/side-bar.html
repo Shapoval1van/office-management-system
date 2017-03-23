@@ -6,6 +6,9 @@
         <li>
             <a href="/secured/dashboard">Dashboard</a>
         </li>
+        <li>
+            <a ng-href="{{getReportUrl()}}">Report</a>
+        </li>
         <!--For employee (also for manager and admin)-->
         <div ng-show="hasEmployeePermission()">
             <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
@@ -20,8 +23,8 @@
             <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
                 <a href="/secured/request/free">Free requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('')}">
-                <a href="#">Asigned requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/assigned')}">
+                <a href="/secured/request/assigned">Asigned requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
                 <a ng-href="/secured/request-group">Request groups</a>
