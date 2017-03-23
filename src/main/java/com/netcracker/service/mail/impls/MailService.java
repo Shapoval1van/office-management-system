@@ -8,12 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class MailService implements MailSending {
@@ -21,12 +24,11 @@ public class MailService implements MailSending {
     private String MAIL_LOGIN;
 
     @Inject
-    private MailSender mailSender;
+    private JavaMailSender mailSender;
     @Autowired
     private NotificationTextBuilder notificationTextBuilder;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-
 
     /**
      * This method sends mail.
@@ -59,11 +61,18 @@ public class MailService implements MailSending {
     public void send(Notification notification) {
         SimpleMailMessage msg = new SimpleMailMessage();
         try {
-            msg.setFrom(MAIL_LOGIN);
-            msg.setTo(notification.getPerson().getEmail());
-            msg.setSubject(notification.getSubject());
-            msg.setText(notificationTextBuilder.buildText(notification));
-            mailSender.send(msg);
+            MimeMessagePreparator preparator = new MimeMessagePreparator() {
+                @Override
+                public void prepare(MimeMessage mimeMessage) throws Exception {
+                    MimeMessageHelper mimeHelper = new MimeMessageHelper(mimeMessage);
+                    mimeHelper.setFrom(MAIL_LOGIN);
+                    mimeHelper.setTo(notification.getPerson().getEmail());
+                    mimeHelper.setSubject(notification.getSubject());
+                    mimeHelper.setText(notificationTextBuilder.buildText(notification), true);
+                }
+            };
+
+            mailSender.send(preparator);
         } catch (MailException e){
             eventPublisher.publishEvent(new NotificationSendingErrorEvent(notification));
         }

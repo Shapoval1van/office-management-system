@@ -1,14 +1,14 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListByUserController", ["$scope", "$location", "$window", "$http", "PersonService", "RequestService",
-            function ($scope, $location, $window,  $http, PersonService, RequestService) {
+        .controller("RequestListByUserController", ["$scope", "$location", "$rootScope", "$window", "$http", "PersonService", "RequestService",
+            function ($scope, $location, $rootScope, $window,  $http, PersonService, RequestService) {
 
                 $scope.selectedCurrentManager = undefined;
                 $scope.selectedUser = undefined;
                 $scope.managers = [];
                 $scope.users = [];
 
-                var requestDetails = "/request/";
+                var requestDetails = "/secured/request/";
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
@@ -31,11 +31,13 @@
                 $scope.assigned = false;
                 var path = $location.path();
 
-                if (path=="/request/assigned"){
+                if (path=="/secured/request/assigned"){
                     $scope.assigned = true;
                     $scope.personType = "Employee";
                     $scope.placeholder = "Find assigned requests by manager name";
                     $scope.title = "Enter manager name to get all assigned requests";
+
+                    $rootScope.sideBarActiveElem = "request-assigned";
 
                     $scope.updateManager = function() {
                         if($scope.selectedCurrentManager.length >= 2) {
@@ -82,6 +84,8 @@
                     $scope.personType = "Manager";
                     $scope.placeholder = "Find all requests by user name";
                     $scope.title = "Enter user name to get all user requests";
+
+                    $rootScope.sideBarActiveElem = "request-user";
 
                     $scope.updateUser = function() {
                         if($scope.selectedUser.length >= 2) {
@@ -175,7 +179,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $window.open("/request/" + requestId + "/details", '_blank');
+                    $window.open("/secured/request/" + requestId + "/details", '_blank');
                     //$scope.goToUrl("/request/" + requestId + "/details");
                 };
 

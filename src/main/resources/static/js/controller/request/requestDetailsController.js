@@ -25,12 +25,16 @@
                 $scope.periodList = ["Day", "Month", "All"];
                 $scope.chosenPeriod = "Month";
 
+                $scope.subscribers = [];
+
                 var requestId = $routeParams.requestId;
+                $scope.requestId = $routeParams.requestId;
 
                 $scope.getRequest = function () {
                     RequestService.getRequestById(requestId)
                         .then(function (callback) {
                             $scope.request = callback.data;
+                            $scope.getSubscribers();
                         }, function (callback) {
                             console.log("Error");
                             console.log(callback);
@@ -39,8 +43,8 @@
 
                 $scope.getRequest();
 
-                $scope.getHistoryPage = function (period, pageNumber) {
-                    return RequestService.getRequestHistory(requestId, period, PAGE_SIZE, pageNumber)
+                $scope.getHistoryPage = function (period, pageNumber, pageSize) {
+                    return RequestService.getRequestHistory(requestId, period, pageSize, pageNumber)
                         .then(function (callback) {
                             callback.data.forEach(function (historyItem) {
                                 historyItem.changeItems.forEach(function (changeItem) {
@@ -56,19 +60,19 @@
                         });
                 };
 
-                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
 
                 $scope.changeHistoryPeriod = function () {
                     $scope.historyPageNumber = 1;
                     $scope.historyList = [];
-                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
                     console.log($scope.chosenPeriod);
                     console.log($scope.historyPageNumber);
                 };
 
                 $scope.getNextHistoryPage = function (period) {
                     $scope.historyPageNumber++;
-                    $scope.getHistoryPage(period, $scope.historyPageNumber);
+                    $scope.getHistoryPage(period, $scope.historyPageNumber, PAGE_SIZE);
                 };
 
                 $scope.getPageSize = function () {
@@ -214,7 +218,7 @@
                     return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
                         .then(function (callback) {
                             $scope.getRequest();
-                            $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber);
+                            // $scope.getHistoryPage($scope.chosenPeriod, 1, 1);
                         }, function () {
 
                         })
@@ -233,6 +237,37 @@
                 $scope.setReopen = function () {
                     swal("Request reopen", "Request successful reopen!", "success");
                     return $scope.updateRequestStatus(1);
+                };
+
+                $scope.subscribe = function () {
+                    return PersonService.subscribe($scope.request.id)
+                        .then(function (callback) {
+                            $scope.getRequest();
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.unsubscribe = function () {
+                    return PersonService.unsubscribe($scope.request.id)
+                        .then(function (callback) {
+                            $scope.getRequest();
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.getSubscribers = function () {
+                    return PersonService.getSubscribers($scope.request.id)
+                        .then(function (callback) {
+                            $scope.subscribers = callback.data;
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.isCurrentUserSubscribing = function () {
+                    return PersonService.isPersonSubscribing($scope.subscribers, currentUser.id);
                 };
 
                 $scope.isCanceled = function () {
@@ -272,7 +307,7 @@
                 };
 
                 $scope.requestUpdate = function(requestId) {
-                    window.location = "/request/" + requestId + '/update';
+                    window.location = "/secured/request/" + requestId + '/update';
                 };
                 // $http({
                 //     method: 'GET',

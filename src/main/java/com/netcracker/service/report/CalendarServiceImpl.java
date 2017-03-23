@@ -11,6 +11,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
@@ -33,9 +34,10 @@ public class CalendarServiceImpl implements CalendarService {
     private PersonRepository personRepository;
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public List<CalendarItemDTO> getDataByPeriod(Timestamp start, Timestamp end, String email) throws CurrentUserNotPresentException {
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public List<CalendarItemDTO> getDataByPeriod(Timestamp start, Timestamp end, Principal principal) throws CurrentUserNotPresentException {
         Locale locale =  LocaleContextHolder.getLocale();
+        String email = principal.getName();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale)));
 

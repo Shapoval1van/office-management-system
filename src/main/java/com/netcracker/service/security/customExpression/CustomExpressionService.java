@@ -10,4 +10,5 @@ public interface CustomExpressionService {
 
     boolean isRequestPermittedToDelete(long requestId);
     boolean isRequestPermittedToChangeStatus(Request request, Status status, Principal principal);
+    boolean isNotificationBelongToPerson(Long notificationId, String personName);
 }

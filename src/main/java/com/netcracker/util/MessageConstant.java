@@ -2,11 +2,13 @@ package com.netcracker.util;
 
 public class MessageConstant {
     //USER ERROR
-    public static final String USER_ERROR_NOT_PRESENT ="user.error.not.present";
-    public static final String USER_WITH_ID_NOT_PRESENT="user.error.not.present.with.id";
-    public static final String USER_WITH_EMAIL_NOT_PRESENT="user.error.email";
+    public static final String USER_ERROR_NOT_PRESENT = "user.error.not.present";
+    public static final String USER_WITH_ID_NOT_PRESENT = "user.error.not.present.with.id";
+    public static final String USER_ALREADY_DELETED ="user.deleted.error";
+    public static final String USER_WITH_EMAIL_NOT_PRESENT = "user.error.email";
     public static final String USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE = "user.error.update.from.manager.to.employee";
     public static final String USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE = "user.error.update.from.admin.to.employee";
+
 
     //REQUEST ERROR
     public static final String REQUEST_ERROR_NOT_EXIST = "request.error.not.exist";
@@ -17,6 +19,8 @@ public class MessageConstant {
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
     public static final String REQUEST_ERROR_UPDATE_NOT_PERMISSION = "request.error.update.not.permission";
     public static final String REQUEST_ERROR_UPDATE_NON_FREE = "request.error.update.non.free";
+    public static final String REQUEST_ERROR_NOT_EXIST_PERSON_OR_REQUEST = "request.error.not.exist.person.or.request";
+    public static final String REQUEST_NOT_ASSIGNED = "request.error.not.assigned";
 
     // SUB REQUEST ERROR
     public static final String SUB_REQUEST_ERROR_PARENT = "subrequest.error.parent";
@@ -30,8 +34,13 @@ public class MessageConstant {
     public static final String STATUS_ERROR_NOT_AVAILABLE_FOR_GROUP = "status.error.not.available.for.group";
     public static final String STATUS_ERROR_NOT_AVAILABLE = "status.error.not.available";
 
+    //AMINISTRATOR ERROR
+    public static final String ADMINISTRATOR_REMOVING_ERROR = "admin.error.removing.user";
+
     // MANAGER ERROR
     public static final String MANAGER_ERROR_MAIL = "manager.error.email";
+    public static final String MANAGER_HAS_REQUESTS_ERROR = "manager.error.has.available.requests";
+
 
     // EMPLOYEE ERROR
     public static final String EMPLOYEE_ERROR_MAIL = "employee.error.email";
@@ -50,4 +59,9 @@ public class MessageConstant {
 
     //REPORT
     public static final String NOT_DATA_FOR_THIS_ROLE = "report.not.data.for.this.role";
+
+    //UPDATE REQUEST HIGHLIGHTING
+    public static final String REQUEST_UPDATE_MESSAGE_SUBJECT = "request.update.message.subject";
+    public static final String REQUEST_UPDATE_MESSAGE_BODY = "request.update.message.body";
+
 }

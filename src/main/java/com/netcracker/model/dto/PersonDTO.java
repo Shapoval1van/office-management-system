@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.validation.CreateValidatorGroup;
+import com.netcracker.model.validation.DeleteUserValidatorGroup;
 import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.model.view.View;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDTO {
@@ -29,25 +31,24 @@ public class PersonDTO {
     private String lastName;
     @JsonView(View.Public.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+    @Size(max = 50, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class, DeleteUserValidatorGroup.class})
     @NotNull(groups = CreateValidatorGroup.class)
     @Pattern(regexp = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     private String email;
     @JsonView(View.Internal.class)
     @Size(max = 70, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     //@NotNull(groups = CreateValidatorGroup.class)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
+   // @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class, DeleteUserValidatorGroup.class})
     private String password;
     @JsonView(View.Public.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull(groups = {DeleteUserValidatorGroup.class})
     private Integer role;
     @JsonView(View.Public.class)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean enabled;
 
-    public PersonDTO() {
-    }
 
     public PersonDTO(Person person) {
         if (person!=null){

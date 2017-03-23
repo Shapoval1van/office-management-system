@@ -9,7 +9,7 @@ public class MainController {
 
     @GetMapping(value = {"/*", "/login/*", "/resetPassword/*", "/request/*", "request/{requestId}/*", "/person/{personId}/*",
             "/request-group/{requestGroupId}/requests", "/report/*", "/test/**",
-            "/admin/*"}, produces = MediaType.TEXT_HTML_VALUE)
+            "/admin/*", "/secured/**"}, produces = MediaType.TEXT_HTML_VALUE)
     public String goIndex() {
         return "/static/index.html";
     }

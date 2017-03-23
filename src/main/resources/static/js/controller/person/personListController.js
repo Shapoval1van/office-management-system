@@ -1,9 +1,9 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("PersonListController", ["$scope", "$http",
-            function ($scope, $http) {
+        .controller("PersonListController", ["$scope", "$http", "$rootScope",
+            function ($scope, $http, $rootScope) {
 
-                var personDetails = "/person/";
+                var personDetails = "/secured/person/";
                 $scope.pageSize = 10;
                 $scope.persons = {};
                 $scope.roles = [{roleId: 4, name: 'ALL'},
@@ -14,6 +14,9 @@
                 $scope.totalItems = 0;
                 $scope.currentPage = 1;
                 $scope.selectedRole = $scope.roles[0];
+                $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+                $rootScope.sideBarActiveElem = "users";
 
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");
@@ -63,6 +66,22 @@
 
                 $scope.personUpdate = function(personId) {
                     window.location = personDetails + personId + '/update';
+                };
+                $scope.personDelete = function(person) {
+                    if (person.email === $scope.currentUser.email)
+                        window.alert("You cannot delete yourself")
+                    else{
+                        $scope.person = person;
+                        $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
+                        then(function successCallback(response) {
+                            $scope.persons =$scope.persons.filter(function(person) {
+                                return person.email !== $scope.person.email;
+                            });
+                        }, function errorCallback(response) {
+                            console.log(response);
+                        });
+                    }
+
                 };
 
             }])

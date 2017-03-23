@@ -10,14 +10,15 @@
                     },
 
                     eventClick: function(calEvent, jsEvent, view) {
-                        window.location.href = "/request/" + calEvent.id + "/details";
+                        window.open("/secured/request/" + calEvent.id + "/details", '_blank');
                     },
 
                     nowIndicator: true,
                     firstDay: 1, // Monday
+                    timeFormat: 'H(:mm)',
 
                     header: {
-                        left: 'month,agendaWeek,agendaDay',
+                        left: 'month,listWeek,listDay',
                         center: 'title',
                         right: 'prevYear,prev,today,next,nextYear'
                     }

@@ -3,6 +3,7 @@ package com.netcracker.model.dto;
 /**
  * Created by nuts on 3/19/17.
  */
+
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.view.View;
@@ -18,6 +19,10 @@ public class CalendarItemDTO {
     private Timestamp start;
     @JsonView(View.Public.class)
     private Timestamp end;
+    @JsonView(View.Public.class)
+    private StatusDTO status;
+    @JsonView(View.Public.class)
+    private PriorityDTO priority;
 
     public CalendarItemDTO() {
     }
@@ -27,6 +32,8 @@ public class CalendarItemDTO {
         this.id = request.getId();
         this.start = request.getCreationTime();
         this.end = request.getEstimate();
+        this.status = new StatusDTO(request.getStatus());
+        this.priority = new PriorityDTO(request.getPriority());
     }
 
     public Long getId() {
@@ -59,5 +66,13 @@ public class CalendarItemDTO {
 
     public void setEnd(Timestamp end) {
         this.end = end;
+    }
+
+    public StatusDTO getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusDTO status) {
+        this.status = status;
     }
 }

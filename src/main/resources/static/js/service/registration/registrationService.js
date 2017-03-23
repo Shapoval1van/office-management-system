@@ -29,7 +29,7 @@
         };
 
         service.loadRoles = function () {
-            var promise = $http.get("/api/v1/registration/roleData")
+            var promise = $http.get("/api/v1/registration/roles")
                 .then(function (response) {
                     response.isError = false;
                     response.roles = [];
