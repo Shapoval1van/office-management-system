@@ -8,7 +8,24 @@
                     <div class="col-lg-12 col-md-12">
                         <form class="form-horizontal">
                             <fieldset>
-                                <legend>Request: {{request.name}}</legend>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <legend>Request: {{request.name}}</legend>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-default" ng-show="!isCurrentUserSubscribing()"
+                                                ng-click="subscribe()">
+                                                Subscribe <i class="fa fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-default" ng-show="isCurrentUserSubscribing()"
+                                                ng-click="unsubscribe()">
+                                            Unsubscribe <i class="fa fa-eye-slash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-1">
+
+                                    </div>
+                                </div>
                                 <div class="form-group col-md-12 col-lg-12">
 
                                     <div class="col-md-12 btn-group">

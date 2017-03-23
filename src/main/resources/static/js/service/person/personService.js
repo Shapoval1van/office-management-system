@@ -24,15 +24,43 @@
                 };
 
                 personService.assign = function (requestId, personId) {
-                  return $http.post("/api/request/assignRequest", {
-                      requestId: requestId,
-                      personId: personId
-                  })
-                      .then(function (callback) {
-                          return callback;
-                      }, function (callback) {
-                          return callback;
-                      })
+                    return $http.post("/api/request/assignRequest", {
+                        requestId: requestId,
+                        personId: personId
+                    })
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                personService.subscribe = function (requestId) {
+                    return $http.put("/api/person/subscribe", {requestId: requestId})
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                personService.unsubscribe = function (requestId) {
+                    return $http.put("/api/person/unsubscribe", {requestId: requestId})
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                personService.getSubscribers = function (requestId) {
+                    return $http.get("/api/person/subscribers/request/" + requestId);
+                };
+
+                personService.isPersonSubscribing = function (personList, personId) {
+                    return personList.some(function (person) {
+                        return person.id === personId;
+                    })
                 };
 
                 return personService;

@@ -3,6 +3,7 @@ package com.netcracker.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
+import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
@@ -188,7 +189,7 @@ public class RequestController {
     public void addRequestToRequestGroup(@RequestBody RequestGroupDTO requestGroupDTO,
                                          @PathVariable("requestId") Long requestId,
                                          Principal principal) throws ResourceNotFoundException,
-                                                              IncorrectStatusException, IllegalAccessException {
+            IncorrectStatusException, IllegalAccessException, RequestNotAssignedException {
         requestService.addToRequestGroup(requestId, requestGroupDTO.getId(), principal);
     }
 

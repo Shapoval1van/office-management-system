@@ -25,12 +25,15 @@
                 $scope.periodList = ["Day", "Month", "All"];
                 $scope.chosenPeriod = "Month";
 
+                $scope.subscribers = [];
+
                 var requestId = $routeParams.requestId;
 
                 $scope.getRequest = function () {
                     RequestService.getRequestById(requestId)
                         .then(function (callback) {
                             $scope.request = callback.data;
+                            $scope.getSubscribers();
                         }, function (callback) {
                             console.log("Error");
                             console.log(callback);
@@ -239,6 +242,37 @@
                     return $scope.updateRequestStatus(1);
                 };
 
+                $scope.subscribe = function () {
+                    return PersonService.subscribe($scope.request.id)
+                        .then(function (callback) {
+                            $scope.getRequest();
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.unsubscribe = function () {
+                    return PersonService.unsubscribe($scope.request.id)
+                        .then(function (callback) {
+                            $scope.getRequest();
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.getSubscribers = function () {
+                    return PersonService.getSubscribers($scope.request.id)
+                        .then(function (callback) {
+                            $scope.subscribers = callback.data;
+                        }, function (callback) {
+
+                        });
+                };
+
+                $scope.isCurrentUserSubscribing = function () {
+                    return PersonService.isPersonSubscribing($scope.subscribers, currentUser.id);
+                };
+
                 $scope.isCanceled = function () {
                     return RequestService.isCanceled($scope.request);
                 };
@@ -274,33 +308,6 @@
                 $scope.isFree = function () {
                     return $scope.request.status.name === "FREE";
                 };
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'
-                // }).then(function successCallback(response) {
-                //     $scope.historyList = buildHistoryList(response.data);
-                // }, function errorCallback(response) {
-                //
-                // });
-                //
-                // $scope.historyForPeriod = function (item_selected) {
-                //     var period = item_selected.toLowerCase();
-                //     $http({
-                //         method: 'GET',
-                //         url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
-                //     }).then(function successCallback(response) {
-                //         $scope.historyList = buildHistoryList(response.data);
-                //     }, function errorCallback(response) {
-                //
-                //     });
-                // };
-
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/sub/' + $routeParams.requestId
-                // }).then(function successCallback(response) {
-                //     $scope.subRequest = response.data;
-                // }, function errorCallback(response) {
 
             }])
 })();
