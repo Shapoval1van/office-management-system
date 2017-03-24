@@ -5,6 +5,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.repository.common.Pageable;
@@ -14,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestGroupService {
-    List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable);
+    Page<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable);
+
+    Page<RequestGroupDTO> getRequestGroupDTOByAuthorId(Long authorId, Pageable pageable);
 
     List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId);
 
@@ -24,9 +27,9 @@ public interface RequestGroupService {
 
     Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist;
 
-    void removeRequestGroup(Integer requestGroupId) throws ResourceNotFoundException;
+    void removeRequestGroup(Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
-    int getRequestGroupCountByAuthor(Long authorId);
+    Long getRequestGroupCountByAuthor(Long authorId);
 
     void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;
 }

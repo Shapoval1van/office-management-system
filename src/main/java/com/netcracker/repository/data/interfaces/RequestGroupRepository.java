@@ -12,7 +12,7 @@ public interface RequestGroupRepository extends JdbcRepository<RequestGroup, Int
 
     List<RequestGroup> findRequestGroupByNameRegex(String regex, Long authorId);
 
-    int countRequestGroupByAuthor(Long authorId);
+    Long countRequestGroupByAuthor(Long authorId);
 
     Optional<RequestGroup> findRequestGroupByNameAndAuthor(String name, Long authorId);
 }

@@ -1,6 +1,5 @@
 package com.netcracker.repository.data.interfaces;
 
-import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -44,6 +43,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     Long countAllRequestByEmployee(Long employeeId);
 
     Long countAllRequestByManager(Long managerId);
+
+    Long countRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 

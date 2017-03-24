@@ -5,6 +5,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.entity.*;
 import com.netcracker.repository.common.Pageable;
@@ -20,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -53,8 +55,33 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Override
     @PreAuthorize("isAuthenticated()")
-    public List<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
-        return requestGroupRepository.findRequestGroupByAuthorId(authorId, pageable);
+    public Page<RequestGroup> getRequestGroupByAuthorId(Long authorId, Pageable pageable) {
+
+        List<RequestGroup> requestGroupsByAuthor = requestGroupRepository.findRequestGroupByAuthorId(authorId, pageable);
+
+        Long count = requestGroupRepository.countRequestGroupByAuthor(authorId);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestGroupsByAuthor);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Page<RequestGroupDTO> getRequestGroupDTOByAuthorId(Long authorId, Pageable pageable) {
+
+        Page<RequestGroup> requestGroupPage = getRequestGroupByAuthorId(authorId, pageable);
+
+        List<RequestGroup> requestGroupsByAuthor = (List<RequestGroup>) requestGroupPage.getData();
+
+        List<RequestGroupDTO> requestGroupDTOList = new LinkedList<>();
+
+        requestGroupsByAuthor.forEach(requestGroup -> {
+            RequestGroupDTO requestGroupDTO = new RequestGroupDTO(requestGroup);
+            requestGroupDTO.setRequestCount(requestRepository.countRequestsByRequestGroupId(requestGroup.getId()));
+            requestGroupDTOList.add(requestGroupDTO);
+        });
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(),
+                requestGroupPage.getTotalElements(), requestGroupDTOList);
     }
 
     @Override
@@ -117,11 +144,23 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         return saveRequestGroup(requestGroup);
     }
 
+    /**
+     * All request removed
+     *
+     * @param requestGroupId
+     * @param principal
+     * @throws ResourceNotFoundException
+     * @throws IllegalAccessException
+     */
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public void removeRequestGroup(Integer requestGroupId) throws ResourceNotFoundException {
+    public void removeRequestGroup(Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
 
         RequestGroup requestGroup = getRequestGroupById(requestGroupId);
+
+        if (!isAccessLegal(requestGroup, principal))
+            throw new IllegalAccessException(messageSource
+                    .getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, LOCALE));
 
         List<Request> requests = requestRepository.findRequestsByRequestGroupId(requestGroup.getId());
         requests.forEach(request -> requestRepository.removeRequestFromRequestGroup(request.getId()));
@@ -131,7 +170,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Override
     @PreAuthorize("isAuthenticated()")
-    public int getRequestGroupCountByAuthor(Long authorId) {
+    public Long getRequestGroupCountByAuthor(Long authorId) {
         return requestGroupRepository.countRequestGroupByAuthor(authorId);
     }
 
