@@ -13,7 +13,7 @@ import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +46,7 @@ public class ReportServiceImpl implements ReportService {
     private RequestService requestService;
 
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period) throws CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
         Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
@@ -62,8 +62,27 @@ public class ReportServiceImpl implements ReportService {
         return requestArrayList;
     }
 
+
+    @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public List<Request> getAllRequestByAdminForPeriodWithAlternativeRole(Long personId, String period, Role alternativeRole)
+            throws CurrentUserNotPresentException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
+                messageSource.getMessage(USER_ERROR_NOT_PRESENT, new Object[]{personId}, locale)));
+        if(alternativeRole.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period);
+            requestArrayList.forEach(request -> requestService.fill(request));
+            return requestArrayList;
+        }
+        List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+        requestArrayList.forEach(request -> requestService.fill(request));
+        return requestArrayList;
+    }
+
+    @Transactional(readOnly = true)
+//    @PreAuthorize("isAuthenticated()")
     public List<Request> getAllRequestByPersonIdForPeriod(Long personId, String period, Pageable pageable)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -82,9 +101,29 @@ public class ReportServiceImpl implements ReportService {
         return requestArrayList;
     }
 
+
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public List<Request> getAllRequestByAdminForPeriodWithAlternativeRole(@P("id")Long personId, String period,
+                                                                          Role alternativeRole, Pageable pageable)
+            throws CurrentUserNotPresentException {
+        Locale locale = LocaleContextHolder.getLocale();
+        Person person = personRepository.findOne(personId).orElseThrow(() -> new CurrentUserNotPresentException(
+                messageSource.getMessage(USER_ERROR_NOT_PRESENT, new Object[]{personId}, locale)));
+        if(alternativeRole.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period, pageable);
+            requestArrayList.forEach(request -> requestService.fill(request));
+            return requestArrayList;
+        }
+        List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period, pageable);
+        requestArrayList.forEach(request -> requestService.fill(request));
+        return requestArrayList;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+//    @PreAuthorize("isAuthenticated()")
     public List<ReportDTO> getDataForChartsToManager(Long personId, String period, ChartsType chartsType)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
@@ -101,7 +140,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public List<ReportDTO> getDataForChartsToEmployee(Long personId, String period, ChartsType chartsType)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
@@ -116,12 +155,43 @@ public class ReportServiceImpl implements ReportService {
         return new ArrayList<>();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public List<ReportDTO> getDataForChartsToAdmin(Long personId, String period, ChartsType chartsType, Role alternativeRole)
+            throws CurrentUserNotPresentException {
+        Person person = getPerson(personId);
+        List<Request> requestList;
+        if(alternativeRole.getName().equals(Role.ROLE_EMPLOYEE)){
+            requestList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period);
+        }else{
+            requestList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period);
+        }
+        if (chartsType == ChartsType.AREA) {
+            return period.toLowerCase().equals("year") ? buildReportDTOtoColumnCharts(requestList) : buildReportDTOtoAreaCharts(requestList);
+        } else if (chartsType == ChartsType.PIE) {
+            return buildReportDTOtoPieCharts(requestList);
+        }
+        return new ArrayList<>();
+    }
 
     @Override
+    @Transactional(readOnly = true)
+//    @PreAuthorize("isAuthenticated()")
     public Long countRequestByPersonIdForPeriod(Long personId, String reportPeriod) {
         Person person = personRepository.findOne(personId).get();
         Role role = roleRepository.findRoleById(person.getRole().getId()).get();
         if(role.getName().equals(Role.ROLE_OFFICE_MANAGER)){
+            return requestRepository.countAllAssignedRequestToManagerForPeriod(personId, reportPeriod);
+        }
+        return requestRepository.countRequestByEmployeeIdForPeriod(personId, reportPeriod);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Long countRequestByAdminIdForPeriod(Long personId, String reportPeriod, Role alternativeRole) {
+        if(alternativeRole.getName().equals(Role.ROLE_OFFICE_MANAGER)){
             return requestRepository.countAllAssignedRequestToManagerForPeriod(personId, reportPeriod);
         }
         return requestRepository.countRequestByEmployeeIdForPeriod(personId, reportPeriod);

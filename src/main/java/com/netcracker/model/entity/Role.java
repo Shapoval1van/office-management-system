@@ -23,6 +23,10 @@ public class Role implements Persistable<Integer>, GrantedAuthority {
         this.id = id;
     }
 
+    public Role(String name) {
+        this.name = name;
+    }
+
     @Override
     public Integer getId() {
         return id;

@@ -1,10 +1,12 @@
 package com.netcracker.service.security.customExpression;
 
+
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.repository.data.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,9 @@ public class CustomExpressionServiceImpl implements CustomExpressionService {
 
     @Autowired
     private RequestRepository requestRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PersonRepository personRepository;
