@@ -24,6 +24,8 @@ public interface RequestGroupService {
 
     Optional<RequestGroup> updateRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws ResourceNotFoundException, IllegalAccessException, RequestGroupAlreadyExist;
 
+    void removeRequestGroup(Integer requestGroupId) throws ResourceNotFoundException;
+
     int getRequestGroupCountByAuthor(Long authorId);
 
     void setRequestGroupStatus(Integer requestGroupId, Integer statusId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException;

@@ -118,6 +118,18 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public void removeRequestGroup(Integer requestGroupId) throws ResourceNotFoundException {
+
+        RequestGroup requestGroup = getRequestGroupById(requestGroupId);
+
+        List<Request> requests = requestRepository.findRequestsByRequestGroupId(requestGroup.getId());
+        requests.forEach(request -> requestRepository.removeRequestFromRequestGroup(request.getId()));
+
+        requestGroupRepository.delete(requestGroupId);
+    }
+
+    @Override
     @PreAuthorize("isAuthenticated()")
     public int getRequestGroupCountByAuthor(Long authorId) {
         return requestGroupRepository.countRequestGroupByAuthor(authorId);
