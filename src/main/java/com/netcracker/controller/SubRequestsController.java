@@ -3,7 +3,6 @@ package com.netcracker.controller;
 import com.netcracker.exception.BadRequestException;
 import com.netcracker.exception.CannotCreateSubRequestException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PriorityDTO;
 import com.netcracker.model.dto.RequestDTO;
 import com.netcracker.model.dto.StatusDTO;
@@ -28,14 +27,14 @@ public class SubRequestsController {
     @PostMapping("/api/request/{requestId}/subrequests")
     public RequestDTO createSubrequest(@PathVariable Long requestId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
-                                       Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException {
+                                       Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
         Request sub = requestDTO.toRequest();
-        return new RequestDTO(service.createRequest(requestId, sub, principal.getName()));
+        return new RequestDTO(service.createRequest(requestId, sub, principal));
     }
 
     @GetMapping("/api/request/{requestId}/subrequests")
-    public List<RequestDTO> getSubrequests(@PathVariable Long requestId, Principal principal) throws ResourceNotFoundException, BadRequestException {
-        return service.getAllSubRequest(requestId, principal.getName()).stream()
+    public List<RequestDTO> getSubrequests(@PathVariable Long requestId, Principal principal) throws ResourceNotFoundException, BadRequestException, CannotCreateSubRequestException {
+        return service.getAllSubRequest(requestId, principal).stream()
                 .map(request -> new RequestDTO(request)).collect(Collectors.toList());
     }
 
@@ -43,7 +42,7 @@ public class SubRequestsController {
     public void deleteSubrequest(@PathVariable Long requestId,
                                  @PathVariable Long subId,
                                  Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
-        service.deleteSubRequest(requestId, subId,principal.getName());
+        service.deleteSubRequest(requestId, subId, principal);
     }
 
     @PutMapping("/api/request/{requestId}/subrequests/{subId}")
@@ -51,7 +50,7 @@ public class SubRequestsController {
                                        @PathVariable Long subId,
                                        @Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                        Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
-        return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest(),principal.getName()));
+        return new RequestDTO(service.updateRequest(subId, requestId, requestDTO.toRequest(), principal));
     }
 
     @GetMapping("/api/priorities")
