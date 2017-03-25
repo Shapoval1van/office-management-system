@@ -18,8 +18,6 @@ public interface NotificationSender {
 
     void sendPasswordForNewManager(Person person);
 
-    void sendChangeStatusEvent(Person person, String link);
-
     void sendNewRequestEvent(Person person);
 
     void sendUpdateUserEvent(Person person);

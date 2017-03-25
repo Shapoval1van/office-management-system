@@ -14,15 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-import static com.netcracker.util.MessageConstant.REQUEST_UPDATE_MESSAGE_BODY;
-import static com.netcracker.util.MessageConstant.REQUEST_UPDATE_MESSAGE_SUBJECT;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @PropertySource("classpath:notification/templates/notificationTemplates.properties")
@@ -55,6 +54,8 @@ public class NotificationService implements NotificationSender {
     private String USER_RECOVER_SUBJECT;
     @Value("${request.expiry.reminder.message.subject}")
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
+    @Value("${update.request.message.subject}")
+    private String REQUEST_UPDATE_MESSAGE_SUBJECT;
 
 
     @Value("${password.reminder.message.src}")
@@ -79,6 +80,8 @@ public class NotificationService implements NotificationSender {
     private String USER_DELETE_MESSAGE_SRC;
     @Value("${recover.deleted.user.message.src}")
     private String USER_RECOVER_MESSAGE_SRC;
+    @Value("${server.source}")
+    private String SERVER_SOURCE;
 
     @Autowired
     private MailService mailService;
@@ -133,29 +136,11 @@ public class NotificationService implements NotificationSender {
         mailService.send(notification);
     }
 
-
-    @Override
-    public void sendChangeStatusEvent(Person person, String link) {
-        Notification notification = NotificationBuilder.build(person,
-                REQUEST_STATUS_CHANGE_SUBJECT,
-                STATUS_CHANGE_MESSAGE_SRC,
-                link);
-        mailService.send(notification);
-    }
-
     @Override
     public void sendNewRequestEvent(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 NEW_REQUEST_SUBJECT,
                 NEW_REQUEST_MESSAGE_SRC);
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendUpdateRequestEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                REQUEST_UPDATE_SUBJECT,
-                REQUEST_UPDATE_MESSAGE_SRC);
         mailService.send(notification);
     }
 
@@ -223,8 +208,9 @@ public class NotificationService implements NotificationSender {
     public void sendRequestExpiryReminder(List<Request> expiringRequests) {
         expiringRequests.forEach(request -> {
             Notification notification = NotificationBuilder.build(request.getManager(),
-                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT,
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT.concat(request.getName()),
                     REQUEST_EXPIRY_REMINDER_MESSAGE_SRC,
+                    detailsLink(request.getId()),
                     request);
             mailService.send(notification);
         });
@@ -232,31 +218,25 @@ public class NotificationService implements NotificationSender {
 
     @Override
     public void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
-
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
 
         subscribers.forEach(person -> {
-            String link = buildRequestDetailsLink(oldRequest.getId());
-            String requestUpdateMessageSubject = messageSource.getMessage(REQUEST_UPDATE_MESSAGE_SUBJECT,
-                    new Object[]{oldRequest.getName()}, locale);
+            String requestUpdateMessageSubject = REQUEST_UPDATE_MESSAGE_SUBJECT.concat(oldRequest.getName());
 
             changeItemSet.forEach(changeItem -> {
-                String requestUpdateMessageBody = messageSource.getMessage(REQUEST_UPDATE_MESSAGE_BODY,
-                        new Object[]{changeItem.getField().getName(), changeItem.getOldVal(),
-                                changeItem.getNewVal(), changeTime, link}, locale);
-
-                mailService.send(person.getEmail(), requestUpdateMessageSubject, requestUpdateMessageBody);
+                Notification notification = NotificationBuilder.build(person, requestUpdateMessageSubject,
+                        REQUEST_UPDATE_MESSAGE_SRC, detailsLink(oldRequest.getId()), oldRequest,
+                        new ChangeItem(changeItem.getOldVal(), changeItem.getNewVal(), changeItem.getField()));
+                mailService.send(notification);
             });
         });
-
     }
 
-    private String buildRequestDetailsLink(Long requestId) {
+    private String detailsLink(Long requestId) {
         return new StringBuilder()
-                .append("https://management-office.herokuapp.com/request/")
+                .append(SERVER_SOURCE)
+                .append("request/")
                 .append(requestId)
                 .append("/details")
                 .toString();
