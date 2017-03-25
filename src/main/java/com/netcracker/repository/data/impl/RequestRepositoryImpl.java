@@ -362,6 +362,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
         return super.findOne(requestId);
     }
 
+    @Override
+    public Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId) {
+        return this.queryForObject("SELECT * FROM request WHERE request_id  = ? AND parent_id = ?", id, parenId);
+    }
+
     private String getQueryByPeriod(String period, String role) {
         switch (period) {
             case "month":

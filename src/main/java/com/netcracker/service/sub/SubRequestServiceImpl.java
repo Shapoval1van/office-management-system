@@ -31,6 +31,10 @@ public class SubRequestServiceImpl {
     private final static String INVALID_ESTIMATE_MESSAGE = "Invalid estimate";
     private final static String INVALID_PRIORITY_MESSAGE = "Invalid priority";
     private final static String INTERNAL_ERROR_MESSAGE = "Internal error";
+    private final static String PERSON_NOT_FOUND_MESSAGE = "Person not found";
+    private final static String SUBREQUEST_NOT_FOUND_MESSAGE = "Subrequest not found";
+    private final static String ACCESS_DENIED_MESSAGE = "Access denied";
+    private final static String CLOSED_REQUEST_ERROR_MESSQGE = "Parent request status is CLOSED";
 
     @Autowired
     private StatusRepository statusRepository;
@@ -45,16 +49,18 @@ public class SubRequestServiceImpl {
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Request createRequest(Long parenId, Request subrequest, Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
 
-        Request parentRequest = this.verifyParent(parenId);
-        subrequest.setParent(this.verifyParent(parenId));
+        Request parentRequest = this.loadParent(parenId);
+        this.verifyParenStatus(parentRequest);
+        subrequest.setParent(this.loadParent(parenId));
 
-        Person creator = this.verifyPerson(principal, parentRequest);
+        Person creator = this.loadPerson(principal);
+        this.verifyPermission(parentRequest, creator);
         subrequest.setEmployee(creator);
 
-        Priority priority = this.verifyPriority(subrequest.getPriority(), "NORMAL");
+        Priority priority = this.loadPriority(subrequest.getPriority(), "NORMAL");
         subrequest.setPriority(priority);
 
-        Status statusFree = this.verifyStatus(null, StatusEnum.FREE);
+        Status statusFree = this.loadStatus(null, StatusEnum.FREE);
         subrequest.setStatus(statusFree);
 
         subrequest.setCreationTime(new Timestamp(new Date().getTime()));
@@ -70,11 +76,14 @@ public class SubRequestServiceImpl {
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Request updateRequest(Long subId, Long parenId, Request subrequest, Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
 
-        Request parent = this.verifyParent(parenId);
+        Request parentRequest = this.loadParent(parenId);
+        this.verifyParenStatus(parentRequest);
 
-        Request savedRequest = this.verifySubrequest(subId, parent);
+        Request savedRequest = this.loadSubrequest(subId, parentRequest);
 
-        Person updater = this.verifyPerson(principal, parent);
+        Person updater = this.loadPerson(principal);
+
+        this.verifyPermission(parentRequest, updater);
 
         if (subrequest.getName()!=null){
             savedRequest.setName(subrequest.getName());
@@ -83,18 +92,18 @@ public class SubRequestServiceImpl {
         savedRequest.setDescription(subrequest.getDescription());
 
         if (subrequest.getStatus()!=null){
-            Status newStatus = this.verifyStatus(subrequest.getStatus(), null);
+            Status newStatus = this.loadStatus(subrequest.getStatus(), null);
             savedRequest.setStatus(newStatus);
         }
 
         if (subrequest.getPriority()!=null){
-            Priority newPriority = this.verifyPriority(subrequest.getPriority(), null);
+            Priority newPriority = this.loadPriority(subrequest.getPriority(), null);
             savedRequest.setPriority(newPriority);
         }
 
         if (subrequest.getEstimate()!=null){
             savedRequest.setEstimate(subrequest.getEstimate());
-            this.verifyEstimate(subrequest, parent);
+            this.verifyEstimate(subrequest, parentRequest);
         } else {
             savedRequest.setEstimate(null);
         }
@@ -105,20 +114,28 @@ public class SubRequestServiceImpl {
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public List<Request> getAllSubRequest(Long parentId, Principal principal) throws ResourceNotFoundException, BadRequestException, CannotCreateSubRequestException {
-        Request parent = verifyParent(parentId);
-        Person person = verifyPerson(principal, parent);
 
-        return requestRepository.getAllSubRequest(parent.getId());
+        Request parentRequest = loadParent(parentId);
+
+
+        Person person = loadPerson(principal);
+
+        this.verifyPermission(parentRequest, person);
+
+        return requestRepository.getAllSubRequest(parentRequest.getId());
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void deleteSubRequest(Long parentId, Long subId, Principal principal) throws ResourceNotFoundException, BadRequestException, CannotCreateSubRequestException {
-        Request parent = this.verifyParent(parentId);
+        Request parentRequest = this.loadParent(parentId);
+        this.verifyParenStatus(parentRequest);
 
-        Person person = this.verifyPerson(principal, parent);
+        Person person = this.loadPerson(principal);
 
-        Request sub = this.verifySubrequest(subId, parent);
+        this.verifyPermission(parentRequest, person);
+
+        Request sub = this.loadSubrequest(subId, parentRequest);
 
         requestRepository.delete(sub.getId());
     }
@@ -135,47 +152,55 @@ public class SubRequestServiceImpl {
         return priorityRepository.findAll();
     }
 
-    private Person verifyPerson(Principal principal, Request parentRequest) throws CannotCreateSubRequestException, ResourceNotFoundException {
-        Person person;
+    private Person loadPerson(Principal principal) throws ResourceNotFoundException, BadRequestException {
         if (principal != null && principal.getName() != null){
-            person = personRepository.findPersonByEmail(principal.getName())
-                    .orElseThrow(() -> new ResourceNotFoundException("Person not found."));
+            return personRepository.findPersonByEmail(principal.getName())
+                    .orElseThrow(() -> new ResourceNotFoundException(PERSON_NOT_FOUND_MESSAGE));
         } else {
-            throw new ResourceNotFoundException("Person not found.");
+            throw new BadRequestException();
         }
+    }
 
+    private Request loadParent(Long id) throws ResourceNotFoundException, BadRequestException {
+        if (id != null){
+            Request parentRequest = requestRepository.findOne(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(PARENT_NOT_FOUND_MESSAGE));
+            if (parentRequest.getParent() != null){
+                throw new BadRequestException(SUBREQUEST_CHILD_MESSAGE);
+            }
+            return parentRequest;
+        } else {
+            throw new BadRequestException();
+        }
+    }
+
+    private void verifyParenStatus(Request parentRequest) throws BadRequestException {
+        if (parentRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId()) ||
+                parentRequest.getStatus().getId().equals(StatusEnum.CANCELED.getId())){
+            throw new BadRequestException(CLOSED_REQUEST_ERROR_MESSQGE);
+        }
+    }
+
+    private void verifyPermission(Request parentRequest, Person person ) throws CannotCreateSubRequestException {
         if (!person.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
-            if (parentRequest.getManager()==null || parentRequest.getManager().getId() != person.getId()){
-                throw new CannotCreateSubRequestException("You can not create subrequest.");
+            if (parentRequest.getManager() ==null || parentRequest.getManager().getId() != person.getId()){
+                throw new CannotCreateSubRequestException(ACCESS_DENIED_MESSAGE);
             }
         }
-        return person;
     }
 
-    private Request verifyParent(Long id) throws ResourceNotFoundException, BadRequestException {
-        Request parentRequest = requestRepository.findOne(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PARENT_NOT_FOUND_MESSAGE));
-        if (parentRequest.getParent() != null){
-            throw new BadRequestException(SUBREQUEST_CHILD_MESSAGE);
+    private Request loadSubrequest(Long id, Request parentRequest) throws ResourceNotFoundException, BadRequestException {
+        Request subRequest;
+        if (id != null){
+            subRequest = requestRepository.findSubrequestByIdAndParent(id, parentRequest.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(SUBREQUEST_NOT_FOUND_MESSAGE));
+            return subRequest;
+        } else {
+            throw new BadRequestException();
         }
-        return parentRequest;
     }
 
-    private Request verifySubrequest(Long id, Request parentRequest) throws ResourceNotFoundException, BadRequestException {
-        Request subRequest = requestRepository.findOne(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Subrequest not found."));
-
-        if (subRequest.getParent()==null){
-            throw new BadRequestException("This request is not a subrequest.");
-        }
-
-        if (subRequest.getParent().getId() != parentRequest.getId()){
-            throw new BadRequestException("This request is not a subrequest.");
-        }
-        return subRequest;
-    }
-
-    private Priority verifyPriority(Priority priority, String defaultPriorityName) throws CannotCreateSubRequestException, ResourceNotFoundException {
+    private Priority loadPriority(Priority priority, String defaultPriorityName) throws CannotCreateSubRequestException, ResourceNotFoundException {
         if (priority != null){
             return priorityRepository.findOne(priority.getId())
                     .orElseThrow(() -> new ResourceNotFoundException(INVALID_PRIORITY_MESSAGE));
@@ -186,7 +211,7 @@ public class SubRequestServiceImpl {
         return null;
     }
 
-    private Status verifyStatus(Status status, StatusEnum defaultStatus) throws ResourceNotFoundException {
+    private Status loadStatus(Status status, StatusEnum defaultStatus) throws ResourceNotFoundException {
         if (status != null){
             return statusRepository.findOne(status.getId())
                     .orElseThrow(() -> new ResourceNotFoundException(INTERNAL_ERROR_MESSAGE));

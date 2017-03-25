@@ -74,4 +74,6 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> getFreeRequests(Pageable pageable);
 
     List<Request> getFreeRequests();
+
+    Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId);
 }
