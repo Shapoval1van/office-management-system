@@ -9,9 +9,10 @@ public class Notification implements Persistable<Long> {
 
     private Long id;
     private Person person;
-    private String link = "";
-    private String text = "";
-    private String subject = "";
+    private String link;
+    private String template;
+    private String text;
+    private String subject;
     private Request request;
     private ChangeItem changeItem;
 
@@ -41,12 +42,12 @@ public class Notification implements Persistable<Long> {
         this.link = link;
     }
 
-    public String getText() {
-        return text;
+    public String getTemplate() {
+        return template;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setTemplate(String template) {
+        this.template = template;
     }
 
     public String getSubject() {
@@ -71,5 +72,13 @@ public class Notification implements Persistable<Long> {
 
     public void setChangeItem(ChangeItem changeItem) {
         this.changeItem = changeItem;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

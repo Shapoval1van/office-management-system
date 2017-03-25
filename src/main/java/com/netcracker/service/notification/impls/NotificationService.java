@@ -12,7 +12,6 @@ import com.netcracker.util.ChangeTracker;
 import com.netcracker.util.NotificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-@PropertySource("classpath:notification/templates/notificationTemplates.properties")
+@PropertySource("classpath:property/notification/notificationTemplates.properties")
 public class NotificationService implements NotificationSender {
 
     @Autowired
@@ -34,12 +33,8 @@ public class NotificationService implements NotificationSender {
 
     @Value("${password.reminder.subject}")
     private String PASSWORD_REMINDER_SUBJECT;
-    @Value("${information.message.subject}")
-    private String INFORMATION_MESSAGE_SUBJECT;
     @Value("${registration.message.subject}")
     private String REGISTRATION_MESSAGE_SUBJECT;
-    @Value("${custom.information.message.subject}")
-    private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
     @Value("${status.message.subject}")
     private String REQUEST_STATUS_CHANGE_SUBJECT;
     @Value("${new.request.message.subject}")
@@ -60,10 +55,6 @@ public class NotificationService implements NotificationSender {
 
     @Value("${password.reminder.message.src}")
     private String PASSWORD_REMINDER_MESSAGE_SRC;
-    @Value("${information.message.src}")
-    private String INFORMATION_MESSAGE_SRC;
-    @Value("${custom.information.message.src}")
-    private String CUSTOM_INFORMATION_MESSAGE_SRC;
     @Value("${registration.message.src}")
     private String REGISTRATION_MESSAGE_SRC;
     @Value("${requestStatus.message.src}")
@@ -80,6 +71,8 @@ public class NotificationService implements NotificationSender {
     private String USER_DELETE_MESSAGE_SRC;
     @Value("${recover.deleted.user.message.src}")
     private String USER_RECOVER_MESSAGE_SRC;
+    @Value("${simple.message.src}")
+    private String SIMPLE_MESSAGE_SRC;
     @Value("${server.source}")
     private String SERVER_SOURCE;
 
@@ -90,10 +83,6 @@ public class NotificationService implements NotificationSender {
     private PersonRepository personRepository;
 
     @Autowired
-    private MessageSource messageSource;
-
-
-    @Autowired
     public void setNotificationRepository(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
@@ -102,6 +91,7 @@ public class NotificationService implements NotificationSender {
     public void sendPasswordReminder(Person person, String link) {
         Notification notification = NotificationBuilder.build(person,
                 PASSWORD_REMINDER_SUBJECT,
+                SIMPLE_MESSAGE_SRC,
                 PASSWORD_REMINDER_MESSAGE_SRC,
                 link);
 
@@ -109,38 +99,22 @@ public class NotificationService implements NotificationSender {
     }
 
     @Override
-    public void sendInformationNotification(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                INFORMATION_MESSAGE_SUBJECT,
-                INFORMATION_MESSAGE_SRC);
-
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendCustomInformationNotification(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                CUSTOM_INFORMATION_MESSAGE_SUBJECT,
-                CUSTOM_INFORMATION_MESSAGE_SRC);
-
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendRegistrationCompletedNotification(Person person, String link) {
+    public void sendRegistrationCompletedNotification(Person person, String token) {
         Notification notification = NotificationBuilder.build(person,
                 REGISTRATION_MESSAGE_SUBJECT,
+                SIMPLE_MESSAGE_SRC,
                 REGISTRATION_MESSAGE_SRC,
-                link);
-
+                SERVER_SOURCE.concat("login/").concat(token));
         mailService.send(notification);
     }
 
     @Override
-    public void sendNewRequestEvent(Person person) {
+    public void sendNewRequestEvent(Person person, Request request) {
         Notification notification = NotificationBuilder.build(person,
-                NEW_REQUEST_SUBJECT,
-                NEW_REQUEST_MESSAGE_SRC);
+                NEW_REQUEST_SUBJECT.concat(request.getName()),
+                SIMPLE_MESSAGE_SRC,
+                NEW_REQUEST_MESSAGE_SRC,
+                detailsLink(request.getId()));
         mailService.send(notification);
     }
 
@@ -148,7 +122,8 @@ public class NotificationService implements NotificationSender {
     public void sendUpdateUserEvent(Person person) {
         Notification notification = NotificationBuilder.build(person,
                 USER_UPDATE_SUBJECT,
-                USER_UPDATE_MESSAGE_SRC);
+                USER_UPDATE_MESSAGE_SRC,
+                SERVER_SOURCE);
         mailService.send(notification);
     }
 
@@ -236,6 +211,7 @@ public class NotificationService implements NotificationSender {
     private String detailsLink(Long requestId) {
         return new StringBuilder()
                 .append(SERVER_SOURCE)
+                .append("secured/")
                 .append("request/")
                 .append(requestId)
                 .append("/details")

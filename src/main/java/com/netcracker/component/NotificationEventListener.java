@@ -18,9 +18,7 @@ public class NotificationEventListener {
 
     @EventListener
     public void handlePersonRegistration(PersonRegistrationEvent event) {
-        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
-        notificationService.sendRegistrationCompletedNotification(event.getPerson(),
-                SITE_LINK.concat("/").concat(event.getToken().getTokenValue()));
+        notificationService.sendRegistrationCompletedNotification(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
@@ -41,7 +39,7 @@ public class NotificationEventListener {
 
     @EventListener
     public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
-        notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
+        notificationService.sendNewRequestEvent(newRequestEvent.getPerson(), newRequestEvent.getRequest());
     }
 
     @EventListener

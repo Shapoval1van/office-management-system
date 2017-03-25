@@ -164,7 +164,7 @@ public class RequestServiceImpl implements RequestService {
                         .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
-        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
+        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager, request));
         Optional<Request> savedRequest = this.requestRepository.save(request);
         //            Automatically subscribe author to request
         personRepository.subscribe(savedRequest.get().getId(), savedRequest.get().getEmployee().getId());

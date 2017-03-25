@@ -59,7 +59,6 @@ public class MailService implements MailSending {
     @Override
     @Async
     public void send(Notification notification) {
-        SimpleMailMessage msg = new SimpleMailMessage();
         try {
             MimeMessagePreparator preparator = new MimeMessagePreparator() {
                 @Override
