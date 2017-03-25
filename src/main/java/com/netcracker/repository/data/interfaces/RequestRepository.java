@@ -1,6 +1,5 @@
 package com.netcracker.repository.data.interfaces;
 
-import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Priority;
 import com.netcracker.model.entity.Request;
@@ -14,6 +13,8 @@ import java.util.Optional;
 
 public interface RequestRepository extends JdbcRepository<Request, Long> {
     int changeRequestStatus(Request request, Status status);
+
+    int deleteRequest(Request request);
 
     List<Request> getAllRequests();
 

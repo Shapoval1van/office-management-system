@@ -12,11 +12,14 @@ public class MessageConstant {
 
     //REQUEST ERROR
     public static final String REQUEST_ERROR_NOT_EXIST = "request.error.not.exist";
+    public static final String REQUEST_ERROR_DELETE_CANCELED = "request.error.delete.canceled";
     public static final String REQUEST_ERROR_DELETE_CLOSED = "request.error.delete.closed";
     public static final String REQUEST_ERROR_DELETE_NOT_PERMISSION = "request.error.delete.not.permission";
     public static final String REQUEST_ERROR_DELETE_NOT_FREE = "request.error.delete.not.free";
     public static final String REQUEST_ERROR_ALREADY_ASSIGNED = "request.error.already.assigned";
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
+    public static final String REQUEST_ERROR_UPDATE_CANCELED = "request.error.update.canceled";
+    public static final String REQUEST_ERROR_UPDATE_CLOSED = "request.error.update.closed";
     public static final String REQUEST_ERROR_UPDATE_NOT_PERMISSION = "request.error.update.not.permission";
     public static final String REQUEST_ERROR_UPDATE_NON_FREE = "request.error.update.non.free";
     public static final String REQUEST_ERROR_NOT_EXIST_PERSON_OR_REQUEST = "request.error.not.exist.person.or.request";

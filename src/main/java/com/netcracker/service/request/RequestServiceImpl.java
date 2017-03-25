@@ -180,20 +180,15 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         Optional<Person> employee = personRepository.findOne(newRequest.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
+
         if (!oldRequest.isPresent()) return Optional.empty();
-        if (isCurrentUserAdmin(principal)) {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(), new Request(oldRequest.get().getId())));
-            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(newRequest);
-//        } else if (currentUser.get().getId().equals(employee.get().getId())
-//                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
-//                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
-//            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
-//            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-//            return this.requestRepository.updateRequest(newRequest);
-        } else if (!employee.get().getId().equals(currentUser.get().getId())) {
+        if (StatusEnum.CANCELED.getId().equals(oldRequest.get().getStatus().getId())){
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CANCELED, null, locale));
+        } else if (StatusEnum.CLOSED.getId().equals(oldRequest.get().getStatus().getId())){
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CLOSED, null, locale));
+        } else if (!employee.get().getId().equals(currentUser.get().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (oldRequest.get().getStatus().getId() != StatusEnum.FREE.getId()) {
+        } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest.get(), newRequest, new Date()));
@@ -346,20 +341,26 @@ public class RequestServiceImpl implements RequestService {
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Request request = getRequestById(id).get();
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
-        if (StatusEnum.CLOSED.getName().equals(request.getStatus().getName()))
+        Optional<Request> requestOptional = requestRepository.findOne(id);
+        if (!requestOptional.isPresent())
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{id}, locale));
+        Request request = requestOptional.get();
+
+        if (StatusEnum.CANCELED.getId().equals(request.getStatus().getId()))
+            throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CANCELED, null, locale));
+        else if (StatusEnum.CLOSED.getId().equals(request.getStatus().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CLOSED, null, locale));
         else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.getEmployee().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_PERMISSION, null, locale));
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), principal.getName());
+            requestRepository.deleteRequest(request);
             if (request.getParent() == null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty())
-                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()), principal.getName()));
+                    subRequestList.forEach(r -> requestRepository.deleteRequest(r));
             }
         }
     }
@@ -368,33 +369,14 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int changeRequestStatus(Request request, Status status, String authorName) {
-        if (request.getEmployee() != null) {
-            Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
-            Optional<Request> requestDB = requestRepository.findOne(request.getId());
-            //history
-            Request newRequest = new Request(requestDB.get());
-            newRequest.setStatus(status);
-
-            updateRequestHistory(newRequest, requestDB.get(), authorName);
-
-            eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
-
-            eventPublisher.publishEvent(new ChangeRequestEvent(requestDB.get(), newRequest, new Date()));
-
-            return requestRepository.changeRequestStatus(request, status);
-        }
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
-        //history
         Request newRequest = new Request(requestDB.get());
+
         newRequest.setStatus(status);
-
         updateRequestHistory(newRequest, requestDB.get(), authorName);
-
         eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
-
         eventPublisher.publishEvent(new ChangeRequestEvent(requestDB.get(), newRequest, new Date()));
-
         return requestRepository.changeRequestStatus(request, status);
     }
 

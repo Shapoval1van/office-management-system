@@ -47,6 +47,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.by.manager}")
     public String GET_ALL_REQUESTS_BY_MANAGER;
 
+    @Value("${request.delete}")
+    private String DELETE_REQUEST;
+
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
 
@@ -178,7 +181,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
-        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
+        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId(), request.getId());
+    }
+
+    @Override
+    public int deleteRequest(Request request) {
+        return getJdbcTemplate().update(DELETE_REQUEST, request.getId());
     }
 
     @Override
