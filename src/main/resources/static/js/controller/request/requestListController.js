@@ -158,7 +158,7 @@
 
                         swal("Request canceled!", "", "success");
                         window.setTimeout(function(){
-                            location.reload();}, 2000)
+                            location.reload();}, 1000)
                     });
                 };
 

@@ -17,33 +17,54 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12 block" ng-show="isManager || isAdministrator || isEmployee">
-                        <h2 class="article-text">My request information</h2>
-                        <div class="list-outer-wrapper">
-                            <span class="list-inner-wrapper">
-                                <ul class="request-list">
-                                    <li>You have created: <span
-                                            class="text__special"><span class="digit">{{requestListSize}}</span> requests</span></li>
-                                    <li>You have: <span
-                                            class="text__special"><span class="digit">{{freeRequestListCount}}</span> free requests</span></li>
-                                    <li>You have: <span class="text__special"><span class="digit">{{progressRequestListCount}}</span> in progress requests</span></li>
-                                    <li>You have: <span class="text__special"><span class="digit">{{closedRequestListCount}}</span> closed requests</span></li>
-                                    <li>You have: <span class="text__special"><span class="digit">{{canceledRequestListCount}}</span> canceled requests</span></li>
-                                </ul>
-                            </span>
+                    <div class="col-md-12 block" ng-show="isManager || isAdministrator">
+                        <div class="col-md-6">
+                            <h2 class="article-text">My request information</h2>
+                            <div class="list-outer-wrapper">
+                                <span class="list-inner-wrapper">
+                                    <ul class="request-list">
+                                        <li>You have created: <span
+                                                class="text__special"><span class="digit">{{requestListSize}}</span> requests</span></li>
+                                        <li>You have: <span
+                                                class="text__special"><span
+                                                class="digit">{{freeRequestListCount}}</span> free requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{progressRequestListCount}}</span> in progress requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{closedRequestListCount}}</span> closed requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{canceledRequestListCount}}</span> canceled requests</span></li>
+                                    </ul>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h2 class="article-text">Assigned request information</h2>
+                            <div class="list-outer-wrapper">
+                                <span class="list-inner-wrapper">
+                                    <ul class="request-list">
+                                        <li>You have: <span class="text__special"><span class="digit">{{freeAssignedRequestCount}}</span> free assigned requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{progressAssignedRequestCount}}</span> in progress assigned requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{closedAssignedRequestCount}}</span> closed assigned requests</span></li>
+                                    </ul>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-12 block" ng-show="isManager || isAdministrator">
-                        <h2 class="article-text">Assigned request information</h2>
+                    <div class="col-md-12 block" ng-show="isEmployee">
+                        <h2 class="article-text">My request information</h2>
                         <div class="list-outer-wrapper">
-                            <span class="list-inner-wrapper">
-                                <ul class="request-list">
-                                    <li>You have: <span class="text__special"><span class="digit">{{freeAssignedRequestCount}}</span> free assigned requests</span></li>
-                                    <li>You have: <span class="text__special"><span class="digit">{{progressAssignedRequestCount}}</span> in progress assigned requests</span></li>
-                                    <li>You have: <span class="text__special"><span class="digit">{{closedAssignedRequestCount}}</span> closed assigned requests</span></li>
-                                </ul>
-                            </span>
+                                <span class="list-inner-wrapper">
+                                    <ul class="request-list">
+                                        <li>You have created: <span
+                                                class="text__special"><span class="digit">{{requestListSize}}</span> requests</span></li>
+                                        <li>You have: <span
+                                                class="text__special"><span
+                                                class="digit">{{freeRequestListCount}}</span> free requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{progressRequestListCount}}</span> in progress requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{closedRequestListCount}}</span> closed requests</span></li>
+                                        <li>You have: <span class="text__special"><span class="digit">{{canceledRequestListCount}}</span> canceled requests</span></li>
+                                    </ul>
+                                </span>
                         </div>
                     </div>
 
@@ -68,9 +89,12 @@
                                 <span class="list-inner-wrapper">
                                     <ul class="request-list">
                                         <li>In system: <span class="text__special"><span class="digit">{{personListSize}}</span> persons</span></li>
-                                        <li>In system: <span class="text__special"><span class="digit">{{adminCount}}</span> admins</span></li>
-                                        <li>In system: <span class="text__special"><span class="digit">{{managerCount}}</span> managers</span></li>
-                                        <li>In system: <span class="text__special"><span class="digit">{{employeeCount}}</span> employees</span></li>
+                                        <li>In system: <span class="text__special"><span
+                                                class="digit">{{adminCount}}</span> admins</span></li>
+                                        <li>In system: <span class="text__special"><span
+                                                class="digit">{{managerCount}}</span> managers</span></li>
+                                        <li>In system: <span class="text__special"><span
+                                                class="digit">{{employeeCount}}</span> employees</span></li>
                                     </ul>
                                 </span>
                             </div>
@@ -81,3 +105,4 @@
         </div>
     </div>
 </div>
+<footer-directive></footer-directive>

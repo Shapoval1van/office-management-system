@@ -164,7 +164,7 @@
                             swal("Request canceled!", "", "success");
                             window.setTimeout(function () {
                                 window.location = "javascript:history.back()"
-                            }, 2000)
+                            }, 1000)
                         });
                 };
 
