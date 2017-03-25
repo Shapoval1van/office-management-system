@@ -32,6 +32,7 @@ public class SubRequestServiceImpl {
     private static final String INVALID_ESTIMATE_MESSAGE = "Invalid estimate.";
     private static final String PARENT_STATUS_ERROR_MESSAGE = "Parent request is CLOSED or CANCELED.";
     private static final String NOT_PARENT_ERROR_MESSAGE = "This request can not have subtasks.";
+
     @Autowired
     private StatusRepository statusRepository;
     @Autowired
@@ -119,7 +120,12 @@ public class SubRequestServiceImpl {
         Person person = loadPerson(principal);
         this.verifyPermission(parentRequest, person);
 
-        return requestRepository.getAllSubRequest(parentRequest.getId());
+        List<Request> requests = requestRepository.getAllSubRequest(parentRequest.getId());
+        requests.forEach(request -> {
+            Person creator = personRepository.findOne(request.getEmployee().getId()).orElseGet(Person::new);
+            request.setEmployee(creator);
+        });
+        return requests;
     }
 
     @Transactional
