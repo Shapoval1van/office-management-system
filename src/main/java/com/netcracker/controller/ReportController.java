@@ -7,7 +7,6 @@ import com.netcracker.model.dto.CalendarItemDTO;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.ReportDTO;
 import com.netcracker.model.entity.ChartsType;
-import com.netcracker.model.entity.Role;
 import com.netcracker.repository.common.Pageable;
 import com.netcracker.service.report.CalendarService;
 import com.netcracker.service.report.ReportService;
@@ -52,13 +51,13 @@ public class ReportController {
     public List<FullRequestDTO> getAllRequestByAdminForPeriod(@Pattern(regexp = "(quarter|year|month)")
                                                                @RequestParam(name = "period", defaultValue = "month") String period,
                                                                @PathVariable(name = "personId") Long personId,
-                                                               @Pattern(regexp = "(manager|employee)")
-                                                               @RequestParam(name = "role", defaultValue = "manager") String role,
+                                                               @Pattern(regexp = "(2|3)")
+                                                               @RequestParam(name = "role", defaultValue = "2") String roleId,
                                                                Pageable pageable)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         List<FullRequestDTO> responseList = new ArrayList<>();
         reportService.getAllRequestByAdminForPeriodWithAlternativeRole(personId, period,
-                createRoleByName(role), pageable).forEach(request -> responseList.add(new FullRequestDTO(request)));
+                Long.parseLong(roleId), pageable).forEach(request -> responseList.add(new FullRequestDTO(request)));
         return responseList;
     }
 
@@ -67,10 +66,10 @@ public class ReportController {
     public ResponseEntity<?> countRequestByPersonIdForPeriod(@Pattern(regexp = "(quarter|year|month)")
                                                              @RequestParam(name = "period", defaultValue = "month") String period,
                                                              @PathVariable(name = "personId") Long personId,
-                                                             @Pattern(regexp = "(manager|employee)")
-                                                             @RequestParam(name = "role", defaultValue = "manager") String role)
+                                                             @Pattern(regexp = "(2|3)")
+                                                             @RequestParam(name = "role", defaultValue = "2") String roleId)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
-        return new ResponseEntity<>(reportService.countRequestByAdminIdForPeriod(personId, period, createRoleByName(role))
+        return new ResponseEntity<>(reportService.countRequestByAdminIdForPeriod(personId, period, Long.parseLong(roleId))
                 , HttpStatus.OK);
     }
 
@@ -109,11 +108,11 @@ public class ReportController {
                                              @RequestParam(name = "period", defaultValue = "month") String period,
                                              @Pattern(regexp = "(pie|area)")
                                              @RequestParam(name = "type", defaultValue = "area") String type,
-                                             @Pattern(regexp = "(manager|employee)")
-                                             @RequestParam(name = "role", defaultValue = "manager") String role)
+                                             @Pattern(regexp = "(2|3)")
+                                             @RequestParam(name = "role", defaultValue = "2") String roleId)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         return reportService.getDataForChartsToAdmin(personId, period, ChartsType.valueOf(type.toUpperCase()),
-               createRoleByName(role));
+                Long.parseLong(roleId));
     }
 
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/calendar")
@@ -124,10 +123,5 @@ public class ReportController {
         long startTime = Long.parseLong(start);
         long endTime = Long.parseLong(end);
         return calendarService.getDataByPeriod(new Timestamp(startTime*1000), new Timestamp(endTime*1000), principal.getName());
-    }
-
-    private Role createRoleByName(String role){
-        if(role.equals("manager")) return new Role("ROLE_OFFICE MANAGER");
-        else return new Role("ROLE_EMPLOYEE");
     }
 }
