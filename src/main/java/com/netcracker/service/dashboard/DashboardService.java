@@ -9,4 +9,6 @@ public interface DashboardService {
 
     Dashboard getData(Principal principal);
 
+    Dashboard getDataByUser(Long userId);
+
 }

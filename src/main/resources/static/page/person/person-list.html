@@ -31,7 +31,7 @@
                             <tbody>
                             <tr ng-repeat="person in personList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
-                                <td>{{person.firstName}}</td>
+                                <td ng-click="goToPersonDetailsPage(person.id)">{{person.firstName}}</td>
                                 <td>{{person.lastName}}</td>
                                 <td>{{person.email}}</td>
                                 <td>{{person.role.name}}</td>

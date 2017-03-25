@@ -1,0 +1,53 @@
+<div id="wrapper" class="toggled">
+    <side-bar></side-bar>
+    <div id="page-content-wrapper" ng-cloak="">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 block">
+                        <div class="col-md-4">
+                            <p class="top-article__text">User name: <span class="text__special">{{userName}}</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="top-article__text">User role: <span class="text__special">{{userRole}}</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="top-article__text">User email: <span class="text__special">{{email}}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 block" ng-show="isManager || isEmployee">
+                        <h2 class="article-text">User request information</h2>
+                        <div class="list-outer-wrapper">
+                            <span class="list-inner-wrapper">
+                                <ul class="request-list">
+                                    <li>User has created: <span
+                                            class="text__special"><span class="digit">{{requestListSize}}</span> requests</span></li>
+                                    <li>User has: <span
+                                            class="text__special"><span class="digit">{{freeRequestListCount}}</span> free requests</span></li>
+                                    <li>User has: <span class="text__special"><span class="digit">{{progressRequestListCount}}</span> in progress requests</span></li>
+                                    <li>User has: <span class="text__special"><span class="digit">{{closedRequestListCount}}</span> closed requests</span></li>
+                                    <li>User has: <span class="text__special"><span class="digit">{{canceledRequestListCount}}</span> canceled requests</span></li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 block" ng-show="isManager">
+                        <h2 class="article-text">User assigned request information</h2>
+                        <div class="list-outer-wrapper">
+                            <span class="list-inner-wrapper">
+                                <ul class="request-list">
+                                    <li>User has: <span class="text__special"><span class="digit">{{freeAssignedRequestCount}}</span> free assigned requests</span></li>
+                                    <li>User has: <span class="text__special"><span class="digit">{{progressAssignedRequestCount}}</span> in progress assigned requests</span></li>
+                                    <li>User has: <span class="text__special"><span class="digit">{{closedAssignedRequestCount}}</span> closed assigned requests</span></li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

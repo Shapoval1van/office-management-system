@@ -120,6 +120,10 @@
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
                     })
+                    .when("/secured/person/:personId/details", {
+                        templateUrl: "/static/page/person/person-info.html",
+                        controller: "PersonDetailController"
+                    })
                     .when("/secured/report/:personId", {
                         templateUrl: "/static/page/report/report.html",
                         controller: "ReportController"
