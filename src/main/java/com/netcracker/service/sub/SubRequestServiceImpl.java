@@ -26,16 +26,12 @@ import java.util.List;
 @Service
 public class SubRequestServiceImpl {
 
-    private final static String PARENT_NOT_FOUND_MESSAGE = "Parent not found.";
-    private final static String SUBREQUEST_CHILD_MESSAGE = "Subrequest can not have subrequests.";
-    private final static String INVALID_ESTIMATE_MESSAGE = "Invalid estimate";
-    private final static String INVALID_PRIORITY_MESSAGE = "Invalid priority";
-    private final static String INTERNAL_ERROR_MESSAGE = "Internal error";
-    private final static String PERSON_NOT_FOUND_MESSAGE = "Person not found";
-    private final static String SUBREQUEST_NOT_FOUND_MESSAGE = "Subrequest not found";
-    private final static String ACCESS_DENIED_MESSAGE = "Access denied";
-    private final static String CLOSED_REQUEST_ERROR_MESSQGE = "Parent request status is CLOSED";
-
+    private static final String INTERNAL_ERROR_MESSAGE = "Internal error.";
+    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Resource not found.";
+    private static final String ACCESS_DENIED_MESSAGE = "Access denied.";
+    private static final String INVALID_ESTIMATE_MESSAGE = "Invalid estimate.";
+    private static final String PARENT_STATUS_ERROR_MESSAGE = "Parent request is CLOSED or CANCELED.";
+    private static final String NOT_PARENT_ERROR_MESSAGE = "This request can not have subtasks.";
     @Autowired
     private StatusRepository statusRepository;
     @Autowired
@@ -47,26 +43,28 @@ public class SubRequestServiceImpl {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Request createRequest(Long parenId, Request subrequest, Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
+    public Request createRequest(Long parenId, Request subRequest, Principal principal) throws CannotCreateSubRequestException, ResourceNotFoundException, BadRequestException {
 
         Request parentRequest = this.loadParent(parenId);
         this.verifyParenStatus(parentRequest);
-        subrequest.setParent(this.loadParent(parenId));
+        subRequest.setParent(this.loadParent(parenId));
 
         Person creator = this.loadPerson(principal);
         this.verifyPermission(parentRequest, creator);
-        subrequest.setEmployee(creator);
+        subRequest.setEmployee(creator);
 
-        Priority priority = this.loadPriority(subrequest.getPriority(), "NORMAL");
-        subrequest.setPriority(priority);
+        Priority priority = priorityRepository.findOne(subRequest.getPriority().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
+        subRequest.setPriority(priority);
 
-        Status statusFree = this.loadStatus(null, StatusEnum.FREE);
-        subrequest.setStatus(statusFree);
+        Status statusFree = statusRepository.findOne(StatusEnum.FREE.getId())
+                .orElseThrow(() -> new CannotCreateSubRequestException(INTERNAL_ERROR_MESSAGE));
+        subRequest.setStatus(statusFree);
 
-        subrequest.setCreationTime(new Timestamp(new Date().getTime()));
-        this.verifyEstimate(subrequest, parentRequest);
+        subRequest.setCreationTime(new Timestamp(new Date().getTime()));
+        this.verifyEstimate(subRequest, parentRequest);
 
-        return requestRepository.save(subrequest)
+        return requestRepository.save(subRequest)
                 .orElseThrow(() -> new CannotCreateSubRequestException(INTERNAL_ERROR_MESSAGE));
     }
 
@@ -92,12 +90,14 @@ public class SubRequestServiceImpl {
         savedRequest.setDescription(subrequest.getDescription());
 
         if (subrequest.getStatus()!=null){
-            Status newStatus = this.loadStatus(subrequest.getStatus(), null);
+            Status newStatus = statusRepository.findOne(subrequest.getStatus().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
             savedRequest.setStatus(newStatus);
         }
 
         if (subrequest.getPriority()!=null){
-            Priority newPriority = this.loadPriority(subrequest.getPriority(), null);
+            Priority newPriority = priorityRepository.findOne(subrequest.getPriority().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
             savedRequest.setPriority(newPriority);
         }
 
@@ -116,10 +116,7 @@ public class SubRequestServiceImpl {
     public List<Request> getAllSubRequest(Long parentId, Principal principal) throws ResourceNotFoundException, BadRequestException, CannotCreateSubRequestException {
 
         Request parentRequest = loadParent(parentId);
-
-
         Person person = loadPerson(principal);
-
         this.verifyPermission(parentRequest, person);
 
         return requestRepository.getAllSubRequest(parentRequest.getId());
@@ -132,11 +129,9 @@ public class SubRequestServiceImpl {
         this.verifyParenStatus(parentRequest);
 
         Person person = this.loadPerson(principal);
-
         this.verifyPermission(parentRequest, person);
 
         Request sub = this.loadSubrequest(subId, parentRequest);
-
         requestRepository.delete(sub.getId());
     }
 
@@ -155,7 +150,7 @@ public class SubRequestServiceImpl {
     private Person loadPerson(Principal principal) throws ResourceNotFoundException, BadRequestException {
         if (principal != null && principal.getName() != null){
             return personRepository.findPersonByEmail(principal.getName())
-                    .orElseThrow(() -> new ResourceNotFoundException(PERSON_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
         } else {
             throw new BadRequestException();
         }
@@ -164,9 +159,9 @@ public class SubRequestServiceImpl {
     private Request loadParent(Long id) throws ResourceNotFoundException, BadRequestException {
         if (id != null){
             Request parentRequest = requestRepository.findOne(id)
-                    .orElseThrow(() -> new ResourceNotFoundException(PARENT_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
             if (parentRequest.getParent() != null){
-                throw new BadRequestException(SUBREQUEST_CHILD_MESSAGE);
+                throw new BadRequestException(NOT_PARENT_ERROR_MESSAGE);
             }
             return parentRequest;
         } else {
@@ -177,7 +172,7 @@ public class SubRequestServiceImpl {
     private void verifyParenStatus(Request parentRequest) throws BadRequestException {
         if (parentRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId()) ||
                 parentRequest.getStatus().getId().equals(StatusEnum.CANCELED.getId())){
-            throw new BadRequestException(CLOSED_REQUEST_ERROR_MESSQGE);
+            throw new BadRequestException(PARENT_STATUS_ERROR_MESSAGE);
         }
     }
 
@@ -193,33 +188,11 @@ public class SubRequestServiceImpl {
         Request subRequest;
         if (id != null){
             subRequest = requestRepository.findSubrequestByIdAndParent(id, parentRequest.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(SUBREQUEST_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
             return subRequest;
         } else {
             throw new BadRequestException();
         }
-    }
-
-    private Priority loadPriority(Priority priority, String defaultPriorityName) throws CannotCreateSubRequestException, ResourceNotFoundException {
-        if (priority != null){
-            return priorityRepository.findOne(priority.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(INVALID_PRIORITY_MESSAGE));
-        } else if (defaultPriorityName != null){
-            return priorityRepository.findPriorityByName(defaultPriorityName)
-                    .orElseThrow(() -> new CannotCreateSubRequestException(INTERNAL_ERROR_MESSAGE));
-        }
-        return null;
-    }
-
-    private Status loadStatus(Status status, StatusEnum defaultStatus) throws ResourceNotFoundException {
-        if (status != null){
-            return statusRepository.findOne(status.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException(INTERNAL_ERROR_MESSAGE));
-        } else if (defaultStatus != null){
-            return statusRepository.findStatusByName(defaultStatus.getName())
-                    .orElseThrow(() -> new ResourceNotFoundException(INTERNAL_ERROR_MESSAGE));
-        }
-        return null;
     }
 
     private void verifyEstimate(Request subrequest, Request parentRequest) throws BadRequestException {
