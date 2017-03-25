@@ -515,9 +515,20 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable) {
+        Person manager = personRepository.findPersonByEmail(principal.getName()).get();
+        List<Request> requestList = requestRepository.getAllAssignedRequest(manager.getId(), pageable);
+        Long count = requestRepository.countAllAssignedByManager(manager.getId());
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
-        List<Request> requestList = requestRepository.getAllAssignedRequest(managerId, pageable);
+        List<Request> requestList = requestRepository.getAllAssignedRequestByManager(managerId, pageable);
         Long count = requestRepository.countAllAssignedByManager(managerId);
         requestList.forEach(this::fillRequest);
 

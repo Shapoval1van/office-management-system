@@ -49,7 +49,7 @@ public class DashboardServiceImpl implements DashboardService {
         if (person.getRole().getId().equals(RoleEnum.EMPLOYEE.getId()))
             return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount, canceledRequestCount);
         else if (person.getRole().getId().equals(RoleEnum.PROJECT_MANAGER.getId())){ // manager data
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequest(person.getId());
+            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
             int freeAssignedCount = 0;
             int progressAssignedCount = 0;
             int closedAssignedCount = 0;
@@ -67,7 +67,7 @@ public class DashboardServiceImpl implements DashboardService {
                     canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount);
         } else { // administrator data
 
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequest(person.getId());
+            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
             int freeAssignedCount = 0;
             int progressAssignedCount = 0;
             int closedAssignedCount = 0;

@@ -20,9 +20,11 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getAllSubRequest(Long parentId);
 
-    List<Request> getAllAssignedRequest(Long managerId, Pageable pageable);
+    List<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
-    List<Request> getAllAssignedRequest(Long managerId);
+    List<Request> getAllAssignedRequestByManager(Long managerId);
+
+    List<Request> getAllAssignedRequest(Long managerId, Pageable pageable);
 
     List<Request> getAllRequestByUser(Long userId, Pageable pageable);
 

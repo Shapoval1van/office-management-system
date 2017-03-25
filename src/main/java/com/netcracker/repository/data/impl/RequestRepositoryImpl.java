@@ -38,6 +38,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.assigned.by.manager}")
     public String FIND_ALL_ASSIGNED_BY_MANAGER;
 
+    @Value("${request.find.all.assigned}")
+    public String FIND_ALL_ASSIGNED;
+
     @Value("${request.find.all.available}")
     public String GET_AVAILABLE_REQUESTS;
 
@@ -209,13 +212,18 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, pageable, managerId);
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, managerId);
+    }
+
+    @Override
+    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+        return super.queryForList(FIND_ALL_ASSIGNED, pageable, managerId);
     }
 
     @Override

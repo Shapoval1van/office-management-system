@@ -179,6 +179,13 @@ public class RequestController {
         return ResponseEntity.ok(requestPage);
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/assigned")
+    public ResponseEntity<?> getAssignedRequestList(Principal principal, Pageable pageable) {
+        Page<Request> requestPage = requestService.getAllAssignedRequest(principal, pageable);
+
+        return ResponseEntity.ok(requestPage);
+    }
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/user/{userId}")
     public ResponseEntity<?> getRequestListByUser(@PathVariable Long userId, Pageable pageable) {
         Page<Request> requestPage = requestService.getAllRequestByUser(userId, pageable);

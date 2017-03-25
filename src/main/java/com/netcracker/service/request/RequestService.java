@@ -47,6 +47,8 @@ public interface RequestService {
 
     Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
 
+    Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable);
+
     Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
     Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);

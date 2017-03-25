@@ -100,6 +100,10 @@
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
+                    .when("/secured/request/my/assigned", {
+                        templateUrl: "/static/page/request/assigned-request-page.html",
+                        controller: "AssignedRequestListController"
+                    })
                     .when("/secured/calendar", {
                         templateUrl: "/static/page/report/calendar.html",
                         controller: "CalendarController"
