@@ -40,20 +40,8 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
-        frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
-        notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
-    }
-
-    @EventListener
     public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
         notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
-    }
-
-    @EventListener
-    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
-        frontendNotificationService.sendNotificationToAllSubscribed(requestUpdateEvent.getRequest().getId(), "Request updated");
-        notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
     }
 
     @EventListener
@@ -77,8 +65,8 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequest(ChangeRequestEvent changeRequestEvent) {
-        notificationService.sendRequestUpdateNotification(changeRequestEvent.getOldRequest(),
-                changeRequestEvent.getNewRequest(), changeRequestEvent.getChangeTime());
+    public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
+        notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(),
+                updateRequestEvent.getNewRequest(), updateRequestEvent.getChangeTime());
     }
 }

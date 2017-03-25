@@ -13,6 +13,7 @@ public class Notification implements Persistable<Long> {
     private String text = "";
     private String subject = "";
     private Request request;
+    private ChangeItem changeItem;
 
     @Override
     public Long getId() {
@@ -62,5 +63,13 @@ public class Notification implements Persistable<Long> {
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public ChangeItem getChangeItem() {
+        return changeItem;
+    }
+
+    public void setChangeItem(ChangeItem changeItem) {
+        this.changeItem = changeItem;
     }
 }
