@@ -456,6 +456,9 @@ public class RequestServiceImpl implements RequestService {
 
         if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            Optional<Request> newRequest = getRequestById(requestId);
+            updateRequestHistory(newRequest.get(), request.get(), person.get().getEmail());
+
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
             return true;
@@ -477,10 +480,12 @@ public class RequestServiceImpl implements RequestService {
     public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> request = getRequestById(requestId);
-        Optional<Request> person = getRequestById(personId);
+        Optional<Person> person = personRepository.findOne(personId);
 
         if (request.isPresent() && person.isPresent()){
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            Optional<Request> newRequest = getRequestById(requestId);
+            updateRequestHistory(newRequest.get(), request.get(), person.get().getEmail());
             return true;
         }
 

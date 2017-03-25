@@ -107,10 +107,13 @@
                     return (typeof thing === "undefined");
                 };
 
-                $scope.isAdmin = function (thing) {
-                    return currentUser.role === 'ROLE_ADMINISTRATOR';
+                $scope.isAdmin = function () {
+                    return PersonService.isAdministrator(currentUser.role);
                 };
 
+                $scope.isManager = function () {
+                    return PersonService.isManager(currentUser.role);
+                };
 
                 $scope.assignToMe = function (requestId) {
                     return PersonService.assignToMe(requestId)

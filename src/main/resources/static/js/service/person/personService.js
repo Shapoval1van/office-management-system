@@ -74,6 +74,15 @@
                     })
                 };
 
+                personService.isManager = function (role) {
+                    return role === "ROLE_OFFICE MANAGER";
+                };
+
+                personService.isAdministrator = function (role) {
+                    return role === "ROLE_ADMINISTRATOR";
+                };
+
+
                 return personService;
             }])
 })();
