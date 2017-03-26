@@ -23,13 +23,12 @@ public class NotificationEventListener {
 
     @EventListener
     public void handleResetPassword(ResetPasswordEvent event) {
-        String link = event.getLink().concat("/resetPassword").concat("/" + event.getToken().getTokenValue());
-        notificationService.sendPasswordReminder(event.getPerson(), link);
+        notificationService.sendPasswordReminder(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
     public void handleNewPassword(NewPasswordEvent event) {
-        notificationService.sendPasswordForNewManager(event.getPerson());
+        notificationService.sendRecoveryPasswordForNewUser(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener

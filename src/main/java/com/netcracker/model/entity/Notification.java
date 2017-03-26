@@ -26,6 +26,20 @@ public class Notification implements Persistable<Long> {
         this.id = id;
     }
 
+    public Notification() {
+    }
+
+    public Notification(NotificationBuilder builder) {
+        this.id = builder.id;
+        this.person = builder.person;
+        this.link = builder.link;
+        this.template = builder.template;
+        this.text = builder.text;
+        this.subject = builder.subject;
+        this.request = builder.request;
+        this.changeItem = builder.changeItem;
+    }
+
     public Person getPerson() {
         return person;
     }
@@ -80,5 +94,65 @@ public class Notification implements Persistable<Long> {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public static class NotificationBuilder {
+        private Long id;
+        private Person person;
+        private String link;
+        private String template;
+        private String text;
+        private String subject;
+        private Request request;
+        private ChangeItem changeItem;
+
+        public NotificationBuilder(Person person, String subject){
+            this.person = person;
+            this.subject = subject;
+        }
+
+        public NotificationBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public NotificationBuilder person(Person person) {
+            this.person = person;
+            return this;
+        }
+
+        public NotificationBuilder link(String link) {
+            this.link = link;
+            return this;
+        }
+
+        public NotificationBuilder template(String template) {
+            this.template = template;
+            return this;
+        }
+
+        public NotificationBuilder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+        public NotificationBuilder subject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+
+        public NotificationBuilder request(Request request) {
+            this.request = request;
+            return this;
+        }
+
+        public NotificationBuilder changeItem(ChangeItem changeItem) {
+            this.changeItem = changeItem;
+            return this;
+        }
+
+        public Notification build(){
+            return new Notification(this);
+        }
     }
 }

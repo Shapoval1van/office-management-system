@@ -12,7 +12,7 @@ public interface NotificationSender {
 
     void sendRegistrationCompletedNotification(Person person, String link);
 
-    void sendPasswordForNewManager(Person person);
+    void sendRecoveryPasswordForNewUser(Person person, String token);
 
     void sendNewRequestEvent(Person person, Request request);
 
