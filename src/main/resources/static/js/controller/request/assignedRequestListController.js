@@ -13,6 +13,8 @@
                 $scope.selectedRequest = -1;
                 $scope.requestListVisibility = true;
 
+                $scope.request = {};
+
                 $rootScope.sideBarActiveElem = "my-requests";
 
                 $scope.pageChanged = function () {
@@ -37,6 +39,45 @@
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     $scope.goToUrl("/secured/request/" + requestId + "/details");
+                };
+
+                $scope.updateRequestStatus = function (statusId, request) {
+                    $scope.request = request;
+                    $scope.request.status = statusId;
+                    $scope.request.priority = $scope.request.priority.id;
+                    if (!!$scope.request.employee)
+                        $scope.request.employee = $scope.request.employee.id;
+                    if (!!$scope.request.manager)
+                        $scope.request.manager = $scope.request.manager.id;
+                    if (!!$scope.request.parent)
+                        $scope.request.parent = $scope.request.parent.id;
+                    if (!!$scope.request.requestGroup)
+                        $scope.request.requestGroup = $scope.request.requestGroup.id;
+
+                    return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
+                        .then(function (callback) {
+                            $scope.pageChanged();
+                        }, function () {
+
+                        })
+                };
+
+                $scope.setInProgressStatus = function (request) {
+                    swal("Request start", "Request successful start!", "success");
+                    return $scope.updateRequestStatus(2, request);
+                };
+
+                $scope.setClosedStatus = function (request) {
+                    swal("Request finished", "Request successful finished!", "success");
+                    return $scope.updateRequestStatus(3, request);
+                };
+
+                $scope.isInProgress = function (statusName) {
+                    return statusName === "IN PROGRESS";
+                };
+
+                $scope.isFree = function (statusName) {
+                    return statusName === "FREE";
                 };
 
             }])

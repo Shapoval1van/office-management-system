@@ -25,12 +25,18 @@
                             <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td>{{request.employee.firstName}} {{request.employee.lastName}}</td>
-                                <td>{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.priority.name}}</td>
-                                <td>{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.status.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.employee.firstName}} {{request.employee.lastName}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
                                 <td>
+                                    <button class="btn btn-info" ng-show="isFree(request.status.name)"
+                                            ng-click="setInProgressStatus(request)">Start request
+                                    </button>
+                                    <button class="btn btn-info" ng-show="isInProgress(request.status.name)"
+                                            ng-click="setClosedStatus(request)">Finish request
+                                    </button>
                                 </td>
                             </tr>
                             </tbody>
