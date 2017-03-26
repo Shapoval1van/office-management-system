@@ -432,13 +432,14 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> request = getRequestById(requestId);
+        Optional<Request> oldRequest = getRequestById(requestId);
         Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
 
-        if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
+        if (oldRequest.isPresent() && person.isPresent() && oldRequest.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
-            updateRequestHistory(newRequest.get(), request.get(), person.get().getEmail());
+            updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
@@ -460,13 +461,22 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> request = getRequestById(requestId);
+        Optional<Request> oldRequest = getRequestById(requestId);
         Optional<Person> person = personRepository.findOne(personId);
 
-        if (request.isPresent() && person.isPresent()){
+        if (oldRequest.isPresent() && person.isPresent()){
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
-            updateRequestHistory(newRequest.get(), request.get(), person.get().getEmail());
+
+            // Subscribe new manager to request
+            personRepository.subscribe(requestId, person.get().getId());
+
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
+            updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
+
+            if(oldRequest.get().getManager() != null) {
+                personRepository.unsubscribe(requestId, oldRequest.get().getManager().getId()); // unsubscribe old manager
+            }
             return true;
         }
 
