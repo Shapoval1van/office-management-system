@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.Request;
@@ -55,7 +56,9 @@ public interface RequestService {
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
-    List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+    Page<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable);
 
     void fill(Request request);
 

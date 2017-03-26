@@ -48,6 +48,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     Long countAllRequestByManager(Long managerId);
 
+    Long countRequestsByRequestGroupId(Integer requestGroupId);
+
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId, Pageable pageable);

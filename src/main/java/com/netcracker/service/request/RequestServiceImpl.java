@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.*;
@@ -399,10 +400,25 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
-        List<Request> requestsByRequestGroupId = requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
-        requestsByRequestGroupId.forEach(this::fillRequest);
-        return requestsByRequestGroupId;
+    @PreAuthorize("isAuthenticated()")
+    public Page<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        List<Request> requestsByRequestGroup = requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
+        requestsByRequestGroup.forEach(this::fillRequest);
+        Long count = requestRepository.countRequestsByRequestGroupId(requestGroupId);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestsByRequestGroup);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        Page<Request> requestsByRequestGroup = getRequestsByRequestGroup(requestGroupId, pageable);
+        List<FullRequestDTO> fullRequestDTOList = requestsByRequestGroup.getData()
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList());
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(),
+                requestsByRequestGroup.getTotalElements(), fullRequestDTOList);
     }
 
     @Scheduled(cron = "${request.expiry.remind.time}")
@@ -435,7 +451,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> request = getRequestById(requestId);
         Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
 
-        if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
+        if (request.isPresent() && person.isPresent() && request.get().getManager() == null) {
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
@@ -447,6 +463,7 @@ public class RequestServiceImpl implements RequestService {
 
     /**
      * Method for assign another person to request
+     *
      * @param requestId
      * @param personId
      * @return true in case success operation
@@ -460,7 +477,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> request = getRequestById(requestId);
         Optional<Request> person = getRequestById(personId);
 
-        if (request.isPresent() && person.isPresent()){
+        if (request.isPresent() && person.isPresent()) {
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             return true;
         }

@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', '$routeParams', "$http", "WebSocketService", "RequestService", "CommentService", "PersonService",
-            function ($scope, $routeParams, $http, WebSocketService, RequestService, CommentService, PersonService) {
+        .controller("RequestDetailsController", ['$scope', '$routeParams', "$http", "WebSocketService", "RequestService", "CommentService", "PersonService", "RequestGroupService",
+            function ($scope, $routeParams, $http, WebSocketService, RequestService, CommentService, PersonService, RequestGroupService) {
 
                 var PAGE_SIZE = 10;
                 $scope.selectedManager;
@@ -35,6 +35,7 @@
                         .then(function (callback) {
                             $scope.request = callback.data;
                             $scope.getSubscribers();
+                            $scope.getRequestGroupById();
                         }, function (callback) {
                             console.log("Error");
                             console.log(callback);
@@ -227,6 +228,25 @@
                         })
                 };
 
+                $scope.getRequestGroupById = function () {
+                    if (!!$scope.request.requestGroup)
+                        return RequestGroupService.getRequestGroupById($scope.request.requestGroup.id)
+                            .then(function (callback) {
+                                $scope.request.requestGroup = callback.data;
+                            }, function () {
+                                console.log("Failure");
+                            })
+                };
+
+                $scope.removeFromRequestGroup = function () {
+                    return RequestService.removeFromRequestGroup($scope.request.id)
+                        .then(function () {
+                            $scope.getRequest();
+                        }, function () {
+
+                        })
+                };
+
                 $scope.setInProgressStatus = function () {
                     swal("Request start", "Request successful start!", "success");
                     return $scope.updateRequestStatus(2);
@@ -269,6 +289,10 @@
                         });
                 };
 
+                $scope.goToRequestGroupDetails = function () {
+                    $scope.goToUrl("/secured/request-group/" + $scope.request.requestGroup.id + "/requests");
+                };
+
                 $scope.isCurrentUserSubscribing = function () {
                     return PersonService.isPersonSubscribing($scope.subscribers, currentUser.id);
                 };
@@ -280,13 +304,23 @@
                 $scope.isAssigned = function () {
                     return RequestService.isAssigned($scope.request);
                 };
+
+                $scope.showAddGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !$scope.request.requestGroup;
+                };
+
+                $scope.showRemoveFromGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !!$scope.request.requestGroup;
+                };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {
-                    return currentUser.role == "ROLE_OFFICE MANAGER";
+                    return currentUser.role === "ROLE_OFFICE MANAGER";
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserAdministrator = function () {
-                    return currentUser.role == "ROLE_ADMINISTRATOR";
+                    return currentUser.role === "ROLE_ADMINISTRATOR";
                 };
                 //FIXME: Move to service
                 $scope.isAuthor = function () {
@@ -312,33 +346,6 @@
                 $scope.requestUpdate = function (requestId) {
                     window.location = "/secured/request/" + requestId + '/update';
                 };
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'
-                // }).then(function successCallback(response) {
-                //     $scope.historyList = buildHistoryList(response.data);
-                // }, function errorCallback(response) {
-                //
-                // });
-                //
-                // $scope.historyForPeriod = function (item_selected) {
-                //     var period = item_selected.toLowerCase();
-                //     $http({
-                //         method: 'GET',
-                //         url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
-                //     }).then(function successCallback(response) {
-                //         $scope.historyList = buildHistoryList(response.data);
-                //     }, function errorCallback(response) {
-                //
-                //     });
-                // };
-
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/sub/' + $routeParams.requestId
-                // }).then(function successCallback(response) {
-                //     $scope.subRequest = response.data;
-                // }, function errorCallback(response) {
 
             }])
 })();

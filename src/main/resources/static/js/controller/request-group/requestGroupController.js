@@ -12,26 +12,21 @@
 
                 $rootScope.sideBarActiveElem = "request-group";
 
-                $scope.getPageMaxCount = function () {
-                    return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)
-                        .then(function (callback) {
-                            $scope.maxPageSize = callback.data;
-                        }, function (callback) {
-
-                        })
-                };
-
-                $scope.getPageMaxCount();
+                $scope.currentRequestGroup = {};
 
                 $scope.getGroupByAuthor = function () {
-                    $scope.getPageMaxCount();
-                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.maxPageSize)
+                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.pageSize)
                         .then(function (callback) {
-                            $scope.groups = callback.data;
+                            $scope.groups = callback.data.data;
+                            $scope.maxPageSize = callback.data.totalElements;
+                            $scope.currentPage = callback.data.pageNumber + 1;
+                            $scope.pageSize = callback.data.pageSize;
                         }, function (callback) {
                             console.log("Failure")
                         });
                 };
+
+                $scope.getGroupByAuthor();
 
                 $scope.searchByNamePattern = function () {
                     return RequestGroupService.findGroupByNamePattern($scope.currentUser.id, $scope.requestGroupNamePattern)
@@ -49,6 +44,19 @@
                         }, function (callback) {
 
                         })
+                };
+
+                $scope.deleteRequestGroup = function () {
+                    return RequestGroupService.deleteRequestGroup($scope.currentRequestGroup.id)
+                        .then(function () {
+                            $scope.getGroupByAuthor();
+                        }, function () {
+                            console.log("Failure")
+                        })
+                };
+
+                $scope.setCurrentRequestGroup = function (requestGroup) {
+                    $scope.currentRequestGroup = requestGroup;
                 };
 
                 $scope.goToRequestGroupPage = function (requestGroupId) {

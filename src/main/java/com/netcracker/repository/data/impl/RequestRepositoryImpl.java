@@ -86,6 +86,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.count.by.manager}")
     private String COUNT_ALL_REQUEST_BY_MANAGER;
 
+    @Value("${request.count.by.request.group}")
+    private String COUNT_REQUEST_BY_REQUEST_GROUP;
+
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
 
@@ -284,6 +287,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countAllRequestByManager(Long managerID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_MANAGER, Long.class, managerID);
+    }
+
+    @Override
+    public Long countRequestsByRequestGroupId(Integer requestGroupId) {
+        return getJdbcTemplate().queryForObject(COUNT_REQUEST_BY_REQUEST_GROUP, Long.class, requestGroupId);
     }
 
     @Override

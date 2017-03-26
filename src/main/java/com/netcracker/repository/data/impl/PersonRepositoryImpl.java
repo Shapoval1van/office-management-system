@@ -29,6 +29,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String ROLE_ID_COLUMN = "role_id";
     public static final String ENABLED_COLUMN = "enabled";
 
+    public static final int SUCCESS_UPDATE_CODE = 1;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 
     @Value("${person.find.by.email}")
@@ -213,7 +215,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         for (Person subscriber : subscribers) {
             if (subscriber.getId().equals(personId)) {
                 LOGGER.info("Person {} already subscribing on request {}", personId, requestId);
-                return 1;
+                return SUCCESS_UPDATE_CODE;
             }
         }
 
