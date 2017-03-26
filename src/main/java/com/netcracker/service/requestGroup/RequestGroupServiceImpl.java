@@ -70,15 +70,7 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
         Page<RequestGroup> requestGroupPage = getRequestGroupByAuthorId(authorId, pageable);
 
-        List<RequestGroup> requestGroupsByAuthor = (List<RequestGroup>) requestGroupPage.getData();
-
-        List<RequestGroupDTO> requestGroupDTOList = new LinkedList<>();
-
-        requestGroupsByAuthor.forEach(requestGroup -> {
-            RequestGroupDTO requestGroupDTO = new RequestGroupDTO(requestGroup);
-            requestGroupDTO.setRequestCount(requestRepository.countRequestsByRequestGroupId(requestGroup.getId()));
-            requestGroupDTOList.add(requestGroupDTO);
-        });
+        List<RequestGroupDTO> requestGroupDTOList = covertToDTO((List<RequestGroup>) requestGroupPage.getData());
 
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(),
                 requestGroupPage.getTotalElements(), requestGroupDTOList);
@@ -89,6 +81,14 @@ public class RequestGroupServiceImpl implements RequestGroupService {
     public List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId) {
         String regex = generateRegexByNamePart(namePart);
         return requestGroupRepository.findRequestGroupByNameRegex(regex, authorId);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public List<RequestGroupDTO> getRequestGroupDTOByNamePart(String namePart, Long authorId) {
+        String regex = generateRegexByNamePart(namePart);
+        List<RequestGroupDTO> requestGroupDTOList = covertToDTO(getRequestGroupByNamePart(regex, authorId));
+        return requestGroupDTOList;
     }
 
     @Override
@@ -266,5 +266,17 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         }
 
         return true;
+    }
+
+    private List<RequestGroupDTO> covertToDTO(List<RequestGroup> requestGroups) {
+        List<RequestGroupDTO> requestGroupDTOList = new LinkedList<>();
+
+        requestGroups.forEach(requestGroup -> {
+            RequestGroupDTO requestGroupDTO = new RequestGroupDTO(requestGroup);
+            requestGroupDTO.setRequestCount(requestRepository.countRequestsByRequestGroupId(requestGroup.getId()));
+            requestGroupDTOList.add(requestGroupDTO);
+        });
+
+        return requestGroupDTOList;
     }
 }

@@ -8,7 +8,6 @@ import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.dto.StatusDTO;
-import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.repository.common.Pageable;
@@ -36,8 +35,9 @@ public class RequestGroupController {
 
     @GetMapping({"/author/{authorId}/search/{namePart}"})
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestGroup> getRequestGroupByNamePart(@PathVariable("authorId") Long authorId, @PathVariable("namePart") String namePart) {
-        return requestGroupService.getRequestGroupByNamePart(namePart, authorId);
+    public List<RequestGroupDTO> getRequestGroupByNamePart(@PathVariable("authorId") Long authorId,
+                                                           @PathVariable("namePart") String namePart) {
+        return requestGroupService.getRequestGroupDTOByNamePart(namePart, authorId);
     }
 
     @PostMapping("/")

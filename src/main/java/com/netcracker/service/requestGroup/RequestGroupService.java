@@ -21,6 +21,8 @@ public interface RequestGroupService {
 
     List<RequestGroup> getRequestGroupByNamePart(String namePart, Long authorId);
 
+    List<RequestGroupDTO> getRequestGroupDTOByNamePart(String namePart, Long authorId);
+
     Optional<RequestGroup> saveRequestGroup(RequestGroup requestGroup) throws RequestGroupAlreadyExist;
 
     Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist;

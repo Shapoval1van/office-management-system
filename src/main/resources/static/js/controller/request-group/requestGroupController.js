@@ -14,19 +14,7 @@
 
                 $scope.currentRequestGroup = {};
 
-                // $scope.getPageMaxCount = function () {
-                //     return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)
-                //         .then(function (callback) {
-                //             $scope.maxPageSize = callback.data;
-                //         }, function (callback) {
-                //
-                //         })
-                // };
-                //
-                // $scope.getPageMaxCount();
-
                 $scope.getGroupByAuthor = function () {
-                    // $scope.getPageMaxCount();
                     return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.pageSize)
                         .then(function (callback) {
                             $scope.groups = callback.data.data;
