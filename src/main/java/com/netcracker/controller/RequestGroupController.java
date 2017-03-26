@@ -30,8 +30,8 @@ public class RequestGroupController {
 
     @GetMapping({"/author/{authorId}"})
     @ResponseStatus(HttpStatus.OK)
-    public Page<RequestGroup> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
-        return requestGroupService.getRequestGroupByAuthorId(authorId, pageable);
+    public Page<RequestGroupDTO> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
+        return requestGroupService.getRequestGroupDTOByAuthorId(authorId, pageable);
     }
 
     @GetMapping({"/author/{authorId}/search/{namePart}"})
@@ -68,5 +68,11 @@ public class RequestGroupController {
                                          @RequestBody StatusDTO statusDTO,
                                          Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         requestGroupService.setRequestGroupStatus(requestGroupId, statusDTO.getId(), principal);
+    }
+
+    @DeleteMapping("/{requestGroupId}")
+    public void deleteRequestGroup(@PathVariable Integer requestGroupId, Principal principal)
+            throws ResourceNotFoundException, IllegalAccessException {
+        requestGroupService.removeRequestGroup(requestGroupId, principal);
     }
 }

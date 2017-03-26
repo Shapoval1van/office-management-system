@@ -50,6 +50,15 @@
                         })
                 };
 
+                requestGroupService.deleteRequestGroup = function (requestGroupId) {
+                    return $http.delete("/api/request-group/" + requestGroupId)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 return requestGroupService;
             }])
 })();
