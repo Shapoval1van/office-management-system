@@ -229,11 +229,21 @@
                 };
 
                 $scope.getRequestGroupById = function () {
-                    return RequestGroupService.getRequestGroupById($scope.request.requestGroup.id)
-                        .then(function (callback) {
-                            $scope.request.requestGroup = callback.data;
+                    if (!!$scope.request.requestGroup)
+                        return RequestGroupService.getRequestGroupById($scope.request.requestGroup.id)
+                            .then(function (callback) {
+                                $scope.request.requestGroup = callback.data;
+                            }, function () {
+                                console.log("Failure");
+                            })
+                };
+
+                $scope.removeFromRequestGroup = function () {
+                    return RequestService.removeFromRequestGroup($scope.request.id)
+                        .then(function () {
+                            $scope.getRequest();
                         }, function () {
-                            console.log("Failure");
+
                         })
                 };
 
@@ -293,6 +303,16 @@
 
                 $scope.isAssigned = function () {
                     return RequestService.isAssigned($scope.request);
+                };
+
+                $scope.showAddGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !$scope.request.requestGroup;
+                };
+
+                $scope.showRemoveFromGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !!$scope.request.requestGroup;
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {

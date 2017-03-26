@@ -28,27 +28,56 @@
                                 </div>
                                 <div class="form-group col-md-12 col-lg-12">
 
-                                    <div class="col-md-12 btn-group">
-                                        <add-to-request-group-btn
-                                                ng-show="isCurrentUserManager() || isCurrentUserAdministrator()"></add-to-request-group-btn>
-                                        <assign-to-me-btn
-                                                ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()"></assign-to-me-btn>
-                                        <assign-to-smb-btn ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
-                                        <button class="btn btn-info" ng-show="isAssignedManager() && isFree()"
-                                                ng-click="setInProgressStatus()">Start request
-                                        </button>
-                                        <button class="btn btn-info" ng-show="isAssignedManager() && isInProgress()"
-                                                ng-click="setClosedStatus()">Finish request
-                                        </button>
-                                        <button class="btn btn-info" ng-show="isAuthor() && isClosed()"
-                                                ng-click="setReopen()">Reopen request
-                                        </button>
-
-                                        <a ng-click="requestDelete(request.id)" class="btn btn-danger"
-                                           ng-hide="isCanceled()">Cancel</a>
-                                        <a ng-click="requestUpdate(request.id)" class="btn btn-info"
-                                           ng-hide="isCanceled()">Edit</a>
-                                        <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-1" ng-hide="isCanceled()">
+                                                <button ng-click="requestDelete(request.id)" class="btn btn-danger">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                            <!--Request group buttons-->
+                                            <add-to-request-group-btn ng-show="showAddGroupBtn()" class="col-md-2">
+                                            </add-to-request-group-btn>
+                                            <div ng-show="!showAddGroupBtn()" class="col-md-2">
+                                                <remove-from-request-group-modal></remove-from-request-group-modal>
+                                                <button class="btn btn-danger" data-dismiss="modal" data-toggle="modal"
+                                                        data-target="#removeFromRequestGroupModal">
+                                                    Remove from group
+                                                </button>
+                                            </div>
+                                            <!--/Request group buttons-->
+                                            <!--Assigning buttons-->
+                                            <assign-to-me-btn class="col-md-2"
+                                                              ng-show="!isAssigned() && isCurrentUserManager()
+                                                              || isCurrentUserAdministrator()">
+                                            </assign-to-me-btn>
+                                            <assign-to-smb-btn class="col-md-2"
+                                                               ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
+                                            <!--/Assigning buttons-->
+                                            <!--Change status buttons-->
+                                            <div class="col-md-2" ng-show="isAssignedManager() && isFree()">
+                                                <button class="btn btn-secondary" ng-click="setInProgressStatus()">
+                                                    Start request
+                                                </button>
+                                            </div>
+                                            <div class="col-md-2" ng-show="isAssignedManager() && isInProgress()">
+                                                <button class="btn btn-secondary" ng-click="setClosedStatus()">
+                                                    Finish request
+                                                </button>
+                                            </div>
+                                            <div class="col-md-2" ng-show="isAuthor() && isClosed()">
+                                                <button class="btn btn-secondary" ng-click="setReopen()">
+                                                    Reopen request
+                                                </button>
+                                            </div>
+                                            <!--/Change status buttons-->
+                                            <div class="col-md-1" ng-hide="isCanceled()">
+                                                <button ng-click="requestUpdate(request.id)" class="btn btn-secondary">
+                                                    Edit
+                                                </button>
+                                            </div>
+                                            <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
+                                        </div>
                                     </div>
 
                                     <div class="form-group col-md-6 col-lg-6">
