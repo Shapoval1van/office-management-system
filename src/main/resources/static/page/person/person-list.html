@@ -32,9 +32,9 @@
                             <tr ng-repeat="person in personList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToPersonDetailsPage(person.id)">{{person.firstName}}</td>
-                                <td>{{person.lastName}}</td>
-                                <td>{{person.email}}</td>
-                                <td>{{person.role.name}}</td>
+                                <td ng-click="goToPersonDetailsPage(person.id)">{{person.lastName}}</td>
+                                <td ng-click="goToPersonDetailsPage(person.id)">{{person.email}}</td>
+                                <td ng-click="goToPersonDetailsPage(person.id)">{{person.role.name}}</td>
                                 <td>
                                     <a ng-click="personUpdate(person.id)" class="btn btn-info">Edit</a>
                                     <a ng-click="personDelete(person)" class="btn btn-danger">Delete</a>

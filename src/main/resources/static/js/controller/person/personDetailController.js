@@ -28,7 +28,7 @@
                         url: '/api/person/' + $scope.personId
                     }).then(function (response) {
                         $scope.userName = response.data.firstName + " " + response.data.lastName;
-                        $scope.userRole = response.data.role.name.substr(5, response.data.role.name.length);;
+                        $scope.userRole = response.data.role.name.substr(5, response.data.role.name.length);
                         $scope.email = response.data.email;
                         console.log($scope.userRole);
                         $scope.testGetData();
@@ -38,51 +38,30 @@
 
                 $scope.getUserInfo();
 
-                $scope.testGetData = function () {
 
-                    if ($scope.userRole=="EMPLOYEE"){
+                $scope.isEmployee = true;
+                $scope.isManager = false;
 
-                        $scope.isEmployee = true;
-                        $scope.isManager = false;
+                $scope.getData = function () {
+                    $http({
+                        method: 'GET',
+                        url: '/api/dashboard/data/' + $scope.personId
+                    }).then(function (response) {
+                        $scope.requestListSize = response.data.requestListSize;
+                        $scope.freeRequestListCount = response.data.freeRequestListCount;
+                        $scope.progressRequestListCount = response.data.progressRequestListCount;
+                        $scope.closedRequestListCount = response.data.closedRequestListCount;
+                        $scope.canceledRequestListCount = response.data.canceledRequestListCount;
 
-                        $scope.getData = function() {
-                            $http({
-                                method: 'GET',
-                                url: '/api/dashboard/data/' + $scope.personId
-                            }).then(function (response) {
-                                $scope.requestListSize = response.data.requestListSize;
-                                $scope.freeRequestListCount = response.data.freeRequestListCount;
-                                $scope.progressRequestListCount = response.data.progressRequestListCount;
-                                $scope.closedRequestListCount = response.data.closedRequestListCount;
-                                $scope.canceledRequestListCount = response.data.canceledRequestListCount;
+                        $scope.freeAssignedRequestCount = response.data.freeAssignedRequestCount;
+                        $scope.progressAssignedRequestCount = response.data.progressAssignedRequestCount;
+                        $scope.closedAssignedRequestCount = response.data.closedAssignedRequestCount;
 
-                            }, function errorCallback(response) {
-                            });
-                        };
-                    } else{
-
-                        $scope.isManager = true;
-
-                        $scope.getData = function() {
-                            $http({
-                                method: 'GET',
-                                url: '/api/dashboard/data/' + $scope.personId
-                            }).then(function (response) {
-                                $scope.requestListSize = response.data.requestListSize;
-                                $scope.freeRequestListCount = response.data.freeRequestListCount;
-                                $scope.progressRequestListCount = response.data.progressRequestListCount;
-                                $scope.closedRequestListCount = response.data.closedRequestListCount;
-                                $scope.canceledRequestListCount = response.data.canceledRequestListCount;
-
-                                $scope.freeAssignedRequestCount = response.data.freeAssignedRequestCount;
-                                $scope.progressAssignedRequestCount = response.data.progressAssignedRequestCount;
-                                $scope.closedAssignedRequestCount = response.data.closedAssignedRequestCount;
-
-                            }, function errorCallback(response) {
-                            });
-                        };
-                    }
+                    }, function errorCallback(response) {
+                    });
                 };
+
+                $scope.getData();
 
             }])
 })();

@@ -51,7 +51,7 @@
                                 <td>
                                     <assign-to-me-btn ng-show="!my"></assign-to-me-btn>
                                     <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
-                                    <assign-to-smb-btn ng-show="!my"></assign-to-smb-btn>
+                                    <assign-to-smb-btn ng-show="!my && isAdmin()"></assign-to-smb-btn>
                                     <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
                                     <!--<cancel-request-btn ng-show="my"></cancel-request-btn>-->
                                 </td>
