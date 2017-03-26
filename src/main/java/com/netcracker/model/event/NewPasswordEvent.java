@@ -1,19 +1,10 @@
 package com.netcracker.model.event;
 
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Token;
 
-public class NewPasswordEvent {
-    private Person person;
-
-    public NewPasswordEvent(Person person) {
-        this.person = person;
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
+public class NewPasswordEvent extends SecurityEvent{
+    public NewPasswordEvent(String link, Person person, Token token) {
+        super(link, person, token);
     }
 }

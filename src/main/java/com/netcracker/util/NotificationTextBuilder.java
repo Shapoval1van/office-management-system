@@ -16,9 +16,12 @@ public class NotificationTextBuilder {
         VelocityEngine engine = new VelocityEngine();
         VelocityContext context = new VelocityContext();
         engine.init();
-        Template template = engine.getTemplate(notification.getText());
+        Template template = engine.getTemplate(notification.getTemplate());
         context.put("name", notification.getPerson().getFirstName());
-        if (!notification.getLink().equals("")) {
+        if (notification.getText() != null){
+            context.put("mailBody", notification.getText());
+        }
+        if (notification.getLink() != null) {
             context.put("link", notification.getLink());
         }
         if (notification.getRequest() != null) {
@@ -27,6 +30,11 @@ public class NotificationTextBuilder {
             context.put("requestName", notification.getRequest().getName());
             context.put("requestEstimate", notification.getRequest().getEstimate());
             context.put("requestDescription", notification.getRequest().getDescription());
+        }
+        if (notification.getChangeItem() != null){
+            context.put("changeItem", notification.getChangeItem().getField().getName());
+            context.put("oldValue", notification.getChangeItem().getOldVal());
+            context.put("newValue", notification.getChangeItem().getNewVal());
         }
         StringWriter writer = new StringWriter();
         template.merge(context,writer);

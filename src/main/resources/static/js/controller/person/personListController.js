@@ -84,6 +84,10 @@
 
                 };
 
+                $scope.goToPersonDetailsPage = function (personId) {
+                    $scope.goToUrl("/secured/person/" + personId + "/details");
+                };
+
             }])
 })();
 

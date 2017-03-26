@@ -10,19 +10,11 @@ import java.util.List;
 public interface NotificationSender {
     void sendPasswordReminder(Person person, String link);
 
-    void sendInformationNotification(Person person);
-
-    void sendCustomInformationNotification(Person person);
-
     void sendRegistrationCompletedNotification(Person person, String link);
 
-    void sendPasswordForNewManager(Person person);
+    void sendRecoveryPasswordForNewUser(Person person, String token);
 
-    void sendChangeStatusEvent(Person person, String link);
-
-    void sendNewRequestEvent(Person person);
-
-    void sendUpdateRequestEvent(Person person);
+    void sendNewRequestEvent(Person person, Request request);
 
     void sendUpdateUserEvent(Person person);
 

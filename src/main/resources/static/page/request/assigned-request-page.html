@@ -5,49 +5,39 @@
             <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
-                    <div class="col-md-8" ng-show="assigned">
-                        <input ng-model="selectedCurrentManager" type="text" placeholder="{{placeholder}}"
-                               ng-change="updateManager()" uib-typeahead="manager as manager.firstName + ' '
-                               +  manager.lastName for manager in managers"
-                               class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
+                    <div class="col-md-10" ng-show="!requestListVisibility">
+                        <p class="empty-request-title">You have no assigned request!</p>
                     </div>
 
-                    <div class="col-md-8" ng-show="!assigned">
-                        <input ng-model="selectedUser" type="text" placeholder="{{placeholder}}"
-                               ng-change="updateUser()" uib-typeahead="user as user.firstName + ' '
-                               +  user.lastName for user in users"
-                               class="form-control" typeahead-show-hint="true" typeahead-min-length="3">
-                    </div>
-                    <div class="col-md-10" ng-show="requestListByUserVisibility">
-                        <p class="empty-request-title-2">{{title}}</p>
-                    </div>
-                    <a ng-click="pageChanged()" class="btn btn-default">Get request</a>
-                    <div class="col-md-12" ng-show="!requestListByUserVisibility">
-                        <table st-table="requestList" st-safe-src="requests" class="table table-stripped user-table-stripped">
+                    <div class="col-md-12" ng-show="requestListVisibility">
+                        <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
                             <th st-sort="name">Name</th>
-                            <th>{{personType}}</th>
+                            <th>Employee</th>
                             <th st-sort="estimate">Estimate</th>
                             <th st-sort="priority.name">Priority</th>
                             <th st-sort="creationTime">Created</th>
                             <th>Status</th>
-                            <!--<th></th>-->
+                            <th></th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td ng-show="assigned" ng-click="goToRequestDetailsPage(request.id)">
-                                    {{request.employee.firstName}} {{request.employee.lastName}}
-                                </td>
-                                <td ng-show="!assigned" ng-click="goToRequestDetailsPage(request.id)">
-                                    {{request.manager.firstName}} {{request.manager.lastName}}
-                                </td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.employee.firstName}} {{request.employee.lastName}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
+                                <td>
+                                    <button class="btn btn-info" ng-show="isFree(request.status.name)"
+                                            ng-click="setInProgressStatus(request)">Start request
+                                    </button>
+                                    <button class="btn btn-info" ng-show="isInProgress(request.status.name)"
+                                            ng-click="setClosedStatus(request)">Finish request
+                                    </button>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -61,7 +51,6 @@
                                     ng-change="pageChanged()" items-per-page="pageSize"></ul>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

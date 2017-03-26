@@ -5,6 +5,7 @@ import com.netcracker.service.dashboard.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,12 @@ public class DashboardController {
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/data")
     public ResponseEntity<?> getData(Principal principal) {
         Dashboard data = dashboardService.getData(principal);
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/data/{userId}")
+    public ResponseEntity<?> getDataByUser(@PathVariable Long userId) {
+        Dashboard data = dashboardService.getDataByUser(userId);
         return ResponseEntity.ok(data);
     }
 }

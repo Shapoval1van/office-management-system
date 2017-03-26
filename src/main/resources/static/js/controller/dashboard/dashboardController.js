@@ -109,31 +109,6 @@
 
                 $scope.getData();
 
-                // $scope.getData = function() {
-                //         $http({
-                //             method: 'GET',
-                //             url: '/api/dashboard/data'
-                //         }).then(function (response) {
-                //             $scope.requests = [];
-                //             $scope.requests = response.data.data;
-                //             $scope.totalItems = response.data.totalElements;
-                //
-                //         }, function errorCallback(response) {
-                //         });
-                // };
-
-                // $scope.isCurrentUserEmployee = function () {
-                //     return currentUser.role == "EMPLOYEE";
-                // };
-                //
-                // $scope.isCurrentUserManager = function () {
-                //     return currentUser.role == "OFFICE MANAGER";
-                // };
-                //
-                // $scope.isCurrentUserAdministrator = function () {
-                //     return currentUser.role == "ADMINISTRATOR";
-                // };
-
             }])
 })();
 

@@ -18,20 +18,17 @@ public class NotificationEventListener {
 
     @EventListener
     public void handlePersonRegistration(PersonRegistrationEvent event) {
-        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
-        notificationService.sendRegistrationCompletedNotification(event.getPerson(),
-                SITE_LINK.concat("/").concat(event.getToken().getTokenValue()));
+        notificationService.sendRegistrationCompletedNotification(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
     public void handleResetPassword(ResetPasswordEvent event) {
-        String link = event.getLink().concat("/resetPassword").concat("/" + event.getToken().getTokenValue());
-        notificationService.sendPasswordReminder(event.getPerson(), link);
+        notificationService.sendPasswordReminder(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
     public void handleNewPassword(NewPasswordEvent event) {
-        notificationService.sendPasswordForNewManager(event.getPerson());
+        notificationService.sendRecoveryPasswordForNewUser(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
@@ -40,20 +37,8 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
-        frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
-        notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
-    }
-
-    @EventListener
     public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
-        notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
-    }
-
-    @EventListener
-    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
-        frontendNotificationService.sendNotificationToAllSubscribed(requestUpdateEvent.getRequest().getId(), "Request updated");
-        notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
+        notificationService.sendNewRequestEvent(newRequestEvent.getPerson(), newRequestEvent.getRequest());
     }
 
     @EventListener
@@ -77,8 +62,10 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequest(ChangeRequestEvent changeRequestEvent) {
-        notificationService.sendRequestUpdateNotification(changeRequestEvent.getOldRequest(),
-                changeRequestEvent.getNewRequest(), changeRequestEvent.getChangeTime());
+    public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
+        frontendNotificationService.sendNotificationToAllSubscribed(updateRequestEvent.getOldRequest(),
+                updateRequestEvent.getNewRequest());
+        notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(),
+                updateRequestEvent.getNewRequest(), updateRequestEvent.getChangeTime());
     }
 }

@@ -34,7 +34,7 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
         columns.put(ID_COLUMN, entity.getId());
         columns.put(PERSON_ID_COLUMN, entity.getPerson().getId());
         columns.put(SUBJECT_COLUMN, entity.getSubject());
-        columns.put(TEXT_COLUMN, entity.getText());
+        columns.put(TEXT_COLUMN, entity.getTemplate());
         columns.put(LINK_COLUMN, entity.getLink());
         return columns;
     }
@@ -46,7 +46,7 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
             notification.setId(resultSet.getLong(ID_COLUMN));
             notification.setPerson(new Person(resultSet.getLong(PERSON_ID_COLUMN)));
             notification.setSubject(resultSet.getString(SUBJECT_COLUMN));
-            notification.setText(resultSet.getString(TEXT_COLUMN));
+            notification.setTemplate(resultSet.getString(TEXT_COLUMN));
             notification.setLink(resultSet.getString(LINK_COLUMN));
 
             return notification;
