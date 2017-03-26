@@ -18,7 +18,6 @@
                 };
                 $scope.showNewSubForm = false;
                 $scope.statusComparator = function (v1, v2) {
-                    console.log(v1);
                     if (v1.value == 3) {
                       return 1;
                   } else {
@@ -116,6 +115,7 @@
                 };
 
                 $scope.updateSub = function (sub) {
+                    console.log(sub);
                     if (sub.name==""||sub.name.length<3){
                         $scope.validationError.editSubTittle = true;
                         return;
@@ -128,6 +128,7 @@
                             }
                         }
                     });
+                    sub.status = sub.shownStatus;
                     SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
                         if (response.isError == false){
                             $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
@@ -143,8 +144,6 @@
                 $scope.resetEdit = function (sub) {
                     $scope._fromTempSub(sub);
                 };
-
-
 
                 $scope.toggleNewSub = function () {
                     $scope.showNewSubForm =  $scope.showNewSubForm?false:true;

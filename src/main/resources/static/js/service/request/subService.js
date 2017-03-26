@@ -12,6 +12,7 @@
                             angular.forEach(callback.data, function (subrequest) {
                                 subrequest.showEdit = false;
                                 subrequest.estimate = _transformEstimate(subrequest.estimate);
+                                subrequest.shownStatus = subrequest.status;
                             });
                             return callback;
                         }, function (callback) {
@@ -65,6 +66,7 @@
                             callback.data.showEdit = false;
                             callback.data.estimate = _transformEstimate(callback.data.estimate);
                             callback.sub = callback.data;
+                            callback.sub.shownStatus = callback.sub.status;
                             return callback;
                         }, function (callback) {
                             callback.isError = true;
