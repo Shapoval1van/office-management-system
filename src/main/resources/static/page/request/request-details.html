@@ -176,7 +176,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="subtask-container">
-                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs">
+                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs | orderBy:'status':false:statusComparator">
                                                             <div class="panel-heading" ng-show="sub.showEdit">
                                                                 <div class="row">
                                                                     <div class="col-lg-6">

@@ -108,7 +108,7 @@ public class SubRequestServiceImpl {
         } else {
             savedRequest.setEstimate(null);
         }
-        
+
         Person creator = personRepository.findOne(savedRequest.getEmployee().getId()).orElseGet(Person::new);
         savedRequest.setEmployee(creator);
         return requestRepository.updateRequest(savedRequest)

@@ -17,6 +17,14 @@
                     editSubTittle:false
                 };
                 $scope.showNewSubForm = false;
+                $scope.statusComparator = function (v1, v2) {
+                    console.log(v1);
+                    if (v1.value == 3) {
+                      return 1;
+                  } else {
+                      return -1;
+                  }
+                };
 
                 $scope.getStatusName = function (id) {
                     var status = "";
@@ -120,13 +128,9 @@
                             }
                         }
                     });
-                    console.log("------------")
-                    console.log(sub);
                     SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
-
                         if (response.isError == false){
                             $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
-                            console.log(response.sub);
                         }
                     });
                 };
