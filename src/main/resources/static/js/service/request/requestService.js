@@ -89,11 +89,11 @@
 
 
                 requestService.isCanceled = function (request) {
-                    return !!request.status && request.status.name == "CANCELED";
+                    return !!request.status && request.status.name === "CANCELED";
                 };
 
                 requestService.isAssigned = function (request) {
-                    return request.manager != null;
+                    return request.manager !== null;
                 };
 
                 requestService.notifyAboutExpiringEstimateTime = function () {
@@ -105,6 +105,10 @@
                             callback.isError = true;
                             return callback;
                         });
+                };
+
+                requestService.removeFromRequestGroup = function (requestId) {
+                    return $http.delete("/api/request/" + requestId + "/group");
                 };
 
                 return requestService;

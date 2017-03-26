@@ -9,21 +9,11 @@
                 $scope.requests = [];
                 $scope.currentPage = 1;
                 $scope.pageSize = 20;
-                $scope.maxSize = 5;
+                $scope.maxPageSize = 20;
+                $scope.request = {};
 
                 var inProgressStatusId = 2;
                 var closedStatusId = 3;
-
-                $scope.getPageMaxCount = function () {
-                    return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)
-                        .then(function (callback) {
-                            $scope.maxSize = Math.floor(callback.data / $scope.pageSize);
-                        }, function (callback) {
-
-                        })
-                };
-
-                $scope.getPageMaxCount();
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     return $scope.goToUrl("/secured/request/" + requestId + "/details/");
@@ -32,7 +22,10 @@
                 $scope.getRequestByGroup = function () {
                     return RequestService.getRequestsByRequestGroup(requestGroupId, $scope.currentPage, $scope.pageSize)
                         .then(function (callback) {
-                            $scope.requests = callback.data;
+                            $scope.requests = callback.data.data;
+                            $scope.maxPageSize = callback.data.totalElements;
+                            $scope.currentPage = callback.data.pageNumber + 1;
+                            $scope.pageSize = callback.data.pageSize;
                         }, function () {
 
                         })
@@ -56,6 +49,19 @@
                         }, function () {
 
                         })
+                };
+
+                $scope.removeFromRequestGroup = function () {
+                    return RequestService.removeFromRequestGroup($scope.request.id)
+                        .then(function (callback) {
+                            $scope.getRequestByGroup();
+                        }, function () {
+                            console.log("Failure");
+                        })
+                };
+
+                $scope.setCurrentRequest = function (request) {
+                    $scope.request = request;
                 };
 
                 $scope.isRequestGroupFree = function () {
