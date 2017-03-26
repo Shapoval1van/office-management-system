@@ -310,8 +310,8 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <div ng-click="getNextCommentPage()">
-                                                <p>Show {{getPageSize()}} more</p>
+                                            <div ng-click="getNextCommentPage()" class="show-more-wrapper">
+                                                <p class="show-more-text">Show {{getPageSize()}} more</p>
                                             </div>
                                         </div>
                                     </div>
@@ -326,7 +326,7 @@
                                     </option>
                                 </select>
                                 <table st-table="displayedHistory" st-safe-src="historyList"
-                                       class="table table-stripped task-row">
+                                       class="table table-stripped">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -362,8 +362,8 @@
                                         </td>
                                     </tbody>
                                 </table>
-                                <div ng-click="getNextHistoryPage('month')">
-                                    <p>Show {{getPageSize()}} more</p>
+                                <div ng-click="getNextHistoryPage('month')" class="show-more-wrapper">
+                                    <p class="show-more-text">Show {{getPageSize()}} more</p>
                                 </div>
                             </uib-tab>
                         </uib-tabset>
@@ -374,3 +374,4 @@
         </div>
     </div>
 </div>
+<footer-directive></footer-directive>

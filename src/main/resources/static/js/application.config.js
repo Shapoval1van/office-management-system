@@ -100,6 +100,10 @@
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
+                    .when("/secured/request/my/assigned", {
+                        templateUrl: "/static/page/request/assigned-request-page.html",
+                        controller: "AssignedRequestListController"
+                    })
                     .when("/secured/calendar", {
                         templateUrl: "/static/page/report/calendar.html",
                         controller: "CalendarController"
@@ -115,6 +119,10 @@
                     .when("/secured/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
+                    })
+                    .when("/secured/person/:personId/details", {
+                        templateUrl: "/static/page/person/person-info.html",
+                        controller: "PersonDetailController"
                     })
                     .when("/secured/report/:personId", {
                         templateUrl: "/static/page/report/report.html",

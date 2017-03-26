@@ -38,6 +38,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.assigned.by.manager}")
     public String FIND_ALL_ASSIGNED_BY_MANAGER;
 
+    @Value("${request.find.all.assigned}")
+    public String FIND_ALL_ASSIGNED;
+
     @Value("${request.find.all.available}")
     public String GET_AVAILABLE_REQUESTS;
 
@@ -46,6 +49,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.find.all.by.manager}")
     public String GET_ALL_REQUESTS_BY_MANAGER;
+
+    @Value("${request.delete}")
+    private String DELETE_REQUEST;
 
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
@@ -178,7 +184,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
-        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
+        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId(), request.getId());
+    }
+
+    @Override
+    public int deleteRequest(Request request) {
+        return getJdbcTemplate().update(DELETE_REQUEST, request.getId());
     }
 
     @Override
@@ -201,13 +212,18 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, pageable, managerId);
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, managerId);
+    }
+
+    @Override
+    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+        return super.queryForList(FIND_ALL_ASSIGNED, pageable, managerId);
     }
 
     @Override
@@ -360,6 +376,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Optional<Request> findOne(Long requestId) {
         return super.findOne(requestId);
+    }
+
+    @Override
+    public Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId) {
+        return this.queryForObject("SELECT * FROM request WHERE request_id  = ? AND parent_id = ?", id, parenId);
     }
 
     private String getQueryByPeriod(String period, String role) {

@@ -13,7 +13,6 @@ import com.netcracker.model.view.View;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDTO {
@@ -38,7 +37,7 @@ public class PersonDTO {
     @JsonView(View.Internal.class)
     @Size(max = 70, groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class})
     //@NotNull(groups = CreateValidatorGroup.class)
-   // @JsonInclude(JsonInclude.Include.NON_NULL)
+    // @JsonInclude(JsonInclude.Include.NON_NULL)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,70}$", groups = {CreateValidatorGroup.class, UpdateValidatorGroup.class, DeleteUserValidatorGroup.class})
     private String password;
     @JsonView(View.Public.class)
@@ -50,21 +49,24 @@ public class PersonDTO {
     private Boolean enabled;
 
 
+    public PersonDTO() {
+    }
+
     public PersonDTO(Person person) {
-        if (person!=null){
+        if (person != null) {
             this.id = person.getId();
             this.firstName = person.getFirstName();
             this.lastName = person.getLastName();
             this.email = person.getEmail();
             this.password = person.getPassword();
-            if (person.getRole()!=null){
+            if (person.getRole() != null) {
                 this.role = person.getRole().getId();
             }
             this.enabled = person.isEnabled();
         }
     }
 
-    public Person toPerson(){
+    public Person toPerson() {
         Person person = new Person();
         person.setId(this.id);
         person.setFirstName(this.firstName);

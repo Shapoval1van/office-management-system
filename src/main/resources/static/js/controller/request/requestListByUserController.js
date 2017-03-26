@@ -148,39 +148,12 @@
                     return currentUser.role === 'ROLE_ADMINISTRATOR';
                 };
 
-                // $scope.assignToMe = function (requestId) {
-                //     return PersonService.assign(requestId, currentUser.id)
-                //         .then(function (response) {
-                //             $scope.assignedMessage = response.data.message;
-                //         }, function (response) {
-                //             $scope.assignedMessage = response.data.errors
-                //                 .map(function (e) {
-                //                     return e.detail
-                //                 })
-                //                 .join('. ');
-                //         });
-                // };
-
-                // $scope.assignToSmb = function () {
-                //     return PersonService.assign($scope.request.id, $scope.selectedManager.id)
-                //         .then(function (response) {
-                //             $scope.assignedMessage = response.data.message;
-                //         }, function (response) {
-                //             $scope.assignedMessage = response.data.errors
-                //                 .map(function (e) {
-                //                     return e.detail
-                //                 })
-                //                 .join('. ');
-                //         });
-                // };
-
                 $scope.selectRequest = function (requestId) {
                     $scope.selectedRequest = requestId;
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     $window.open("/secured/request/" + requestId + "/details", '_blank');
-                    //$scope.goToUrl("/request/" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {

@@ -4,15 +4,15 @@ import com.netcracker.model.entity.Request;
 
 import java.util.Date;
 
-public class ChangeRequestEvent {
+public class UpdateRequestEvent {
     private Request oldRequest;
     private Request newRequest;
     private Date changeTime;
 
-    public ChangeRequestEvent() {
+    public UpdateRequestEvent() {
     }
 
-    public ChangeRequestEvent(Request oldRequest, Request newRequest, Date changeTime) {
+    public UpdateRequestEvent(Request oldRequest, Request newRequest, Date changeTime) {
         this.oldRequest = oldRequest;
         this.newRequest = newRequest;
         this.changeTime = changeTime;

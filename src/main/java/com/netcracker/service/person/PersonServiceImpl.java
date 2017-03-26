@@ -4,8 +4,8 @@ import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.dto.Page;
+import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.event.DeleteUserEvent;
@@ -68,7 +68,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
 
-
     @Override
     public Long getCountDeletedPersonByRole(Integer roleId) {
         return 1l;//personRepository.getCountDeletedPersonByRole(roleId);
@@ -80,28 +79,23 @@ public class PersonServiceImpl implements PersonService {
         Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CannotDeleteUserException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
 
-        if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())){
-            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+        if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())) {
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L) {
                 throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
-            }
-            else if (principal.getName().equals(person.getEmail())){
+            } else if (principal.getName().equals(person.getEmail())) {
                 throw new CannotDeleteUserException(messageSource.getMessage(ADMINISTRATOR_REMOVING_ERROR, null, locale));
-            }
-            else{
+            } else {
                 publishOnDeleteUserEvent(person);
                 return Optional.of(disablePerson(person));
             }
-        }
-        else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())) {
-            if (requestRepository.countAllRequestByManager(person.getId()) != 0L){
+        } else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())) {
+            if (requestRepository.countAllRequestByManager(person.getId()) != 0L) {
                 throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
-            }
-            else{
+            } else {
                 publishOnDeleteUserEvent(person);
                 return Optional.of(disablePerson(person));
             }
-        }
-        else {
+        } else {
             publishOnDeleteUserEvent(person);
             return Optional.of(disablePerson(person));
         }
@@ -155,7 +149,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
-        if(namePattern == null) {
+        if (namePattern == null) {
             return this.personRepository.getPersonList(pageable);
         }
         return this.personRepository.getUsersByNamePattern(pageable, namePattern);
@@ -238,7 +232,7 @@ public class PersonServiceImpl implements PersonService {
         return Optional.of(person);
     }
 
-    private Person disablePerson(Person person){
+    private Person disablePerson(Person person) {
         person.setEnabled(false);
         person.setDeleted(true);
         personRepository.updatePersonAvailable(person);

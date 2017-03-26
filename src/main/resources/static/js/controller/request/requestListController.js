@@ -152,13 +152,11 @@
                         RequestService.cancelRequest(requestId)
                         .then(function (callback) {
                             $scope.requests = callback.data;
+                            swal("Request canceled!", "", "success");
+                            $scope.pageChanged();
                         }, function (error) {
                             console.log(error);
                         });
-
-                        swal("Request canceled!", "", "success");
-                        window.setTimeout(function(){
-                            location.reload();}, 2000)
                     });
                 };
 
