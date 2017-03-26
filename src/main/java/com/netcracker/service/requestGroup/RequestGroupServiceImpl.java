@@ -4,6 +4,7 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.CannotCreateRequestGroupException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
@@ -108,7 +109,9 @@ public class RequestGroupServiceImpl implements RequestGroupService {
 
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public Optional<RequestGroup> saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
+    public RequestGroup saveRequestGroup(RequestGroupDTO requestGroupDTO, Principal principal)
+            throws CannotCreateRequestGroupException, CurrentUserNotPresentException {
+
         RequestGroup requestGroup = requestGroupDTO.toRequestGroup();
 
         String currentUserEmail = principal.getName();
@@ -125,7 +128,10 @@ public class RequestGroupServiceImpl implements RequestGroupService {
         } else
             requestGroup.setAuthor(currentUser.get());
 
-        return saveRequestGroup(requestGroup);
+        Optional<RequestGroup> savedRequestGroup = saveRequestGroup(requestGroup);
+
+        return savedRequestGroup.orElseThrow(() -> new CannotCreateRequestGroupException(messageSource
+                .getMessage(CANNOT_CREATE_REQUEST_GROUP, new Object[]{requestGroup.getName()}, LOCALE)));
     }
 
     @Override
@@ -228,6 +234,8 @@ public class RequestGroupServiceImpl implements RequestGroupService {
      * @return request group
      * @throws ResourceNotFoundException
      */
+    @Override
+    @PreAuthorize("isAuthenticated()")
     public RequestGroup getRequestGroupById(Integer requestGroupId) throws ResourceNotFoundException {
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 

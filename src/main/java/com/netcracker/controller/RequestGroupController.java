@@ -4,10 +4,12 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.CannotCreateRequestGroupException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.dto.StatusDTO;
+import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.UpdateValidatorGroup;
 import com.netcracker.repository.common.Pageable;
@@ -27,6 +29,12 @@ public class RequestGroupController {
     @Autowired
     private RequestGroupService requestGroupService;
 
+    @GetMapping("/{requestGroupId}")
+    @ResponseStatus(HttpStatus.OK)
+    public RequestGroup getRequestGroupById(@PathVariable Integer requestGroupId) throws ResourceNotFoundException {
+        return requestGroupService.getRequestGroupById(requestGroupId);
+    }
+
     @GetMapping({"/author/{authorId}"})
     @ResponseStatus(HttpStatus.OK)
     public Page<RequestGroupDTO> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
@@ -42,9 +50,9 @@ public class RequestGroupController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
-                                   Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
-        requestGroupService.saveRequestGroup(requestGroupDTO, principal);
+    public RequestGroup createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
+                                           Principal principal) throws CurrentUserNotPresentException, CannotCreateRequestGroupException {
+        return requestGroupService.saveRequestGroup(requestGroupDTO, principal);
     }
 
     @PutMapping("/{requestGroupId}")

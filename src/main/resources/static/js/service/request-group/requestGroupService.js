@@ -59,6 +59,10 @@
                         })
                 };
 
+                requestGroupService.getRequestGroupById = function (requestGroupId) {
+                    return $http.get("/api/request-group/" + requestGroupId);
+                };
+
                 return requestGroupService;
             }])
 })();

@@ -15,7 +15,7 @@
                                     <div class="col-md-1">
                                         <button class="btn btn-default" ng-show="!isCurrentUserSubscribing()"
                                                 ng-click="subscribe()">
-                                                Subscribe <i class="fa fa-eye"></i>
+                                            Subscribe <i class="fa fa-eye"></i>
                                         </button>
                                         <button class="btn btn-default" ng-show="isCurrentUserSubscribing()"
                                                 ng-click="unsubscribe()">
@@ -44,10 +44,12 @@
                                                 ng-click="setReopen()">Reopen request
                                         </button>
 
-                                            <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-hide="isCanceled()">Cancel</a>
-                                            <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-hide="isCanceled()">Edit</a>
-                                            <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
-                                        </div>
+                                        <a ng-click="requestDelete(request.id)" class="btn btn-danger"
+                                           ng-hide="isCanceled()">Cancel</a>
+                                        <a ng-click="requestUpdate(request.id)" class="btn btn-info"
+                                           ng-hide="isCanceled()">Edit</a>
+                                        <!--<cancel-request-btn ng-hide="isCanceled() && isAuthor()"></cancel-request-btn>-->
+                                    </div>
 
                                     <div class="form-group col-md-6 col-lg-6">
                                         <label for="author" class="col-lg-1 control-label">Author:</label>
@@ -114,6 +116,23 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group col-lg-6 col-md-6">
+                                        <label for="manager" class="col-lg-2 control-label">Request group:</label>
+                                        <div class="col-lg-12">
+                                            <span ng-if="!!request.requestGroup" class="form-control-static"
+                                                  id="request-group">
+                                                <a ng-click="goToRequestGroupDetails()">
+                                                    {{request.requestGroup.name}}
+                                                </a>
+                                            </span>
+
+                                            <span ng-if="!request.requestGroup" class="form-control-static">
+                                                Not specified
+                                            </span>
+
+                                        </div>
+                                    </div>
+
                                     <div class="form-group col-md-12 col-lg-12">
                                         <label for="details" class="col-lg-1 col-md-1 control-label">Details:</label>
                                         <div class="col-lg-12">
@@ -121,155 +140,213 @@
                                             {{request.description}}
                                         </span>
                                         </div>
-                                    </div >
-                                        <div class="col-md-12 col-lg-12" ng-controller="SubController" >
-                                            <uib-accordion class = "subtask-accordion" ng-show = "((Session.getUserRole()=='ROLE_ADMINISTRATOR')||(Session.getUserRole()=='ROLE_OFFICE MANAGER'&&request.manager.id == Session.getCurrentUser().id))">
-                                                <div uib-accordion-group class="panel-default" is-open="status.open">
-                                                    <uib-accordion-heading>
-                                                        Subtasks <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                                                    </uib-accordion-heading>
-                                                    <button class="btn btn-success pull-up" ng-show="!showNewSubForm" ng-click="toggleNewSub()">Add new subtask</button>
-                                                    <div class="subtask-form" ng-show = "showNewSubForm">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">New subtask</div>
-                                                            <div class="panel-body">
-                                                                <form class="form-horizontal">
-                                                                    <fieldset>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group" ng-class = "{'has-warning':validationError.newSubTittle}">
-                                                                                <label for="inputTitle" class="col-lg-2 control-label">Title</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <input type="text" class="form-control" id="inputTitle" placeholder="Title" ng-model="newSub.name" ng-change="validationError.newSubTittle=false">
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="inputDetails" class="col-lg-2 control-label">Details</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <textarea type="text" class="form-control" id="inputDetails" ng-model="newSub.description" ></textarea>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group">
-                                                                                <label for="inputEstimate" class="col-lg-2 control-label">Estimate</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <input type="datetime-local" class="form-control" id="inputEstimate" ng-model="newSub.estimate">
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="inputPriority" class="col-lg-2 control-label">Priority</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputPriority" ng-model="newSub.priority" ng-options="value.id as value.name for value in priorities">
-                                                                                    </Select>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-lg-12">
-                                                                            <div class="pull-right">
-                                                                                <button class="btn btn-primary" ng-click="addSub()">Add</button>
-                                                                                <button class="btn btn-default" ng-click="toggleNewSub()">Cancel</button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </fieldset>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="subtask-container">
-                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs">
-                                                            <div class="panel-heading" ng-show="sub.showEdit">
-                                                                <div class="row">
+                                    </div>
+                                    <div class="col-md-12 col-lg-12" ng-controller="SubController">
+                                        <uib-accordion class="subtask-accordion"
+                                                       ng-show="((Session.getUserRole()=='ROLE_ADMINISTRATOR')||(Session.getUserRole()=='ROLE_OFFICE MANAGER'&&request.manager.id == Session.getCurrentUser().id))">
+                                            <div uib-accordion-group class="panel-default" is-open="status.open">
+                                                <uib-accordion-heading>
+                                                    Subtasks <i class="pull-right glyphicon"
+                                                                ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                </uib-accordion-heading>
+                                                <button class="btn btn-success pull-up" ng-show="!showNewSubForm"
+                                                        ng-click="toggleNewSub()">Add new subtask
+                                                </button>
+                                                <div class="subtask-form" ng-show="showNewSubForm">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">New subtask</div>
+                                                        <div class="panel-body">
+                                                            <form class="form-horizontal">
+                                                                <fieldset>
                                                                     <div class="col-lg-6">
-                                                                            <input type="text" ng-class = "{'has-warning':validationError.editSubTittle}" class="form-control input-sm" ng-model = "sub.name">
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-warning':validationError.newSubTittle}">
+                                                                            <label for="inputTitle"
+                                                                                   class="col-lg-2 control-label">Title</label>
+                                                                            <div class="col-lg-10">
+                                                                                <input type="text" class="form-control"
+                                                                                       id="inputTitle"
+                                                                                       placeholder="Title"
+                                                                                       ng-model="newSub.name"
+                                                                                       ng-change="validationError.newSubTittle=false">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="inputDetails"
+                                                                                   class="col-lg-2 control-label">Details</label>
+                                                                            <div class="col-lg-10">
+                                                                                <textarea type="text"
+                                                                                          class="form-control"
+                                                                                          id="inputDetails"
+                                                                                          ng-model="newSub.description"></textarea>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="col-lg-6">
+                                                                        <div class="form-group">
+                                                                            <label for="inputEstimate"
+                                                                                   class="col-lg-2 control-label">Estimate</label>
+                                                                            <div class="col-lg-10">
+                                                                                <input type="datetime-local"
+                                                                                       class="form-control"
+                                                                                       id="inputEstimate"
+                                                                                       ng-model="newSub.estimate">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="inputPriority"
+                                                                                   class="col-lg-2 control-label">Priority</label>
+                                                                            <div class="col-lg-10">
+                                                                                <Select type="text" class="form-control"
+                                                                                        id="inputPriority"
+                                                                                        ng-model="newSub.priority"
+                                                                                        ng-options="value.id as value.name for value in priorities">
+                                                                                </Select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-12">
                                                                         <div class="pull-right">
-                                                                            <button class="btn btn-primary btn-xs" ng-click="updateSub(sub)" >Save</button>
-                                                                            <button class="btn btn-danger btn-xs" ng-click="resetEdit(sub)">Cancel</button>
+                                                                            <button class="btn btn-primary"
+                                                                                    ng-click="addSub()">Add
+                                                                            </button>
+                                                                            <button class="btn btn-default"
+                                                                                    ng-click="toggleNewSub()">Cancel
+                                                                            </button>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="panel-heading" ng-show="!sub.showEdit">
-                                                                <span ng-bind = "sub.name">
-                                                                </span>
-                                                                <div class="pull-right">
-                                                                    <button class="btn btn-primary btn-xs" ng-click="goEdit(sub)">Edit</button>
-                                                                    <button class="btn btn-danger btn-xs" ng-click="deleteSub(sub)">Delete</button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <form class="form-horizontal">
-                                                                    <fieldset>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group" ng-show="sub.showEdit">
-                                                                                <label for="inputEditStatus" class="col-lg-2 control-label">Status</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputEditStatus" ng-model="sub.status" ng-options="value.id as value.name for value in statuses">
-                                                                                    </Select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="!sub.showEdit">
-                                                                                <label for="outputStatus" class="col-lg-2 control-label">Status</label>
-                                                                                <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputStatus">
-                                                                                        {{getStatusName(sub.status)}}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="sub.showEdit">
-                                                                                <label for="inputEditDetails" class="col-lg-2 control-label">Details</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <textarea type="text" class="form-control" id="inputEditDetails" ng-model="sub.description" ></textarea>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="!sub.showEdit">
-                                                                                <label for="outputDetails" class="col-lg-2 control-label">Details</label>
-                                                                                <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputDetails" ng-bind="sub.description">
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-lg-6">
-                                                                            <div class="form-group" ng-show="sub.showEdit">
-                                                                                <label for="inputEditPriority" class="col-lg-2 control-label">Priority</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputEditPriority" ng-model="sub.priority" ng-options="value.id as value.name for value in priorities">
-                                                                                    </Select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="!sub.showEdit">
-                                                                                <label for="outputPriority" class="col-lg-2 control-label">Priority</label>
-                                                                                <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputPriority">
-                                                                                        {{getPriorityName(sub.priority)}}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="sub.showEdit">
-                                                                                <label for="inputEditEstimate" class="col-lg-2 control-label">Estimate</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <input type="datetime-local" class="form-control" id="inputEditEstimate" ng-model="sub.estimate">
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="!sub.showEdit">
-                                                                                <label for="outputEstimate" class="col-lg-2 control-label">Estimate</label>
-                                                                                <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputEstimate">
-                                                                                        {{sub.estimate | date: "dd.MM.yyyy HH:mm"}}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </fieldset>
-                                                                </form>
-                                                            </div>
+                                                                </fieldset>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </uib-accordion>
-                                        </div>
+                                                <div class="subtask-container">
+                                                    <div class="panel panel-default pull-up" ng-repeat="sub in subs">
+                                                        <div class="panel-heading" ng-show="sub.showEdit">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <input type="text"
+                                                                           ng-class="{'has-warning':validationError.editSubTittle}"
+                                                                           class="form-control input-sm"
+                                                                           ng-model="sub.name">
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="pull-right">
+                                                                        <button class="btn btn-primary btn-xs"
+                                                                                ng-click="updateSub(sub)">Save
+                                                                        </button>
+                                                                        <button class="btn btn-danger btn-xs"
+                                                                                ng-click="resetEdit(sub)">Cancel
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="panel-heading" ng-show="!sub.showEdit">
+                                                                <span ng-bind="sub.name">
+                                                                </span>
+                                                            <div class="pull-right">
+                                                                <button class="btn btn-primary btn-xs"
+                                                                        ng-click="goEdit(sub)">Edit
+                                                                </button>
+                                                                <button class="btn btn-danger btn-xs"
+                                                                        ng-click="deleteSub(sub)">Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <form class="form-horizontal">
+                                                                <fieldset>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="form-group" ng-show="sub.showEdit">
+                                                                            <label for="inputEditStatus"
+                                                                                   class="col-lg-2 control-label">Status</label>
+                                                                            <div class="col-lg-10">
+                                                                                <Select type="text" class="form-control"
+                                                                                        id="inputEditStatus"
+                                                                                        ng-model="sub.status"
+                                                                                        ng-options="value.id as value.name for value in statuses">
+                                                                                </Select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="!sub.showEdit">
+                                                                            <label for="outputStatus"
+                                                                                   class="col-lg-2 control-label">Status</label>
+                                                                            <div class="form-control-static col-lg-10">
+                                                                                    <span id="outputStatus">
+                                                                                        {{getStatusName(sub.status)}}
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="sub.showEdit">
+                                                                            <label for="inputEditDetails"
+                                                                                   class="col-lg-2 control-label">Details</label>
+                                                                            <div class="col-lg-10">
+                                                                                <textarea type="text"
+                                                                                          class="form-control"
+                                                                                          id="inputEditDetails"
+                                                                                          ng-model="sub.description"></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="!sub.showEdit">
+                                                                            <label for="outputDetails"
+                                                                                   class="col-lg-2 control-label">Details</label>
+                                                                            <div class="form-control-static col-lg-10">
+                                                                                    <span id="outputDetails"
+                                                                                          ng-bind="sub.description">
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="form-group" ng-show="sub.showEdit">
+                                                                            <label for="inputEditPriority"
+                                                                                   class="col-lg-2 control-label">Priority</label>
+                                                                            <div class="col-lg-10">
+                                                                                <Select type="text" class="form-control"
+                                                                                        id="inputEditPriority"
+                                                                                        ng-model="sub.priority"
+                                                                                        ng-options="value.id as value.name for value in priorities">
+                                                                                </Select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="!sub.showEdit">
+                                                                            <label for="outputPriority"
+                                                                                   class="col-lg-2 control-label">Priority</label>
+                                                                            <div class="form-control-static col-lg-10">
+                                                                                    <span id="outputPriority">
+                                                                                        {{getPriorityName(sub.priority)}}
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="sub.showEdit">
+                                                                            <label for="inputEditEstimate"
+                                                                                   class="col-lg-2 control-label">Estimate</label>
+                                                                            <div class="col-lg-10">
+                                                                                <input type="datetime-local"
+                                                                                       class="form-control"
+                                                                                       id="inputEditEstimate"
+                                                                                       ng-model="sub.estimate">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group" ng-show="!sub.showEdit">
+                                                                            <label for="outputEstimate"
+                                                                                   class="col-lg-2 control-label">Estimate</label>
+                                                                            <div class="form-control-static col-lg-10">
+                                                                                    <span id="outputEstimate">
+                                                                                        {{sub.estimate | date: "dd.MM.yyyy HH:mm"}}
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </fieldset>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </uib-accordion>
+                                    </div>
                                 </div>
                             </fieldset>
                         </form>
@@ -277,97 +354,97 @@
                 </div>
                 <div class="row">
                     <div class="container-fluid">
-                    <div class="col-lg-12">
-                        <uib-tabset active="activeForm">
-                            <uib-tab index="0" heading="Comments">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <form>
-                                            <div class="form-group">
-                                                <label for="comment">Your comment:</label>
-                                                <textarea placeholder="Write comment here"
-                                                          ng-model="$parent.$parent.comment" id="comment"
-                                                          class="form-control"></textarea>
-                                                <button class="btn btn-success send-comment-btn"
-                                                        ng-click="sendComment()">Send comment
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div id="comments-wrapper">
-                                        <div class="col-lg-12 col-md-12"
-                                             ng-repeat="comment in comments | orderBy: 'publishDate': true ">
-                                            <div class="list-group comment-wrapper">
-                                                <div class="comment-header">
-                                                    <span class="comment-author">{{getAuthorName(comment.author.id)}}</span>
-                                                    <span class="comment-date">
+                        <div class="col-lg-12">
+                            <uib-tabset active="activeForm">
+                                <uib-tab index="0" heading="Comments">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form>
+                                                <div class="form-group">
+                                                    <label for="comment">Your comment:</label>
+                                                    <textarea placeholder="Write comment here"
+                                                              ng-model="$parent.$parent.comment" id="comment"
+                                                              class="form-control"></textarea>
+                                                    <button class="btn btn-success send-comment-btn"
+                                                            ng-click="sendComment()">Send comment
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div id="comments-wrapper">
+                                            <div class="col-lg-12 col-md-12"
+                                                 ng-repeat="comment in comments | orderBy: 'publishDate': true ">
+                                                <div class="list-group comment-wrapper">
+                                                    <div class="comment-header">
+                                                        <span class="comment-author">{{getAuthorName(comment.author.id)}}</span>
+                                                        <span class="comment-date">
                                                     {{comment.publishDate | date: "dd.MM.yyyy HH:mm"}}
                                                 </span>
-                                                </div>
-                                                <div class="comment-body">
-                                                    <p>{{comment.body}}</p>
+                                                    </div>
+                                                    <div class="comment-body">
+                                                        <p>{{comment.body}}</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div>
-                                            <div ng-click="getNextCommentPage()">
-                                                <p>Show {{getPageSize()}} more</p>
+                                            <div>
+                                                <div ng-click="getNextCommentPage()">
+                                                    <p>Show {{getPageSize()}} more</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </uib-tab>
-                            <uib-tab index="1" heading="History">
-                                <select ng-model="$parent.$parent.chosenPeriod"
-                                        ng-change="changeHistoryPeriod()" class="input-sm">
-                                    <option ng-repeat="period in periodList" ng-value="period"
-                                            ng-selected="$parent.$parent.period === chosenPeriod">
-                                        {{period}}
-                                    </option>
-                                </select>
-                                <table st-table="displayedHistory" st-safe-src="historyList"
-                                       class="table table-stripped task-row">
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th st-sort="field.name">Property</th>
-                                        <th st-sort="oldVal">Old value</th>
-                                        <th st-sort="newVal">New value</th>
-                                        <th st-sort="author.lastName">Author</th>
-                                        <th st-sort="createDate">Change time</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr class="history-row" ng-repeat="historyItem in displayedHistory">
-                                        <td>
-                                            {{$index + 1}}
-                                        </td>
-                                        <td>
-                                            {{historyItem.field.name}}
-                                        </td>
-                                        <td>
-                                            {{historyItem.oldVal}}
-                                        </td>
-                                        <td>
-                                            {{historyItem.newVal}}
-                                        </td>
-                                        <td>
-                                            <a href="#">
-                                                {{historyItem.author.firstName}}
-                                                {{historyItem.author.lastName}}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            {{historyItem.createDate | date : 'dd.MM.yyyy HH:mm:ss'}}
-                                        </td>
-                                    </tbody>
-                                </table>
-                                <div ng-click="getNextHistoryPage('month')">
-                                    <p>Show {{getPageSize()}} more</p>
-                                </div>
-                            </uib-tab>
-                        </uib-tabset>
-                    </div>
+                                </uib-tab>
+                                <uib-tab index="1" heading="History">
+                                    <select ng-model="$parent.$parent.chosenPeriod"
+                                            ng-change="changeHistoryPeriod()" class="input-sm">
+                                        <option ng-repeat="period in periodList" ng-value="period"
+                                                ng-selected="$parent.$parent.period === chosenPeriod">
+                                            {{period}}
+                                        </option>
+                                    </select>
+                                    <table st-table="displayedHistory" st-safe-src="historyList"
+                                           class="table table-stripped task-row">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th st-sort="field.name">Property</th>
+                                            <th st-sort="oldVal">Old value</th>
+                                            <th st-sort="newVal">New value</th>
+                                            <th st-sort="author.lastName">Author</th>
+                                            <th st-sort="createDate">Change time</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="history-row" ng-repeat="historyItem in displayedHistory">
+                                            <td>
+                                                {{$index + 1}}
+                                            </td>
+                                            <td>
+                                                {{historyItem.field.name}}
+                                            </td>
+                                            <td>
+                                                {{historyItem.oldVal}}
+                                            </td>
+                                            <td>
+                                                {{historyItem.newVal}}
+                                            </td>
+                                            <td>
+                                                <a href="#">
+                                                    {{historyItem.author.firstName}}
+                                                    {{historyItem.author.lastName}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {{historyItem.createDate | date : 'dd.MM.yyyy HH:mm:ss'}}
+                                            </td>
+                                        </tbody>
+                                    </table>
+                                    <div ng-click="getNextHistoryPage('month')">
+                                        <p>Show {{getPageSize()}} more</p>
+                                    </div>
+                                </uib-tab>
+                            </uib-tabset>
+                        </div>
                     </div>
                 </div>
             </div>
