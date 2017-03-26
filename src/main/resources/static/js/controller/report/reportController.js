@@ -9,6 +9,17 @@
                 var that = this;
                 var personId = $routeParams.personId;
 
+                $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+                var isAdmin = false;
+                var functionalityOfManager = 2;
+                var functionalityOfUser = 3;
+                var functionality = 2;
+
+                $scope.userInput = undefined;
+                $scope.userToShow = undefined;
+
+
                 //fetch period
                 if($location.search().period == undefined){
                     $scope.period = 'month';
@@ -35,23 +46,59 @@
                     $scope.type = 'area2d';
                 }
 
+                $scope.checkAdmin = function () {
+                    if($scope.currentUser.role=='ROLE_ADMINISTRATOR'){
+                        isAdmin=true;
+                    }
+                };
+                $scope.checkAdmin();
+
+                $scope.getPersonData = function () {
+                    $http({
+                        method: 'GET',
+                        url: 'api/person/' + personId
+                    }).then(function successCallback(response) {
+                        $scope.userToShow = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+                };
+                $scope.getPersonData();
+
 
                 $scope.getTotalPage = function () {
+                    if(userToShow.role.id==2||userToShow.role.id==3){
                     return ReportService.getTotalPage(personId, $scope.period.toLowerCase())
                         .then(function (response) {
                             $scope.totalItems = response.data;
                         }, function (response) {
                         })
+                    } else {
+                        return ReportService.getTotalPageAdmin(personId, $scope.period.toLowerCase(), functionality )
+                            .then(function (response) {
+                                $scope.totalItems = response.data;
+                            }, function (response) {
+                            })
+                    }
                 };
 
 
                 $scope.pageChanged = function(currentPage) {
+                    if(userToShow.role.id==2||userToShow.role.id==3){
                     return ReportService.pageChanged(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize)
                         .then(function (response) {
                             $scope.requestList =  response.data;
                         }, function (response) {
                             $scope.requestList = [];
                         })
+                    } else {
+                        return ReportService.pageChangedAdmin(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize, functionality)
+                            .then(function (response) {
+                                $scope.requestList =  response.data;
+                            }, function (response) {
+                                $scope.requestList = [];
+                            })
+                    }
                 };
 
                 $scope.SimpleChartForManager = function () {
@@ -64,6 +111,22 @@
 
                 $scope.PieChartForManager = function () {
                     return ReportService.getPieChartForManager(personId, $scope.period.toLowerCase())
+                        .then(function (response) {
+                            $scope.pieChart.data = response.data;
+                        }, function (callback) {
+                        })
+                };
+
+                $scope.SimpleChartForAdmin = function () {
+                    return ReportService.getSimpleChartForManager(personId, $scope.period.toLowerCase(), functionality)
+                        .then(function (response) {
+                            $scope.reportForTime.data = response.data;
+                        }, function (callback) {
+                        })
+                };
+
+                $scope.PieChartForAdmin = function () {
+                    return ReportService.getPieChartForManager(personId, $scope.period.toLowerCase(), functionality)
                         .then(function (response) {
                             $scope.pieChart.data = response.data;
                         }, function (callback) {
@@ -100,8 +163,8 @@
                             $scope.SimpleChartForManager();
                             $scope.PieChartForManager();
                         } else if (that.person.role.id == 1) {
-                            $scope.SimpleChartForManager();
-                            $scope.PieChartForManager();
+                            $scope.SimpleChartForAdmin();
+                            $scope.PieChartForAdmin();
                             //window.location = "javascript:history.back()";
                         } else {
                             window.location = "javascript:history.back()";
@@ -116,6 +179,26 @@
                 $scope.getPeriodData = function (periodItem) {
                     $scope.period=periodItem.toLowerCase();
                     window.location = "/secured/report/"+ personId +"?period=" + periodItem.toLowerCase();
+                };
+
+                $scope.getUser = function (userInput) {
+                    $scope.period=periodItem.toLowerCase();
+                    window.location = "/secured/report/"+ userInput.id +"?period=" + periodItem.toLowerCase();
+                };
+
+                $scope.updateUser = function() {
+                    if($scope.userInput.length >= 2) {
+                        console.log($scope.userInput);
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/users/' +  $scope.userInput +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function successCallback(response) {
+                            $scope.users = response.data;
+                            console.log($scope.users);
+                        }, function errorCallback(response) {
+                        });
+                    }
                 };
 
 

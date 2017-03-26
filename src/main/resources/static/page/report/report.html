@@ -9,6 +9,27 @@
                     <select id="periodSelect" class="input-sm" ng-model="namesOfPeriod.value" ng-options="x for x in namesOfPeriod.values"
                              ng-change="getPeriodData(namesOfPeriod.value)">
                     </select>
+
+
+                    <div class="col-lg-4" ng-show="isAdmin">
+                        <label>{{functionality}}</label>
+                        <label>
+                            <input type="radio" ng-model="functionality" value="2">
+                            Manager
+                        </label><br/>
+                        <label>
+                            <input type="radio" ng-model="functionality" ng-value="3">
+                            User
+                        </label><br/>
+
+                        <div class="form-group">
+                            <label>Write and choose username:</label>
+                            <input type="text" class="form-control" ng-model="userInput" ng-change="updateUser()">
+                        </div>
+                        <a ng-click="getUser(userInput.id)" class="btn btn-info" role="button">Get User Inf.</a>
+                    </div>
+
+
                 </div>
                 <legend>{{title}}</legend>
                 <div ng-if="requestList.length!=0">

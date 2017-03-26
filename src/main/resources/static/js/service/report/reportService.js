@@ -26,6 +26,28 @@
                     });
                 };
 
+                reportService.getTotalPageAdmin = function (personId, period , functionality) {
+                    return $http({
+                        method: 'GET',
+                        url: 'api/report/admin/count/allRequest/' + personId + '?period=' + period + '?role=' + functionality
+                    }).then(function successCallback(response) {
+                        return response;
+                    }, function errorCallback(response) {
+                    });
+                };
+
+
+                reportService.pageChangedAdmin = function(personId, currentPage, period, pageSize, functionality) {
+                    return $http({
+                        method: 'GET',
+                        url: 'api/report/admin/allRequest/'+personId+'?period='+ period
+                        +'&page=' +  currentPage + '&size=' + pageSize + '?role=' + functionality
+                    }).then(function successCallback(response) {
+                        return response;
+                    }, function errorCallback(response) {
+                    });
+                };
+
                 reportService.getSimpleChartForManager = function (personId, period) {
                     return $http({
                         method: 'GET',
@@ -41,6 +63,28 @@
                     return $http({
                         method: 'GET',
                         url: 'api/report/chartsForManager/' + personId + '?type=pie' + '&period=' + period
+                    }).then(function successCallback(response) {
+                        return response;
+                    }, function errorCallback(response) {
+
+                    });
+                };
+
+                reportService.getSimpleChartForAdmin = function (personId, period, functionality) {
+                    return $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForAdmin/' + personId + '?period=' + period + '?role=' + functionality
+                    }).then(function successCallback(response) {
+                        return response;
+                    }, function errorCallback(response) {
+                    });
+
+                };
+
+                reportService.getPieChartForAdmin = function (personId, period, functionality) {
+                    return $http({
+                        method: 'GET',
+                        url: 'api/report/chartsForAdmin/' + personId + '?type=pie' + '&period=' + period + '?role=' + functionality
                     }).then(function successCallback(response) {
                         return response;
                     }, function errorCallback(response) {
