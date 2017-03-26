@@ -64,6 +64,8 @@ public class NotificationEventListener {
 
     @EventListener
     public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
+        frontendNotificationService.sendNotificationToAllSubscribed(updateRequestEvent.getOldRequest(),
+                updateRequestEvent.getNewRequest());
         notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(),
                 updateRequestEvent.getNewRequest(), updateRequestEvent.getChangeTime());
     }
