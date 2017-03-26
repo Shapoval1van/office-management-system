@@ -24,10 +24,9 @@ public class FrontendNotificationController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    //TODO add inspection current user to, or change to principal
     @RequestMapping("/api/notification/{personId}")
-    public List<FrontendNotificationDTO> getAllNotificationToPerson(@PathVariable("personId") Long personId){
-        return frontendNotificationService.getNotificationToPerson(personId);
+    public List<FrontendNotificationDTO> getAllNotificationToPerson(@PathVariable("personId") Long personId, Principal principal){
+        return frontendNotificationService.getNotificationToPerson(personId, principal);
     }
 
     @DeleteMapping("/api/notification/delete")
@@ -38,7 +37,7 @@ public class FrontendNotificationController {
 
     @DeleteMapping("/api/allNotification/delete")
     public ResponseEntity<?> deleteAllNotificationByPerson(@RequestParam(name = "id",required=true) Long id, Principal principal) throws CannotDeleteNotificationException {
-        frontendNotificationService.deleteNotificationByPersonId(id);
+        frontendNotificationService.deleteAllNotificationByPersonId(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
