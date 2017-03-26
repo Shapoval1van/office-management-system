@@ -56,17 +56,17 @@
                                             <!--/Assigning buttons-->
                                             <!--Change status buttons-->
                                             <div class="col-md-2" ng-show="isAssignedManager() && isFree()">
-                                                <button class="btn btn-secondary" ng-click="setInProgressStatus()">
+                                                <button class="btn btn-success" ng-click="setInProgressStatus()">
                                                     Start request
                                                 </button>
                                             </div>
                                             <div class="col-md-2" ng-show="isAssignedManager() && isInProgress()">
-                                                <button class="btn btn-secondary" ng-click="setClosedStatus()">
+                                                <button class="btn btn-warning" ng-click="setClosedStatus()">
                                                     Finish request
                                                 </button>
                                             </div>
                                             <div class="col-md-2" ng-show="isAuthor() && isClosed()">
-                                                <button class="btn btn-secondary" ng-click="setReopen()">
+                                                <button class="btn btn-info" ng-click="setReopen()">
                                                     Reopen request
                                                 </button>
                                             </div>
