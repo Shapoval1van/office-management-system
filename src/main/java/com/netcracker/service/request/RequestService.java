@@ -45,6 +45,8 @@ public interface RequestService {
 
     Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable);
 
+    Page<Request> getClosedRequestByEmployee(Principal principal, Pageable pageable);
+
     Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
 
     Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable);

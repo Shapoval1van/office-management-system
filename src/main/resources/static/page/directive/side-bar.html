@@ -18,8 +18,8 @@
             <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
                 <a href="/secured/request/my">My requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('')}">
-                <a href="#">Closed requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/my/closed')}">
+                <a href="/secured/request/my/closed">Closed requests</a>
             </li>
         </div>
         <!--For manager (also fo admin)-->
@@ -28,7 +28,7 @@
                 <a href="/secured/request/free">Free requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('/secured/request/my/assigned')}">
-                <a href="/secured/request/my/assigned">Asigned requests</a>
+                <a href="/secured/request/my/assigned">Assigned requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
                 <a ng-href="/secured/request-group">Request groups</a>

@@ -44,6 +44,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     Long countAllAssignedByManager(Long managerId);
 
+    Long countClosedRequestByEmployee(Long personId);
+
     Long countAllRequestByEmployee(Long employeeId);
 
     Long countAllRequestByManager(Long managerId);
@@ -69,6 +71,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     int removeRequestFromRequestGroup(Long requestId);
 
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
+
+    List<Request> getClosedRequestsByEmployee(Pageable pageable, Person person);
 
     List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee);
 
