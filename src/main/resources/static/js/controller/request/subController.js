@@ -16,6 +16,7 @@
                     newSubTittle:false,
                     editSubTittle:false
                 };
+                $scope.showNewSubForm = false;
 
                 $scope.getStatusName = function (id) {
                     var status = "";
@@ -119,9 +120,13 @@
                             }
                         }
                     });
+                    console.log("------------")
+                    console.log(sub);
                     SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
+
                         if (response.isError == false){
-                            $scope.subs[$scope.subs.indexOf(sub)]=response.sub;
+                            $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
+                            console.log(response.sub);
                         }
                     });
                 };
@@ -135,7 +140,7 @@
                     $scope._fromTempSub(sub);
                 };
 
-                $scope.showNewSubForm = false;
+
 
                 $scope.toggleNewSub = function () {
                     $scope.showNewSubForm =  $scope.showNewSubForm?false:true;
