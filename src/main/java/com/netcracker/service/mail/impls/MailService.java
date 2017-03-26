@@ -1,5 +1,6 @@
 package com.netcracker.service.mail.impls;
 
+import com.netcracker.exception.CannotSendEmailException;
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.event.NotificationSendingErrorEvent;
 import com.netcracker.service.mail.interfaces.MailSending;
@@ -59,7 +60,6 @@ public class MailService implements MailSending {
     @Override
     @Async
     public void send(Notification notification) {
-        SimpleMailMessage msg = new SimpleMailMessage();
         try {
             MimeMessagePreparator preparator = new MimeMessagePreparator() {
                 @Override
@@ -75,6 +75,7 @@ public class MailService implements MailSending {
             mailSender.send(preparator);
         } catch (MailException e){
             eventPublisher.publishEvent(new NotificationSendingErrorEvent(notification));
+            throw new CannotSendEmailException();
         }
     }
 }

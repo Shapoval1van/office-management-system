@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="template/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width"/>
+
     <style type="template/css">
         * {
             margin: 0;
@@ -19,21 +20,6 @@
             background: #efefef;
             -webkit-font-smoothing: antialiased;
             -webkit-template-size-adjust: none;
-        }
-
-        a {
-            color: #779e3c;
-            template-decoration: none;
-        }
-
-        .button {
-            display: inline-block;
-            color: white;
-            background: #779e3c;
-            border: solid #779e3c;
-            border-width: 10px 20px 8px;
-            font-weight: bold;
-            border-radius: 4px;
         }
 
         h1, h2, h3 {
@@ -98,20 +84,7 @@
 
         .container .content {
             background: white;
-            padding: 30px 35px;
-        }
-
-        .shortage {
-            display: block;
-            width: 490px;
-            overflow: hidden;
-            white-space: nowrap !important;
-            template-overflow: ellipsis;
-        }
-
-        .request-changed-field {
-            template-transform: uppercase;
-        }
+            padding: 30px 35px;  }
     </style>
 </head>
 <body>
@@ -128,26 +101,8 @@
                     <td class="content">
                         <h2>Hello $name,</h2>
                         <p>
-                            your request <b>"$requestName"</b> was updated.
+                            $mailBody
                         </p>
-                        <pre>Changes: <span class="request-changed-field"><b>$changeItem</b></span></pre>
-                        <ul>
-                            <li><span class="shortage"><strike>$oldValue</strike></span></li>
-                            <li><span class="shortage">$newValue</span></li>
-                        </ul>
-                        <p>
-                            Check more at request page.
-                        </p>
-                        <table>
-                            <tr>
-                                <td align="center">
-                                    <p>
-                                        <a href="$link"
-                                           class="button">Request details</a>
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
                         <p><em>Best regards,<br> Office Management System</em></p>
                     </td>
                 </tr>

@@ -1,6 +1,6 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("NotifierBellController", ['$scope', '$location', '$http', 'NotificationWebSocketService',
+        .controller("NotifierNavController", ['$scope', '$location', '$http', 'NotificationWebSocketService',
             function ($scope, $location, $http, NotificationWebSocketService) {
                 userId=JSON.parse(localStorage.getItem("currentUser")).id;
                 $scope.getNotification = function() {
@@ -39,7 +39,6 @@
                 };
 
                 $scope.toRequest = function(itemId) {
-                    //TODO add url
                     window.location = "/secured/request/"+itemId+"/details";
                 };
 
@@ -49,7 +48,7 @@
                 NotificationWebSocketService.initialize();
                 //Receive message from web socket
                 NotificationWebSocketService.receive().then(null, null, function (comment) {
-                    $scope.notifications.push(comment);
+                    $scope.notifications.unshift(comment);
                 });
             }])
 })();

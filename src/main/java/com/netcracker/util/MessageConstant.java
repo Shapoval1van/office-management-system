@@ -66,5 +66,10 @@ public class MessageConstant {
     //UPDATE REQUEST HIGHLIGHTING
     public static final String REQUEST_UPDATE_MESSAGE_SUBJECT = "request.update.message.subject";
     public static final String REQUEST_UPDATE_MESSAGE_BODY = "request.update.message.body";
+    public static final String DELETE_NOTIFICATION_EXCEPTION = "cannot.delete.notification.exception";
+    public static final String CHANGE_STATUS_SUBJECT = "change.status.subject";
+    public static final String CHANGE_MANGER_SUBJECT = "change.manager.subject";
+    public static final String CHANGE_REQUEST = "change.request";
+    public static final String CHANGE_GROUP = "change.group";
 
 }

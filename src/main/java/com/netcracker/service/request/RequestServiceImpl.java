@@ -164,10 +164,10 @@ public class RequestServiceImpl implements RequestService {
                         .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
-        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
         Optional<Request> savedRequest = this.requestRepository.save(request);
         //            Automatically subscribe author to request
         personRepository.subscribe(savedRequest.get().getId(), savedRequest.get().getEmployee().getId());
+        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager, request));
         return savedRequest;
     }
 
@@ -180,7 +180,6 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> oldRequest = requestRepository.findOne(requestId);
         Optional<Person> employee = personRepository.findOne(newRequest.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
-
         if (!oldRequest.isPresent()) return Optional.empty();
         if (StatusEnum.CANCELED.getId().equals(oldRequest.get().getStatus().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CANCELED, null, locale));
@@ -191,8 +190,7 @@ public class RequestServiceImpl implements RequestService {
         } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest.get(), newRequest, new Date()));
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(), new Request(oldRequest.get().getId())));
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date()));
             updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
             return this.requestRepository.updateRequest(newRequest);
         }
@@ -211,7 +209,7 @@ public class RequestServiceImpl implements RequestService {
         futureNewRequest.get().setPriority(p.get());
         updateRequestHistory(futureNewRequest.get(), oldRequest, authorName);
 
-        eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest, futureNewRequest.get(), new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date()));
 
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
@@ -375,8 +373,9 @@ public class RequestServiceImpl implements RequestService {
 
         newRequest.setStatus(status);
         updateRequestHistory(newRequest, requestDB.get(), authorName);
-        eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
-        eventPublisher.publishEvent(new ChangeRequestEvent(requestDB.get(), newRequest, new Date()));
+
+        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date()));
+
         return requestRepository.changeRequestStatus(request, status);
     }
 

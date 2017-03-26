@@ -3,7 +3,7 @@
         .directive("notifier", function () {
             return{
                 restrict: "E",
-                templateUrl: "/static/page/directive/notifierBell.html"
+                templateUrl: "/static/page/directive/notifier-nav.html"
             }
         });
 })();
