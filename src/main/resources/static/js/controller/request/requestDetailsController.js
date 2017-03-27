@@ -184,6 +184,28 @@
                         });
                 };
 
+                $scope.unassign = function(requestId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really unassige manager from this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, unasigne!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            RequestService.unassign(requestId)
+                                .then(function (callback) {
+                                    $scope.requests = callback.data;
+                                    swal("Request unassigned!", "", "success");
+                                    $scope.getRequest();
+                                }, function (error) {
+                                    console.log(error);
+                                });
+                        });
+                };
+
                 $scope.update = function () {
                     //TODO: Change page number and page size
                     return PersonService.searchManagerByName($scope.selectedManager, 1, 20)

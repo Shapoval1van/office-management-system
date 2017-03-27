@@ -102,20 +102,27 @@
                 }
 
 
+                $scope.isAssigned = function (request) {
+                    return RequestService.isAssigned(request);
+                };
 
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");
                 };
 
-                $scope.isAdmin = function (thing) {
-                    return currentUser.role === 'ROLE_ADMINISTRATOR';
+                $scope.isAdmin = function () {
+                    return PersonService.isAdministrator(currentUser.role);
                 };
 
+                $scope.isManager = function () {
+                    return PersonService.isManager(currentUser.role);
+                };
 
                 $scope.assignToMe = function (requestId) {
                     return PersonService.assignToMe(requestId)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
+                            $scope.pageChanged();
                         }, function (response) {
                             $scope.assignedMessage = response.data.errors
                                 .map(function (e) {
@@ -129,12 +136,35 @@
                     return PersonService.assign(requestId, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
+                            $scope.pageChanged();
                         }, function (response) {
                             $scope.assignedMessage = response.data.errors
                                 .map(function (e) {
                                     return e.detail
                                 })
                                 .join('. ');
+                        });
+                };
+
+                $scope.unassign = function(requestId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want unassign manager from this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, unasigne!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            RequestService.unassign(requestId)
+                                .then(function (callback) {
+                                    $scope.requests = callback.data;
+                                    swal("Request unassigned!", "", "success");
+                                    $scope.pageChanged();
+                                }, function (error) {
+                                    console.log(error);
+                                });
                         });
                 };
 

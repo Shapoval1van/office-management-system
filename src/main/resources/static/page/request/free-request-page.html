@@ -49,10 +49,11 @@
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td ng-show="my" ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
                                 <td>
-                                    <assign-to-me-btn ng-show="!my"></assign-to-me-btn>
+                                    <assign-to-me-btn ng-show="!my && isManager() && !isAssigned(request)"></assign-to-me-btn>
                                     <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
-                                    <assign-to-smb-btn ng-show="!my && isAdmin()"></assign-to-smb-btn>
+                                    <assign-to-smb-btn ng-show="!my && isAdmin() && !isAssigned(request)"></assign-to-smb-btn>
                                     <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
+                                    <a ng-click="unassign(request.id)" class="btn btn-danger" ng-show="isAssigned(request) && !my">Unassign</a>
                                 </td>
                             </tr>
                             </tbody>

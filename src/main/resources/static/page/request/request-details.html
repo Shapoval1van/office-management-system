@@ -45,6 +45,9 @@
                                                     Remove from group
                                                 </button>
                                             </div>
+                                            <div ng-show="isCurrentUserAdministrator() && isAssigned()" class="col-md-2">
+                                                <a ng-click="unassign(request.id)" class="btn btn-danger">Unassign</a>
+                                            </div>
                                             <!--/Request group buttons-->
                                             <!--Assigning buttons-->
                                             <assign-to-me-btn class="col-md-2"

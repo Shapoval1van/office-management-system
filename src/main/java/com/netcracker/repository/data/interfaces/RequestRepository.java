@@ -87,5 +87,7 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> getFreeRequests();
 
     Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId);
+
+    int unassign(Long requestId);
 }
 
