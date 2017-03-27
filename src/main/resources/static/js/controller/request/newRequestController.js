@@ -93,7 +93,7 @@
                         .then(function (callback) {
                             window.location = "javascript:history.back()";
                         }, function (error) {
-                            swal("Updare Failure!", error.data.errors[0].detail, "error");
+                            swal("Update Failure!", error.data.errors[0].detail, "error");
                             console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })

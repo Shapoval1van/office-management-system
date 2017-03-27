@@ -25,7 +25,7 @@
                         }, function (error) {
                             console.log(error);
                             swal("Update Failure!", error.data.message, "error");
-                            console.log($scope.person)
+                            //console.log($scope.person)
                         })
                 };
 
