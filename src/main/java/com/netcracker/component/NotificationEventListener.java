@@ -68,4 +68,19 @@ public class NotificationEventListener {
         notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(),
                 updateRequestEvent.getNewRequest(), updateRequestEvent.getChangeTime());
     }
+
+    @EventListener
+    public void handleAssignRequest(RequestAssignEvent requestAssignEvent){
+        notificationService.requestAssignNotification(requestAssignEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleAssignRequestToGroup(RequestAddToGroupEvent requestAddToGroupEvent){
+        notificationService.requestAssignToGroup(requestAddToGroupEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleRequestNewComment(RequestNewCommentEvent requestNewCommentEvent){
+        notificationService.newComment(requestNewCommentEvent.getRequest());
+    }
 }

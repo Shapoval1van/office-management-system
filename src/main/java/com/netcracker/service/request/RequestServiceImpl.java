@@ -301,7 +301,9 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         request.setRequestGroup(new RequestGroup(requestGroupId));
-        return requestRepository.updateRequestGroup(requestId, requestGroupId);
+        int rowsUpdated = requestRepository.updateRequestGroup(requestId, requestGroupId);
+        eventPublisher.publishEvent(new RequestAddToGroupEvent(getRequestById(request.getId()).get()));
+        return rowsUpdated;
     }
 
     /**
@@ -480,6 +482,7 @@ public class RequestServiceImpl implements RequestService {
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
+            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
             return true;
         }
 
@@ -500,10 +503,12 @@ public class RequestServiceImpl implements RequestService {
     public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> request = getRequestById(requestId);
-        Optional<Request> person = getRequestById(personId);
+        Optional<Person> person = personRepository.findOne(personId);
 
         if (request.isPresent() && person.isPresent()) {
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            personRepository.subscribe(requestId, person.get().getId());
+            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
             return true;
         }
 
@@ -623,6 +628,11 @@ public class RequestServiceImpl implements RequestService {
 
         Status status = request.getStatus();
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+
+        RequestGroup requestGroup = request.getRequestGroup();
+        if (requestGroup != null){
+            request.setRequestGroup(requestGroupRepository.findOne(requestGroup.getId()).orElseGet(null));
+        }
     }
 
     private void fill(Set<ChangeGroup> changeGroup) {

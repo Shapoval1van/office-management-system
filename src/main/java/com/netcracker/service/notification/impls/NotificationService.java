@@ -45,6 +45,12 @@ public class NotificationService implements NotificationSender {
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
     @Value("${confirmation.of.registration.subject}")
     private String CONFIRMATION_OF_REGISTRATION_SUBJECT;
+    @Value("${request.assigned.subject}")
+    private String REQUEST_ASSIGNED_SUBJECT;
+    @Value("${request.assigned.to.group.subject}")
+    private String REQUEST_ASSIGNED_TO_GROUP_SUBJECT;
+    @Value("${request.new.comment.subject}")
+    private String REQUEST_NEW_COMMENT_SUBJECT;
 
     @Value("${confirmation.of.registration.body}")
     private String CONFIRMATION_OF_REGISTRATION_BODY;
@@ -58,6 +64,12 @@ public class NotificationService implements NotificationSender {
     private String USER_RECOVER_MESSAGE_BODY;
     @Value("${password.reminder.message.body}")
     private String PASSWORD_REMINDER_MESSAGE_BODY;
+    @Value("${request.assigned.body}")
+    private String REQUEST_ASSIGNED_BODY;
+    @Value("${request.assigned.to.group.body}")
+    private String REQUEST_ASSIGNED_TO_GROUP_BODY;
+    @Value("${request.new.comment.body}")
+    private String REQUEST_NEW_COMMENT_BODY;
 
     @Value("${request.expiry.reminder.message.src}")
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_TEMPLATE;
@@ -190,7 +202,6 @@ public class NotificationService implements NotificationSender {
     public void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime) {
         List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
-
         subscribers.forEach(person -> {
             changeItemSet.forEach(changeItem -> {
                 Notification notification = new Notification.NotificationBuilder(person,
@@ -202,6 +213,48 @@ public class NotificationService implements NotificationSender {
                         .build();
                 mailService.send(notification);
             });
+        });
+    }
+
+    @Override
+    public void requestAssignNotification(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_ASSIGNED_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_ASSIGNED_BODY.concat(request.getManager().getFullName()))
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+    @Override
+    public void requestAssignToGroup(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_ASSIGNED_TO_GROUP_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_ASSIGNED_TO_GROUP_BODY.concat(request.getRequestGroup().getName()))
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+    @Override
+    public void newComment(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_NEW_COMMENT_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_NEW_COMMENT_BODY)
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
         });
     }
 
