@@ -29,6 +29,16 @@
                     format: "DD.MM.YYYY HH:mm"
                 };
 
+                var showErrorMessage = function (text) {
+                    text = text?text:"";
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error",
+                        confirmButtonText: "Close"
+                    });
+                };
+
                 $scope.getStatusName = function (id) {
                     var status = "";
                     angular.forEach($scope.statuses, function (obj) {
@@ -80,6 +90,12 @@
                               name: "",
                               priority: 2
                           };
+                      } else {
+                          if (response.data!=null && response.data.errors[0]){
+                              showErrorMessage(response.data.errors[0].detail);
+                          } else {
+                              showErrorMessage();
+                          }
                       }
                   });
                 };
@@ -90,6 +106,12 @@
                             var i = $scope.subs.indexOf(sub);
                             if(i != -1) {
                                 $scope.subs.splice(i, 1);
+                            }
+                        } else {
+                            if (response.data!=null && response.data.errors[0]){
+                                showErrorMessage(response.data.errors[0].detail);
+                            } else {
+                                showErrorMessage();
                             }
                         }
                     });
@@ -124,6 +146,7 @@
                         $scope.validationError.editSubTittle = true;
                         return;
                     }
+                    
                     angular.forEach($scope.tempSubs, function (obj) {
                         if (obj.id == sub.id){
                             var i = $scope.tempSubs.indexOf(obj);
@@ -132,10 +155,17 @@
                             }
                         }
                     });
+
                     sub.status = sub.shownStatus;
                     SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
                         if (response.isError == false){
                             $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
+                        } else {
+                            if (response.data!=null && response.data.errors[0]){
+                                showErrorMessage(response.data.errors[0].detail);
+                            } else {
+                                showErrorMessage();
+                            }
                         }
                     });
                 };
