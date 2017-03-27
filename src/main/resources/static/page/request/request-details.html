@@ -128,7 +128,13 @@
                                                     <uib-accordion-heading>
                                                         Subtasks <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                                     </uib-accordion-heading>
-                                                    <button class="btn btn-success pull-up" ng-show="!showNewSubForm && (request.status.id==1 || request.status.id==2)" ng-click="toggleNewSub()">Add new subtask</button>
+                                                    <div>
+                                                        <button class="btn btn-success pull-up" ng-show="!showNewSubForm && (request.status.id==1 || request.status.id==2)" ng-click="toggleNewSub()">Add new subtask</button>
+                                                        <button class="btn btn-success pull-up"  ng-click="showFinished = !showFinished">
+                                                            <span class="glyphicon glyphicon-ok" ng-show = "showFinished"></span>
+                                                            <span class="glyphicon glyphicon glyphicon-remove" ng-show = "!showFinished"> </span> Show finished
+                                                        </button>
+                                                    </div>
                                                     <div class="subtask-form" ng-show = "showNewSubForm">
                                                         <div class="panel panel-default">
                                                             <div class="panel-heading">New subtask</div>
@@ -179,7 +185,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="subtask-container">
-                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs | orderBy:'status':false:statusComparator">
+                                                        <div class="panel panel-default pull-up" ng-repeat="sub in subs | orderBy:'status':false:statusComparator" ng-show="finishedFilter(showFinished, sub)">
                                                             <div class="panel-heading" ng-show="sub.showEdit && (request.status.id==1 || request.status.id==2)">
                                                                 <div class="row">
                                                                     <div class="col-lg-6">
@@ -213,21 +219,6 @@
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="form-group" ng-show="request.status.id==1 || request.status.id==2">
-                                                                                <label for="inputEditStatus" class="col-lg-2 control-label">Status</label>
-                                                                                <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputEditStatus" ng-model="sub.shownStatus" ng-change="onStatusChange(sub)" ng-options="value.id as value.name for value in statuses">
-                                                                                    </Select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="form-group" ng-show="!(request.status.id==1 || request.status.id==2)">
-                                                                                <label for="outputStatus" class="col-lg-2 control-label">Status</label>
-                                                                                <div class="form-control-static col-lg-10">
-                                                                                    <span id="outputStatus">
-                                                                                        {{getStatusName(sub.status)}}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
                                                                             <div class="form-group" ng-show="sub.showEdit">
                                                                                 <label for="inputEditDetails" class="col-lg-2 control-label">Details</label>
                                                                                 <div class="col-lg-10">
@@ -243,6 +234,21 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                            <div class="form-group" ng-show="request.status.id==1 || request.status.id==2">
+                                                                                <label for="inputEditStatus" class="col-lg-2 control-label">Status</label>
+                                                                                <div class="col-lg-10">
+                                                                                    <Select type="text" class="form-control" id="inputEditStatus" ng-model="sub.shownStatus" ng-change="onStatusChange(sub)" ng-options="value.id as value.name for value in statuses">
+                                                                                    </Select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group" ng-show="!(request.status.id==1 || request.status.id==2)">
+                                                                                <label for="outputStatus" class="col-lg-2 control-label">Status</label>
+                                                                                <div class="form-control-static col-lg-10">
+                                                                                    <span id="outputStatus">
+                                                                                        {{getStatusName(sub.status)}}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
                                                                             <div class="form-group" ng-show="sub.showEdit">
                                                                                 <label for="inputEditPriority" class="col-lg-2 control-label">Priority</label>
                                                                                 <div class="col-lg-10">

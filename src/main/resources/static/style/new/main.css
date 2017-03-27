@@ -17,6 +17,10 @@
     text-align: left!important;
 }
 
+.subtask-container label{
+    text-align: left!important;
+}
+
 .subtask-form label{
     text-align: left!important;
 }

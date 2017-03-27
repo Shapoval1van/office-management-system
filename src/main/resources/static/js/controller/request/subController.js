@@ -24,6 +24,7 @@
                       return -1;
                   }
                 };
+                $scope.showFinished = true;
 
                 $scope.getStatusName = function (id) {
                     var status = "";
@@ -71,7 +72,7 @@
                   }
                   SubService.addSubRequest($scope.newSub, requestId).then(function (response) {
                       if (response.isError == false){
-                          $scope.subs.push(response.sub);
+                          $scope.subs.unshift(response.sub);
                           $scope.newSub = {
                               name: "",
                               priority: 2
@@ -135,6 +136,15 @@
                         }
                     });
                 };
+
+                $scope.finishedFilter = function (showFinished, sub) {
+                    if (showFinished == true){
+                        return true;
+                    } else if (sub.status == 3){
+                        return false;
+                    }
+                    return true;
+                }
 
                 $scope.onStatusChange = function (sub) {
                     if (!sub.showEdit){

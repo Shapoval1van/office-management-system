@@ -51,6 +51,7 @@
                             callback.isError = false;
                             callback.data.showEdit = false;
                             callback.data.estimate = _transformEstimate(callback.data.estimate);
+                            callback.data.shownStatus = callback.data.status;
                             callback.sub = callback.data;
                             return callback;
                         }, function (callback) {
