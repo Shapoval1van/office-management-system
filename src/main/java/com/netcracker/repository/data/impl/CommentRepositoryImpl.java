@@ -29,6 +29,9 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
     @Value("${comment.find.by.request.id}")
     private String FIND_COMMENTS_BY_REQUEST_ID;
 
+    @Value("${comment.count.by.request.id}")
+    private String COUNT_COMMENTS_BY_REQUEST_ID;
+
     public CommentRepositoryImpl() {
         super(Comment.TABLE_NAME, Comment.ID_COLUMN);
     }
@@ -70,6 +73,11 @@ public class CommentRepositoryImpl extends GenericJdbcRepository<Comment, Long> 
     public List<Comment> findCommentByRequestId(Long requestId, Pageable pageable) {
         List<Comment> requestComments = super.queryForList(FIND_COMMENTS_BY_REQUEST_ID, pageable, requestId);
         return requestComments;
+    }
+
+    @Override
+    public Long countCommentByRequest(Long requestId) {
+        return super.jdbcTemplate.queryForObject(COUNT_COMMENTS_BY_REQUEST_ID, Long.class, requestId);
     }
 
 }

@@ -1,8 +1,8 @@
 package com.netcracker.service.comment;
 
-import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.CommentDTO;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.Comment;
 import com.netcracker.model.entity.Person;
 import com.netcracker.repository.common.Pageable;
@@ -47,8 +47,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentByRequestId(Long requestId, Pageable pageable) {
-        return commentRepository.findCommentByRequestId(requestId, pageable);
+    public Page<Comment> getCommentByRequestId(Long requestId, Pageable pageable) {
+        List<Comment> commentByRequest = commentRepository.findCommentByRequestId(requestId, pageable);
+        Long count = commentRepository.countCommentByRequest(requestId);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, commentByRequest);
     }
 
     @Override

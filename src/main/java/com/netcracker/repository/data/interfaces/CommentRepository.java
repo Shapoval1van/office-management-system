@@ -14,4 +14,6 @@ public interface CommentRepository extends JdbcRepository<Comment, Long> {
     List<Comment> findCommentByRequestId(Long requestId);
 
     List<Comment> findCommentByRequestId(Long requestId, Pageable pageable);
+    
+    Long countCommentByRequest(Long requestId);
 }

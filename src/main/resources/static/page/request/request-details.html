@@ -416,8 +416,9 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <div ng-click="getNextCommentPage()" class="show-more-wrapper">
-                                                <p class="show-more-text">Show {{getPageSize()}} more</p>
+                                            <div ng-click="getNextCommentPage()" class="show-more-wrapper"
+                                                 ng-show="getCommentPageSize() > 0">
+                                                <p class="show-more-text">Show {{getCommentPageSize()}} more</p>
                                             </div>
                                         </div>
                                     </div>
