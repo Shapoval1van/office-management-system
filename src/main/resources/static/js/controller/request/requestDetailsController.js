@@ -235,14 +235,10 @@
                 $scope.assignToSmb = function () {
                     return PersonService.assign($scope.request.id, $scope.selectedManager.id)
                         .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
+                            swal("Request assigned!", "Request successful assigned", "success");
                             $scope.getRequest();
                         }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                            swal("Assigning Failure!", response.data.errors, "error");
                         });
                 };
 
