@@ -204,7 +204,7 @@ public class RequestServiceImpl implements RequestService {
         } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName() ));
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date()));
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -299,7 +299,9 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         request.setRequestGroup(new RequestGroup(requestGroupId));
-        return requestRepository.updateRequestGroup(requestId, requestGroupId);
+        int rowsUpdated = requestRepository.updateRequestGroup(requestId, requestGroupId);
+        eventPublisher.publishEvent(new RequestAddToGroupEvent(getRequestById(request.getId()).get()));
+        return rowsUpdated;
     }
 
     /**
@@ -500,6 +502,7 @@ public class RequestServiceImpl implements RequestService {
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
+            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
             return true;
         }
 
@@ -653,6 +656,11 @@ public class RequestServiceImpl implements RequestService {
 
         Status status = request.getStatus();
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+
+        RequestGroup requestGroup = request.getRequestGroup();
+        if (requestGroup != null){
+            request.setRequestGroup(requestGroupRepository.findOne(requestGroup.getId()).orElseGet(null));
+        }
     }
 
     private void fill(Set<ChangeGroup> changeGroup) {
