@@ -51,11 +51,10 @@
                                             <!--/Request group buttons-->
                                             <!--Assigning buttons-->
                                             <assign-to-me-btn class="col-md-2"
-                                                              ng-show="!isAssigned() && isCurrentUserManager()
-                                                              || isCurrentUserAdministrator()">
+                                                              ng-show="!isAssigned() && isCurrentUserManager()">
                                             </assign-to-me-btn>
                                             <assign-to-smb-btn class="col-md-2"
-                                                               ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
+                                                               ng-show="!isAssigned() && isCurrentUserAdministrator()"></assign-to-smb-btn>
                                             <!--/Assigning buttons-->
                                             <!--Change status buttons-->
                                             <div class="col-md-2" ng-show="isAssignedManager() && isFree()">
