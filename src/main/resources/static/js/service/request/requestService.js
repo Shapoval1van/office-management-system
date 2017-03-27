@@ -42,6 +42,7 @@
                         })
                 };
 
+
                 requestService.getAssignedRequestList = function (pageNumber, pageSize) {
                     return $http.get("/api/request/list/assigned?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
@@ -50,7 +51,6 @@
                             return callback;
                         })
                 };
-
                 requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
                     return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
@@ -62,6 +62,15 @@
 
                 requestService.getAllRequestByEmployee = function (pageNumber, pageSize) {
                     return $http.get("/api/request/list/my?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
