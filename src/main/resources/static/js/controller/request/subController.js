@@ -25,6 +25,9 @@
                   }
                 };
                 $scope.showFinished = true;
+                $scope.dateOptions = {
+                    format: "DD.MM.YYYY HH:mm"
+                };
 
                 $scope.getStatusName = function (id) {
                     var status = "";

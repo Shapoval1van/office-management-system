@@ -158,11 +158,8 @@
                                                                         <div class="col-lg-6">
                                                                             <div class="form-group">
                                                                                 <label for="newSubDate" class="col-lg-2 control-label">Estimate</label>
-                                                                               <!-- <div class="col-lg-10">
-                                                                                    <input type="datetime-local" class="form-control" id="inputEstimate" ng-model="newSub.estimate">
-                                                                                </div>-->
                                                                                 <div class="col-lg-10" ng-click="calendarFormClick()">
-                                                                                    <input class="form-control" id='newSubDate' placeholder="Estimate" ng-model="newSub.estimate">
+                                                                                    <input class="form-control" id='newSubDate' datetimepicker options="dateOptions" placeholder="Estimate" ng-model="newSub.estimate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group">
@@ -266,18 +263,15 @@
                                                                             </div>
                                                                             <div class="form-group" ng-show="sub.showEdit">
                                                                                 <label for="inputEditEstimate" class="col-lg-2 control-label">Estimate</label>
-                                                                                <!--<div class="col-lg-10">
-                                                                                    <input type="datetime-local" class="form-control" id="inputEditEstimate" ng-model="sub.estimate">
-                                                                                </div>-->
-                                                                                <div class="col-lg-10" ng-click="calendarFormClick()">
-                                                                                    <input class="form-control" id='inputEditEstimate' placeholder="Estimate" ng-model="sub.estimate">
+                                                                                <div class="col-lg-10">
+                                                                                    <input class="form-control" id='inputEditEstimate' datetimepicker options="dateOptions" placeholder="Estimate" ng-model="sub.estimate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group" ng-show="!sub.showEdit">
                                                                                 <label for="outputEstimate" class="col-lg-2 control-label">Estimate</label>
                                                                                 <div class="form-control-static col-lg-10">
                                                                                     <span id="outputEstimate">
-                                                                                        {{sub.estimate | date: "dd.MM.yyyy HH:mm"}}
+                                                                                        {{sub.estimate.format("DD.MM.YYYY HH:mm")}}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
