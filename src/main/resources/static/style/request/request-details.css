@@ -49,19 +49,6 @@ label[for='comment']{
 .history-row td{
     text-align: center;
 }
-.btn-info{
-    float: none!important;
-    margin: 5px 10px!important;
-    -webkit-border-radius: 5px!important;
-    -moz-border-radius: 5px!important;
-    border-radius: 5px!important;
-}
-.btn-danger{
-    margin: 5px 10px 5px 0!important;
-    -webkit-border-radius: 5px!important;
-    -moz-border-radius: 5px!important;
-    border-radius: 5px!important;
-}
 label[for="details"], label[for="manager"]{
     text-align: left!important;
 }

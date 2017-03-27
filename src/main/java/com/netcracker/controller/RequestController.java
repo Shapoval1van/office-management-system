@@ -84,7 +84,7 @@ public class RequestController {
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/add")
     public ResponseEntity<?> addRequest(@Validated(CreateValidatorGroup.class) @RequestBody RequestDTO requestDTO,
                                         Principal principal) throws CannotCreateSubRequestException,
-                                                                    CannotCreateRequestException {
+            CannotCreateRequestException {
         Request request = requestDTO.toRequest();
         requestService.saveRequest(request, principal);
         return ResponseEntity.ok(new MessageDTO("Added"));
@@ -103,7 +103,7 @@ public class RequestController {
     public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,
                                                  @Validated(CreateValidatorGroup.class)
                                                  @RequestBody RequestDTO requestDTO, Principal principal)
-                                                 throws ResourceNotFoundException, IllegalAccessException {
+            throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Request> result = requestService.updateRequest(currentRequest, requestId, principal);
@@ -114,11 +114,11 @@ public class RequestController {
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/update/{statusId}")
     public ResponseEntity<?> updateRequestStatus(@PathVariable Long requestId,
-                                                       @PathVariable Integer statusId,
-                                                       @Validated(CreateValidatorGroup.class)
-                                                       @RequestBody RequestDTO requestDTO,
-                                                       Principal principal)
-                                                       throws ResourceNotFoundException, IllegalAccessException {
+                                                 @PathVariable Integer statusId,
+                                                 @Validated(CreateValidatorGroup.class)
+                                                 @RequestBody RequestDTO requestDTO,
+                                                 Principal principal)
+            throws ResourceNotFoundException, IllegalAccessException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Status> status = statusService.getStatusById(statusId);
@@ -131,7 +131,7 @@ public class RequestController {
     @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class)
                                            @PathVariable Long requestId, Principal principal)
-                                           throws CannotDeleteRequestException, ResourceNotFoundException {
+            throws CannotDeleteRequestException, ResourceNotFoundException {
         Optional<Request> request = requestService.getRequestById(requestId);
         if (!request.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -212,16 +212,15 @@ public class RequestController {
     @DeleteMapping("/{requestId}/group")
     @ResponseStatus(HttpStatus.OK)
     public void removeFromRequestGroup(@PathVariable("requestId") Long requestId, Principal principal)
-                                       throws ResourceNotFoundException, IllegalAccessException {
+            throws ResourceNotFoundException, IllegalAccessException {
         requestService.removeFromRequestGroup(requestId, principal);
     }
 
     @GetMapping("/request-group/{requestGroupId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<FullRequestDTO> getRequestByRequestGroup(@PathVariable("requestGroupId") Integer requestGroupId,
+    public Page<FullRequestDTO> getRequestByRequestGroup(@PathVariable("requestGroupId") Integer requestGroupId,
                                                          Pageable pageable) {
 
-        List<Request> requestsByRequestGroup = requestService.getRequestsByRequestGroup(requestGroupId, pageable);
-        return requestsByRequestGroup.stream().map(FullRequestDTO::new).collect(Collectors.toList());
+        return requestService.getFullRequestDTOByRequestGroup(requestGroupId, pageable);
     }
 }
