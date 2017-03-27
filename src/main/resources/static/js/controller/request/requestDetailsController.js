@@ -15,6 +15,8 @@
 
                 $scope.historyPageNumber = 1;
                 $scope.commentPageNumber = 1;
+                $scope.commentPageSize = 3;
+                $scope.commentMaxPageSize = 0;
 
                 $scope.request = {};
                 $scope.historyList = [];
@@ -80,11 +82,22 @@
                     return PAGE_SIZE;
                 };
 
+                $scope.getCommentPageSize = function () {
+                    if ($scope.commentMaxPageSize - $scope.comments.length >= $scope.commentPageSize) {
+                        return $scope.commentPageSize;
+                    }
+                    else {
+                        $scope.commentPageSize = $scope.commentMaxPageSize - $scope.comments.length;
+                        return $scope.commentPageSize;
+                    }
+                };
+
                 //Subscribe to topic /topic/request/{requestId}
                 WebSocketService.initialize(requestId);
                 //Receive message from web socket
                 WebSocketService.receive().then(null, null, function (comment) {
                     $scope.comments.push(comment);
+                    $scope.maxPageSize++;
                 });
 
                 $scope.sendComment = function () {
@@ -100,7 +113,9 @@
                 $scope.getCommentsOfRequest = function (pageNumber, pageSize) {
                     return CommentService.getCommentsByRequestId(requestId, pageNumber, pageSize)
                         .then(function (callback) {
-                            callback.data.forEach(function (comment) {
+                            $scope.commentPageSize = callback.data.pageSize;
+                            $scope.commentMaxPageSize = callback.data.totalElements;
+                            callback.data.data.forEach(function (comment) {
                                 $scope.comments.push(comment);
                             })
                         }, function (callback) {
@@ -108,11 +123,11 @@
                         })
                 };
 
-                $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+                $scope.getCommentsOfRequest($scope.commentPageNumber, $scope.commentPageSize);
 
                 $scope.getNextCommentPage = function () {
                     $scope.commentPageNumber++;
-                    $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+                    $scope.getCommentsOfRequest($scope.commentPageNumber, $scope.commentPageSize);
                 };
 
                 var isGetAuthorRequestPending = false;
