@@ -36,6 +36,7 @@
                         $scope.groups = response.data;
                         $scope.assignedMessage = "Linked";
                         $scope.getRequest();
+                        $('.modal-backdrop').fadeOut();
                     }, function errorCallback(response) {
                         $scope.assignedMessage = response.data.errors
                             .map(function (e) {
@@ -54,6 +55,7 @@
                         .then(function (callback) {
                             $scope.selectedRequestGroup = callback.data;
                             $scope.link();
+                            $('.modal-backdrop').fadeOut();
                         }, function (response) {
                             $scope.assignedMessage = response.data.errors
                                 .map(function (e) {

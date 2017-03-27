@@ -38,13 +38,18 @@
                                             <!--Request group buttons-->
                                             <add-to-request-group-btn ng-show="showAddGroupBtn()" class="col-md-2">
                                             </add-to-request-group-btn>
-                                            <div ng-show="!showAddGroupBtn()" class="col-md-2">
-                                                <remove-from-request-group-modal></remove-from-request-group-modal>
-                                                <button class="btn btn-danger" data-dismiss="modal" data-toggle="modal"
-                                                        data-target="#removeFromRequestGroupModal">
-                                                    Remove from group
+                                            <div class="col-md-2" ng-show="!showAddGroupBtn()">
+                                                <button class="btn btn-danger" ng-click="removeFromRequestGroup()">
+                                                    Remove from request group
                                                 </button>
                                             </div>
+                                            <!--<div ng-show="!showAddGroupBtn()" class="col-md-2">-->
+                                                <!--<remove-from-request-group-modal></remove-from-request-group-modal>-->
+                                                <!--<button class="btn btn-danger" data-dismiss="modal" data-toggle="modal"-->
+                                                        <!--data-target="#removeFromRequestGroupModal">-->
+                                                    <!--Remove from group-->
+                                                <!--</button>-->
+                                            <!--</div>-->
                                             <div ng-show="isCurrentUserAdministrator() && isAssigned()" class="col-md-2">
                                                 <a ng-click="unassign(request.id)" class="btn btn-danger">Unassign</a>
                                             </div>

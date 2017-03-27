@@ -53,13 +53,18 @@
                                 </td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
                                 <td>
-                                    <remove-from-request-group-modal></remove-from-request-group-modal>
-                                    <div data-dismiss="modal" data-toggle="modal"
-                                         data-target="#removeFromRequestGroupModal">
-                                        <button class="btn btn-danger" ng-click="setCurrentRequest(request)">
+                                    <div class="col-md-2">
+                                        <button class="btn btn-danger" ng-click="removeFromRequestGroup(request.id)">
                                             Remove from request group
                                         </button>
                                     </div>
+                                    <!--<remove-from-request-group-modal></remove-from-request-group-modal>-->
+                                    <!--<div data-dismiss="modal" data-toggle="modal"-->
+                                         <!--data-target="#removeFromRequestGroupModal">-->
+                                        <!--<button class="btn btn-danger" ng-click="setCurrentRequest(request)">-->
+                                            <!--Remove from request group-->
+                                        <!--</button>-->
+                                    <!--</div>-->
                                 </td>
                             </tr>
                             </tbody>

@@ -60,21 +60,12 @@
                             RequestGroupService.deleteRequestGroup(groupId)
                                 .then(function () {
                                     $scope.getGroupByAuthor();
+                                    swal("Request group deleted!", "", "success");
                                 }, function (error) {
                                     swal("Delete Request Group Failure!", error, "error");
                                 });
-                            swal("Request group deleted!", "", "success");
                         });
                 };
-
-                // $scope.deleteRequestGroup = function () {
-                //     return RequestGroupService.deleteRequestGroup($scope.currentRequestGroup.id)
-                //         .then(function () {
-                //             $scope.getGroupByAuthor();
-                //         }, function () {
-                //             console.log("Failure")
-                //         })
-                // };
 
                 $scope.setCurrentRequestGroup = function (requestGroup) {
                     $scope.currentRequestGroup = requestGroup;

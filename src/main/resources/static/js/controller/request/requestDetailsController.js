@@ -277,13 +277,34 @@
                             })
                 };
 
-                $scope.removeFromRequestGroup = function () {
-                    return RequestService.removeFromRequestGroup($scope.request.id)
-                        .then(function () {
-                            $scope.getRequest();
-                        }, function () {
+                // $scope.removeFromRequestGroup = function () {
+                //     return RequestService.removeFromRequestGroup($scope.request.id)
+                //         .then(function () {
+                //             $scope.getRequest();
+                //         }, function () {
+                //
+                //         })
+                // };
 
-                        })
+                $scope.removeFromRequestGroup = function () {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to remove request from this group",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, remove it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestService.removeFromRequestGroup($scope.request.id)
+                                .then(function (callback) {
+                                    $scope.getRequest();
+                                    swal("Request was removed from request group!", "", "success");
+                                }, function () {
+                                    swal("Remove Request From Group Failure!", "", "error");
+                                });
+                        });
                 };
 
                 $scope.setInProgressStatus = function () {
