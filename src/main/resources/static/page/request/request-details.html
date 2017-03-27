@@ -50,9 +50,14 @@
                                             </div>
                                             <!--/Request group buttons-->
                                             <!--Assigning buttons-->
-                                            <assign-to-me-btn class="col-md-2"
-                                                              ng-show="!isAssigned() && isCurrentUserManager()">
-                                            </assign-to-me-btn>
+                                            <div class="col-md-2" ng-show="!isAssigned() && isCurrentUserManager()">
+                                                <button class="btn btn-info" ng-click="assignToMe(request.id)">
+                                                    Assign request
+                                                </button>
+                                            </div>
+                                            <!--<assign-to-me-btn class="col-md-2"-->
+                                                              <!--ng-show="!isAssigned() && isCurrentUserManager()">-->
+                                            <!--</assign-to-me-btn>-->
                                             <assign-to-smb-btn class="col-md-2"
                                                                ng-show="!isAssigned() && isCurrentUserAdministrator()"></assign-to-smb-btn>
                                             <!--/Assigning buttons-->

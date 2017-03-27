@@ -150,9 +150,10 @@ public class RequestController {
 
     @PostMapping(produces = JSON_MEDIA_TYPE, value = "/assign/request")
     public ResponseEntity<?> assignRequest(@Validated(CreateValidatorGroup.class)
-                                           @RequestBody RequestAssignDTO requestAssignDTO)
+                                           @RequestBody RequestAssignDTO requestAssignDTO,
+                                           Principal principal)
             throws CannotAssignRequestException {
-        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId());
+        requestService.assignRequest(requestAssignDTO.getRequestId(), requestAssignDTO.getPersonId(), principal);
 
         return ResponseEntity.ok(new MessageDTO("Assigned"));
     }

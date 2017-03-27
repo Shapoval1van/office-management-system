@@ -38,7 +38,7 @@ public interface RequestService {
 
     boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException;
 
-    boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException; // Assign to somebody
+    boolean assignRequest(Long requestId, Long personId,  Principal principal) throws CannotAssignRequestException; // Assign to somebody
 
     Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
 
@@ -61,6 +61,8 @@ public interface RequestService {
     Page<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
 
     Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName);
 
     void fill(Request request);
 
