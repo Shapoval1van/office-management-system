@@ -179,6 +179,14 @@ public class RequestController {
         return ResponseEntity.ok(requestPage);
     }
 
+    @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/my/closed")
+    public ResponseEntity<?> getClosedRequestListByEmployee(Pageable pageable, Principal principal) {
+        Page<Request> requestPage = requestService.getClosedRequestByEmployee(principal, pageable);
+
+        return ResponseEntity.ok(requestPage);
+    }
+
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/list/assigned")
     public ResponseEntity<?> getAssignedRequestList(Principal principal, Pageable pageable) {
         Page<Request> requestPage = requestService.getAllAssignedRequest(principal, pageable);

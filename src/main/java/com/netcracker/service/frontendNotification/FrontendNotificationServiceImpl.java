@@ -91,6 +91,8 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
         int STATUS_FIELD_ID = 3;
         int MANAGER_FIELD_ID = 4;
         int GROUP_FIELD_ID = 7;
+        int STATUS_CLOSED_ID = 3;
+        int STATUS_FREE_ID = 1;
 
         List<Person> people = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
         ArrayList<ChangeItem> changeItemSet = new ArrayList<>(changeTracker.findMismatching(oldRequest, newRequest));
@@ -107,22 +109,33 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
                     changeItem -> {
                         if (changeItem.getField().getId() == STATUS_FIELD_ID) {
                             Status status = statusRepository.findOne(newRequest.getStatus().getId()).get();
-                            String statusName = status.getName().toLowerCase().replace("_", " ");
-                            String subject = messageSource.getMessage(CHANGE_STATUS_SUBJECT,
-                                    new Object[]{requestName, statusName}, locale);
+                            String statusName = status.getName().toLowerCase().replace("_", " ").toUpperCase();
+                            String subject;
+                            if(status.getId()==STATUS_FREE_ID) {
+                                subject = messageSource.getMessage(CHANGE_STATUS_TO_FREE,
+                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
+                            }
+                            else if(status.getId()==STATUS_CLOSED_ID) {
+                                subject = messageSource.getMessage(CHANGE_STATUS_TO_CLOSED,
+                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
+                            }else {
+                                subject = messageSource.getMessage(CHANGE_STATUS_SUBJECT,
+                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
+                            }
+
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                         } else if (changeItem.getField().getId() == MANAGER_FIELD_ID) {
                             Person manager = personRepository.findOne(newRequest.getManager().getId()).get();
-                            String subject = messageSource.getMessage(CHANGE_MANGER_SUBJECT, new Object[]{requestName,
+                            String subject = messageSource.getMessage(CHANGE_MANGER_SUBJECT, new Object[]{requestName.toUpperCase(),
                                     manager.getLastName()}, locale);
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                         } else if (changeItem.getField().getId() == GROUP_FIELD_ID) {
                             RequestGroup group = requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get();
-                            String subject = messageSource.getMessage(CHANGE_GROUP, new Object[]{requestName, group.getName()}, locale);
+                            String subject = messageSource.getMessage(CHANGE_GROUP, new Object[]{requestName.toUpperCase(), group.getName()}, locale);
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                         } else {
                             if (!isSimpleUpdateNotificationAlreadyExist[0]) {
-                                String subject = messageSource.getMessage(CHANGE_REQUEST, new Object[]{requestName}, locale);
+                                String subject = messageSource.getMessage(CHANGE_REQUEST, new Object[]{requestName.toUpperCase()}, locale);
                                 notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                                 isSimpleUpdateNotificationAlreadyExist[0] = true;
                             }

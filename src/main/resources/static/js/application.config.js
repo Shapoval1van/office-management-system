@@ -92,6 +92,10 @@
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
+                    .when("/secured/request/my/closed", {
+                        templateUrl: "/static/page/request/closed-request-page.html",
+                        controller: "ClosedRequestListController"
+                    })
                     .when("/secured/request/my/assigned", {
                         templateUrl: "/static/page/request/assigned-request-page.html",
                         controller: "AssignedRequestListController"

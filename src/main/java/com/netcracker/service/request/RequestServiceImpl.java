@@ -546,6 +546,17 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional()
+    @PreAuthorize("isAuthenticated()")
+    public Page<Request> getClosedRequestByEmployee(Principal principal, Pageable pageable) {
+        Person employee = personRepository.findPersonByEmail(principal.getName()).get();
+        List<Request> requestList = requestRepository.getClosedRequestsByEmployee(pageable, employee);
+        Long count = requestRepository.countClosedRequestByEmployee(employee.getId());
+        requestList.forEach(this::fillRequest);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllRequestByUser(Long userId, Pageable pageable) {
         List<Request> requestList = requestRepository.getAllRequestByUser(userId, pageable);
