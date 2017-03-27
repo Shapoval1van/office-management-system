@@ -428,6 +428,28 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public void unassign(Long requestId, Principal principal) throws CannotUnassignRequestException, ResourceNotFoundException {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        Optional<Request> oldRequest = getRequestById(requestId);
+        Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
+
+        if(!oldRequest.isPresent()) {
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, null, locale));
+        }
+        if(oldRequest.get().getManager() == null) {
+            throw new CannotUnassignRequestException(messageSource.getMessage(REQUEST_NOT_ASSIGNED, null, locale));
+        }
+
+        requestRepository.unassign(requestId);
+
+        Optional<Request> newRequest = getRequestById(requestId);
+        updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException {

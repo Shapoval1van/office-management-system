@@ -60,4 +60,6 @@ public interface RequestService {
     void fill(Request request);
 
     void checkRequestsForExpiry();
+
+    void unassign(Long requestId, Principal principal) throws CannotUnassignRequestException, ResourceNotFoundException;
 }

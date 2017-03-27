@@ -32,8 +32,9 @@
                                         <add-to-request-group-btn
                                                 ng-show="isCurrentUserManager() || isCurrentUserAdministrator()"></add-to-request-group-btn>
                                         <assign-to-me-btn
-                                                ng-show="!isAssigned() && isCurrentUserManager() || isCurrentUserAdministrator()"></assign-to-me-btn>
-                                        <assign-to-smb-btn ng-show="isCurrentUserAdministrator()"></assign-to-smb-btn>
+                                                ng-show="!isAssigned() && isCurrentUserManager()"></assign-to-me-btn>
+                                        <assign-to-smb-btn ng-show="isCurrentUserAdministrator() && !isAssigned()"></assign-to-smb-btn>
+                                        <a ng-click="unassign(request.id)" class="btn btn-danger" ng-show="isAssigned()">Unassign</a>
                                         <button class="btn btn-info" ng-show="isAssignedManager() && isFree()"
                                                 ng-click="setInProgressStatus()">Start request
                                         </button>

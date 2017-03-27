@@ -164,6 +164,14 @@ public class RequestController {
         return ResponseEntity.ok(requestPage);
     }
 
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/unassige")
+    public ResponseEntity<?> unassign(@PathVariable Long requestId, Principal principal)
+            throws CannotAssignRequestException, ResourceNotFoundException, CannotUnassignRequestException {
+        requestService.unassign(requestId, principal);
+
+        return ResponseEntity.ok(new MessageDTO("Unassigned"));
+    }
+
     @GetMapping(produces = JSON_MEDIA_TYPE, value = "/available")
     public ResponseEntity<?> getRequestList(Pageable pageable) {
         Page<Request> requestPage = requestService.getAvailableRequestList(pageable);

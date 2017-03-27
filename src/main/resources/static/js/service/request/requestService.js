@@ -78,6 +78,14 @@
                         })
                 };
 
+                requestService.unassign = function (requestId) {
+                    return $http.put("/api/request/" + requestId + "/unassige/")
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
                 requestService.updateRequest = function (requestId, request) {
                     return $http.put("/api/request/" + requestId, request)
                         .then(function (callback) {

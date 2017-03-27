@@ -65,6 +65,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.assign}")
     private String ASSIGN_REQUEST_TO_PERSON;
 
+    @Value("${request.unassign}")
+    private String UNASSIGN_REQUEST;
+
     @Value("${request.count.all.by.user}")
     private String COUNT_ALL_BY_USER;
 
@@ -254,6 +257,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public int assignRequest(Long requestId, Long personId, Status status) {
         return getJdbcTemplate().update(ASSIGN_REQUEST_TO_PERSON, personId, status.getId(), requestId);
+    }
+
+    @Override
+    public int unassign(Long requestId) {
+        return getJdbcTemplate().update(UNASSIGN_REQUEST, requestId);
     }
 
     @Override

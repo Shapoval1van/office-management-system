@@ -40,34 +40,36 @@ public class ChangeTracker {
         Javers javers = JaversBuilder.javers().build();
         Diff diff = javers.compare(oldRequest, newRequest);
         List<ValueChange> change = diff.getChangesByType(ValueChange.class);
-        change.forEach(c->{
+        change.forEach(c -> {
             ChangeItem changeItem = new ChangeItem();
             Optional affectedObject = c.getAffectedObject();
-            if(affectedObject.get() instanceof Request){
+            if (affectedObject.get() instanceof Request) {
                 changeItem.setField(fieldRepository.findFieldByName(c.getPropertyName().toUpperCase()).get());
-                changeItem.setOldVal(c.getLeft()!=null?c.getLeft().toString():" ");
-                changeItem.setNewVal(c.getRight()!=null?c.getRight().toString():" ");
+                changeItem.setOldVal(c.getLeft() != null ? c.getLeft().toString() : " ");
+                changeItem.setNewVal(c.getRight() != null ? c.getRight().toString() : " ");
                 changeItemSet.add(changeItem);
-            }else {
-                if(affectedObject.get() instanceof Status){
+            } else {
+                if (affectedObject.get() instanceof Status) {
                     changeItem.setField(fieldRepository.findFieldByName("STATUS").get());
                     changeItem.setOldVal(statusRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
                     changeItem.setNewVal(statusRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
                     changeItemSet.add(changeItem);
                 }
-                if(affectedObject.get() instanceof Person){
+                if (affectedObject.get() instanceof Person) {
                     changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
-                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).get().getFullName());
+                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).orElseGet(
+                            () -> new Person(" ", " ")
+                    ).getFullName());
                     changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
                     changeItemSet.add(changeItem);
                 }
-                if(affectedObject.get() instanceof Priority){
+                if (affectedObject.get() instanceof Priority) {
                     changeItem.setField(fieldRepository.findFieldByName("PRIORITY").get());
                     changeItem.setOldVal(priorityRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
                     changeItem.setNewVal(priorityRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
                     changeItemSet.add(changeItem);
                 }
-                if(affectedObject.get() instanceof RequestGroup){
+                if (affectedObject.get() instanceof RequestGroup) {
                     changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
                     changeItem.setOldVal(requestGroupRepository.findOne(Integer.parseInt(c.getLeft().toString())).get().getName());
                     changeItem.setNewVal(requestGroupRepository.findOne(Integer.parseInt(c.getRight().toString())).get().getName());
@@ -79,32 +81,41 @@ public class ChangeTracker {
         referenceChanges.forEach(r -> {
             String fieldName = r.getPropertyName();
             ChangeItem changeItem = new ChangeItem();
-            if("requestGroup".equals(fieldName)){
+            if ("requestGroup".equals(fieldName)) {
                 changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
                 changeItem.setOldVal(" ");
                 changeItem.setNewVal(requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get().getName());
                 changeItemSet.add(changeItem);
-            }if("manager".equals(fieldName)){
+            }
+            if ("manager".equals(fieldName)) {
                 changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
-                changeItem.setOldVal(" ");
-                changeItem.setNewVal(personRepository.findOne(newRequest.getManager().getId()).get().getFullName());
+                if (oldRequest.getManager() != null) {
+                    changeItem.setOldVal(personRepository.findOne(oldRequest.getManager().getId()).get().getFullName());
+                } else {
+                    changeItem.setOldVal(" ");
+                }
+                if (newRequest.getManager() != null) {
+                    changeItem.setNewVal(personRepository.findOne(newRequest.getManager().getId()).get().getFullName());
+                } else {
+                    changeItem.setNewVal(" ");
+                }
                 changeItemSet.add(changeItem);
             }
         });
         return changeItemSet;
     }
 
-    private void normalizeRequestObj(Request request){
-        if(request.getPriority()!=null){
+    private void normalizeRequestObj(Request request) {
+        if (request.getPriority() != null) {
             request.setPriority(new Priority(request.getPriority().getId()));
         }
-        if(request.getStatus()!=null){
+        if (request.getStatus() != null) {
             request.setStatus(new Status(request.getStatus().getId()));
         }
-        if(request.getManager()!=null){
+        if (request.getManager() != null) {
             request.setManager(new Person(request.getManager().getId()));
         }
-        if(request.getRequestGroup()!=null){
+        if (request.getRequestGroup() != null) {
             request.setRequestGroup(new RequestGroup(request.getRequestGroup().getId()));
         }
     }
