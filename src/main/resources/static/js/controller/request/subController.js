@@ -146,19 +146,19 @@
                         $scope.validationError.editSubTittle = true;
                         return;
                     }
-                    
-                    angular.forEach($scope.tempSubs, function (obj) {
-                        if (obj.id == sub.id){
-                            var i = $scope.tempSubs.indexOf(obj);
-                            if(i != -1) {
-                                $scope.tempSubs.splice(i, 1);
-                            }
-                        }
-                    });
+
 
                     sub.status = sub.shownStatus;
                     SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
                         if (response.isError == false){
+                            angular.forEach($scope.tempSubs, function (obj) {
+                                if (obj.id == sub.id){
+                                    var i = $scope.tempSubs.indexOf(obj);
+                                    if(i != -1) {
+                                        $scope.tempSubs.splice(i, 1);
+                                    }
+                                }
+                            });
                             $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
                         } else {
                             if (response.data!=null && response.data.errors[0]){

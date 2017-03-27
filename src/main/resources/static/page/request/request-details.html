@@ -183,8 +183,8 @@
                                                     </div>
                                                     <div class="subtask-container">
                                                         <div class="panel panel-default pull-up" ng-repeat="sub in subs | orderBy:'status':false:statusComparator" ng-show="finishedFilter(showFinished, sub)">
-                                                            <div class="panel-heading" ng-show="sub.showEdit && (request.status.id==1 || request.status.id==2)">
-                                                                <div class="row">
+                                                            <div class="panel-heading">
+                                                                <div class="row" ng-show="sub.showEdit && (request.status.id==1 || request.status.id==2)">
                                                                     <div class="col-lg-6">
                                                                             <input type="text" ng-class = "{'has-warning':validationError.editSubTittle}" class="form-control input-sm" ng-model = "sub.name">
                                                                     </div>
@@ -195,13 +195,17 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="panel-heading" ng-show="!sub.showEdit && (request.status.id==1 || request.status.id==2)">
-                                                                <span ng-bind = "sub.name">
-                                                                </span>
-                                                                <div class="pull-right">
-                                                                    <button class="btn btn-primary btn-xs" ng-click="goEdit(sub)">Edit</button>
-                                                                    <button class="btn btn-danger btn-xs" ng-click="deleteSub(sub)">Delete</button>
+                                                                <div class="row" ng-show="!sub.showEdit && (request.status.id==1 || request.status.id==2)">
+                                                                    <div class="col-lg-6">
+                                                                        <span ng-bind = "sub.name">
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="pull-right">
+                                                                            <button class="btn btn-primary btn-xs" ng-click="goEdit(sub)">Edit</button>
+                                                                            <button class="btn btn-danger btn-xs" ng-click="deleteSub(sub)">Delete</button>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="panel-body">

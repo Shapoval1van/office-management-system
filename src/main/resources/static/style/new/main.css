@@ -21,6 +21,11 @@
     text-align: left!important;
 }
 
+.subtask-container textarea{
+    height: auto;
+    resize: vertical;
+}
+
 .subtask-form label{
     text-align: left!important;
 }
