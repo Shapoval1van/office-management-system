@@ -48,10 +48,6 @@
                         templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
-                    // .when("/secured/demo", {
-                    //     templateUrl: "/static/page/demo/secured.html",
-                    //     controller: "DemoController"
-                    // })
                     .when("/secured/dashboard", {
                         templateUrl: "/static/page/dashboard/dashboard.html",
                         controller: "DashboardController"
@@ -83,10 +79,6 @@
                     .when("/secured/request-group/:requestGroupId/requests", {
                         templateUrl: "/static/page/request-group/request-by-request-group.html",
                         controller: "RequestGroupDetailsController"
-                    })
-                    .when("/secured/requestGroups", {
-                        templateUrl: "/static/page/request/requestGroups.html",
-                        controller: "RequestGroupController"
                     })
                     .when("/secured/users", {
                         templateUrl: "/static/page/person/person-list.html",

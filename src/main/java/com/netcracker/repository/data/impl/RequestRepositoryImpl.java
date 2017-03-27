@@ -71,6 +71,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.count.all.assigned.by.manager}")
     private String COUNT_ALL_ASSIGNED_BY_MANAGER;
 
+    @Value("${request.count.all.assigned}")
+    private String COUNT_ALL_ASSIGNED;
+
     @Value("${request.count.by.priority}")
     private String COUNT_WITH_PRIORITY;
 
@@ -274,6 +277,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countAllAssignedByManager(Long managerId) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_ASSIGNED_BY_MANAGER, Long.class, managerId);
+    }
+
+    @Override
+    public Long countAllAssigned(Long managerId) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_ASSIGNED, Long.class, managerId);
     }
 
     @Override

@@ -171,6 +171,19 @@ public class RequestServiceImpl implements RequestService {
         return savedRequest;
     }
 
+    /**
+     * Update request
+     * Only Free and In progress requests can be updated.
+     * Admin can update Free and In progress requests.
+     * Author can update only Free requests.
+     *
+     * @param newRequest
+     * @param requestId
+     * @param principal
+     * @return Optional<Request> updated request
+     * @throws ResourceNotFoundException
+     * @throws IllegalAccessException
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
@@ -333,6 +346,18 @@ public class RequestServiceImpl implements RequestService {
         return requests;
     }
 
+    /**
+     * Cancel request
+     * Only Free and In progress requests can be canceled.
+     * Admin can cancel Free and In progress requests.
+     * Author can cancel only Free requests.
+     *
+     * @param id
+     * @param principal
+     * @return
+     * @throws CannotDeleteRequestException
+     * @throws IllegalAccessException
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
@@ -354,11 +379,11 @@ public class RequestServiceImpl implements RequestService {
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            requestRepository.deleteRequest(request);
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName());
             if (request.getParent() == null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty())
-                    subRequestList.forEach(r -> requestRepository.deleteRequest(r));
+                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName()));
             }
         }
     }
@@ -518,7 +543,7 @@ public class RequestServiceImpl implements RequestService {
     public Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable) {
         Person manager = personRepository.findPersonByEmail(principal.getName()).get();
         List<Request> requestList = requestRepository.getAllAssignedRequest(manager.getId(), pageable);
-        Long count = requestRepository.countAllAssignedByManager(manager.getId());
+        Long count = requestRepository.countAllAssigned(manager.getId());
         requestList.forEach(this::fillRequest);
 
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);

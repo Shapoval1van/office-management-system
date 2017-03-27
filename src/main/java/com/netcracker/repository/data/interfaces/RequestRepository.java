@@ -44,6 +44,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     Long countAllAssignedByManager(Long managerId);
 
+    Long countAllAssigned(Long managerId);
+
     Long countAllRequestByEmployee(Long employeeId);
 
     Long countAllRequestByManager(Long managerId);
