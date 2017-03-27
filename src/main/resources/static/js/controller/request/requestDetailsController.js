@@ -15,7 +15,7 @@
 
                 $scope.historyPageNumber = 1;
                 $scope.commentPageNumber = 1;
-                $scope.commentPageSize = 3;
+                $scope.commentPageSize = 10;
                 $scope.commentMaxPageSize = 0;
 
                 $scope.request = {};
