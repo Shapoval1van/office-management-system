@@ -187,21 +187,21 @@
                 $scope.unassign = function(requestId) {
                     swal({
                             title: "Are you sure?",
-                            text: "Do you really unassige manager from this request",
+                            text: "Do you really want to unassign manager from this request",
                             type: "warning",
                             showCancelButton: true,
                             confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes, unasigne!",
+                            confirmButtonText: "Yes, unassign!",
                             closeOnConfirm: false
                         },
                         function(){
                             RequestService.unassign(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
-                                    swal("Request unassigned!", "", "success");
+                                    swal("Request unassigned!", "Request successful unassigned", "success");
                                     $scope.getRequest();
                                 }, function (error) {
-                                    console.log(error);
+                                    swal("Unassigning Failure!", error.data.errors, "error");
                                 });
                         });
                 };
@@ -217,16 +217,24 @@
                 };
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assignToMe(requestId)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                            $scope.getRequest();
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to assign this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, assign!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            PersonService.assignToMe(requestId)
+                                .then(function (response) {
+                                    $scope.requests = response.data;
+                                    swal("Request assigned!", "Request successful assigned", "success");
+                                    $scope.getRequest();
+                                }, function (response) {
+                                    swal("Assigning Failure!", response.data.errors, "error");
+                                });
                         });
                 };
 

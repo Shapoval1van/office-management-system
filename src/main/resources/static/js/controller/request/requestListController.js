@@ -119,16 +119,24 @@
                 };
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assignToMe(requestId)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                            $scope.pageChanged();
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to assign this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, assign!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            PersonService.assignToMe(requestId)
+                                .then(function (response) {
+                                    $scope.requests = response.data;
+                                    swal("Request assigned!", "Request successful assigned", "success");
+                                    $scope.pageChanged();
+                                }, function (response) {
+                                    swal("Assigning Failure!", response.data.errors, "error");
+                                });
                         });
                 };
 
