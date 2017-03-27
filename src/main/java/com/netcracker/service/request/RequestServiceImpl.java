@@ -204,8 +204,7 @@ public class RequestServiceImpl implements RequestService {
         } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date()));
-            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName() ));
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -221,16 +220,15 @@ public class RequestServiceImpl implements RequestService {
         if (!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
         futureNewRequest.get().setPriority(p.get());
-        updateRequestHistory(futureNewRequest.get(), oldRequest, authorName);
 
-        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date(),principal.getName()));
 
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
     }
 
 
-    private Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) {
+    public Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) {
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
         if (!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
@@ -398,9 +396,7 @@ public class RequestServiceImpl implements RequestService {
         Request newRequest = new Request(requestDB.get());
 
         newRequest.setStatus(status);
-        updateRequestHistory(newRequest, requestDB.get(), authorName);
-
-        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
 
         return requestRepository.changeRequestStatus(request, status);
     }
@@ -486,8 +482,7 @@ public class RequestServiceImpl implements RequestService {
         requestRepository.unassign(requestId);
 
         Optional<Request> newRequest = getRequestById(requestId);
-        updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
-        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
     }
 
     @Override
@@ -501,8 +496,7 @@ public class RequestServiceImpl implements RequestService {
         if (oldRequest.isPresent() && person.isPresent() && oldRequest.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
-            updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
@@ -523,7 +517,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
+    public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> oldRequest = getRequestById(requestId);
         Optional<Person> person = personRepository.findOne(personId);
@@ -535,8 +529,7 @@ public class RequestServiceImpl implements RequestService {
             // Subscribe new manager to request
             personRepository.subscribe(requestId, person.get().getId());
 
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date()));
-            updateRequestHistory(newRequest.get(), oldRequest.get(), person.get().getEmail());
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
             if(oldRequest.get().getManager() != null) {
                 personRepository.unsubscribe(requestId, oldRequest.get().getManager().getId()); // unsubscribe old manager
