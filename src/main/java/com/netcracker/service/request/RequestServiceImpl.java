@@ -204,7 +204,7 @@ public class RequestServiceImpl implements RequestService {
         } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date()));
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
             return this.requestRepository.updateRequest(newRequest);
         }
     }
