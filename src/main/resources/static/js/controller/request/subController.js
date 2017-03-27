@@ -4,20 +4,6 @@
             function ($scope, $routeParams, SubService) {
                 var requestId = $routeParams.requestId;
 
-                $(function () {
-                    $('#newSubDate').datetimepicker({
-                        minDate: new Date(),
-                        daysOfWeekDisabled: [0,6]
-                    });
-                });
-                
-                $(function () {
-                    $('#inputEditEstimate').datetimepicker({
-                        minDate: new Date(),
-                        daysOfWeekDisabled: [0,6]
-                    });
-                });
-
                 $scope.subs = [];
                 $scope.tempSubs = [];
                 $scope.statuses = [];
@@ -150,8 +136,11 @@
                     });
                 };
 
-
-
+                $scope.onStatusChange = function (sub) {
+                    if (!sub.showEdit){
+                        $scope.updateSub(sub);
+                    }
+                };
 
                 $scope.goEdit = function (sub) {
                     $scope._toTempSub(sub);

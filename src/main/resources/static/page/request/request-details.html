@@ -216,7 +216,7 @@
                                                                             <div class="form-group" ng-show="request.status.id==1 || request.status.id==2">
                                                                                 <label for="inputEditStatus" class="col-lg-2 control-label">Status</label>
                                                                                 <div class="col-lg-10">
-                                                                                    <Select type="text" class="form-control" id="inputEditStatus" ng-model="sub.shownStatus" ng-change="updateSub(sub)" ng-options="value.id as value.name for value in statuses">
+                                                                                    <Select type="text" class="form-control" id="inputEditStatus" ng-model="sub.shownStatus" ng-change="onStatusChange(sub)" ng-options="value.id as value.name for value in statuses">
                                                                                     </Select>
                                                                                 </div>
                                                                             </div>
