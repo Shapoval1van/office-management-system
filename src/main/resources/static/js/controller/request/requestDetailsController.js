@@ -39,8 +39,7 @@
                             $scope.getSubscribers();
                             $scope.getRequestGroupById();
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -58,8 +57,7 @@
                             });
 
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -103,10 +101,9 @@
                 $scope.sendComment = function () {
                     return CommentService.addComment($scope.comment, requestId)
                         .then(function (callback) {
-                            console.log("Success");
                             $scope.comment = "";
                         }, function (callback) {
-                            console.log("Failure");
+                            swal("Send Comment Error", callback.data, "error");
                         })
                 };
 
@@ -172,36 +169,33 @@
                             RequestService.cancelRequest(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
+                                    swal("Request canceled!", "", "success");
+                                    window.location = "javascript:history.back()"
                                 }, function (error) {
                                     swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                     console.log(error);
                                 });
-
-                            swal("Request canceled!", "", "success");
-                            window.setTimeout(function () {
-                                window.location = "javascript:history.back()"
-                            }, 1000)
                         });
                 };
 
                 $scope.unassign = function(requestId) {
                     swal({
                             title: "Are you sure?",
-                            text: "Do you really unassige manager from this request",
+                            text: "Do you really want to unassign manager from this request",
                             type: "warning",
                             showCancelButton: true,
                             confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes, unasigne!",
+                            confirmButtonText: "Yes, unassign!",
                             closeOnConfirm: false
                         },
                         function(){
                             RequestService.unassign(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
-                                    swal("Request unassigned!", "", "success");
+                                    swal("Request unassigned!", "Request successful unassigned", "success");
                                     $scope.getRequest();
                                 }, function (error) {
-                                    console.log(error);
+                                    swal("Unassigning Failure!", error.data.errors, "error");
                                 });
                         });
                 };
@@ -217,16 +211,24 @@
                 };
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assignToMe(requestId)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                            $scope.getRequest();
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to assign this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, assign!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            PersonService.assignToMe(requestId)
+                                .then(function (response) {
+                                    $scope.requests = response.data;
+                                    swal("Request assigned!", "Request successful assigned", "success");
+                                    $scope.getRequest();
+                                }, function (response) {
+                                    swal("Assigning Failure!", response.data.errors, "error");
+                                });
                         });
                 };
 

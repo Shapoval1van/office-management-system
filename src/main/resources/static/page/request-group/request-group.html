@@ -43,14 +43,19 @@
                                 <td ng-click="goToRequestGroupPage(group.id)">{{group.name}}</td>
                                 <td ng-click="goToRequestGroupPage(group.id)">{{group.requestCount}}</td>
                                 <td>
-                                    <delete-request-group-modal></delete-request-group-modal>
-                                    <div data-dismiss="modal" data-toggle="modal"
-                                         data-target="#deleteRequestGroupModal">
-                                        <button class="btn btn-danger delete-request-group-btn"
-                                                ng-click="setCurrentRequestGroup(group)">
+                                    <div class="col-md-2">
+                                        <button class="btn btn-danger" ng-click="deleteRequestGroup(group.id)">
                                             Delete request group
                                         </button>
                                     </div>
+                                    <!--<delete-request-group-modal></delete-request-group-modal>-->
+                                    <!--<div data-dismiss="modal" data-toggle="modal"-->
+                                         <!--data-target="#deleteRequestGroupModal">-->
+                                        <!--<button class="btn btn-danger delete-request-group-btn"-->
+                                                <!--ng-click="setCurrentRequestGroup(group)">-->
+                                            <!--Delete request group-->
+                                        <!--</button>-->
+                                    <!--</div>-->
                                 </td>
                             </tr>
                             </tbody>
