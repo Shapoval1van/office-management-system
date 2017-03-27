@@ -42,18 +42,39 @@
                         .then(function (callback) {
                             $scope.searchByNamePattern();
                         }, function (callback) {
-
+                            swal("Create Group Error", callback.data, "error");
                         })
                 };
 
-                $scope.deleteRequestGroup = function () {
-                    return RequestGroupService.deleteRequestGroup($scope.currentRequestGroup.id)
-                        .then(function () {
-                            $scope.getGroupByAuthor();
-                        }, function () {
-                            console.log("Failure")
-                        })
+                $scope.deleteRequestGroup = function (groupId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to delete this request group",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, delete it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestGroupService.deleteRequestGroup(groupId)
+                                .then(function () {
+                                    $scope.getGroupByAuthor();
+                                }, function (error) {
+                                    swal("Delete Request Group Failure!", error, "error");
+                                });
+                            swal("Request group deleted!", "", "success");
+                        });
                 };
+
+                // $scope.deleteRequestGroup = function () {
+                //     return RequestGroupService.deleteRequestGroup($scope.currentRequestGroup.id)
+                //         .then(function () {
+                //             $scope.getGroupByAuthor();
+                //         }, function () {
+                //             console.log("Failure")
+                //         })
+                // };
 
                 $scope.setCurrentRequestGroup = function (requestGroup) {
                     $scope.currentRequestGroup = requestGroup;

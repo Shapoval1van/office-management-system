@@ -39,8 +39,7 @@
                             $scope.getSubscribers();
                             $scope.getRequestGroupById();
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -58,8 +57,7 @@
                             });
 
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -103,10 +101,9 @@
                 $scope.sendComment = function () {
                     return CommentService.addComment($scope.comment, requestId)
                         .then(function (callback) {
-                            console.log("Success");
                             $scope.comment = "";
                         }, function (callback) {
-                            console.log("Failure");
+                            swal("Send Comment Error", callback.data, "error");
                         })
                 };
 
@@ -172,15 +169,12 @@
                             RequestService.cancelRequest(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
+                                    swal("Request canceled!", "", "success");
+                                    window.location = "javascript:history.back()"
                                 }, function (error) {
                                     swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                     console.log(error);
                                 });
-
-                            swal("Request canceled!", "", "success");
-                            window.setTimeout(function () {
-                                window.location = "javascript:history.back()"
-                            }, 1000)
                         });
                 };
 
