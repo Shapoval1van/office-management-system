@@ -28,6 +28,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String PASSWORD_COLUMN = "password";
     public static final String ROLE_ID_COLUMN = "role_id";
     public static final String ENABLED_COLUMN = "enabled";
+    public static final String DELETED_COLUMN = "deleted";
 
     public static final int SUCCESS_UPDATE_CODE = 1;
 
@@ -103,6 +104,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         columns.put(PASSWORD_COLUMN, entity.getPassword());
         columns.put(ROLE_ID_COLUMN, entity.getRole().getId());
         columns.put(ENABLED_COLUMN, entity.isEnabled());
+        columns.put(DELETED_COLUMN, entity.isDeleted());
         return columns;
     }
 
@@ -119,6 +121,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
                 person.setPassword(resultSet.getString(PASSWORD_COLUMN));
                 person.setRole(new Role(resultSet.getInt(ROLE_ID_COLUMN)));
                 person.setEnabled(resultSet.getBoolean(ENABLED_COLUMN));
+                person.setDeleted(resultSet.getBoolean(DELETED_COLUMN));
                 return person;
             }
         };

@@ -10,7 +10,8 @@
                 $scope.priorities = [];
                 $scope.newSub = {
                     name: "",
-                    priority: 2
+                    priority: 2,
+                    estimate: ""
                 };
                 $scope.validationError = {
                     newSubTittle:false,
@@ -26,7 +27,10 @@
                 };
                 $scope.showFinished = true;
                 $scope.dateOptions = {
-                    format: "DD.MM.YYYY HH:mm"
+                    format: "DD.MM.YYYY HH:mm",
+                    daysOfWeekDisabled: [0,6],
+                    minDate: new Date(),
+                    useCurrent: false
                 };
 
                 var showErrorMessage = function (text) {
@@ -196,6 +200,11 @@
 
                 $scope.toggleNewSub = function () {
                     $scope.showNewSubForm =  $scope.showNewSubForm?false:true;
+                    $scope.newSub = {
+                        name: "",
+                        priority: 2,
+                        estimate: ""
+                    };
                 };
 
             }])
