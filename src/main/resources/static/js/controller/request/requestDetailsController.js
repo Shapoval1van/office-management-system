@@ -304,18 +304,30 @@
                 };
 
                 $scope.setInProgressStatus = function () {
-                    swal("Request start", "Request successful start!", "success");
-                    return $scope.updateRequestStatus(2);
+                    return $scope.updateRequestStatus(2)
+                        .then(function (callback) {
+                            swal("Request start", "Request successful start!", "success");
+                        }, function (callback) {
+                            swal("Request start", "Can't start request! " + callback.data.errors, "error");
+                        });
                 };
 
                 $scope.setClosedStatus = function () {
-                    swal("Request finished", "Request successful finished!", "success");
-                    return $scope.updateRequestStatus(3);
+                    return $scope.updateRequestStatus(3)
+                        .then(function (callback) {
+                            swal("Request finished", "Request successful finished!", "success");
+                        }, function (callback) {
+                            swal("Request finish", "Can't finish request! " + callback.data.errors, "error");
+                        });
                 };
 
                 $scope.setReopen = function () {
-                    swal("Request reopen", "Request successful reopen!", "success");
-                    return $scope.updateRequestStatus(1);
+                    return $scope.updateRequestStatus(1)
+                        .then(function (callback) {
+                            swal("Request reopen", "Request successful reopen!", "success");
+                        }, function (callback) {
+                            swal("Request reopen", "Can't reopen request! " + callback.data.errors, "error");
+                        });
                 };
 
                 $scope.subscribe = function () {
