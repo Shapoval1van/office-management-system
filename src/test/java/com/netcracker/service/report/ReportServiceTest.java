@@ -1,6 +1,7 @@
 package com.netcracker.service.report;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.exception.NotDataForThisRoleException;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Role;
@@ -70,7 +71,7 @@ public class ReportServiceTest {
     }
 
     @Test
-    public void getAllRequestByPersonIdForPeriod() throws CurrentUserNotPresentException {
+    public void getAllRequestByPersonIdForPeriod() throws CurrentUserNotPresentException, NotDataForThisRoleException {
         ArrayList<Request>requestArrayList = new ArrayList<>();
         requestArrayList.add(new Request());
         requestArrayList.add(new Request());
@@ -82,7 +83,7 @@ public class ReportServiceTest {
     }
 
     @Test(expected = CurrentUserNotPresentException.class)
-    public void getAllRequestByPersonIdForPeriodWithNotValidId() throws CurrentUserNotPresentException {
+    public void getAllRequestByPersonIdForPeriodWithNotValidId() throws CurrentUserNotPresentException, NotDataForThisRoleException {
         ArrayList<Request>requestArrayList = new ArrayList<>();
         requestArrayList.add(new Request());
         requestArrayList.add(new Request());

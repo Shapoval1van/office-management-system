@@ -2,12 +2,29 @@
     angular.module("OfficeManagementSystem")
         .controller("ReportController", ["$scope", "$routeParams", "$location", "$http", "ReportService",
             function ($scope, $routeParams, $location, $http, ReportService) {
+
                 $scope.currentPage = 1;
                 $scope.pageSize = 10;
                 $scope.totalItems = 0;
                 $scope.maxSize = 5;
-                var that = this;
+
+                //var that = this;
                 var personId = $routeParams.personId;
+
+                var currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                $scope.userRole = currentUser.role.substr(5, currentUser.role.length);
+
+                $scope.isAdminRadio = false;
+                var functionalityOfManager = true;
+                var ManagerFunctionality = 2;
+                var UserFunctionality = 3;
+                $scope.userInput = undefined;
+                $scope.userToShow = undefined;
+
+                $scope.isAdministrator = false;
+                $scope.isManager = false;
+                $scope.isEmployee = false;
+
 
                 //fetch period
                 if($location.search().period == undefined){
@@ -27,6 +44,12 @@
                     "values": ["Month", "Quarter", "Year"]
                 };
 
+                $scope.namesOfFunctionality = {
+                    "type": "select",
+                    "value": "Manager",
+                    "values": ["Manager", "User"]
+                };
+
 
                 //chose type of first charts
                 if($scope.period=='year'){
@@ -35,28 +58,206 @@
                     $scope.type = 'area2d';
                 }
 
-
-                $scope.getTotalPage = function () {
-                    return ReportService.getTotalPage(personId, $scope.period.toLowerCase())
-                        .then(function (response) {
-                            $scope.totalItems = response.data;
-                        }, function (response) {
-                        })
+                $scope.getSelectFunc = function (valueOfFunc) {
+                    if(valueOfFunc=="Manager"){
+                        functionalityOfManager = true;
+                        $scope.getData();
+                    } else if(valueOfFunc=="User"){
+                        functionalityOfManager = false;
+                        $scope.getData();
+                    }
                 };
 
+                if ($scope.userRole=="EMPLOYEE"){
+                    $scope.isEmployee = true;
+                    $scope.getData = function() {
+                        $http({
+                            method: 'GET',
+                            url: 'api/person/' + personId
+                        }).then(function (response) {
+                            $scope.userToShow = response.data;
+                            if ($scope.userToShow.role.id == 3) {
+                                $scope.SimpleChartForEmployee();
+                                $scope.PieChartForEmployee();
+                                $scope.pageChanged(1);
+                                $scope.getTotalPage(personId);
+                            } else {
+                                window.location = "javascript:history.back()";
+                            }
+                        }, function errorCallback(response) {
+                        });
+                    };
+                } else if ($scope.userRole=="OFFICE MANAGER"){
+                    $scope.isManager = true;
+                    $scope.getData = function() {
+                        $http({
+                            method: 'GET',
+                            url: 'api/person/' + personId
+                        }).then(function (response) {
+                            $scope.userToShow = response.data;
+                            if ($scope.userToShow.role.id == 2) {
+                                $scope.SimpleChartForManager();
+                                $scope.PieChartForManager();
+                                $scope.pageChanged(1);
+                                $scope.getTotalPage(personId);
+                            } else {
+                                window.location = "javascript:history.back()";
+                            }
+                        }, function errorCallback(response) {
+                        });
+                    };
+                } else if ($scope.userRole=="ADMINISTRATOR"){
+                    $scope.isAdministrator = true;
+                    $scope.isAdminRadio = true;
+                    $scope.getData = function() {
+                        $http({
+                            method: 'GET',
+                            url: 'api/person/' + personId
+                        }).then(function (response) {
+                            $scope.userToShow = response.data;
+                            if ($scope.userToShow.role.id == 3) {
+                                $scope.isAdminRadio = false;
+                                $scope.SimpleChartForEmployee();
+                                $scope.PieChartForEmployee();
+                                $scope.pageChanged(1);
+                                $scope.getTotalPage(personId);
+                            } else if($scope.userToShow.role.id == 2) {
+                                $scope.isAdminRadio = false;
+                                $scope.SimpleChartForManager();
+                                $scope.PieChartForManager();
+                                $scope.pageChanged(1);
+                                $scope.getTotalPage(personId);
+                            }else if($scope.userToShow.role.id == 1) {
+                                if(functionalityOfManager){
+                                    $scope.SimpleChartForAdmin(ManagerFunctionality);
+                                    $scope.PieChartForAdmin(ManagerFunctionality);
+                                    $scope.pageChanged(1);
+                                    $scope.getTotalPage(personId);
+                                }else if(!functionalityOfManager){
+                                    $scope.SimpleChartForAdmin(UserFunctionality);
+                                    $scope.PieChartForAdmin(UserFunctionality);
+                                     //
+                                    $scope.pageChanged(1);
+                                    $scope.getTotalPage(personId);
+                                }
+                            }else {
+                                window.location = "javascript:history.back()";
+                            }
+                        }, function errorCallback(response) {
+                        });
+                    };
+                }
+
+                $scope.getData();
+
+
+
+
+
+
+                // $scope.checkAdmin = function () {
+                //     if($scope.currentUser.role=='ROLE_ADMINISTRATOR'){
+                //         $scope.isAdmin=true;
+                //     }
+                // };
+                // $scope.checkAdmin();
+
+                // $scope.getPersonData = function () {
+                //     $http({
+                //         method: 'GET',
+                //         url: 'api/person/' + personId
+                //     }).then(function successCallback(response) {
+                //         $scope.userToShow = response.data;
+                //         console.log($scope.userToShow);
+                //
+                //     }, function errorCallback(response) {
+                //
+                //     });
+                // };
+                // $scope.getPersonData();
+
+                // $scope.getAllData = function () {
+                //     $http({
+                //         method: 'GET',
+                //         url: 'api/person/' + personId
+                //     }).then(function successCallback(response) {
+                //         that.person = response.data;
+                //         if (that.person.role.id == 3) {
+                //
+                //         } else if (that.person.role.id == 2) {
+                //             $scope.SimpleChartForManager();
+                //             $scope.PieChartForManager();
+                //         } else if (that.person.role.id == 1) {
+                //             console.log($scope.userToShow);
+                //             $scope.getTotalPage(personId); //
+                //             $scope.pageChanged(1);
+                //             $scope.SimpleChartForAdmin();
+                //             $scope.PieChartForAdmin();
+                //
+                //
+                //
+                //         } else {
+                //             window.location = "javascript:history.back()";
+                //         }
+                //     }, function errorCallback(response) {
+                //
+                //     });
+                // };
+                //
+                // $scope.getAllData();
+
+
+                $scope.getTotalPage = function (personId) {
+                    if ($scope.userToShow.role.id == 1){
+                        if(functionalityOfManager){
+                            var functionality = ManagerFunctionality;
+                        }else {
+                            var functionality = UserFunctionality;
+                        }
+                        return ReportService.getTotalPageAdmin(personId, $scope.period.toLowerCase(), functionality )
+                            .then(function successCallback(response) {
+                                $scope.totalItems = response.data;
+                                console.log($scope.totalItems);
+                            }, function (response) {
+                            })
+                    } else {
+                        return ReportService.getTotalPage(personId, $scope.period.toLowerCase())
+                            .then(function successCallback(response) {
+                                $scope.totalItems = response.data;
+                                console.log($scope.totalItems);
+                            }, function (response) {
+                            })
+                    }
+                };
 
                 $scope.pageChanged = function(currentPage) {
-                    return ReportService.pageChanged(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize)
-                        .then(function (response) {
-                            $scope.requestList =  response.data;
-                        }, function (response) {
-                            $scope.requestList = [];
-                        })
+                    if($scope.userToShow.role.id == 1){
+                        if(functionalityOfManager){
+                            var functionality = ManagerFunctionality;
+                        }else {
+                            var functionality = UserFunctionality;
+                        }
+                        return ReportService.pageChangedAdmin(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize, functionality)
+                            .then(function successCallback(response) {
+                                $scope.requestList =  response.data;
+                                console.log($scope.requestList);
+                            }, function (response) {
+                                $scope.requestList = [];
+                            })
+                    } else {
+                        return ReportService.pageChanged(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize)
+                            .then(function successCallback(response) {
+                                $scope.requestList =  response.data;
+                                console.log(response.data);
+                            }, function (response) {
+                                $scope.requestList = [];
+                            })
+                    }
                 };
 
                 $scope.SimpleChartForManager = function () {
                     return ReportService.getSimpleChartForManager(personId, $scope.period.toLowerCase())
-                        .then(function (response) {
+                        .then(function successCallback(response) {
                             $scope.reportForTime.data = response.data;
                         }, function (callback) {
                         })
@@ -64,7 +265,23 @@
 
                 $scope.PieChartForManager = function () {
                     return ReportService.getPieChartForManager(personId, $scope.period.toLowerCase())
-                        .then(function (response) {
+                        .then(function successCallback(response) {
+                            $scope.pieChart.data = response.data;
+                        }, function (callback) {
+                        })
+                };
+
+                $scope.SimpleChartForAdmin = function (functionality) {
+                    return ReportService.getSimpleChartForAdmin(personId, $scope.period.toLowerCase(), functionality)
+                        .then(function successCallback(response) {
+                            $scope.reportForTime.data = response.data;
+                        }, function (callback) {
+                        })
+                };
+
+                $scope.PieChartForAdmin = function (functionality) {
+                    return ReportService.getPieChartForAdmin(personId, $scope.period.toLowerCase(), functionality)
+                        .then(function successCallback(response) {
                             $scope.pieChart.data = response.data;
                         }, function (callback) {
                         })
@@ -72,7 +289,7 @@
 
                 $scope.SimpleChartForEmployee = function () {
                     return ReportService.getSimpleChartEmployee(personId, $scope.period.toLowerCase())
-                        .then(function (response) {
+                        .then(function successCallback(response) {
                             $scope.reportForTime.data = response.data;
                         }, function (callback) {
                         })
@@ -80,43 +297,37 @@
 
                 $scope.PieChartForEmployee = function () {
                     return ReportService.getPieChartEmployee(personId, $scope.period.toLowerCase())
-                        .then(function (response) {
+                        .then(function successCallback(response) {
                             $scope.pieChart.data = response.data;
                         }, function (callback) {
                         })
                 };
 
-                //FIXME
-                $scope.getAllData = function () {
-                    $http({
-                        method: 'GET',
-                        url: 'api/person/' + personId
-                    }).then(function successCallback(response) {
-                        that.person = response.data;
-                        if (that.person.role.id == 3) {
-                            $scope.SimpleChartForEmployee();
-                            $scope.PieChartForEmployee();
-                        } else if (that.person.role.id == 2) {
-                            $scope.SimpleChartForManager();
-                            $scope.PieChartForManager();
-                        } else if (that.person.role.id == 1) {
-                            $scope.SimpleChartForManager();
-                            $scope.PieChartForManager();
-                            //window.location = "javascript:history.back()";
-                        } else {
-                            window.location = "javascript:history.back()";
-                        }
-                    }, function errorCallback(response) {
-
-                    });
-                };
-
-                $scope.getAllData();
 
                 $scope.getPeriodData = function (periodItem) {
                     $scope.period=periodItem.toLowerCase();
                     window.location = "/secured/report/"+ personId +"?period=" + periodItem.toLowerCase();
                 };
+
+                $scope.getUser = function (userInput) {
+                    window.location = "/secured/report/"+ userInput.id
+                };
+
+                $scope.updateUser = function() {
+                    if($scope.userInput.length >= 2) {
+                        console.log($scope.userInput);
+                        $http({
+                            method: 'GET',
+                            url: '/api/person/users/' +  $scope.userInput +
+                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                        }).then(function successCallback(response) {
+                            $scope.users = response.data;
+                            console.log($scope.users);
+                        }, function errorCallback(response) {
+                        });
+                    }
+                };
+
 
 
                 $scope.reportForTime  = {
@@ -188,8 +399,5 @@
                     ]
                 };
 
-                $scope.pageChanged(1);
-
-                $scope.getTotalPage(personId, $scope.period.toLowerCase()); //
             }])
 })();
