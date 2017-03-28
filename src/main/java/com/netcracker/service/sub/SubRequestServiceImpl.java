@@ -30,6 +30,7 @@ public class SubRequestServiceImpl {
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "Resource not found.";
     private static final String ACCESS_DENIED_MESSAGE = "Access denied.";
     private static final String INVALID_ESTIMATE_MESSAGE = "Invalid estimate.";
+    private static final String INVALID_STATUS = "Invalid status";
     private static final String PARENT_STATUS_ERROR_MESSAGE = "Parent request is CLOSED or CANCELED.";
     private static final String NOT_PARENT_ERROR_MESSAGE = "This request can not have subtasks.";
 
@@ -93,6 +94,9 @@ public class SubRequestServiceImpl {
         if (subrequest.getStatus()!=null){
             Status newStatus = statusRepository.findOne(subrequest.getStatus().getId())
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
+            if (newStatus.getId().equals(StatusEnum.CANCELED.getId())){
+                throw new BadRequestException(INVALID_STATUS);
+            }
             savedRequest.setStatus(newStatus);
         }
 
