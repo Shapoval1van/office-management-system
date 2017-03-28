@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestDetailsController", ['$scope', '$routeParams', "$http", "WebSocketService", "RequestService", "CommentService", "PersonService",
-            function ($scope, $routeParams, $http, WebSocketService, RequestService, CommentService, PersonService) {
+        .controller("RequestDetailsController", ['$scope', '$routeParams', "$http", "WebSocketService", "RequestService", "CommentService", "PersonService", "RequestGroupService",
+            function ($scope, $routeParams, $http, WebSocketService, RequestService, CommentService, PersonService, RequestGroupService) {
 
                 var PAGE_SIZE = 10;
                 $scope.selectedManager;
@@ -15,6 +15,8 @@
 
                 $scope.historyPageNumber = 1;
                 $scope.commentPageNumber = 1;
+                $scope.commentPageSize = 10;
+                $scope.commentMaxPageSize = 0;
 
                 $scope.request = {};
                 $scope.historyList = [];
@@ -35,9 +37,9 @@
                         .then(function (callback) {
                             $scope.request = callback.data;
                             $scope.getSubscribers();
+                            $scope.getRequestGroupById();
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -55,8 +57,7 @@
                             });
 
                         }, function (callback) {
-                            console.log("Error");
-                            console.log(callback);
+                            swal("Get Request Error", callback.data, "error");
                         });
                 };
 
@@ -79,27 +80,39 @@
                     return PAGE_SIZE;
                 };
 
+                $scope.getCommentPageSize = function () {
+                    if ($scope.commentMaxPageSize - $scope.comments.length >= $scope.commentPageSize) {
+                        return $scope.commentPageSize;
+                    }
+                    else {
+                        $scope.commentPageSize = $scope.commentMaxPageSize - $scope.comments.length;
+                        return $scope.commentPageSize;
+                    }
+                };
+
                 //Subscribe to topic /topic/request/{requestId}
                 WebSocketService.initialize(requestId);
                 //Receive message from web socket
                 WebSocketService.receive().then(null, null, function (comment) {
                     $scope.comments.push(comment);
+                    $scope.maxPageSize++;
                 });
 
                 $scope.sendComment = function () {
                     return CommentService.addComment($scope.comment, requestId)
                         .then(function (callback) {
-                            console.log("Success");
                             $scope.comment = "";
                         }, function (callback) {
-                            console.log("Failure");
+                            swal("Send Comment Error", callback.data, "error");
                         })
                 };
 
                 $scope.getCommentsOfRequest = function (pageNumber, pageSize) {
                     return CommentService.getCommentsByRequestId(requestId, pageNumber, pageSize)
                         .then(function (callback) {
-                            callback.data.forEach(function (comment) {
+                            $scope.commentPageSize = callback.data.pageSize;
+                            $scope.commentMaxPageSize = callback.data.totalElements;
+                            callback.data.data.forEach(function (comment) {
                                 $scope.comments.push(comment);
                             })
                         }, function (callback) {
@@ -107,11 +120,11 @@
                         })
                 };
 
-                $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+                $scope.getCommentsOfRequest($scope.commentPageNumber, $scope.commentPageSize);
 
                 $scope.getNextCommentPage = function () {
                     $scope.commentPageNumber++;
-                    $scope.getCommentsOfRequest($scope.commentPageNumber, PAGE_SIZE);
+                    $scope.getCommentsOfRequest($scope.commentPageNumber, $scope.commentPageSize);
                 };
 
                 var isGetAuthorRequestPending = false;
@@ -156,15 +169,34 @@
                             RequestService.cancelRequest(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
+                                    swal("Request canceled!", "", "success");
+                                    window.location = "javascript:history.back()"
                                 }, function (error) {
                                     swal("Cancel Failure!", error.data.errors[0].detail, "error");
                                     console.log(error);
                                 });
+                        });
+                };
 
-                            swal("Request canceled!", "", "success");
-                            window.setTimeout(function () {
-                                window.location = "javascript:history.back()"
-                            }, 1000)
+                $scope.unassign = function(requestId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to unassign manager from this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, unassign!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            RequestService.unassign(requestId)
+                                .then(function (callback) {
+                                    $scope.requests = callback.data;
+                                    swal("Request unassigned!", "Request successful unassigned", "success");
+                                    $scope.getRequest();
+                                }, function (error) {
+                                    swal("Unassigning Failure!", error.data.errors, "error");
+                                });
                         });
                 };
 
@@ -179,30 +211,34 @@
                 };
 
                 $scope.assignToMe = function (requestId) {
-                    return PersonService.assignToMe(requestId)
-                        .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
-                            $scope.getRequest();
-                        }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to assign this request",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, assign!",
+                            closeOnConfirm: false
+                        },
+                        function(){
+                            PersonService.assignToMe(requestId)
+                                .then(function (response) {
+                                    $scope.requests = response.data;
+                                    swal("Request assigned!", "Request successful assigned", "success");
+                                    $scope.getRequest();
+                                }, function (response) {
+                                    swal("Assigning Failure!", response.data.errors, "error");
+                                });
                         });
                 };
 
                 $scope.assignToSmb = function () {
                     return PersonService.assign($scope.request.id, $scope.selectedManager.id)
                         .then(function (response) {
-                            $scope.assignedMessage = response.data.message;
+                            swal("Request assigned!", "Request successful assigned", "success");
                             $scope.getRequest();
                         }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                            swal("Assigning Failure!", response.data.errors, "error");
                         });
                 };
 
@@ -225,6 +261,46 @@
                         }, function () {
 
                         })
+                };
+
+                $scope.getRequestGroupById = function () {
+                    if (!!$scope.request.requestGroup)
+                        return RequestGroupService.getRequestGroupById($scope.request.requestGroup.id)
+                            .then(function (callback) {
+                                $scope.request.requestGroup = callback.data;
+                            }, function () {
+                                console.log("Failure");
+                            })
+                };
+
+                // $scope.removeFromRequestGroup = function () {
+                //     return RequestService.removeFromRequestGroup($scope.request.id)
+                //         .then(function () {
+                //             $scope.getRequest();
+                //         }, function () {
+                //
+                //         })
+                // };
+
+                $scope.removeFromRequestGroup = function () {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to remove request from this group",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, remove it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestService.removeFromRequestGroup($scope.request.id)
+                                .then(function (callback) {
+                                    $scope.getRequest();
+                                    swal("Request was removed from request group!", "", "success");
+                                }, function () {
+                                    swal("Remove Request From Group Failure!", "", "error");
+                                });
+                        });
                 };
 
                 $scope.setInProgressStatus = function () {
@@ -269,6 +345,10 @@
                         });
                 };
 
+                $scope.goToRequestGroupDetails = function () {
+                    $scope.goToUrl("/secured/request-group/" + $scope.request.requestGroup.id + "/requests");
+                };
+
                 $scope.isCurrentUserSubscribing = function () {
                     return PersonService.isPersonSubscribing($scope.subscribers, currentUser.id);
                 };
@@ -280,13 +360,23 @@
                 $scope.isAssigned = function () {
                     return RequestService.isAssigned($scope.request);
                 };
+
+                $scope.showAddGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !$scope.request.requestGroup;
+                };
+
+                $scope.showRemoveFromGroupBtn = function () {
+                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
+                        !!$scope.request.requestGroup;
+                };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {
-                    return currentUser.role == "ROLE_OFFICE MANAGER";
+                    return currentUser.role === "ROLE_OFFICE MANAGER";
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserAdministrator = function () {
-                    return currentUser.role == "ROLE_ADMINISTRATOR";
+                    return currentUser.role === "ROLE_ADMINISTRATOR";
                 };
                 //FIXME: Move to service
                 $scope.isAuthor = function () {
@@ -312,33 +402,6 @@
                 $scope.requestUpdate = function (requestId) {
                     window.location = "/secured/request/" + requestId + '/update';
                 };
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/history/' + $routeParams.requestId + '?period=day'
-                // }).then(function successCallback(response) {
-                //     $scope.historyList = buildHistoryList(response.data);
-                // }, function errorCallback(response) {
-                //
-                // });
-                //
-                // $scope.historyForPeriod = function (item_selected) {
-                //     var period = item_selected.toLowerCase();
-                //     $http({
-                //         method: 'GET',
-                //         url: '/api/request/history/' + $routeParams.requestId + '?period=' + period
-                //     }).then(function successCallback(response) {
-                //         $scope.historyList = buildHistoryList(response.data);
-                //     }, function errorCallback(response) {
-                //
-                //     });
-                // };
-
-                // $http({
-                //     method: 'GET',
-                //     url: '/api/request/sub/' + $routeParams.requestId
-                // }).then(function successCallback(response) {
-                //     $scope.subRequest = response.data;
-                // }, function errorCallback(response) {
 
             }])
 })();

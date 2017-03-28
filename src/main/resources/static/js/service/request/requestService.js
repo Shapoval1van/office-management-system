@@ -42,6 +42,7 @@
                         })
                 };
 
+
                 requestService.getAssignedRequestList = function (pageNumber, pageSize) {
                     return $http.get("/api/request/list/assigned?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
@@ -50,7 +51,6 @@
                             return callback;
                         })
                 };
-
                 requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
                     return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
@@ -69,6 +69,15 @@
                         })
                 };
 
+                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize) {
+                    return $http.get("/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 requestService.getRequestsByRequestGroup = function (requestGroupId, pageNumber, pageSize) {
                     return $http.get("/api/request/request-group/" + requestGroupId + "?page=" + pageNumber + "&size=" + pageSize)
                         .then(function (callback) {
@@ -78,6 +87,14 @@
                         })
                 };
 
+                requestService.unassign = function (requestId) {
+                    return $http.put("/api/request/" + requestId + "/unassige/")
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
                 requestService.updateRequest = function (requestId, request) {
                     return $http.put("/api/request/" + requestId, request)
                         .then(function (callback) {
@@ -98,11 +115,11 @@
 
 
                 requestService.isCanceled = function (request) {
-                    return !!request.status && request.status.name == "CANCELED";
+                    return !!request.status && request.status.name === "CANCELED";
                 };
 
                 requestService.isAssigned = function (request) {
-                    return request.manager != null;
+                    return request.manager !== null;
                 };
 
                 requestService.notifyAboutExpiringEstimateTime = function () {
@@ -114,6 +131,10 @@
                             callback.isError = true;
                             return callback;
                         });
+                };
+
+                requestService.removeFromRequestGroup = function (requestId) {
+                    return $http.delete("/api/request/" + requestId + "/group");
                 };
 
                 return requestService;

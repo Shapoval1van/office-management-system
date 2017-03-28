@@ -1,8 +1,10 @@
 package com.netcracker.component;
 
+import com.netcracker.model.entity.Request;
 import com.netcracker.model.event.*;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
 import com.netcracker.service.notification.impls.NotificationService;
+import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,9 @@ public class NotificationEventListener {
 
     @Autowired
     private FrontendNotificationService frontendNotificationService;
+
+    @Autowired
+    private RequestService requestService;
 
     @EventListener
     public void handlePersonRegistration(PersonRegistrationEvent event) {
@@ -63,9 +68,25 @@ public class NotificationEventListener {
 
     @EventListener
     public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
-        frontendNotificationService.sendNotificationToAllSubscribed(updateRequestEvent.getOldRequest(),
-                updateRequestEvent.getNewRequest());
-        notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(),
-                updateRequestEvent.getNewRequest(), updateRequestEvent.getChangeTime());
+        Request oldRequest = updateRequestEvent.getOldRequest();
+        Request newRequest = updateRequestEvent.getNewRequest();
+        requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName()) ;
+        frontendNotificationService.sendNotificationToAllSubscribed(oldRequest, newRequest);
+        notificationService.sendRequestUpdateNotification(oldRequest, newRequest, updateRequestEvent.getChangeTime());
+    }
+
+    @EventListener
+    public void handleAssignRequest(RequestAssignEvent requestAssignEvent){
+        notificationService.requestAssignNotification(requestAssignEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleAssignRequestToGroup(RequestAddToGroupEvent requestAddToGroupEvent){
+        notificationService.requestAssignToGroup(requestAddToGroupEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleRequestNewComment(RequestNewCommentEvent requestNewCommentEvent){
+        notificationService.newComment(requestNewCommentEvent.getRequest());
     }
 }

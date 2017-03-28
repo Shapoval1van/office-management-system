@@ -1,0 +1,49 @@
+<div id="wrapper" class="toggled">
+    <side-bar></side-bar>
+    <div id="page-content-wrapper" ng-cloak="">
+        <div class="container-fluid">
+            <div class="jumbotron bordered">
+                <div class="row">
+                    <div class="col-md-10" ng-show="!requestListVisibility">
+                        <p class="empty-request-title">Closed request list is empty.</p>
+                    </div>
+
+                    <div class="col-md-12" ng-show="requestListVisibility">
+                        <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
+                            <thead>
+                            <th>#</th>
+                            <th st-sort="name">Name</th>
+                            <th st-sort="estimate">Estimate</th>
+                            <th st-sort="priority.name">Priority</th>
+                            <th st-sort="creationTime">Created</th>
+                            <th>Manager</th>
+                            <th ng-show="my">Status</th>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="request in requestList" class="task-row">
+                                <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td>{{request.manager.firstName}} {{request.manager.lastName}}</td>
+                                <td ng-show="my" ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="center-block col-md-10">
+                                <ul uib-pagination total-items="totalItems" ng-model="currentPage"
+                                    max-size="maxSize" class="pagination-sm" boundary-links="true"
+                                    ng-change="pageChanged()" items-per-page="pageSize"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer-directive></footer-directive>

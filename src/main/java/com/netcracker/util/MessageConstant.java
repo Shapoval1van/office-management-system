@@ -53,6 +53,7 @@ public class MessageConstant {
     public static final String REQUEST_GROUP_ILLEGAL_ACCESS = "request.group.error.illegal.access";
     public static final String REQUEST_GROUP_NOT_EXIST = "request.group.error.not.exist";
     public static final String REQUEST_GROUP_ALREADY_EXIST = "request.group.error.already.exist";
+    public static final String CANNOT_CREATE_REQUEST_GROUP = "request.group.error.cannot.create";
 
     //TOKEN
     public static final String TOKEN_ERROR_EXPIRED = "token.error.expired";
@@ -71,5 +72,6 @@ public class MessageConstant {
     public static final String CHANGE_MANGER_SUBJECT = "change.manager.subject";
     public static final String CHANGE_REQUEST = "change.request";
     public static final String CHANGE_GROUP = "change.group";
-
+    public static final String CHANGE_STATUS_TO_FREE= "change.status.to.free";
+    public static final String CHANGE_STATUS_TO_CLOSED= "change.status.to.closed";
 }

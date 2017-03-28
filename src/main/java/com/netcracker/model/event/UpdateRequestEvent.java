@@ -8,14 +8,16 @@ public class UpdateRequestEvent {
     private Request oldRequest;
     private Request newRequest;
     private Date changeTime;
+    private String personName;
 
     public UpdateRequestEvent() {
     }
 
-    public UpdateRequestEvent(Request oldRequest, Request newRequest, Date changeTime) {
+    public UpdateRequestEvent(Request oldRequest, Request newRequest, Date changeTime, String personName) {
         this.oldRequest = oldRequest;
         this.newRequest = newRequest;
         this.changeTime = changeTime;
+        this.personName = personName;
     }
 
     public Request getOldRequest() {
@@ -40,5 +42,13 @@ public class UpdateRequestEvent {
 
     public void setChangeTime(Date changeTime) {
         this.changeTime = changeTime;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 }

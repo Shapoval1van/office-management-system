@@ -151,6 +151,7 @@ public class RequestControllerTest {
         requestAssignDTO.setPersonId(2L);
 
         mockMvc.perform(post("/api/request/assign/request")
+                .principal(principal)
                 .content(this.json(requestAssignDTO))
                 .contentType(contentType))
                 .andExpect(status().isOk());

@@ -44,9 +44,15 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     Long countAllAssignedByManager(Long managerId);
 
+    Long countAllAssigned(Long managerId);
+
+    Long countClosedRequestByEmployee(Long personId);
+
     Long countAllRequestByEmployee(Long employeeId);
 
     Long countAllRequestByManager(Long managerId);
+
+    Long countRequestsByRequestGroupId(Integer requestGroupId);
 
     List<Request> findRequestsByRequestGroupId(Integer requestGroupId);
 
@@ -70,6 +76,8 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
 
     List<Request> getRequestsByEmployee(Pageable pageable, Person employee);
 
+    List<Request> getClosedRequestsByEmployee(Pageable pageable, Person person);
+
     List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee);
 
     List<Request> getFreeRequestsWithPriority(Integer priorityId, Pageable pageable, Priority priority);
@@ -79,5 +87,7 @@ public interface RequestRepository extends JdbcRepository<Request, Long> {
     List<Request> getFreeRequests();
 
     Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId);
+
+    int unassign(Long requestId);
 }
 

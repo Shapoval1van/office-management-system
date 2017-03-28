@@ -7,6 +7,7 @@
         "ngTouch",
         "ui.bootstrap",
         "ng-fusioncharts",
-        "smart-table"
+        "smart-table",
+        "ae-datetimepicker"
     ])
 })();

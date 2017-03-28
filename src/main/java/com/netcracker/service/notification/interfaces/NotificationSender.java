@@ -29,4 +29,10 @@ public interface NotificationSender {
     void sendRequestExpiryReminder(List<Request> expiringRequests);
 
     void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime);
+
+    void requestAssignNotification(Request request);
+
+    void requestAssignToGroup(Request request);
+
+    void newComment(Request request);
 }

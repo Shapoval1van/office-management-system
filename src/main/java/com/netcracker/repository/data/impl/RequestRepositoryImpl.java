@@ -65,11 +65,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.assign}")
     private String ASSIGN_REQUEST_TO_PERSON;
 
+    @Value("${request.unassign}")
+    private String UNASSIGN_REQUEST;
+
     @Value("${request.count.all.by.user}")
     private String COUNT_ALL_BY_USER;
 
     @Value("${request.count.all.assigned.by.manager}")
     private String COUNT_ALL_ASSIGNED_BY_MANAGER;
+
+    @Value("${request.count.all.assigned}")
+    private String COUNT_ALL_ASSIGNED;
 
     @Value("${request.count.by.priority}")
     private String COUNT_WITH_PRIORITY;
@@ -85,6 +91,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.count.by.manager}")
     private String COUNT_ALL_REQUEST_BY_MANAGER;
+
+    @Value("${request.count.by.request.group}")
+    private String COUNT_REQUEST_BY_REQUEST_GROUP;
 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
@@ -109,6 +118,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.all.by.manager.and.period}")
     private String GET_ALL_BY_MG_REQUEST_BY_PERIOD;
+
+    @Value("${request.find.all.closed.by.employee}")
+    private String GET_CLOSED_REQUEST_BY_EMPLOYEE;
+
+    @Value("${request.count.closed.by.employee}")
+    private String COUNT_CLOSED_REQUEST_BY_EMPLOYEE;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -202,6 +217,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public List<Request> getClosedRequestsByEmployee(Pageable pageable, Person person) {
+        return this.queryForList(GET_CLOSED_REQUEST_BY_EMPLOYEE, pageable, person.getId());
+    }
+
+    @Override
     public List<Request> getRequestsByEmployeeAndPeriod(Timestamp start, Timestamp end, Person employee) {
         return this.queryForList(GET_ALL_BY_MG_REQUEST_BY_PERIOD, start, end, start, end, employee.getId());
     }
@@ -257,6 +277,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public int unassign(Long requestId) {
+        return getJdbcTemplate().update(UNASSIGN_REQUEST, requestId);
+    }
+
+    @Override
     public Long countFreeByPriority(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
     }
@@ -277,6 +302,16 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public Long countAllAssigned(Long managerId) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_ASSIGNED, Long.class, managerId);
+    }
+
+    @Override
+    public Long countClosedRequestByEmployee(Long personId) {
+        return getJdbcTemplate().queryForObject(COUNT_CLOSED_REQUEST_BY_EMPLOYEE, Long.class, personId);
+    }
+
+    @Override
     public Long countAllRequestByEmployee(Long employeeID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_EMPLOYEE, Long.class, employeeID);
     }
@@ -284,6 +319,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countAllRequestByManager(Long managerID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_MANAGER, Long.class, managerID);
+    }
+
+    @Override
+    public Long countRequestsByRequestGroupId(Integer requestGroupId) {
+        return getJdbcTemplate().queryForObject(COUNT_REQUEST_BY_REQUEST_GROUP, Long.class, requestGroupId);
     }
 
     @Override
