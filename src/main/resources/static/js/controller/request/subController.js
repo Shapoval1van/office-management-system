@@ -200,6 +200,11 @@
 
                 $scope.toggleNewSub = function () {
                     $scope.showNewSubForm =  $scope.showNewSubForm?false:true;
+                    $scope.newSub = {
+                        name: "",
+                        priority: 2,
+                        estimate: ""
+                    };
                 };
 
             }])
