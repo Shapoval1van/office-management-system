@@ -205,6 +205,15 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
+            if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
+                List<Request> subRequestList = getAllSubRequest(newRequest.getId());
+                if (!subRequestList.isEmpty()){
+                    subRequestList.forEach(sub -> {
+                        sub.setStatus(new Status(StatusEnum.CLOSED.getId()));
+                        requestRepository.updateRequest(sub);
+                    });
+                }
+            }
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -381,24 +390,29 @@ public class RequestServiceImpl implements RequestService {
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
             changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName());
-            if (request.getParent() == null) {
-                List<Request> subRequestList = getAllSubRequest(request.getId());
-                if (!subRequestList.isEmpty())
-                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName()));
-            }
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public int changeRequestStatus(Request request, Status status, String authorName) {
+    public int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException {
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
         Request newRequest = new Request(requestDB.get());
 
         newRequest.setStatus(status);
         eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
+
+        if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
+            List<Request> subRequestList = getAllSubRequest(newRequest.getId());
+            if (!subRequestList.isEmpty()){
+                subRequestList.forEach(sub -> {
+                    sub.setStatus(new Status(StatusEnum.CLOSED.getId()));
+                    requestRepository.updateRequest(sub);
+                });
+            }
+        }
 
         return requestRepository.changeRequestStatus(request, status);
     }

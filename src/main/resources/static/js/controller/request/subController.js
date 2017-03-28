@@ -207,5 +207,13 @@
                     };
                 };
 
+                $scope.$watch('request.status', function (newValue, oldValue, scope) {
+                    SubService.getSubRequests(requestId).then(function (data) {
+                        if (data.isError == false){
+                            $scope.subs = data.data;
+                        }
+                    });
+                });
+
             }])
 })();
