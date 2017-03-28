@@ -91,11 +91,11 @@ public class ReportServiceImpl implements ReportService {
         if (person.getRole().getId()==ROLE_ADMIN_ID)
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         if (person.getRole().getId()==ROLE_EMPLOYEE_ID) {
-            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period, pageable);
+            List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period, pageable);
             requestArrayList.forEach(request -> requestService.fill(request));
             return requestArrayList;
         }
-        List<Request> requestArrayList = requestRepository.findRequestByEmployeeIdForPeriod(personId, period, pageable);
+        List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period, pageable);
         requestArrayList.forEach(request -> requestService.fill(request));
         return requestArrayList;
     }
@@ -104,14 +104,14 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
-    public List<Request> getAllRequestByAdminForPeriodWithAlternativeRole(@P("id")Long personId, String period,
+    public List<Request> getAllRequestByAdminForPeriodWithAlternativeRole(Long personId, String period,
                                                                           Long roleId, Pageable pageable)
             throws CurrentUserNotPresentException, NotDataForThisRoleException {
         Person person = getPerson(personId);
-        if (person.getRole().getId()==ROLE_ADMIN_ID)
+        if (person.getRole().getId()!=ROLE_ADMIN_ID)
             throw new NotDataForThisRoleException(messageSource.getMessage(NOT_DATA_FOR_THIS_ROLE, null, locale));
         if(roleId==ROLE_MANAGER_ID){
-            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(person.getId(), period, pageable);
+            List<Request> requestArrayList = requestRepository.findAllAssignedRequestToManagerForPeriod(personId, period, pageable);
             requestArrayList.forEach(request -> requestService.fill(request));
             return requestArrayList;
         }
@@ -164,9 +164,9 @@ public class ReportServiceImpl implements ReportService {
         Person person = getPerson(personId);
         List<Request> requestList;
         if(roleId==ROLE_MANAGER_ID){
-            requestList = requestRepository.findRequestByEmployeeIdForPeriod(person.getId(), period);
-        }else{
             requestList = requestRepository.findAllAssignedRequestToManagerForPeriod(person.getId(), period);
+        }else{
+            requestList = requestRepository.findRequestByEmployeeIdForPeriod(person.getId(), period);
         }
         if (chartsType == ChartsType.AREA) {
             return period.toLowerCase().equals("year") ? buildReportDTOtoColumnCharts(requestList) : buildReportDTOtoAreaCharts(requestList);

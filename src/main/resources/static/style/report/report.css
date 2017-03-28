@@ -15,3 +15,27 @@
     -webkit-transition:all linear 0s;
     transition:all linear 0s;
 }
+
+.reportclass_test * {
+    display: inline-block;
+}
+
+.reportclass_test {
+    text-align: center;
+}
+
+.reportclass_test select {
+    margin-right: 20px;
+}
+.reportclass_test label {
+    margin-right: 10px;
+}
+
+.reportclass_test .test .form-group input.form-control {
+    vertical-align: middle!important;
+}
+
+.reportclass_test .btn .btn-info {
+    position: relative;
+    bottom: 3px;
+}
