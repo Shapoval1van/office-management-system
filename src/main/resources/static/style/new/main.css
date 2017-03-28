@@ -46,3 +46,7 @@
 .center-down h2 {
     text-align: center;
 }
+
+.word-break {
+    word-wrap:break-word;
+}
