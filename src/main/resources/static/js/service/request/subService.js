@@ -2,15 +2,17 @@
     angular.module("OfficeManagementSystem")
         .service("SubService", ["$http",
             function ($http) {
+
                 var service = {};
 
                 service.getSubRequests = function (id) {
                     return $http.get("/api/request/"+id+"/subrequests")
                         .then(function (callback) {
                             callback.isError = false;
-                            angular.forEach(callback.data, function (obj) {
-                                obj["showEdit"] = false;
-                                obj["estimate"] = transformEstimate(obj["estimate"]);
+                            angular.forEach(callback.data, function (subrequest) {
+                                subrequest.showEdit = false;
+                                subrequest.estimate = _transformEstimate(subrequest.estimate);
+                                subrequest.shownStatus = subrequest.status;
                             });
                             return callback;
                         }, function (callback) {
@@ -23,7 +25,7 @@
                     return $http.get("/api/statuses")
                         .then(function (callback) {
                             callback.isError = false;
-                            callback.data = transformStatuses(callback.data);
+                            callback.data = _transformStatuses(callback.data);
                             return callback;
                         }, function (callback) {
                             callback.isError = true;
@@ -35,7 +37,7 @@
                     return $http.get("/api/priorities")
                         .then(function (callback) {
                             callback.isError = false;
-                            callback.data = transformPriorities(callback.data);
+                            callback.data = _transformPriorities(callback.data);
                             return callback;
                         }, function (callback) {
                             callback.isError = true;
@@ -47,8 +49,9 @@
                     return $http.post("/api/request/"+parent+"/subrequests", sub)
                         .then(function (callback) {
                             callback.isError = false;
-                            callback.data["showEdit"] = false;
-                            callback.data["estimate"] = transformEstimate(callback.data["estimate"]);
+                            callback.data.showEdit = false;
+                            callback.data.estimate = _transformEstimate(callback.data.estimate);
+                            callback.data.shownStatus = callback.data.status;
                             callback.sub = callback.data;
                             return callback;
                         }, function (callback) {
@@ -61,9 +64,10 @@
                     return $http.put("/api/request/"+parent+"/subrequests/"+id, sub)
                         .then(function (callback) {
                             callback.isError = false;
-                            callback.data["showEdit"] = false;
-                            callback.data["estimate"] = transformEstimate(callback.data["estimate"]);
+                            callback.data.showEdit = false;
+                            callback.data.estimate = _transformEstimate(callback.data.estimate);
                             callback.sub = callback.data;
+                            callback.sub.shownStatus = callback.sub.status;
                             return callback;
                         }, function (callback) {
                             callback.isError = true;
@@ -82,17 +86,14 @@
                         })
                 };
 
-
-
-
-                var transformEstimate = function (timestamp) {
+                var _transformEstimate = function (timestamp) {
                     if (timestamp == null){
                         return '';
                     }
                     return new Date(timestamp);
                 };
 
-                var transformStatuses = function (statuses) {
+                var _transformStatuses = function (statuses) {
                     angular.forEach(statuses, function (obj) {
                         if (obj.name == "FREE"){
                             obj.name = "New";
@@ -113,7 +114,7 @@
                     return statuses;
                 };
 
-                var transformPriorities = function (statuses) {
+                var _transformPriorities = function (statuses) {
                     angular.forEach(statuses, function (obj) {
                         if (obj.name == "HIGH"){
                             obj.name = "High";

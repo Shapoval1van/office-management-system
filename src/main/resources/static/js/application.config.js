@@ -48,10 +48,6 @@
                         templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
-                    // .when("/secured/demo", {
-                    //     templateUrl: "/static/page/demo/secured.html",
-                    //     controller: "DemoController"
-                    // })
                     .when("/secured/dashboard", {
                         templateUrl: "/static/page/dashboard/dashboard.html",
                         controller: "DashboardController"
@@ -84,10 +80,6 @@
                         templateUrl: "/static/page/request-group/request-by-request-group.html",
                         controller: "RequestGroupDetailsController"
                     })
-                    .when("/secured/requestGroups", {
-                        templateUrl: "/static/page/request/requestGroups.html",
-                        controller: "RequestGroupController"
-                    })
                     .when("/secured/users", {
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"
@@ -99,6 +91,14 @@
                     .when("/secured/request/my", {
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
+                    })
+                    .when("/secured/request/my/closed", {
+                        templateUrl: "/static/page/request/closed-request-page.html",
+                        controller: "ClosedRequestListController"
+                    })
+                    .when("/secured/request/my/assigned", {
+                        templateUrl: "/static/page/request/assigned-request-page.html",
+                        controller: "AssignedRequestListController"
                     })
                     .when("/secured/calendar", {
                         templateUrl: "/static/page/report/calendar.html",
@@ -115,6 +115,10 @@
                     .when("/secured/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
+                    })
+                    .when("/secured/person/:personId/details", {
+                        templateUrl: "/static/page/person/person-info.html",
+                        controller: "PersonDetailController"
                     })
                     .when("/secured/report/:personId", {
                         templateUrl: "/static/page/report/report.html",

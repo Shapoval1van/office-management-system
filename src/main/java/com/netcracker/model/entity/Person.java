@@ -29,6 +29,11 @@ public class Person implements Persistable<Long>, UserDetails {
         this.id = id;
     }
 
+    public Person(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     @Override
     public Long getId() {
         return id;

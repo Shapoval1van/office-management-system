@@ -16,6 +16,28 @@
                     newSubTittle:false,
                     editSubTittle:false
                 };
+                $scope.showNewSubForm = false;
+                $scope.statusComparator = function (v1, v2) {
+                    if (v1.value == 3) {
+                      return 1;
+                  } else {
+                      return -1;
+                  }
+                };
+                $scope.showFinished = true;
+                $scope.dateOptions = {
+                    format: "DD.MM.YYYY HH:mm"
+                };
+
+                var showErrorMessage = function (text) {
+                    text = text?text:"";
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error",
+                        confirmButtonText: "Close"
+                    });
+                };
 
                 $scope.getStatusName = function (id) {
                     var status = "";
@@ -63,11 +85,17 @@
                   }
                   SubService.addSubRequest($scope.newSub, requestId).then(function (response) {
                       if (response.isError == false){
-                          $scope.subs.push(response.sub);
+                          $scope.subs.unshift(response.sub);
                           $scope.newSub = {
                               name: "",
                               priority: 2
                           };
+                      } else {
+                          if (response.data!=null && response.data.errors[0]){
+                              showErrorMessage(response.data.errors[0].detail);
+                          } else {
+                              showErrorMessage();
+                          }
                       }
                   });
                 };
@@ -78,6 +106,12 @@
                             var i = $scope.subs.indexOf(sub);
                             if(i != -1) {
                                 $scope.subs.splice(i, 1);
+                            }
+                        } else {
+                            if (response.data!=null && response.data.errors[0]){
+                                showErrorMessage(response.data.errors[0].detail);
+                            } else {
+                                showErrorMessage();
                             }
                         }
                     });
@@ -107,23 +141,48 @@
                 };
 
                 $scope.updateSub = function (sub) {
+                    console.log(sub);
                     if (sub.name==""||sub.name.length<3){
                         $scope.validationError.editSubTittle = true;
                         return;
                     }
-                    angular.forEach($scope.tempSubs, function (obj) {
-                        if (obj.id == sub.id){
-                            var i = $scope.tempSubs.indexOf(obj);
-                            if(i != -1) {
-                                $scope.tempSubs.splice(i, 1);
+
+
+                    sub.status = sub.shownStatus;
+                    SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
+                        if (response.isError == false){
+                            angular.forEach($scope.tempSubs, function (obj) {
+                                if (obj.id == sub.id){
+                                    var i = $scope.tempSubs.indexOf(obj);
+                                    if(i != -1) {
+                                        $scope.tempSubs.splice(i, 1);
+                                    }
+                                }
+                            });
+                            $scope.subs[$scope.subs.indexOf(sub)] = response.sub;
+                        } else {
+                            if (response.data!=null && response.data.errors[0]){
+                                showErrorMessage(response.data.errors[0].detail);
+                            } else {
+                                showErrorMessage();
                             }
                         }
                     });
-                    SubService.updateSubRequest(sub.id, sub, requestId).then(function (response) {
-                        if (response.isError == false){
-                            $scope.subs[$scope.subs.indexOf(sub)]=response.sub;
-                        }
-                    });
+                };
+
+                $scope.finishedFilter = function (showFinished, sub) {
+                    if (showFinished == true){
+                        return true;
+                    } else if (sub.status == 3){
+                        return false;
+                    }
+                    return true;
+                }
+
+                $scope.onStatusChange = function (sub) {
+                    if (!sub.showEdit){
+                        $scope.updateSub(sub);
+                    }
                 };
 
                 $scope.goEdit = function (sub) {
@@ -134,8 +193,6 @@
                 $scope.resetEdit = function (sub) {
                     $scope._fromTempSub(sub);
                 };
-
-                $scope.showNewSubForm = false;
 
                 $scope.toggleNewSub = function () {
                     $scope.showNewSubForm =  $scope.showNewSubForm?false:true;

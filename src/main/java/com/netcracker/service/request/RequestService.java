@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.Request;
@@ -37,7 +38,7 @@ public interface RequestService {
 
     boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException;
 
-    boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException; // Assign to somebody
+    boolean assignRequest(Long requestId, Long personId,  Principal principal) throws CannotAssignRequestException; // Assign to somebody
 
     Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable);
 
@@ -45,7 +46,11 @@ public interface RequestService {
 
     Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable);
 
+    Page<Request> getClosedRequestByEmployee(Principal principal, Pageable pageable);
+
     Page<Request> getAllRequestByUser(Long userId, Pageable pageable);
+
+    Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable);
 
     Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
@@ -53,9 +58,15 @@ public interface RequestService {
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
-    List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+    Page<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable);
+
+    Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName);
 
     void fill(Request request);
 
     void checkRequestsForExpiry();
+
+    void unassign(Long requestId, Principal principal) throws CannotUnassignRequestException, ResourceNotFoundException;
 }

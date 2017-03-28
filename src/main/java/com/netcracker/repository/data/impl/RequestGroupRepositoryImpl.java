@@ -74,8 +74,8 @@ public class RequestGroupRepositoryImpl extends GenericJdbcRepository<RequestGro
     }
 
     @Override
-    public int countRequestGroupByAuthor(Long authorId) {
-        return super.jdbcTemplate.queryForObject(COUNT_REQUEST_GROUP_BY_AUTHOR, Integer.class, authorId);
+    public Long countRequestGroupByAuthor(Long authorId) {
+        return super.jdbcTemplate.queryForObject(COUNT_REQUEST_GROUP_BY_AUTHOR, Long.class, authorId);
     }
 
     @Override

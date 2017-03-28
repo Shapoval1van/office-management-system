@@ -71,13 +71,12 @@
                             })
                     };
 
-                    $scope.calendarFormClick = function(){
-                        $scope.calendarClick = true;
-                    };
-
                     $scope.getRequestCredential();
 
                 }
+                $scope.calendarFormClick = function(){
+                    $scope.calendarClick = true;
+                };
 
                 $scope.wrongRequestNameMessage = "Name must contain at least 3 letters";
                 $scope.requestNameRegExp = /^(([a-zA-Z\d]+)\s?\1?){3,}$/;
@@ -94,16 +93,18 @@
                         .then(function (callback) {
                             window.location = "javascript:history.back()";
                         }, function (error) {
-                            swal("Updare Failure!", error.data.errors[0].detail, "error");
+                            swal("Update Failure!", error.data.errors[0].detail, "error");
                             console.log("Updating request Failure!");
                             console.log($scope.requestCredentials)
                         })
                 };
                 
                 $scope.sendRequestCredentials = function () {
-                    $scope.estimateTime = new Date($('#datetimepicker4').data('date')).getTime();
-                    if ($scope.estimateTime!=undefined)
-                    $scope.requestCredentials.estimate = $scope.estimateTime;
+                    if ($scope.calendarClick==false){
+                        $scope.requestCredentials.estimate = null;
+                    } else {
+                        $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                    }
                     $http.post("/api/request/add", $scope.requestCredentials)
                         .then(function (callback) {
                             $scope.name = callback.data.name;

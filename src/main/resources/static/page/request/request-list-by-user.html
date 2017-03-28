@@ -23,7 +23,7 @@
                     </div>
                     <a ng-click="pageChanged()" class="btn btn-default">Get request</a>
                     <div class="col-md-12" ng-show="!requestListByUserVisibility">
-                        <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
+                        <table st-table="requestList" st-safe-src="requests" class="table table-stripped user-table-stripped">
                             <thead>
                             <th>#</th>
                             <th st-sort="name">Name</th>
@@ -38,22 +38,16 @@
                             <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td ng-show="assigned">
+                                <td ng-show="assigned" ng-click="goToRequestDetailsPage(request.id)">
                                     {{request.employee.firstName}} {{request.employee.lastName}}
                                 </td>
-                                <td ng-show="!assigned">
+                                <td ng-show="!assigned" ng-click="goToRequestDetailsPage(request.id)">
                                     {{request.manager.firstName}} {{request.manager.lastName}}
                                 </td>
-                                <td>{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.priority.name}}</td>
-                                <td>{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.status.name}}</td>
-                                <!--<td>-->
-                                    <!--<assign-to-me-btn ng-show="assigned"></assign-to-me-btn>-->
-                                    <!--<a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="!assigned">Edit</a>-->
-                                    <!--<assign-to-smb-btn ng-show="assigned"></assign-to-smb-btn>-->
-                                    <!--<a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="!assigned">Cancel</a>-->
-                                <!--</td>-->
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -74,3 +68,4 @@
         </div>
     </div>
 </div>
+<footer-directive></footer-directive>

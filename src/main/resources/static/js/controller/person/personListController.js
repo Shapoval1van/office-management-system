@@ -69,7 +69,7 @@
                 };
                 $scope.personDelete = function(person) {
                     if (person.email === $scope.currentUser.email)
-                        window.alert("You cannot delete yourself")
+                        swal("You cannot delete yourself");
                     else{
                         $scope.person = person;
                         $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
@@ -82,6 +82,10 @@
                         });
                     }
 
+                };
+
+                $scope.goToPersonDetailsPage = function (personId) {
+                    $scope.goToUrl("/secured/person/" + personId + "/details");
                 };
 
             }])

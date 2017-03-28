@@ -113,6 +113,16 @@ public class PersonServiceImpl implements PersonService {
         eventPublisher.publishEvent(event);
     }
 
+    /**
+     * Update person
+     * The person role cannot be updated from manager to employee
+     * and from admin to employee
+     *
+     * @param person
+     * @param personId
+     * @return Optional<Person> updated person
+     * @throws CannotUpdatePersonException
+     */
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
@@ -120,16 +130,14 @@ public class PersonServiceImpl implements PersonService {
 
         Optional<Person> oldUser = getPersonById(personId);
         if (!oldUser.isPresent()) return Optional.empty();
-        if (RoleEnum.EMPLOYEE.getId().equals(oldUser.get().getRole().getId())) {
-            eventPublisher.publishEvent(new NotificationPersonUpdateEvent(person));
-            this.personRepository.updatePerson(person);
-            return Optional.of(person);
-        } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
+        if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
-            throw new CannotUpdatePersonException(messageSource.getMessage(USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));
+            throw new CannotUpdatePersonException(messageSource.getMessage(
+                    USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));
         else if (RoleEnum.ADMINISTRATOR.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
-            throw new CannotUpdatePersonException(messageSource.getMessage(USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE, null, locale));
+            throw new CannotUpdatePersonException(messageSource.getMessage(
+                    USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE, null, locale));
         else {
             eventPublisher.publishEvent(new NotificationPersonUpdateEvent(person));
             this.personRepository.updatePerson(person);

@@ -31,18 +31,41 @@
                             <th st-sort="priority.name">Priority</th>
                             <th st-sort="creationTime">Created</th>
                             <th st-sort="status.name">Status</th>
+                            <th></th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="request in requestList">
-                                <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">
+                                    {{(currentPage - 1) * pageSize + $index + 1}}
+                                </td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">
                                     {{request.manager.firstName}} {{request.manager.lastName}}
                                 </td>
-                                <td>{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.priority.name}}</td>
-                                <td>{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
-                                <td>{{request.status.name}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">
+                                    {{request.estimate | date: "dd.MM.yyyy HH:mm"}}
+                                </td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">
+                                    {{request.priority.name}}
+                                </td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">
+                                    {{request.creationTime | date: "dd.MM.yyyy HH:mm"}}
+                                </td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
+                                <td>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-danger" ng-click="removeFromRequestGroup(request.id)">
+                                            Remove from request group
+                                        </button>
+                                    </div>
+                                    <!--<remove-from-request-group-modal></remove-from-request-group-modal>-->
+                                    <!--<div data-dismiss="modal" data-toggle="modal"-->
+                                         <!--data-target="#removeFromRequestGroupModal">-->
+                                        <!--<button class="btn btn-danger" ng-click="setCurrentRequest(request)">-->
+                                            <!--Remove from request group-->
+                                        <!--</button>-->
+                                    <!--</div>-->
+                                </td>
                             </tr>
                             </tbody>
                         </table>

@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.*;
@@ -164,13 +165,26 @@ public class RequestServiceImpl implements RequestService {
                         .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))
         ));
         request.setCreationTime(new Timestamp(new Date().getTime()));
-        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager));
         Optional<Request> savedRequest = this.requestRepository.save(request);
         //            Automatically subscribe author to request
         personRepository.subscribe(savedRequest.get().getId(), savedRequest.get().getEmployee().getId());
+        eventPublisher.publishEvent(new NotificationNewRequestEvent(manager, request));
         return savedRequest;
     }
 
+    /**
+     * Update request
+     * Only Free and In progress requests can be updated.
+     * Admin can update Free and In progress requests.
+     * Author can update only Free requests.
+     *
+     * @param newRequest
+     * @param requestId
+     * @param principal
+     * @return Optional<Request> updated request
+     * @throws ResourceNotFoundException
+     * @throws IllegalAccessException
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
@@ -181,24 +195,16 @@ public class RequestServiceImpl implements RequestService {
         Optional<Person> employee = personRepository.findOne(newRequest.getEmployee().getId());
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
         if (!oldRequest.isPresent()) return Optional.empty();
-        if (isCurrentUserAdmin(principal)) {
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(), new Request(oldRequest.get().getId())));
-            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-            return this.requestRepository.updateRequest(newRequest);
-//        } else if (currentUser.get().getId().equals(employee.get().getId())
-//                && oldRequest.get().getStatus().getId().equals(StatusEnum.CLOSED.getId())
-//                && newRequest.getStatus().getId().equals(StatusEnum.FREE.getId())) {
-//            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get()));
-//            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
-//            return this.requestRepository.updateRequest(newRequest);
-        } else if (!employee.get().getId().equals(currentUser.get().getId())) {
+        if (StatusEnum.CANCELED.getId().equals(oldRequest.get().getStatus().getId())){
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CANCELED, null, locale));
+        } else if (StatusEnum.CLOSED.getId().equals(oldRequest.get().getStatus().getId())){
+            throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CLOSED, null, locale));
+        } else if (!employee.get().getId().equals(currentUser.get().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (oldRequest.get().getStatus().getId() != StatusEnum.FREE.getId()) {
+        } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest.get(), newRequest, new Date()));
-            eventPublisher.publishEvent(new NotificationRequestUpdateEvent(employee.get(), new Request(oldRequest.get().getId())));
-            updateRequestHistory(newRequest, oldRequest.get(), principal.getName());
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -214,16 +220,15 @@ public class RequestServiceImpl implements RequestService {
         if (!p.isPresent()) return Optional.empty();
         Request oldRequest = new Request(futureNewRequest.get());
         futureNewRequest.get().setPriority(p.get());
-        updateRequestHistory(futureNewRequest.get(), oldRequest, authorName);
 
-        eventPublisher.publishEvent(new ChangeRequestEvent(oldRequest, futureNewRequest.get(), new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date(),principal.getName()));
 
         this.requestRepository.updateRequestPriority(futureNewRequest.get());
         return futureNewRequest;
     }
 
 
-    private Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) {
+    public Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) {
         Optional<Person> author = personRepository.findPersonByEmail(authorName);
         if (!author.isPresent()) return Optional.empty();
         ChangeGroup changeGroup = new ChangeGroup();
@@ -294,7 +299,9 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
         request.setRequestGroup(new RequestGroup(requestGroupId));
-        return requestRepository.updateRequestGroup(requestId, requestGroupId);
+        int rowsUpdated = requestRepository.updateRequestGroup(requestId, requestGroupId);
+        eventPublisher.publishEvent(new RequestAddToGroupEvent(getRequestById(request.getId()).get()));
+        return rowsUpdated;
     }
 
     /**
@@ -340,26 +347,44 @@ public class RequestServiceImpl implements RequestService {
         return requests;
     }
 
+    /**
+     * Cancel request
+     * Only Free and In progress requests can be canceled.
+     * Admin can cancel Free and In progress requests.
+     * Author can cancel only Free requests.
+     *
+     * @param id
+     * @param principal
+     * @return
+     * @throws CannotDeleteRequestException
+     * @throws IllegalAccessException
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Request request = getRequestById(id).get();
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
-        if (StatusEnum.CLOSED.getName().equals(request.getStatus().getName()))
+        Optional<Request> requestOptional = requestRepository.findOne(id);
+        if (!requestOptional.isPresent())
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{id}, locale));
+        Request request = requestOptional.get();
+
+        if (StatusEnum.CANCELED.getId().equals(request.getStatus().getId()))
+            throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CANCELED, null, locale));
+        else if (StatusEnum.CLOSED.getId().equals(request.getStatus().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CLOSED, null, locale));
         else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.getEmployee().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_PERMISSION, null, locale));
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), principal.getName());
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName());
             if (request.getParent() == null) {
                 List<Request> subRequestList = getAllSubRequest(request.getId());
                 if (!subRequestList.isEmpty())
-                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()), principal.getName()));
+                    subRequestList.forEach(r -> changeRequestStatus(r, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName()));
             }
         }
     }
@@ -368,32 +393,12 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int changeRequestStatus(Request request, Status status, String authorName) {
-        if (request.getEmployee() != null) {
-            Optional<Person> person = personRepository.findOne(request.getEmployee().getId());
-            Optional<Request> requestDB = requestRepository.findOne(request.getId());
-            //history
-            Request newRequest = new Request(requestDB.get());
-            newRequest.setStatus(status);
-
-            updateRequestHistory(newRequest, requestDB.get(), authorName);
-
-            eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
-
-            eventPublisher.publishEvent(new ChangeRequestEvent(requestDB.get(), newRequest, new Date()));
-
-            return requestRepository.changeRequestStatus(request, status);
-        }
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
-        //history
         Request newRequest = new Request(requestDB.get());
+
         newRequest.setStatus(status);
-
-        updateRequestHistory(newRequest, requestDB.get(), authorName);
-
-        eventPublisher.publishEvent(new NotificationChangeStatus(person.get(), new Request(newRequest.getId())));
-
-        eventPublisher.publishEvent(new ChangeRequestEvent(requestDB.get(), newRequest, new Date()));
+        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
 
         return requestRepository.changeRequestStatus(request, status);
     }
@@ -418,10 +423,25 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
-        List<Request> requestsByRequestGroupId = requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
-        requestsByRequestGroupId.forEach(this::fillRequest);
-        return requestsByRequestGroupId;
+    @PreAuthorize("isAuthenticated()")
+    public Page<Request> getRequestsByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        List<Request> requestsByRequestGroup = requestRepository.findRequestsByRequestGroupId(requestGroupId, pageable);
+        requestsByRequestGroup.forEach(this::fillRequest);
+        Long count = requestRepository.countRequestsByRequestGroupId(requestGroupId);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestsByRequestGroup);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable) {
+        Page<Request> requestsByRequestGroup = getRequestsByRequestGroup(requestGroupId, pageable);
+        List<FullRequestDTO> fullRequestDTOList = requestsByRequestGroup.getData()
+                .stream()
+                .map(FullRequestDTO::new)
+                .collect(Collectors.toList());
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(),
+                requestsByRequestGroup.getTotalElements(), fullRequestDTOList);
     }
 
     @Scheduled(cron = "${request.expiry.remind.time}")
@@ -447,17 +467,42 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public void unassign(Long requestId, Principal principal) throws CannotUnassignRequestException, ResourceNotFoundException {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        Optional<Request> oldRequest = getRequestById(requestId);
+        Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
+
+        if(!oldRequest.isPresent()) {
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, null, locale));
+        }
+        if(oldRequest.get().getManager() == null) {
+            throw new CannotUnassignRequestException(messageSource.getMessage(REQUEST_NOT_ASSIGNED, null, locale));
+        }
+
+        requestRepository.unassign(requestId);
+
+        Optional<Request> newRequest = getRequestById(requestId);
+        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> request = getRequestById(requestId);
+        Optional<Request> oldRequest = getRequestById(requestId);
         Optional<Person> person = personRepository.findPersonByEmail(principal.getName());
 
-        if (request.isPresent() && person.isPresent() && request.get().getManager() == null){
+        if (oldRequest.isPresent() && person.isPresent() && oldRequest.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            Optional<Request> newRequest = getRequestById(requestId);
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
+            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
             return true;
         }
 
@@ -466,6 +511,7 @@ public class RequestServiceImpl implements RequestService {
 
     /**
      * Method for assign another person to request
+     *
      * @param requestId
      * @param personId
      * @return true in case success operation
@@ -474,13 +520,23 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean assignRequest(Long requestId, Long personId) throws CannotAssignRequestException {
+    public boolean assignRequest(Long requestId, Long personId, Principal principal) throws CannotAssignRequestException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> request = getRequestById(requestId);
-        Optional<Request> person = getRequestById(personId);
+        Optional<Request> oldRequest = getRequestById(requestId);
+        Optional<Person> person = personRepository.findOne(personId);
 
-        if (request.isPresent() && person.isPresent()){
+        if (oldRequest.isPresent() && person.isPresent()){
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
+            Optional<Request> newRequest = getRequestById(requestId);
+
+            // Subscribe new manager to request
+            personRepository.subscribe(requestId, person.get().getId());
+
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+
+            if(oldRequest.get().getManager() != null) {
+                personRepository.unsubscribe(requestId, oldRequest.get().getManager().getId()); // unsubscribe old manager
+            }
             return true;
         }
 
@@ -523,6 +579,17 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional()
+    @PreAuthorize("isAuthenticated()")
+    public Page<Request> getClosedRequestByEmployee(Principal principal, Pageable pageable) {
+        Person employee = personRepository.findPersonByEmail(principal.getName()).get();
+        List<Request> requestList = requestRepository.getClosedRequestsByEmployee(pageable, employee);
+        Long count = requestRepository.countClosedRequestByEmployee(employee.getId());
+        requestList.forEach(this::fillRequest);
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllRequestByUser(Long userId, Pageable pageable) {
         List<Request> requestList = requestRepository.getAllRequestByUser(userId, pageable);
@@ -533,9 +600,20 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    public Page<Request> getAllAssignedRequest(Principal principal, Pageable pageable) {
+        Person manager = personRepository.findPersonByEmail(principal.getName()).get();
+        List<Request> requestList = requestRepository.getAllAssignedRequest(manager.getId(), pageable);
+        Long count = requestRepository.countAllAssigned(manager.getId());
+        requestList.forEach(this::fillRequest);
+
+        return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, requestList);
+    }
+
+    @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
-        List<Request> requestList = requestRepository.getAllAssignedRequest(managerId, pageable);
+        List<Request> requestList = requestRepository.getAllAssignedRequestByManager(managerId, pageable);
         Long count = requestRepository.countAllAssignedByManager(managerId);
         requestList.forEach(this::fillRequest);
 
@@ -578,6 +656,11 @@ public class RequestServiceImpl implements RequestService {
 
         Status status = request.getStatus();
         request.setStatus(statusRepository.findOne(status.getId()).orElseGet(null));
+
+        RequestGroup requestGroup = request.getRequestGroup();
+        if (requestGroup != null){
+            request.setRequestGroup(requestGroupRepository.findOne(requestGroup.getId()).orElseGet(null));
+        }
     }
 
     private void fill(Set<ChangeGroup> changeGroup) {

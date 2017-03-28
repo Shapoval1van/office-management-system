@@ -9,40 +9,28 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
 import com.netcracker.util.ChangeTracker;
-import com.netcracker.util.NotificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-import static com.netcracker.util.MessageConstant.REQUEST_UPDATE_MESSAGE_BODY;
-import static com.netcracker.util.MessageConstant.REQUEST_UPDATE_MESSAGE_SUBJECT;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
-@PropertySource("classpath:notification/templates/notificationTemplates.properties")
+@PropertySource("classpath:property/notification/notificationTemplates.properties")
 public class NotificationService implements NotificationSender {
-
-    @Autowired
-    private ChangeTracker changeTracker;
 
     private static final int RATE = 1800000;
 
     @Value("${password.reminder.subject}")
     private String PASSWORD_REMINDER_SUBJECT;
-    @Value("${information.message.subject}")
-    private String INFORMATION_MESSAGE_SUBJECT;
     @Value("${registration.message.subject}")
     private String REGISTRATION_MESSAGE_SUBJECT;
-    @Value("${custom.information.message.subject}")
-    private String CUSTOM_INFORMATION_MESSAGE_SUBJECT;
-    @Value("${status.message.subject}")
-    private String REQUEST_STATUS_CHANGE_SUBJECT;
     @Value("${new.request.message.subject}")
     private String NEW_REQUEST_SUBJECT;
     @Value("${update.request.message.subject}")
@@ -55,157 +43,135 @@ public class NotificationService implements NotificationSender {
     private String USER_RECOVER_SUBJECT;
     @Value("${request.expiry.reminder.message.subject}")
     private String REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT;
+    @Value("${confirmation.of.registration.subject}")
+    private String CONFIRMATION_OF_REGISTRATION_SUBJECT;
+    @Value("${request.assigned.subject}")
+    private String REQUEST_ASSIGNED_SUBJECT;
+    @Value("${request.assigned.to.group.subject}")
+    private String REQUEST_ASSIGNED_TO_GROUP_SUBJECT;
+    @Value("${request.new.comment.subject}")
+    private String REQUEST_NEW_COMMENT_SUBJECT;
 
+    @Value("${confirmation.of.registration.body}")
+    private String CONFIRMATION_OF_REGISTRATION_BODY;
+    @Value("${delete.user.message.body}")
+    private String USER_DELETE_MESSAGE_BODY;
+    @Value("${registration.message.body}")
+    private String REGISTRATION_MESSAGE_BODY;
+    @Value("${new.request.message.body}")
+    private String NEW_REQUEST_MESSAGE_BODY;
+    @Value("${recover.deleted.user.message.body}")
+    private String USER_RECOVER_MESSAGE_BODY;
+    @Value("${password.reminder.message.body}")
+    private String PASSWORD_REMINDER_MESSAGE_BODY;
+    @Value("${request.assigned.body}")
+    private String REQUEST_ASSIGNED_BODY;
+    @Value("${request.assigned.to.group.body}")
+    private String REQUEST_ASSIGNED_TO_GROUP_BODY;
+    @Value("${request.new.comment.body}")
+    private String REQUEST_NEW_COMMENT_BODY;
 
-    @Value("${password.reminder.message.src}")
-    private String PASSWORD_REMINDER_MESSAGE_SRC;
-    @Value("${information.message.src}")
-    private String INFORMATION_MESSAGE_SRC;
-    @Value("${custom.information.message.src}")
-    private String CUSTOM_INFORMATION_MESSAGE_SRC;
-    @Value("${registration.message.src}")
-    private String REGISTRATION_MESSAGE_SRC;
-    @Value("${requestStatus.message.src}")
-    private String STATUS_CHANGE_MESSAGE_SRC;
-    @Value("${new.request.message.src}")
-    private String NEW_REQUEST_MESSAGE_SRC;
-    @Value("${update.request.message.src}")
-    private String REQUEST_UPDATE_MESSAGE_SRC;
-    @Value("${update.user.message.src}")
-    private String USER_UPDATE_MESSAGE_SRC;
     @Value("${request.expiry.reminder.message.src}")
-    private String REQUEST_EXPIRY_REMINDER_MESSAGE_SRC;
-    @Value("${delete.user.message.src}")
-    private String USER_DELETE_MESSAGE_SRC;
-    @Value("${recover.deleted.user.message.src}")
-    private String USER_RECOVER_MESSAGE_SRC;
+    private String REQUEST_EXPIRY_REMINDER_MESSAGE_TEMPLATE;
+    @Value("${update.request.message.src}")
+    private String REQUEST_UPDATE_MESSAGE_TEMPLATE;
+    @Value("${update.user.message.src}")
+    private String USER_UPDATE_MESSAGE_TEMPLATE;
+    @Value("${simple.message.src}")
+    private String SIMPLE_MESSAGE_TEMPLATE;
+    @Value("${simple.message.no.btn.src}")
+    private String SIMPLE_MESSAGE_NO_BTN_TEMPLATE;
+    @Value("${server.source}")
+    private String SERVER_SOURCE;
 
-    @Autowired
+    private ChangeTracker changeTracker;
     private MailService mailService;
-    private NotificationRepository notificationRepository;
-    @Autowired
     private PersonRepository personRepository;
+    private NotificationRepository notificationRepository;
 
     @Autowired
-    private MessageSource messageSource;
-
-
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
+    }
+    @Autowired
+    public void setPersonRepository(PersonRepository personRepository) {
+        this.personRepository = personRepository;
+    }
     @Autowired
     public void setNotificationRepository(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
+    @Autowired
+    public void setChangeTracker(ChangeTracker changeTracker){
+        this.changeTracker = changeTracker;
+    }
 
     @Override
-    public void sendPasswordReminder(Person person, String link) {
-        Notification notification = NotificationBuilder.build(person,
-                PASSWORD_REMINDER_SUBJECT,
-                PASSWORD_REMINDER_MESSAGE_SRC,
-                link);
-
+    public void sendPasswordReminder(Person person, String token) {
+        Notification notification = new Notification.NotificationBuilder(person, PASSWORD_REMINDER_SUBJECT)
+                .template(SIMPLE_MESSAGE_TEMPLATE)
+                .text(PASSWORD_REMINDER_MESSAGE_BODY)
+                .link(SERVER_SOURCE.concat("resetPassword/").concat(token))
+                .build();
         mailService.send(notification);
     }
 
     @Override
-    public void sendInformationNotification(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                INFORMATION_MESSAGE_SUBJECT,
-                INFORMATION_MESSAGE_SRC);
-
+    public void sendRegistrationCompletedNotification(Person person, String token) {
+        Notification notification = new Notification.NotificationBuilder(person, REGISTRATION_MESSAGE_SUBJECT)
+                .template(SIMPLE_MESSAGE_TEMPLATE)
+                .text(REGISTRATION_MESSAGE_BODY)
+                .link(SERVER_SOURCE.concat("login/").concat(token))
+                .build();
         mailService.send(notification);
     }
 
     @Override
-    public void sendCustomInformationNotification(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                CUSTOM_INFORMATION_MESSAGE_SUBJECT,
-                CUSTOM_INFORMATION_MESSAGE_SRC);
-
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendRegistrationCompletedNotification(Person person, String link) {
-        Notification notification = NotificationBuilder.build(person,
-                REGISTRATION_MESSAGE_SUBJECT,
-                REGISTRATION_MESSAGE_SRC,
-                link);
-
-        mailService.send(notification);
-    }
-
-
-    @Override
-    public void sendChangeStatusEvent(Person person, String link) {
-        Notification notification = NotificationBuilder.build(person,
-                REQUEST_STATUS_CHANGE_SUBJECT,
-                STATUS_CHANGE_MESSAGE_SRC,
-                link);
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendNewRequestEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                NEW_REQUEST_SUBJECT,
-                NEW_REQUEST_MESSAGE_SRC);
-        mailService.send(notification);
-    }
-
-    @Override
-    public void sendUpdateRequestEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                REQUEST_UPDATE_SUBJECT,
-                REQUEST_UPDATE_MESSAGE_SRC);
+    public void sendNewRequestEvent(Person person, Request request) {
+        Notification notification = new Notification.NotificationBuilder(person, NEW_REQUEST_SUBJECT.concat(request.getName()))
+                .template(SIMPLE_MESSAGE_TEMPLATE)
+                .text(NEW_REQUEST_MESSAGE_BODY)
+                .link(detailsLink(request.getId()))
+                .build();
         mailService.send(notification);
     }
 
     @Override
     public void sendUpdateUserEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                USER_UPDATE_SUBJECT,
-                USER_UPDATE_MESSAGE_SRC);
+        Notification notification = new Notification.NotificationBuilder(person, USER_UPDATE_SUBJECT)
+                .template(USER_UPDATE_MESSAGE_TEMPLATE)
+                .link(SERVER_SOURCE)
+                .build();
         mailService.send(notification);
     }
 
     @Override
     public void sendDeleteUserEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                USER_DELETE_SUBJECT,
-                USER_DELETE_MESSAGE_SRC);
+        Notification notification = new Notification.NotificationBuilder(person, USER_DELETE_SUBJECT)
+                .template(SIMPLE_MESSAGE_NO_BTN_TEMPLATE)
+                .text(USER_DELETE_MESSAGE_BODY)
+                .build();
         mailService.send(notification);
     }
 
     @Override
     public void sendRecoverUserEvent(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                USER_RECOVER_SUBJECT,
-                USER_RECOVER_MESSAGE_SRC);
+        Notification notification = new Notification.NotificationBuilder(person, USER_RECOVER_SUBJECT)
+                .template(SIMPLE_MESSAGE_TEMPLATE)
+                .text(USER_RECOVER_MESSAGE_BODY)
+                .link(SERVER_SOURCE)
+                .build();
         mailService.send(notification);
     }
 
     @Override
-    public void sendPasswordForNewManager(Person person) {
-        Notification notification = NotificationBuilder.build(person,
-                REGISTRATION_MESSAGE_SUBJECT,
-                ", you are welcome at our system. Let's start work!!!\n" + "Your pass: " + person.getPassword());
+    public void sendRecoveryPasswordForNewUser(Person person, String token) {
+        Notification notification = new Notification.NotificationBuilder(person, CONFIRMATION_OF_REGISTRATION_SUBJECT)
+                .template(SIMPLE_MESSAGE_TEMPLATE)
+                .text(CONFIRMATION_OF_REGISTRATION_BODY)
+                .link(SERVER_SOURCE.concat("resetPassword/").concat(token))
+                .build();
         mailService.send(notification);
-    }
-
-    @Override
-    @Scheduled(fixedRate = RATE)
-    @Transactional
-    public void resendNotification() {
-        List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
-        notifications.forEach(notification -> {
-            notificationRepository.delete(notification.getId());
-            Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
-            if (personOptional.isPresent()) {
-                notification.setPerson(personOptional.get());
-                notification.setId(null);
-                mailService.send(notification);
-            }
-        });
-
     }
 
     @Override
@@ -222,41 +188,97 @@ public class NotificationService implements NotificationSender {
     @Override
     public void sendRequestExpiryReminder(List<Request> expiringRequests) {
         expiringRequests.forEach(request -> {
-            Notification notification = NotificationBuilder.build(request.getManager(),
-                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT,
-                    REQUEST_EXPIRY_REMINDER_MESSAGE_SRC,
-                    request);
+            Notification notification = new Notification.NotificationBuilder(request.getManager(),
+                    REQUEST_EXPIRY_REMINDER_MESSAGE_SUBJECT.concat(request.getName()))
+                    .template(REQUEST_EXPIRY_REMINDER_MESSAGE_TEMPLATE)
+                    .request(request)
+                    .link(detailsLink(request.getId()))
+                    .build();
             mailService.send(notification);
         });
     }
 
     @Override
     public void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
-
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
-
         subscribers.forEach(person -> {
-            String link = buildRequestDetailsLink(oldRequest.getId());
-            String requestUpdateMessageSubject = messageSource.getMessage(REQUEST_UPDATE_MESSAGE_SUBJECT,
-                    new Object[]{oldRequest.getName()}, locale);
-
             changeItemSet.forEach(changeItem -> {
-                String requestUpdateMessageBody = messageSource.getMessage(REQUEST_UPDATE_MESSAGE_BODY,
-                        new Object[]{changeItem.getField().getName(), changeItem.getOldVal(),
-                                changeItem.getNewVal(), changeTime, link}, locale);
-
-                mailService.send(person.getEmail(), requestUpdateMessageSubject, requestUpdateMessageBody);
+                Notification notification = new Notification.NotificationBuilder(person,
+                                REQUEST_UPDATE_SUBJECT.concat(oldRequest.getName()))
+                        .template(REQUEST_UPDATE_MESSAGE_TEMPLATE)
+                        .link(detailsLink(oldRequest.getId()))
+                        .request(oldRequest)
+                        .changeItem(new ChangeItem(changeItem.getOldVal(), changeItem.getNewVal(), changeItem.getField()))
+                        .build();
+                mailService.send(notification);
             });
         });
-
     }
 
-    private String buildRequestDetailsLink(Long requestId) {
+    @Override
+    public void requestAssignNotification(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_ASSIGNED_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_ASSIGNED_BODY.concat(request.getManager().getFullName()))
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+    @Override
+    public void requestAssignToGroup(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_ASSIGNED_TO_GROUP_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_ASSIGNED_TO_GROUP_BODY.concat(request.getRequestGroup().getName()))
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+    @Override
+    public void newComment(Request request) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_NEW_COMMENT_SUBJECT.concat(request.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_NEW_COMMENT_BODY)
+                    .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+    @Override
+    @Scheduled(fixedRate = RATE)
+    @Transactional
+    public void resendNotification() {
+        List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
+        notifications.forEach(notification -> {
+            notificationRepository.delete(notification.getId());
+            Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
+            if (personOptional.isPresent()) {
+                notification.setPerson(personOptional.get());
+                notification.setId(null);
+                mailService.send(notification);
+            }
+        });
+    }
+
+    private String detailsLink(Long requestId) {
         return new StringBuilder()
-                .append("https://management-office.herokuapp.com/request/")
+                .append(SERVER_SOURCE)
+                .append("secured/")
+                .append("request/")
                 .append(requestId)
                 .append("/details")
                 .toString();
