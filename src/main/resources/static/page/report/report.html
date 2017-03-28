@@ -5,20 +5,19 @@
         <div class="container-fluid">
             <div class="jumbotron bordered">
                 <div class="col-md-12 reportclass_test">
-                    <label for="periodSelect">Select period</label>
+                    <label for="periodSelect">Select period:</label>
                     <select id="periodSelect" class="input-sm" ng-model="namesOfPeriod.value" ng-options="x for x in namesOfPeriod.values"
                              ng-change="getPeriodData(namesOfPeriod.value)">
                     </select>
                     <div class="test" ng-show="isAdministrator">
                         <div ng-show="isAdminRadio">
-                            <label for="select">Select func</label>
+                            <label for="select">Select role:</label>
                             <select id="select" class="input-sm" ng-model="namesOfFunctionality.value" ng-options="x for x in namesOfFunctionality.values"
                                     ng-change="getSelectFunc(namesOfFunctionality.value)">
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Write and choose username:</label>
-
                             <input ng-model="userInput" type="text" placeholder="Username"
                                    ng-change="updateUser(userInput)" uib-typeahead="user as user.firstName + ' '
                                +  user.lastName for user in users"
