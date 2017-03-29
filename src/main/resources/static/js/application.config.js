@@ -5,13 +5,28 @@
                 $rootScope.$on('$routeChangeStart', function (event, next) {
                     if(!SessionService.isUserLoggedIn() && next.$$route.templateUrl.includes('/secured')) {
                         window.location.href = '/login';
+                    } else if(next.$$route.templateUrl.includes('/secured/manager') &&
+                            (SessionService.getUserRole() !== 'ROLE_ADMINISTRATOR' &&
+                            SessionService.getUserRole() !== 'ROLE_OFFICE MANAGER')) {
+                        window.location.href = '/denied';
+                    } else if(next.$$route.templateUrl.includes('/secured/admin') &&
+                        SessionService.getUserRole() !== 'ROLE_ADMINISTRATOR') {
+                        window.location.href = '/denied';
                     }
                 });
                 $rootScope.$on( "$locationChangeStart", function(angularEvent, next, current) {
                     if(!SessionService.isUserLoggedIn() && (next.includes('/secured') || current.includes('/secured'))) {
                         window.location.href = '/login';
+                    } else if((next.includes('/secured/manager') || current.includes('/secured/admin') )&&
+                        (SessionService.getUserRole() !== 'ROLE_ADMINISTRATOR' &&
+                        SessionService.getUserRole() !== 'ROLE_OFFICE MANAGER')) {
+                        window.location.href = '/denied';
+                    } else if((next.includes('/secured/admin')  || current.includes('/secured/admin')) &&
+                        SessionService.getUserRole() !== 'ROLE_ADMINISTRATOR') {
+                        window.location.href = '/denied';
                     }
                 });
+
                 $injector.get('$route');
      }])
      .config(["$routeProvider", "$locationProvider",
@@ -48,85 +63,88 @@
                         templateUrl: "/static/page/reset/new-password-page.html",
                         controller: "RecoverPasswordController"
                     })
-                    .when("/secured/dashboard", {
+                    .when("/secured/employee/dashboard", {
                         templateUrl: "/static/page/dashboard/dashboard.html",
                         controller: "DashboardController"
                     })
-                    .when("/secured/comment/:requestId", {
+                    .when("/secured/employee/comment/:requestId", {
                         templateUrl: "/static/page/test/test-comment.html",
                         controller: "CommentController"
                     })
-                    .when("/secured/newRequest", {
+                    .when("/secured/employee/newRequest", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
-                    .when("/secured/request/:requestId/update", {
+                    .when("/secured/manager/request:requestId/update", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
-                    .when("/secured/request/:requestId/details", {
+                    .when("/secured/employee/request/:requestId/details", {
                         templateUrl: "/static/page/request/request-details.html",
                         controller: "RequestDetailsController"
                     })
-                    .when("/secured/request/free", {
+                    .when("/secured/employee/request/free", {
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
-                    .when("/secured/request-group", {
+                    .when("/secured/manager/request-group", {
                         templateUrl: "/static/page/request-group/request-group.html",
                         controller: "RequestGroupController"
                     })
-                    .when("/secured/request-group/:requestGroupId/requests", {
+                    .when("/secured/manager/request-group/:requestGroupId/requests", {
                         templateUrl: "/static/page/request-group/request-by-request-group.html",
                         controller: "RequestGroupDetailsController"
                     })
-                    .when("/secured/users", {
+                    .when("/secured/admin/users", {
                         templateUrl: "/static/page/person/person-list.html",
                         controller: "PersonListController"
                     })
-                    .when("/secured/deleted-users", {
+                    .when("/secured/admin/deleted-users", {
                         templateUrl: "/static/page/person/deleted-person-list.html",
                         controller: "DeletedPersonListController"
                     })
-                    .when("/secured/request/my", {
+                    .when("/secured/employee/request/my", {
                         templateUrl: "/static/page/request/free-request-page.html",
                         controller: "RequestListController"
                     })
-                    .when("/secured/request/my/closed", {
+                    .when("/secured/employee/request/closed", {
                         templateUrl: "/static/page/request/closed-request-page.html",
                         controller: "ClosedRequestListController"
                     })
-                    .when("/secured/request/my/assigned", {
+                    .when("/secured/manager/request/my/assigned", {
                         templateUrl: "/static/page/request/assigned-request-page.html",
                         controller: "AssignedRequestListController"
                     })
-                    .when("/secured/calendar", {
+                    .when("/secured/manager/calendar", {
                         templateUrl: "/static/page/report/calendar.html",
                         controller: "CalendarController"
                     })
-                    .when("/secured/request/user", {
+                    .when("/secured/admin/request/user", {
                         templateUrl: "/static/page/request/request-list-by-user.html",
                         controller: "RequestListByUserController"
                     })
-                    .when("/secured/request/assigned", {
+                    .when("/secured/admin/request/assigned", {
                         templateUrl: "/static/page/request/request-list-by-user.html",
                         controller: "RequestListByUserController"
                     })
-                    .when("/secured/person/:personId/update", {
+                    .when("/secured/admin/person/:personId/update", {
                         templateUrl: "/static/page/person/person-update.html",
                         controller: "UpdatePersonController"
                     })
-                    .when("/secured/person/:personId/details", {
+                    .when("/secured/employee/person/:personId/details", {
                         templateUrl: "/static/page/person/person-info.html",
                         controller: "PersonDetailController"
                     })
-                    .when("/secured/report/:personId", {
+                    .when("/secured/employee/report/:personId", {
                         templateUrl: "/static/page/report/report.html",
                         controller: "ReportController"
                     })
                     .when("/secured/test/notification/request/expiring", {
                         templateUrl: "/static/page/request/expiry-request-estimate-notification-page.html",
                         controller: "RequestListController"
+                    })
+                    .when("/denied", {
+                        templateUrl: "/static/page/550.html"
                     })
                     .otherwise({
                         templateUrl: "/static/page/404.html"

@@ -349,7 +349,7 @@
                 };
 
                 $scope.goToRequestGroupDetails = function () {
-                    $scope.goToUrl("/secured/request-group/" + $scope.request.requestGroup.id + "/requests");
+                    $scope.goToUrl("/secured/manager/request-group/" + $scope.request.requestGroup.id + "/requests");
                 };
 
                 $scope.isCurrentUserSubscribing = function () {
@@ -403,7 +403,7 @@
                 };
 
                 $scope.requestUpdate = function (requestId) {
-                    window.location = "/secured/request/" + requestId + '/update';
+                    window.location = "/secured/manager/request" + requestId + '/update';
                 };
 
             }])
