@@ -50,3 +50,11 @@
 .word-break {
     word-wrap:break-word;
 }
+
+.loading-screen {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: #2c5c3f;
+    z-index: 9999;
+}
