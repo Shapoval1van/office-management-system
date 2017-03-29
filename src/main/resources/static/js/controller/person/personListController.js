@@ -3,8 +3,8 @@
         .controller("PersonListController", ["$scope", "$http", "$rootScope",
             function ($scope, $http, $rootScope) {
 
-                var personDetails = "/secured/employee/person";
-                var personUpdate = "/secured/admin/person";
+                var personDetails = "/secured/employee/person/";
+                var personUpdate = "/secured/admin/person/";
                 $scope.pageSize = 10;
                 $scope.persons = {};
                 $scope.roles = [{roleId: 4, name: 'ALL'},
@@ -66,7 +66,7 @@
                 };
 
                 $scope.personUpdate = function(personId) {
-                    window.location = personUpdate + personId + '/update';
+                    $scope.goToUrl(personUpdate + personId + '/update');
                 };
                 $scope.personDelete = function(person) {
                         $scope.person = person;

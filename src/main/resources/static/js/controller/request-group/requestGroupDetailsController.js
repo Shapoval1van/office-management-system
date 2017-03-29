@@ -39,7 +39,7 @@
                             swal("All requests in this group was started", "", "success");
                             $scope.getRequestByGroup();
                         }, function () {
-
+                            swal("Request starting failure", "", "error");
                         })
                 };
 
@@ -48,8 +48,9 @@
                         .then(function () {
                             swal("All requests in this group was finished", "", "success");
                             $scope.getRequestByGroup();
+                            $scope.deleteRequestGroup();
                         }, function () {
-
+                            swal("Request finishing failure", "", "error");
                         })
                 };
 
@@ -74,18 +75,27 @@
                         });
                 };
 
-                // $scope.removeFromRequestGroup = function () {
-                //     return RequestService.removeFromRequestGroup($scope.request.id)
-                //         .then(function (callback) {
-                //             $scope.getRequestByGroup();
-                //         }, function () {
-                //             console.log("Failure");
-                //         })
-                // };
+                $scope.deleteRequestGroup = function () {
+                    swal({
+                            title: "Group deleting?",
+                            text: "You finished all requests in group. Do you wan't to delete the group?",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, delete it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestGroupService.deleteRequestGroup(requestGroupId)
+                                .then(function () {
+                                    swal("Request group deleted!", "", "success");
+                                    $scope.goToUrl("/secured/manager/request-group");
+                                }, function (error) {
+                                    swal("Delete Request Group Failure!", error, "error");
+                                });
+                        });
+                };
 
-                // $scope.setCurrentRequest = function (request) {
-                //     $scope.request = request;
-                // };
 
                 $scope.isRequestGroupFree = function () {
                     return $scope.requests.some(function (request) {
