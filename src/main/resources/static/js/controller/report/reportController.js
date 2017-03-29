@@ -328,6 +328,10 @@
                     }
                 };
 
+                $scope.goToRequestDetailsPage = function (requestId) {
+                    $scope.goToUrl("/secured/request/" + requestId + "/details");
+                };
+
 
 
                 $scope.reportForTime  = {

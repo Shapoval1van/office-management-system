@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.ChangeGroup;
@@ -32,9 +33,9 @@ public interface RequestService {
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 
-    void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException;
+    void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException, CannotUpdateStatusException;
 
-    int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException;
+    int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException, CannotUpdateStatusException;
 
     boolean assignRequest(Long requestId, Principal principal) throws CannotAssignRequestException;
 

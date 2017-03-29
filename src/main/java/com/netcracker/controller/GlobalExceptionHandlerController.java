@@ -4,6 +4,7 @@ package com.netcracker.controller;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
 import com.netcracker.model.dto.ErrorDTO;
 import com.netcracker.model.dto.ErrorsDTO;
@@ -95,7 +96,7 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(Collections.singletonList(error));
     }
 
-    @ExceptionHandler(IllegalAccessException.class)
+    @ExceptionHandler({IllegalAccessException.class, CannotUpdateStatusException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorsDTO illegalAccessExceptionHandler(HttpServletRequest request, BaseException e) {
         int errorStatus = HttpStatus.FORBIDDEN.value();

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
+import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.entity.Status;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
@@ -118,7 +120,7 @@ public class RequestController {
                                                  @Validated(CreateValidatorGroup.class)
                                                  @RequestBody RequestDTO requestDTO,
                                                  Principal principal)
-            throws ResourceNotFoundException, IllegalAccessException {
+            throws ResourceNotFoundException, IllegalAccessException, CannotUpdateStatusException {
         Request currentRequest = requestDTO.toRequest();
         currentRequest.setId(requestId);
         Optional<Status> status = statusService.getStatusById(statusId);
@@ -131,7 +133,7 @@ public class RequestController {
     @DeleteMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}")
     public ResponseEntity<?> deleteRequest(@Validated(CreateValidatorGroup.class)
                                            @PathVariable Long requestId, Principal principal)
-            throws CannotDeleteRequestException, ResourceNotFoundException {
+            throws CannotDeleteRequestException, ResourceNotFoundException, CannotUpdateStatusException {
         Optional<Request> request = requestService.getRequestById(requestId);
         if (!request.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
