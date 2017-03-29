@@ -88,7 +88,7 @@
                 };
 
                 requestService.unassign = function (requestId) {
-                    return $http.put("/api/request/" + requestId + "/unassige/")
+                    return $http.put("/api/request/" + requestId + "/unassig/")
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

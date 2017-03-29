@@ -13,7 +13,7 @@
                     <ul class="dropdown-menu scrollable-menu">
                         <li ng-repeat="notification in notifications" ng-click="deleteNotification(notification.id)" class="notification">
                             <strong class="notification-title">{{notification.subject}}, check changes on
-                                <a ng-href="/secured/request/{{notification.request.id}}/details" ng-click="toRequest(notification.request.id)">page</a></strong>
+                                <a ng-href="/secured/employee/request{{notification.request.id}}/details" ng-click="toRequest(notification.request.id)">page</a></strong>
                             <div class="notification-meta">
                                     <small class="timestamp">{{notification.creationTime | date: "dd.MM.yyyy HH:mm"}}</small>
                                 </div>
@@ -28,7 +28,7 @@
                     </ul>
                 </div>
         </li>
-        <li><a ng-show="Session.isUserLoggedIn()" href="/secured/dashboard" ng-bind="Session.getUserName()"></a></li>
+        <li><a ng-show="Session.isUserLoggedIn()" href="/secured/employee/dashboard" ng-bind="Session.getUserName()"></a></li>
         <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
     </ul>
 </div>

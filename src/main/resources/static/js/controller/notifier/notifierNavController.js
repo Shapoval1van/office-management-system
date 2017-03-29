@@ -39,7 +39,7 @@
                 };
 
                 $scope.toRequest = function(itemId) {
-                    window.location = "/secured/request/"+itemId+"/details";
+                    window.location = "/secured/employee/request/"+itemId+"/details";
                 };
 
                 $scope.getNotification();

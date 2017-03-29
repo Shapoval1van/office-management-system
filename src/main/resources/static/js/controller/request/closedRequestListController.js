@@ -35,7 +35,7 @@
                 $scope.pageChanged(1); // get first page
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/secured/request/" + requestId + "/details");
+                    $scope.goToUrl("/secured/employee/request/" + requestId + "/details");
                 };
 
             }])

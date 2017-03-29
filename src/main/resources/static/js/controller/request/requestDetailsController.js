@@ -273,15 +273,6 @@
                             })
                 };
 
-                // $scope.removeFromRequestGroup = function () {
-                //     return RequestService.removeFromRequestGroup($scope.request.id)
-                //         .then(function () {
-                //             $scope.getRequest();
-                //         }, function () {
-                //
-                //         })
-                // };
-
                 $scope.removeFromRequestGroup = function () {
                     swal({
                             title: "Are you sure?",
@@ -358,7 +349,7 @@
                 };
 
                 $scope.goToRequestGroupDetails = function () {
-                    $scope.goToUrl("/secured/request-group/" + $scope.request.requestGroup.id + "/requests");
+                    $scope.goToUrl("/secured/manager/request-group/" + $scope.request.requestGroup.id + "/requests");
                 };
 
                 $scope.isCurrentUserSubscribing = function () {
@@ -387,6 +378,10 @@
                     return currentUser.role === "ROLE_OFFICE MANAGER";
                 };
                 //FIXME: Move to service
+                $scope.isCurrentUserEmployee = function () {
+                    return currentUser.role === "ROLE_EMPLOYEE";
+                };
+                //FIXME: Move to service
                 $scope.isCurrentUserAdministrator = function () {
                     return currentUser.role === "ROLE_ADMINISTRATOR";
                 };
@@ -412,7 +407,7 @@
                 };
 
                 $scope.requestUpdate = function (requestId) {
-                    window.location = "/secured/request/" + requestId + '/update';
+                    window.location = "/secured/employee/request" + requestId + '/update';
                 };
 
             }])
