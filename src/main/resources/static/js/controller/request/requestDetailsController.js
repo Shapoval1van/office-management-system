@@ -178,7 +178,7 @@
                         });
                 };
 
-                $scope.unassign = function(requestId) {
+                $scope.unassign = function (requestId) {
                     swal({
                             title: "Are you sure?",
                             text: "Do you really want to unassign manager from this request",
@@ -188,7 +188,7 @@
                             confirmButtonText: "Yes, unassign!",
                             closeOnConfirm: false
                         },
-                        function(){
+                        function () {
                             RequestService.unassign(requestId)
                                 .then(function (callback) {
                                     $scope.requests = callback.data;
@@ -220,7 +220,7 @@
                             confirmButtonText: "Yes, assign!",
                             closeOnConfirm: false
                         },
-                        function(){
+                        function () {
                             PersonService.assignToMe(requestId)
                                 .then(function (response) {
                                     $scope.requests = response.data;
@@ -364,14 +364,45 @@
                     return RequestService.isAssigned($scope.request);
                 };
 
+                $scope.showCancelButton = function () {
+                    return $scope.isAuthor() || $scope.isCurrentUserAdministrator();
+                };
+
                 $scope.showAddGroupBtn = function () {
-                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
-                        !$scope.request.requestGroup;
+                    return ($scope.isAssignedManager() || $scope.isCurrentUserAdministrator()) && !$scope.isGrouped()
+                        && $scope.isAssigned();
                 };
 
                 $scope.showRemoveFromGroupBtn = function () {
-                    return ($scope.isCurrentUserManager() || $scope.isCurrentUserAdministrator()) &&
-                        !!$scope.request.requestGroup;
+                    return (!$scope.isAssignedManager() || !$scope.isCurrentUserAdministrator()) && $scope.isGrouped();
+                };
+
+                $scope.showAssignBtn = function () {
+                    return !$scope.isAssigned() && $scope.isCurrentUserManager();
+                };
+
+                $scope.showAssignToSmbBtn = function () {
+                    return !$scope.isAssigned() && $scope.isCurrentUserAdministrator();
+                };
+
+                $scope.showStartRequestBtn = function () {
+                    return $scope.isAssignedManager() && $scope.isFree() && !$scope.isGrouped();
+                };
+
+                $scope.showFinishRequestBtn = function () {
+                    return $scope.isAssignedManager() && $scope.isInProgress() && !$scope.isGrouped();
+                };
+
+                $scope.showReopenBtn = function () {
+                    return $scope.isAuthor() && $scope.isClosed() && !$scope.isGrouped();
+                };
+
+                $scope.showUpdateBtn = function () {
+                    return $scope.isFree() && $scope.isAuthor() || $scope.isCurrentUserAdministrator()
+                };
+
+                $scope.showUnassignBtn = function () {
+                    return $scope.isCurrentUserAdministrator() && $scope.isAssigned();
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {
@@ -391,7 +422,7 @@
                 };
                 //FIXME: Move to service
                 $scope.isAssignedManager = function () {
-                    return $scope.request.manager && currentUser.id === $scope.request.manager.id;
+                    return !!$scope.request.manager && currentUser.id === $scope.request.manager.id;
                 };
                 //FIXME: Move to service
                 $scope.isClosed = function () {
@@ -406,8 +437,12 @@
                     return $scope.request.status.name === "FREE";
                 };
 
+                $scope.isGrouped = function () {
+                    return !!$scope.request.requestGroup;
+                };
+
                 $scope.requestUpdate = function (requestId) {
-                    window.location = "/secured/employee/request/" + requestId + '/update';
+                    $scope.goToUrl("/secured/employee/request/" + requestId + '/update');
                 };
 
             }])
