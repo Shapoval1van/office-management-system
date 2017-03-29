@@ -22,7 +22,7 @@
 }
 
 .canceled {
-    background: rgba(255, 0, 8, 0.21) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
 }
 
 .low {
