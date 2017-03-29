@@ -154,7 +154,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $window.open("/secured/employee/request" + requestId + "/details", '_blank');
+                    $window.open("/secured/employee/request/" + requestId + "/details", '_blank');
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {

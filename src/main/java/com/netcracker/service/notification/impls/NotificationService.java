@@ -47,6 +47,8 @@ public class NotificationService implements NotificationSender {
     private String CONFIRMATION_OF_REGISTRATION_SUBJECT;
     @Value("${request.assigned.subject}")
     private String REQUEST_ASSIGNED_SUBJECT;
+    @Value("${request.unassigned.subject}")
+    private String REQUEST_UNASSIGNED_SUBJECT;
     @Value("${request.assigned.to.group.subject}")
     private String REQUEST_ASSIGNED_TO_GROUP_SUBJECT;
     @Value("${request.new.comment.subject}")
@@ -66,6 +68,8 @@ public class NotificationService implements NotificationSender {
     private String PASSWORD_REMINDER_MESSAGE_BODY;
     @Value("${request.assigned.body}")
     private String REQUEST_ASSIGNED_BODY;
+    @Value("${request.unassigned.body}")
+    private String REQUEST_UNASSIGNED_BODY;
     @Value("${request.assigned.to.group.body}")
     private String REQUEST_ASSIGNED_TO_GROUP_BODY;
     @Value("${request.new.comment.body}")
@@ -217,20 +221,6 @@ public class NotificationService implements NotificationSender {
     }
 
     @Override
-    public void requestAssignNotification(Request request) {
-        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
-        subscribers.forEach(person -> {
-            Notification notification = new Notification.NotificationBuilder(person,
-                    REQUEST_ASSIGNED_SUBJECT.concat(request.getName()))
-                    .template(SIMPLE_MESSAGE_TEMPLATE)
-                    .text(REQUEST_ASSIGNED_BODY.concat(request.getManager().getFullName()))
-                    .link(detailsLink(request.getId()))
-                    .build();
-            mailService.send(notification);
-        });
-    }
-
-    @Override
     public void requestAssignToGroup(Request request) {
         List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
         subscribers.forEach(person -> {
@@ -253,6 +243,36 @@ public class NotificationService implements NotificationSender {
                     .template(SIMPLE_MESSAGE_TEMPLATE)
                     .text(REQUEST_NEW_COMMENT_BODY)
                     .link(detailsLink(request.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+    }
+
+
+    @Override
+    public void sendRequestAssignNotification(Request newRequest) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(newRequest.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_ASSIGNED_SUBJECT.concat(newRequest.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_ASSIGNED_BODY.concat(newRequest.getManager().getFullName()))
+                    .link(detailsLink(newRequest.getId()))
+                    .build();
+            mailService.send(notification);
+        });
+
+    }
+
+    @Override
+    public void sendRequestUnassignNotification(Request oldRequest) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
+        subscribers.forEach(person -> {
+            Notification notification = new Notification.NotificationBuilder(person,
+                    REQUEST_UNASSIGNED_SUBJECT.concat(oldRequest.getName()))
+                    .template(SIMPLE_MESSAGE_TEMPLATE)
+                    .text(REQUEST_UNASSIGNED_BODY.concat(oldRequest.getManager().getFullName()))
+                    .link(detailsLink(oldRequest.getId()))
                     .build();
             mailService.send(notification);
         });
@@ -283,5 +303,4 @@ public class NotificationService implements NotificationSender {
                 .append("/details")
                 .toString();
     }
-
 }

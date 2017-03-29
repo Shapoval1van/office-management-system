@@ -504,7 +504,7 @@ public class RequestServiceImpl implements RequestService {
         requestRepository.unassign(requestId);
 
         Optional<Request> newRequest = getRequestById(requestId);
-        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+        eventPublisher.publishEvent(new RequestUnassignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
     }
 
     @Override
@@ -522,7 +522,7 @@ public class RequestServiceImpl implements RequestService {
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
-            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
+            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
             return true;
         }
 
@@ -552,7 +552,7 @@ public class RequestServiceImpl implements RequestService {
             // Subscribe new manager to request
             personRepository.subscribe(requestId, person.get().getId());
 
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
             if(oldRequest.get().getManager() != null) {
                 personRepository.unsubscribe(requestId, oldRequest.get().getManager().getId()); // unsubscribe old manager

@@ -70,14 +70,27 @@ public class NotificationEventListener {
     public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
         Request oldRequest = updateRequestEvent.getOldRequest();
         Request newRequest = updateRequestEvent.getNewRequest();
-        requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName()) ;
-        frontendNotificationService.sendNotificationToAllSubscribed(oldRequest, newRequest);
+        frontendNotificationService.sendNotificationToAllSubscribed(new Request(oldRequest), new Request(newRequest));
         notificationService.sendRequestUpdateNotification(oldRequest, newRequest, updateRequestEvent.getChangeTime());
+        requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName()) ;
     }
 
     @EventListener
     public void handleAssignRequest(RequestAssignEvent requestAssignEvent){
-        notificationService.requestAssignNotification(requestAssignEvent.getRequest());
+        Request oldRequest = requestAssignEvent.getOldRequest();
+        Request newRequest = requestAssignEvent.getNewRequest();
+        requestService.updateRequestHistory(new Request(newRequest), new Request(oldRequest),  requestAssignEvent.getPersonName()) ;
+        frontendNotificationService.sendNotificationToAllSubscribed(new Request(oldRequest), new Request(newRequest));
+        notificationService.sendRequestAssignNotification(newRequest);
+    }
+
+    @EventListener
+    public void handleUnassignRequest(RequestUnassignEvent requestUnassignEvent){
+        Request oldRequest = requestUnassignEvent.getOldRequest();
+        Request newRequest = requestUnassignEvent.getNewRequest();
+        requestService.updateRequestHistory(new Request(newRequest), new Request(oldRequest),  requestUnassignEvent.getPersonName()) ;
+        frontendNotificationService.sendNotificationToAllSubscribed(new Request(oldRequest), new Request(newRequest));
+        notificationService.sendRequestUnassignNotification(oldRequest);
     }
 
     @EventListener

@@ -28,14 +28,15 @@ public class Request implements Persistable<Long> {
     }
 
     public Request(Request other) {
+        if(other == null) return;
         this.id = other.id;
         this.name = other.name;
         this.description = other.description;
         this.creationTime = other.creationTime;
         this.estimate = other.estimate;
         this.status = other.status;
-        this.employee = other.employee;
-        this.manager = other.manager;
+        this.employee = new Person(other.employee);
+        this.manager = new Person(other.manager);
         this.parent = other.parent;
         this.priority = other.priority;
         this.requestGroup = other.requestGroup;

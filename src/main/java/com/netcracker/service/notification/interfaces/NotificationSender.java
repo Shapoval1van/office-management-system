@@ -30,9 +30,11 @@ public interface NotificationSender {
 
     void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime);
 
-    void requestAssignNotification(Request request);
-
     void requestAssignToGroup(Request request);
 
     void newComment(Request request);
+
+    void sendRequestAssignNotification(Request newRequest);
+
+    void sendRequestUnassignNotification(Request oldRequest);
 }
