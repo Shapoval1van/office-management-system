@@ -570,7 +570,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public Page<Request> getAvailableRequestList(Pageable pageable) {
         List<Request> requestList = requestRepository.getFreeRequests(pageable);
 

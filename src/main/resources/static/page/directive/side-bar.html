@@ -10,6 +10,11 @@
             </li>
         </li>
         <li>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
+                <a href="/secured/request/free">Free requests</a>
+            </li>
+        </li>
+        <li>
             <li ng-class="{'sidebar-active': isActive('{{getReportUrl()}}}">
                 <a ng-href="{{getReportUrl()}}">Report</a>
             </li>
@@ -22,11 +27,8 @@
                 <a href="/secured/request/my/closed">Closed requests</a>
             </li>
         </div>
-        <!--For manager (also fo admin)-->
+        <!--For manager (also for admin)-->
         <div ng-show="hasManagerPermission()">
-            <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
-                <a href="/secured/request/free">Free requests</a>
-            </li>
             <li ng-class="{'sidebar-active': isActive('/secured/request/my/assigned')}">
                 <a href="/secured/request/my/assigned">Assigned requests</a>
             </li>

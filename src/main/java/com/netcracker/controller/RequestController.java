@@ -165,7 +165,7 @@ public class RequestController {
         return ResponseEntity.ok(requestPage);
     }
 
-    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/unassige")
+    @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{requestId}/unassige") // TODO unassign
     public ResponseEntity<?> unassign(@PathVariable Long requestId, Principal principal)
             throws CannotAssignRequestException, ResourceNotFoundException, CannotUnassignRequestException {
         requestService.unassign(requestId, principal);
