@@ -20,6 +20,13 @@
                     $scope._relocateUser();
                 }
 
+                $scope.$watch("Session.isUserLoggedIn()", function (newValue, oldValue, scope) {
+                    if(newValue == true){
+                        console.log("Watcher time!!!!!");
+                        $scope._relocateUser();
+                    }
+                });
+
                 $scope.person = {};
                 $scope.username = "";
                 $scope.password = "";
