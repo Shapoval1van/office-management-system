@@ -107,35 +107,48 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
             final boolean[] isSimpleUpdateNotificationAlreadyExist = {false};
             changeItemSet.forEach(
                     changeItem -> {
+                        String subject;
                         if (changeItem.getField().getId() == STATUS_FIELD_ID) {
+                            //create subject depended on change
                             Status status = statusRepository.findOne(newRequest.getStatus().getId()).get();
                             String statusName = status.getName().toLowerCase().replace("_", " ").toUpperCase();
-                            String subject;
-                            if(status.getId()==STATUS_FREE_ID) {
+                            if (status.getId() == STATUS_FREE_ID) {
                                 subject = messageSource.getMessage(CHANGE_STATUS_TO_FREE,
                                         new Object[]{requestName.toUpperCase(), statusName}, locale);
-                            }
-                            else if(status.getId()==STATUS_CLOSED_ID) {
+                            } else if (status.getId() == STATUS_CLOSED_ID) {
                                 subject = messageSource.getMessage(CHANGE_STATUS_TO_CLOSED,
                                         new Object[]{requestName.toUpperCase(), statusName}, locale);
-                            }else {
+                            } else {
                                 subject = messageSource.getMessage(CHANGE_STATUS_SUBJECT,
                                         new Object[]{requestName.toUpperCase(), statusName}, locale);
                             }
+                            notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
+
+                        } else if (changeItem.getField().getId() == MANAGER_FIELD_ID) {
+                            if (newRequest.getManager() == null) {
+                                // manager was unassigned
+                                subject = messageSource.getMessage(CHANGE_MANGER_UNASSIGNED, new Object[]{requestName.toUpperCase()}, locale);
+                            }else {
+                                Person manager = personRepository.findOne(newRequest.getManager().getId()).get();
+                                subject = messageSource.getMessage(CHANGE_MANGER_SUBJECT, new Object[]{requestName.toUpperCase(),
+                                        manager.getLastName()}, locale);
+                            }
 
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
-                        } else if (changeItem.getField().getId() == MANAGER_FIELD_ID) {
-                            Person manager = personRepository.findOne(newRequest.getManager().getId()).get();
-                            String subject = messageSource.getMessage(CHANGE_MANGER_SUBJECT, new Object[]{requestName.toUpperCase(),
-                                    manager.getLastName()}, locale);
-                            notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
+
                         } else if (changeItem.getField().getId() == GROUP_FIELD_ID) {
-                            RequestGroup group = requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get();
-                            String subject = messageSource.getMessage(CHANGE_GROUP, new Object[]{requestName.toUpperCase(), group.getName()}, locale);
+                            if(newRequest.getRequestGroup()==null){
+                                //group was removed
+                                subject = messageSource.getMessage(CHANGE_GROUP_DELETED, new Object[]{requestName.toUpperCase()}, locale);
+                            }else {
+                                RequestGroup group = requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get();
+                                subject = messageSource.getMessage(CHANGE_GROUP, new Object[]{requestName.toUpperCase(), group.getName()}, locale);
+                            }
+
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                         } else {
                             if (!isSimpleUpdateNotificationAlreadyExist[0]) {
-                                String subject = messageSource.getMessage(CHANGE_REQUEST, new Object[]{requestName.toUpperCase()}, locale);
+                                subject = messageSource.getMessage(CHANGE_REQUEST, new Object[]{requestName.toUpperCase()}, locale);
                                 notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
                                 isSimpleUpdateNotificationAlreadyExist[0] = true;
                             }

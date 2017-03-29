@@ -75,4 +75,6 @@ public class MessageConstant {
     public static final String CHANGE_GROUP = "change.group";
     public static final String CHANGE_STATUS_TO_FREE= "change.status.to.free";
     public static final String CHANGE_STATUS_TO_CLOSED= "change.status.to.closed";
+    public static final String CHANGE_MANGER_UNASSIGNED = "change.manager.unassigned";
+    public static final String CHANGE_GROUP_DELETED = "change.group.deleted";
 }
