@@ -6,7 +6,9 @@
                 $scope.selectedManager;
                 $scope.managers = [];
 
-                var requestDetails = "/secured/request/";
+                var requestDetails = "/secured/employee/request/";
+                var requestUpdate = "/secured/manager/request/";
+
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
@@ -25,7 +27,7 @@
 
                 $scope.my = false;
                 var path = $location.path();
-                if (path.toString()=="/secured/request/my"){
+                if (path.toString()==="/secured/employee/request/my"){
 
                     $rootScope.sideBarActiveElem = "my-requests";
 
@@ -46,7 +48,7 @@
                     };
 
                     $scope.requestUpdate = function(requestId) {
-                        window.location = requestDetails + requestId + '/update';
+                        window.location = requestUpdate + requestId + '/update';
                     };
 
                     $scope.requestDetails = function (requestId) {
@@ -213,7 +215,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/secured/request/" + requestId + "/details");
+                    $scope.goToUrl("/secured/employee/request" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {

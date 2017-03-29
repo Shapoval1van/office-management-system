@@ -16,7 +16,7 @@
                 var closedStatusId = 3;
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    return $scope.goToUrl("/secured/request/" + requestId + "/details/");
+                    return $scope.goToUrl("/secured/employee/request/" + requestId + "/details/");
                 };
 
                 $scope.getRequestByGroup = function () {

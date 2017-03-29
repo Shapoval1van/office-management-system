@@ -72,7 +72,7 @@
                 };
 
                 $scope.goToRequestGroupPage = function (requestGroupId) {
-                    return $scope.goToUrl("/secured/request-group/" + requestGroupId + "/requests");
+                    return $scope.goToUrl("/secured/manager/request-group/" + requestGroupId + "/requests");
                 };
 
             }])
