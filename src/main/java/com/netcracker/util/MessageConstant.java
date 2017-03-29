@@ -78,4 +78,8 @@ public class MessageConstant {
     public static final String CHANGE_STATUS_TO_CLOSED= "change.status.to.closed";
     public static final String CHANGE_MANGER_UNASSIGNED = "change.manager.unassigned";
     public static final String CHANGE_GROUP_DELETED = "change.group.deleted";
+
+    //MAIL
+    public static final String MAIL_SENDING_ERROR = "mail.sending.error";
+    public static final String SENDING_TO_DELETED_USER = "user.account.deleted";
 }
