@@ -402,8 +402,10 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
         Request newRequest = new Request(requestDB.get());
-        if(newRequest.getRequestGroup()!=null){
-            throw new CannotUpdateStatusException(messageSource.getMessage(REQUEST_ERROR_UPDATE_STATUS, null, locale));
+        if(!StatusEnum.CANCELED.getId().equals(status)){
+            if(newRequest.getRequestGroup()!=null){
+                throw new CannotUpdateStatusException(messageSource.getMessage(REQUEST_ERROR_UPDATE_STATUS, null, locale));
+            }
         }
         newRequest.setStatus(status);
         eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
