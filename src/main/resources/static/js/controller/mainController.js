@@ -8,7 +8,7 @@
 
                 SessionService.loadSession();
                 var anonymOnlyPages = ["resetPassword", "reset"];
-                var redirectIfTokenExist = "/secured/requestListByEmployee";
+                var redirectIfTokenExist = "/secured/employee/requestListByEmployee";
                 var loginPageUrl = "/login";
 
                 //FIXME: Rewrite it. Check only URL.
@@ -39,7 +39,7 @@
                 };
 
                 $scope.getReportUrl = function () {
-                    return "/secured/report/" + currentUser.id;
+                    return "/secured/employee/report/" + currentUser.id;
                 };
 
                 $scope.hasEmployeePermission = function (url) {
