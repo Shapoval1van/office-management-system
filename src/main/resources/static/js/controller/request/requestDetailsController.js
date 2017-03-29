@@ -403,7 +403,7 @@
                 };
 
                 $scope.requestUpdate = function (requestId) {
-                    window.location = "/secured/manager/request" + requestId + '/update';
+                    window.location = "/secured/employee/request" + requestId + '/update';
                 };
 
             }])

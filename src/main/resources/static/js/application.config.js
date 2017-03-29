@@ -75,7 +75,7 @@
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })
-                    .when("/secured/manager/request:requestId/update", {
+                    .when("/secured/employee/request/:requestId/update", {
                         templateUrl: "/static/page/request/new-request-page.html",
                         controller: "NewRequestController"
                     })

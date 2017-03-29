@@ -7,7 +7,6 @@
                 $scope.managers = [];
 
                 var requestDetails = "/secured/employee/request/";
-                var requestUpdate = "/secured/manager/request/";
 
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
@@ -48,7 +47,7 @@
                     };
 
                     $scope.requestUpdate = function(requestId) {
-                        window.location = requestUpdate + requestId + '/update';
+                        window.location = requestDetails + requestId + '/update';
                     };
 
                     $scope.requestDetails = function (requestId) {
