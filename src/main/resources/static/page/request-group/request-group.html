@@ -8,8 +8,10 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-8">
-                                <input ng-model="requestGroupNamePattern" type="text"
-                                       ng-change="searchByNamePattern()" class="form-control">
+                                <div class="request-group-input-wrapper">
+                                    <input ng-model="requestGroupNamePattern" type="text"
+                                           ng-change="searchByNamePattern()" class="form-control">
+                                </div>
                             </div>
                             <div class="col-md-2">
                                 <button class="btn btn-info" role="button" ng-click="createGroup()">

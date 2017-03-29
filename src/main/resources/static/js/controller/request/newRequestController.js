@@ -7,6 +7,7 @@
                 $scope.update = false;
                 $scope.calendarClick = false;
                 $scope.estimateTime = undefined;
+                $scope.submitAccess = true;
 
                 if (!$routeParams.requestId){
                     $scope.pageTitle = "New request";
@@ -100,19 +101,50 @@
                 };
                 
                 $scope.sendRequestCredentials = function () {
-                    if ($scope.calendarClick==false){
-                        $scope.requestCredentials.estimate = null;
-                    } else {
-                        $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                    if($scope.submitAccess == true) {
+                        if ($scope.calendarClick == false) {
+                            $scope.requestCredentials.estimate = null;
+                        } else {
+                            $scope.requestCredentials.estimate = new Date($('#datetimepicker4').data('date')).getTime();
+                        }
+                        $http.post("/api/request/add", $scope.requestCredentials)
+                            .then(function (callback) {
+                                $scope.name = callback.data.name;
+                                window.location = "javascript:history.back()";
+                            }, function (error) {
+                                swal("New Request Failure!", error.data.message, "error");
+                                console.log("Creating request Failure!")
+                            })
+                    }else{
+                        swal("New Request Failure!", "", "error");
                     }
-                    $http.post("/api/request/add", $scope.requestCredentials)
-                        .then(function (callback) {
-                            $scope.name = callback.data.name;
-                            window.location = "javascript:history.back()";
-                        }, function (error) {
-                            swal("New Request Failure!", error.data.message, "error");
-                            console.log("Creating request Failure!")
-                        })
-                }
+                };
+
+                $scope.inputTitleCheck = function(){
+                    if($scope.requestCredentials.name.length >= 120){
+                        $(".form-group-title").addClass("title-warning");
+                        $(".input-title-wrapper").addClass("warning");
+                        $scope.submitAccess = false;
+                    }
+                    else{
+                        $(".form-group-title").removeClass("title-warning");
+                        $(".input-title-wrapper").removeClass("warning");
+                        $scope.submitAccess = true;
+                    }
+                };
+
+                $scope.inputTextareaCheck = function(){
+                    if($scope.requestCredentials.description.length >= 500){
+                        $(".form-group-details").addClass("details-warning");
+                        $(".input-details-wrapper").addClass("warning");
+                        $scope.submitAccess = false;
+                    }
+                    else{
+                        $(".form-group-details").removeClass("details-warning");
+                        $(".input-details-wrapper").removeClass("warning");
+                        $scope.submitAccess = true;
+                    }
+                };
+
             }])
 })();

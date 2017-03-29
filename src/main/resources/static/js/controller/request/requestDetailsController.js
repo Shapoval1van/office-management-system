@@ -378,6 +378,10 @@
                     return currentUser.role === "ROLE_OFFICE MANAGER";
                 };
                 //FIXME: Move to service
+                $scope.isCurrentUserEmployee = function () {
+                    return currentUser.role === "ROLE_EMPLOYEE";
+                };
+                //FIXME: Move to service
                 $scope.isCurrentUserAdministrator = function () {
                     return currentUser.role === "ROLE_ADMINISTRATOR";
                 };

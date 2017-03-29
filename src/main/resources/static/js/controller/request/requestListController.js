@@ -215,7 +215,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $scope.goToUrl("/secured/employee/request" + requestId + "/details");
+                    $scope.goToUrl("/secured/employee/request/" + requestId + "/details");
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {

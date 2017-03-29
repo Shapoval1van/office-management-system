@@ -38,7 +38,7 @@
                                                 <add-to-request-group-btn class="request-btn" ng-show="showAddGroupBtn()" >
                                                 </add-to-request-group-btn>
                                                     <button class="btn btn-danger request-btn" ng-click="removeFromRequestGroup()"
-                                                            ng-show="!showAddGroupBtn()">
+                                                            ng-show="!showAddGroupBtn() && !isCurrentUserEmployee()">
                                                         Remove from group
                                                     </button>
                                                     <a ng-click="unassign(request.id)" class="btn btn-danger request-btn"

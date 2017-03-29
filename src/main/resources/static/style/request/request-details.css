@@ -65,6 +65,8 @@ label[for="details"], label[for="manager"]{
 legend{
     font-size: 22px;
     font-weight: 400;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
 }
 add-to-request-group-btn{
     display: inline-block;
