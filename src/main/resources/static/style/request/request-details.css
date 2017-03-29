@@ -40,53 +40,28 @@
     text-align: left;
     white-space: pre-wrap;
 }
-
-/*.btn-group{*/
-    /*text-align: center;*/
-/*}*/
-/*add-to-request-group-btn, cancel-request-btn{*/
-    /*display: inline-block;*/
-    /*margin: 5px 10px 10px 10px;*/
-/*}*/
 label[for='comment']{
     margin: 10px 0;
 }
 .send-comment-btn{
     margin: 10px 0;
 }
-/*.comment-wrapper{*/
-    /*box-shadow: none;*/
-    /*border: 1px solid #494949;*/
-    /*-webkit-border-radius: 5px;*/
-    /*-moz-border-radius: 5px;*/
-    /*border-radius: 5px;*/
-/*}*/
-/*.comment-body{*/
-    /*margin: 5px 0;*/
-    /*color: #323232;*/
-/*}*/
-/*.comment-header, .comment-body{*/
-    /*text-indent: 10px;*/
-/*}*/
 .history-row td{
     text-align: center;
 }
-.btn-info{
-    float: none!important;
-    margin: 5px 10px!important;
-    -webkit-border-radius: 5px!important;
-    -moz-border-radius: 5px!important;
-    border-radius: 5px!important;
+label[for="details"], label[for="manager"]{
+    text-align: left!important;
 }
-/*add-to-request-group-btn{*/
-    /*margin: 0!important;*/
-/*}*/
-/*label{*/
-    /*font-size: 16px!important;*/
-/*}*/
-/*.form-control-static{*/
-    /*font-size: 14px!important;*/
-/*}*/
+.show-more-wrapper{
+    text-align: center;
+}
+.show-more-text{
+    display: inline-block;
+    cursor: pointer;
+}
+.show-more-text:hover{
+    text-decoration: underline;
+}
 legend{
     font-size: 22px;
     font-weight: 400;

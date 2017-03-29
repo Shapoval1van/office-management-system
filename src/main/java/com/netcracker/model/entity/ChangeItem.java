@@ -16,6 +16,12 @@ public class ChangeItem implements Persistable<Long> {
     public ChangeItem() {
     }
 
+    public ChangeItem(String oldVal, String newVal, Field field) {
+        this.oldVal = oldVal;
+        this.newVal = newVal;
+        this.field = field;
+    }
+
     public ChangeItem(Long id) {
         this.id = id;
     }

@@ -38,6 +38,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.find.all.assigned.by.manager}")
     public String FIND_ALL_ASSIGNED_BY_MANAGER;
 
+    @Value("${request.find.all.assigned}")
+    public String FIND_ALL_ASSIGNED;
+
     @Value("${request.find.all.available}")
     public String GET_AVAILABLE_REQUESTS;
 
@@ -46,6 +49,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.find.all.by.manager}")
     public String GET_ALL_REQUESTS_BY_MANAGER;
+
+    @Value("${request.delete}")
+    private String DELETE_REQUEST;
 
     @Value("${request.update.status}")
     private String UPDATE_REQUEST_STATUS;
@@ -59,11 +65,17 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Value("${request.assign}")
     private String ASSIGN_REQUEST_TO_PERSON;
 
+    @Value("${request.unassign}")
+    private String UNASSIGN_REQUEST;
+
     @Value("${request.count.all.by.user}")
     private String COUNT_ALL_BY_USER;
 
     @Value("${request.count.all.assigned.by.manager}")
     private String COUNT_ALL_ASSIGNED_BY_MANAGER;
+
+    @Value("${request.count.all.assigned}")
+    private String COUNT_ALL_ASSIGNED;
 
     @Value("${request.count.by.priority}")
     private String COUNT_WITH_PRIORITY;
@@ -79,6 +91,9 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.count.by.manager}")
     private String COUNT_ALL_REQUEST_BY_MANAGER;
+
+    @Value("${request.count.by.request.group}")
+    private String COUNT_REQUEST_BY_REQUEST_GROUP;
 
     @Value("${request.update.group}")
     private String UPDATE_REQUEST_GROUP;
@@ -103,6 +118,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Value("${request.all.by.manager.and.period}")
     private String GET_ALL_BY_MG_REQUEST_BY_PERIOD;
+
+    @Value("${request.find.all.closed.by.employee}")
+    private String GET_CLOSED_REQUEST_BY_EMPLOYEE;
+
+    @Value("${request.count.closed.by.employee}")
+    private String COUNT_CLOSED_REQUEST_BY_EMPLOYEE;
 
     public RequestRepositoryImpl() {
         super(Request.TABLE_NAME, Request.ID_COLUMN);
@@ -178,7 +199,12 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     @Override
     public int changeRequestStatus(Request request, Status status) {
-        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId().intValue(), request.getId().intValue());
+        return getJdbcTemplate().update(UPDATE_REQUEST_STATUS, status.getId(), request.getId());
+    }
+
+    @Override
+    public int deleteRequest(Request request) {
+        return getJdbcTemplate().update(DELETE_REQUEST, request.getId());
     }
 
     @Override
@@ -188,6 +214,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
 
     public List<Request> getRequestsByEmployee(Pageable pageable, Person employee) {
         return this.queryForList(GET_ALL_REQUESTS_BY_EMPLOYEE, pageable, employee.getId());
+    }
+
+    @Override
+    public List<Request> getClosedRequestsByEmployee(Pageable pageable, Person person) {
+        return this.queryForList(GET_CLOSED_REQUEST_BY_EMPLOYEE, pageable, person.getId());
     }
 
     @Override
@@ -201,13 +232,18 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, pageable, managerId);
     }
 
     @Override
-    public List<Request> getAllAssignedRequest(Long managerId) {
+    public List<Request> getAllAssignedRequestByManager(Long managerId) {
         return super.queryForList(FIND_ALL_ASSIGNED_BY_MANAGER, managerId);
+    }
+
+    @Override
+    public List<Request> getAllAssignedRequest(Long managerId, Pageable pageable) {
+        return super.queryForList(FIND_ALL_ASSIGNED, pageable, managerId);
     }
 
     @Override
@@ -241,6 +277,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public int unassign(Long requestId) {
+        return getJdbcTemplate().update(UNASSIGN_REQUEST, requestId);
+    }
+
+    @Override
     public Long countFreeByPriority(Integer priorityId) {
         return getJdbcTemplate().queryForObject(COUNT_WITH_PRIORITY, Long.class, priorityId);
     }
@@ -261,6 +302,16 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     }
 
     @Override
+    public Long countAllAssigned(Long managerId) {
+        return getJdbcTemplate().queryForObject(COUNT_ALL_ASSIGNED, Long.class, managerId);
+    }
+
+    @Override
+    public Long countClosedRequestByEmployee(Long personId) {
+        return getJdbcTemplate().queryForObject(COUNT_CLOSED_REQUEST_BY_EMPLOYEE, Long.class, personId);
+    }
+
+    @Override
     public Long countAllRequestByEmployee(Long employeeID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_EMPLOYEE, Long.class, employeeID);
     }
@@ -268,6 +319,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Long countAllRequestByManager(Long managerID) {
         return getJdbcTemplate().queryForObject(COUNT_ALL_REQUEST_BY_MANAGER, Long.class, managerID);
+    }
+
+    @Override
+    public Long countRequestsByRequestGroupId(Integer requestGroupId) {
+        return getJdbcTemplate().queryForObject(COUNT_REQUEST_BY_REQUEST_GROUP, Long.class, requestGroupId);
     }
 
     @Override
@@ -360,6 +416,11 @@ public class RequestRepositoryImpl extends GenericJdbcRepository<Request, Long> 
     @Override
     public Optional<Request> findOne(Long requestId) {
         return super.findOne(requestId);
+    }
+
+    @Override
+    public Optional<Request> findSubrequestByIdAndParent(Long id, Long parenId) {
+        return this.queryForObject("SELECT * FROM request WHERE request_id  = ? AND parent_id = ?", id, parenId);
     }
 
     private String getQueryByPeriod(String period, String role) {

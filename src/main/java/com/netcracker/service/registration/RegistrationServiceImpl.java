@@ -9,11 +9,9 @@ import com.netcracker.model.entity.Token;
 import com.netcracker.model.entity.TokenType;
 import com.netcracker.model.event.NewPasswordEvent;
 import com.netcracker.model.event.PersonRegistrationEvent;
-import com.netcracker.model.event.ResetPasswordEvent;
 import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.repository.data.interfaces.TokenRepository;
-import com.netcracker.util.MessageConstant;
 import com.netcracker.util.enums.role.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -164,7 +162,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 PersonRegistrationEvent event = new PersonRegistrationEvent(requestLink, person, token);
                 eventPublisher.publishEvent(event);
             }else{
-                ResetPasswordEvent event = new ResetPasswordEvent(requestLink, person, token);
+                NewPasswordEvent event = new NewPasswordEvent(requestLink, person, token);
                 eventPublisher.publishEvent(event);
             }
 

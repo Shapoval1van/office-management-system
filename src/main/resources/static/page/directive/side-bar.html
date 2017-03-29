@@ -2,20 +2,24 @@
     <ul class="sidebar-nav">
         <li class="sidebar-brand">
             Menu
-        </li>
-        <li>
-            <a href="/secured/dashboard">Dashboard</a>
-        </li>
-        <li>
-            <a ng-href="{{getReportUrl()}}">Report</a>
-        </li>
         <!--For employee (also for manager and admin)-->
+        </li>
+        <li ng-show="hasEmployeePermission()">
+            <li ng-class="{'sidebar-active': isActive('/secured/dashboard')}">
+                <a href="/secured/dashboard">Dashboard</a>
+            </li>
+        </li>
+        <li>
+            <li ng-class="{'sidebar-active': isActive('{{getReportUrl()}}}">
+                <a ng-href="{{getReportUrl()}}">Report</a>
+            </li>
+        </li>
         <div ng-show="hasEmployeePermission()">
             <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
                 <a href="/secured/request/my">My requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('')}">
-                <a href="#">Closed requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/my/closed')}">
+                <a href="/secured/request/my/closed">Closed requests</a>
             </li>
         </div>
         <!--For manager (also fo admin)-->
@@ -23,8 +27,8 @@
             <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
                 <a href="/secured/request/free">Free requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/request/assigned')}">
-                <a href="/secured/request/assigned">Asigned requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/request/my/assigned')}">
+                <a href="/secured/request/my/assigned">Assigned requests</a>
             </li>
             <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
                 <a ng-href="/secured/request-group">Request groups</a>

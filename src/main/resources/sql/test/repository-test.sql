@@ -27,12 +27,14 @@ INSERT INTO public.priority (priority_id, name) VALUES
   (3, 'LOW');
 
 INSERT INTO public.field (field_id, name) VALUES
-  (1, 'name'),
-  (2, 'description'),
-  (3, 'status_id'),
-  (4, 'manager_id'),
-  (5, 'priority_id'),
-  (6, 'group_id');
+  (1, 'NAME'),
+  (2, 'DESCRIPTION'),
+  (3, 'STATUS'),
+  (4,'MANAGER'),
+  (5,'PRIORITY'),
+  (6,'ESTIMATE'),
+  (7,'GROUP');
+
 
 
 INSERT INTO public.person (person_id, first_name, last_name, email, password, role_id, enabled) VALUES

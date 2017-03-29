@@ -13,11 +13,14 @@ public class MessageConstant {
 
     //REQUEST ERROR
     public static final String REQUEST_ERROR_NOT_EXIST = "request.error.not.exist";
+    public static final String REQUEST_ERROR_DELETE_CANCELED = "request.error.delete.canceled";
     public static final String REQUEST_ERROR_DELETE_CLOSED = "request.error.delete.closed";
     public static final String REQUEST_ERROR_DELETE_NOT_PERMISSION = "request.error.delete.not.permission";
     public static final String REQUEST_ERROR_DELETE_NOT_FREE = "request.error.delete.not.free";
     public static final String REQUEST_ERROR_ALREADY_ASSIGNED = "request.error.already.assigned";
     public static final String REQUEST_ERROR_MUST_FREE = "request.error.must.free";
+    public static final String REQUEST_ERROR_UPDATE_CANCELED = "request.error.update.canceled";
+    public static final String REQUEST_ERROR_UPDATE_CLOSED = "request.error.update.closed";
     public static final String REQUEST_ERROR_UPDATE_NOT_PERMISSION = "request.error.update.not.permission";
     public static final String REQUEST_ERROR_UPDATE_NON_FREE = "request.error.update.non.free";
     public static final String REQUEST_ERROR_NOT_EXIST_PERSON_OR_REQUEST = "request.error.not.exist.person.or.request";
@@ -51,6 +54,7 @@ public class MessageConstant {
     public static final String REQUEST_GROUP_ILLEGAL_ACCESS = "request.group.error.illegal.access";
     public static final String REQUEST_GROUP_NOT_EXIST = "request.group.error.not.exist";
     public static final String REQUEST_GROUP_ALREADY_EXIST = "request.group.error.already.exist";
+    public static final String CANNOT_CREATE_REQUEST_GROUP = "request.group.error.cannot.create";
 
     //TOKEN
     public static final String TOKEN_ERROR_EXPIRED = "token.error.expired";
@@ -64,5 +68,11 @@ public class MessageConstant {
     //UPDATE REQUEST HIGHLIGHTING
     public static final String REQUEST_UPDATE_MESSAGE_SUBJECT = "request.update.message.subject";
     public static final String REQUEST_UPDATE_MESSAGE_BODY = "request.update.message.body";
-
+    public static final String DELETE_NOTIFICATION_EXCEPTION = "cannot.delete.notification.exception";
+    public static final String CHANGE_STATUS_SUBJECT = "change.status.subject";
+    public static final String CHANGE_MANGER_SUBJECT = "change.manager.subject";
+    public static final String CHANGE_REQUEST = "change.request";
+    public static final String CHANGE_GROUP = "change.group";
+    public static final String CHANGE_STATUS_TO_FREE= "change.status.to.free";
+    public static final String CHANGE_STATUS_TO_CLOSED= "change.status.to.closed";
 }

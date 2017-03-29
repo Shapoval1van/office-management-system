@@ -12,26 +12,21 @@
 
                 $rootScope.sideBarActiveElem = "request-group";
 
-                $scope.getPageMaxCount = function () {
-                    return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)
-                        .then(function (callback) {
-                            $scope.maxPageSize = callback.data;
-                        }, function (callback) {
-
-                        })
-                };
-
-                $scope.getPageMaxCount();
+                $scope.currentRequestGroup = {};
 
                 $scope.getGroupByAuthor = function () {
-                    $scope.getPageMaxCount();
-                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.maxPageSize)
+                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.pageSize)
                         .then(function (callback) {
-                            $scope.groups = callback.data;
+                            $scope.groups = callback.data.data;
+                            $scope.maxPageSize = callback.data.totalElements;
+                            $scope.currentPage = callback.data.pageNumber + 1;
+                            $scope.pageSize = callback.data.pageSize;
                         }, function (callback) {
                             console.log("Failure")
                         });
                 };
+
+                $scope.getGroupByAuthor();
 
                 $scope.searchByNamePattern = function () {
                     return RequestGroupService.findGroupByNamePattern($scope.currentUser.id, $scope.requestGroupNamePattern)
@@ -47,8 +42,33 @@
                         .then(function (callback) {
                             $scope.searchByNamePattern();
                         }, function (callback) {
-
+                            swal("Create Group Error", callback.data, "error");
                         })
+                };
+
+                $scope.deleteRequestGroup = function (groupId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to delete this request group",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, delete it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestGroupService.deleteRequestGroup(groupId)
+                                .then(function () {
+                                    $scope.getGroupByAuthor();
+                                    swal("Request group deleted!", "", "success");
+                                }, function (error) {
+                                    swal("Delete Request Group Failure!", error, "error");
+                                });
+                        });
+                };
+
+                $scope.setCurrentRequestGroup = function (requestGroup) {
+                    $scope.currentRequestGroup = requestGroup;
                 };
 
                 $scope.goToRequestGroupPage = function (requestGroupId) {

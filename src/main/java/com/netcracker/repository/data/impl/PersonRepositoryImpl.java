@@ -30,6 +30,8 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
     public static final String ENABLED_COLUMN = "enabled";
     public static final String DELETED_COLUMN = "deleted";
 
+    public static final int SUCCESS_UPDATE_CODE = 1;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 
     @Value("${person.find.by.email}")
@@ -119,6 +121,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
                 person.setPassword(resultSet.getString(PASSWORD_COLUMN));
                 person.setRole(new Role(resultSet.getInt(ROLE_ID_COLUMN)));
                 person.setEnabled(resultSet.getBoolean(ENABLED_COLUMN));
+                person.setDeleted(resultSet.getBoolean(DELETED_COLUMN));
                 return person;
             }
         };
@@ -215,7 +218,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
         for (Person subscriber : subscribers) {
             if (subscriber.getId().equals(personId)) {
                 LOGGER.info("Person {} already subscribing on request {}", personId, requestId);
-                return 1;
+                return SUCCESS_UPDATE_CODE;
             }
         }
 

@@ -43,7 +43,6 @@
                             $scope.persons = [];
                             $scope.persons = response.data.data;
                             $scope.totalItems = response.data.totalElements;
-
                         }, function errorCallback(response) {
                         });
                     }
@@ -84,7 +83,9 @@
                         }, function errorCallback(response) {
                             console.log(response);
                         });
-
+                    }
+                $scope.goToPersonDetailsPage = function (personId) {
+                    $scope.goToUrl("/secured/person/" + personId + "/details");
                 };
 
             }])

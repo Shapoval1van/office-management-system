@@ -49,7 +49,7 @@ public class DashboardServiceImpl implements DashboardService {
         if (person.getRole().getId().equals(RoleEnum.EMPLOYEE.getId()))
             return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount, canceledRequestCount);
         else if (person.getRole().getId().equals(RoleEnum.PROJECT_MANAGER.getId())){ // manager data
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequest(person.getId());
+            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
             int freeAssignedCount = 0;
             int progressAssignedCount = 0;
             int closedAssignedCount = 0;
@@ -67,7 +67,7 @@ public class DashboardServiceImpl implements DashboardService {
                     canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount);
         } else { // administrator data
 
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequest(person.getId());
+            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
             int freeAssignedCount = 0;
             int progressAssignedCount = 0;
             int closedAssignedCount = 0;
@@ -117,6 +117,47 @@ public class DashboardServiceImpl implements DashboardService {
                     freeRequestList.size(), allRequestList.size(), allFreeRequestCount, allProgressRequestCount,
                     allClosedRequestCount, allCanceledRequestCount, personList.size(), administratorCount, managerCount,
                     employeeCount);
+        }
+    }
+
+    @Override
+    public Dashboard getDataByUser(Long userId) {
+        Person person = personRepository.findOne(userId).get();
+
+        List<Request> requestList = requestRepository.getAllRequestByUser(person.getId());
+        int freeRequestCount = 0;
+        int progressRequestCount = 0;
+        int closedRequestCount = 0;
+        int canceledRequestCount = 0;
+
+        for (Request r: requestList){
+            if (StatusEnum.FREE.getId().equals(r.getStatus().getId()))
+                freeRequestCount++;
+            else if (StatusEnum.IN_PROGRESS.getId().equals(r.getStatus().getId()))
+                progressRequestCount++;
+            else if (StatusEnum.CLOSED.getId().equals(r.getStatus().getId()))
+                closedRequestCount++;
+            else canceledRequestCount++;
+        }
+        if (RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
+            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount, canceledRequestCount);
+        else {
+            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
+            int freeAssignedCount = 0;
+            int progressAssignedCount = 0;
+            int closedAssignedCount = 0;
+
+            for (Request assigned : assignedRequest) {
+                if (StatusEnum.FREE.getId().equals(assigned.getStatus().getId()))
+                    freeAssignedCount++;
+                else if (StatusEnum.IN_PROGRESS.getId().equals(assigned.getStatus().getId()))
+                    progressAssignedCount++;
+                else if (StatusEnum.CLOSED.getId().equals(assigned.getStatus().getId()))
+                    closedAssignedCount++;
+            }
+
+            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount,
+                    canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount);
         }
     }
 }

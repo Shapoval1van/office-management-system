@@ -1,8 +1,10 @@
 package com.netcracker.component;
 
+import com.netcracker.model.entity.Request;
 import com.netcracker.model.event.*;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
 import com.netcracker.service.notification.impls.NotificationService;
+import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -16,22 +18,22 @@ public class NotificationEventListener {
     @Autowired
     private FrontendNotificationService frontendNotificationService;
 
+    @Autowired
+    private RequestService requestService;
+
     @EventListener
     public void handlePersonRegistration(PersonRegistrationEvent event) {
-        String SITE_LINK = "https://management-office.herokuapp.com/login"; // TODO link to site
-        notificationService.sendRegistrationCompletedNotification(event.getPerson(),
-                SITE_LINK.concat("/").concat(event.getToken().getTokenValue()));
+        notificationService.sendRegistrationCompletedNotification(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
     public void handleResetPassword(ResetPasswordEvent event) {
-        String link = event.getLink().concat("/resetPassword").concat("/" + event.getToken().getTokenValue());
-        notificationService.sendPasswordReminder(event.getPerson(), link);
+        notificationService.sendPasswordReminder(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
     public void handleNewPassword(NewPasswordEvent event) {
-        notificationService.sendPasswordForNewManager(event.getPerson());
+        notificationService.sendRecoveryPasswordForNewUser(event.getPerson(), event.getToken().getTokenValue());
     }
 
     @EventListener
@@ -40,20 +42,8 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequestStatus(NotificationChangeStatus changeStatus){
-        frontendNotificationService.sendNotificationToAllSubscribed(changeStatus.getRequest().getId(),"Request status changed");
-        notificationService.sendChangeStatusEvent(changeStatus.getPerson(), changeStatus.getLink());
-    }
-
-    @EventListener
     public void handleNewRequest(NotificationNewRequestEvent newRequestEvent) {
-        notificationService.sendNewRequestEvent(newRequestEvent.getPerson());
-    }
-
-    @EventListener
-    public void handleUpdateRequest(NotificationRequestUpdateEvent requestUpdateEvent){
-        frontendNotificationService.sendNotificationToAllSubscribed(requestUpdateEvent.getRequest().getId(), "Request updated");
-        notificationService.sendUpdateRequestEvent(requestUpdateEvent.getPerson());
+        notificationService.sendNewRequestEvent(newRequestEvent.getPerson(), newRequestEvent.getRequest());
     }
 
     @EventListener
@@ -77,8 +67,26 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleChangeRequest(ChangeRequestEvent changeRequestEvent) {
-        notificationService.sendRequestUpdateNotification(changeRequestEvent.getOldRequest(),
-                changeRequestEvent.getNewRequest(), changeRequestEvent.getChangeTime());
+    public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
+        Request oldRequest = updateRequestEvent.getOldRequest();
+        Request newRequest = updateRequestEvent.getNewRequest();
+        requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName()) ;
+        frontendNotificationService.sendNotificationToAllSubscribed(oldRequest, newRequest);
+        notificationService.sendRequestUpdateNotification(oldRequest, newRequest, updateRequestEvent.getChangeTime());
+    }
+
+    @EventListener
+    public void handleAssignRequest(RequestAssignEvent requestAssignEvent){
+        notificationService.requestAssignNotification(requestAssignEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleAssignRequestToGroup(RequestAddToGroupEvent requestAddToGroupEvent){
+        notificationService.requestAssignToGroup(requestAddToGroupEvent.getRequest());
+    }
+
+    @EventListener
+    public void handleRequestNewComment(RequestNewCommentEvent requestNewCommentEvent){
+        notificationService.newComment(requestNewCommentEvent.getRequest());
     }
 }

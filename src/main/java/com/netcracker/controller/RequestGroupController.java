@@ -4,7 +4,9 @@ import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.IncorrectStatusException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.exception.requestGroup.CannotCreateRequestGroupException;
 import com.netcracker.exception.requestGroup.RequestGroupAlreadyExist;
+import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.RequestGroupDTO;
 import com.netcracker.model.dto.StatusDTO;
 import com.netcracker.model.entity.RequestGroup;
@@ -27,23 +29,30 @@ public class RequestGroupController {
     @Autowired
     private RequestGroupService requestGroupService;
 
+    @GetMapping("/{requestGroupId}")
+    @ResponseStatus(HttpStatus.OK)
+    public RequestGroup getRequestGroupById(@PathVariable Integer requestGroupId) throws ResourceNotFoundException {
+        return requestGroupService.getRequestGroupById(requestGroupId);
+    }
+
     @GetMapping({"/author/{authorId}"})
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestGroup> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
-        return requestGroupService.getRequestGroupByAuthorId(authorId, pageable);
+    public Page<RequestGroupDTO> getRequestGroupByAuthor(@PathVariable("authorId") Long authorId, Pageable pageable) {
+        return requestGroupService.getRequestGroupDTOByAuthorId(authorId, pageable);
     }
 
     @GetMapping({"/author/{authorId}/search/{namePart}"})
     @ResponseStatus(HttpStatus.OK)
-    public List<RequestGroup> getRequestGroupByNamePart(@PathVariable("authorId") Long authorId, @PathVariable("namePart") String namePart) {
-        return requestGroupService.getRequestGroupByNamePart(namePart, authorId);
+    public List<RequestGroupDTO> getRequestGroupByNamePart(@PathVariable("authorId") Long authorId,
+                                                           @PathVariable("namePart") String namePart) {
+        return requestGroupService.getRequestGroupDTOByNamePart(namePart, authorId);
     }
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
-                                   Principal principal) throws CurrentUserNotPresentException, RequestGroupAlreadyExist {
-        requestGroupService.saveRequestGroup(requestGroupDTO, principal);
+    public RequestGroup createRequestGroup(@Validated(CreateValidatorGroup.class) @RequestBody RequestGroupDTO requestGroupDTO,
+                                           Principal principal) throws CurrentUserNotPresentException, CannotCreateRequestGroupException {
+        return requestGroupService.saveRequestGroup(requestGroupDTO, principal);
     }
 
     @PutMapping("/{requestGroupId}")
@@ -57,7 +66,7 @@ public class RequestGroupController {
 
     @GetMapping("/count/author/{authorId}")
     @ResponseStatus(HttpStatus.OK)
-    public int getRequestGroupCountByAuthor(@PathVariable("authorId") Long authorId) {
+    public Long getRequestGroupCountByAuthor(@PathVariable("authorId") Long authorId) {
         return requestGroupService.getRequestGroupCountByAuthor(authorId);
     }
 
@@ -67,5 +76,11 @@ public class RequestGroupController {
                                          @RequestBody StatusDTO statusDTO,
                                          Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException {
         requestGroupService.setRequestGroupStatus(requestGroupId, statusDTO.getId(), principal);
+    }
+
+    @DeleteMapping("/{requestGroupId}")
+    public void deleteRequestGroup(@PathVariable Integer requestGroupId, Principal principal)
+            throws ResourceNotFoundException, IllegalAccessException {
+        requestGroupService.removeRequestGroup(requestGroupId, principal);
     }
 }

@@ -9,21 +9,11 @@
                 $scope.requests = [];
                 $scope.currentPage = 1;
                 $scope.pageSize = 20;
-                $scope.maxSize = 5;
+                $scope.maxPageSize = 20;
+                $scope.request = {};
 
                 var inProgressStatusId = 2;
                 var closedStatusId = 3;
-
-                $scope.getPageMaxCount = function () {
-                    return RequestGroupService.getGroupCountByAuthor($scope.currentUser.id)
-                        .then(function (callback) {
-                            $scope.maxSize = Math.floor(callback.data / $scope.pageSize);
-                        }, function (callback) {
-
-                        })
-                };
-
-                $scope.getPageMaxCount();
 
                 $scope.goToRequestDetailsPage = function (requestId) {
                     return $scope.goToUrl("/secured/request/" + requestId + "/details/");
@@ -32,7 +22,10 @@
                 $scope.getRequestByGroup = function () {
                     return RequestService.getRequestsByRequestGroup(requestGroupId, $scope.currentPage, $scope.pageSize)
                         .then(function (callback) {
-                            $scope.requests = callback.data;
+                            $scope.requests = callback.data.data;
+                            $scope.maxPageSize = callback.data.totalElements;
+                            $scope.currentPage = callback.data.pageNumber + 1;
+                            $scope.pageSize = callback.data.pageSize;
                         }, function () {
 
                         })
@@ -43,6 +36,7 @@
                 $scope.startRequestGroupRequests = function () {
                     return RequestGroupService.setGroupStatus(requestGroupId, inProgressStatusId)
                         .then(function () {
+                            swal("All requests in this group was started", "", "success");
                             $scope.getRequestByGroup();
                         }, function () {
 
@@ -52,11 +46,46 @@
                 $scope.finishRequestGroupRequests = function () {
                     return RequestGroupService.setGroupStatus(requestGroupId, closedStatusId)
                         .then(function () {
+                            swal("All requests in this group was finished", "", "success");
                             $scope.getRequestByGroup();
                         }, function () {
 
                         })
                 };
+
+                $scope.removeFromRequestGroup = function (requestId) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Do you really want to remove request from this group",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, remove it!",
+                            closeOnConfirm: false
+                        },
+                        function () {
+                            RequestService.removeFromRequestGroup(requestId)
+                                .then(function (callback) {
+                                    $scope.getRequestByGroup();
+                                    swal("Request was removed from request group!", "", "success");
+                                }, function () {
+                                    swal("Remove Request From Group Failure!", "", "error");
+                                });
+                        });
+                };
+
+                // $scope.removeFromRequestGroup = function () {
+                //     return RequestService.removeFromRequestGroup($scope.request.id)
+                //         .then(function (callback) {
+                //             $scope.getRequestByGroup();
+                //         }, function () {
+                //             console.log("Failure");
+                //         })
+                // };
+
+                // $scope.setCurrentRequest = function (request) {
+                //     $scope.request = request;
+                // };
 
                 $scope.isRequestGroupFree = function () {
                     return $scope.requests.some(function (request) {

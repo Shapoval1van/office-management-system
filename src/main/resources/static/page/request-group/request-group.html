@@ -31,16 +31,46 @@
                             <tr>
                                 <th>#</th>
                                 <th st-sort="name">Name</th>
+                                <th>Request count</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="group in displayedGroups" ng-click="goToRequestGroupPage(group.id)"
-                                class="animate-repeat">
-                                <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
-                                <td>{{group.name}}</td>
+                            <tr ng-repeat="group in displayedGroups">
+                                <td ng-click="goToRequestGroupPage(group.id)">
+                                    {{(currentPage - 1) * pageSize + $index + 1}}
+                                </td>
+                                <td ng-click="goToRequestGroupPage(group.id)">{{group.name}}</td>
+                                <td ng-click="goToRequestGroupPage(group.id)">{{group.requestCount}}</td>
+                                <td>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-danger" ng-click="deleteRequestGroup(group.id)">
+                                            Delete request group
+                                        </button>
+                                    </div>
+                                    <!--<delete-request-group-modal></delete-request-group-modal>-->
+                                    <!--<div data-dismiss="modal" data-toggle="modal"-->
+                                         <!--data-target="#deleteRequestGroupModal">-->
+                                        <!--<button class="btn btn-danger delete-request-group-btn"-->
+                                                <!--ng-click="setCurrentRequestGroup(group)">-->
+                                            <!--Delete request group-->
+                                        <!--</button>-->
+                                    <!--</div>-->
+                                </td>
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" ng-model="pageSize"
+                                   ng-change="getGroupByAuthor()">
+                        </div>
+                        <div class="center-block col-md-10">
+                            <ul uib-pagination total-items="totalItems" ng-model="currentPage"
+                                max-size="maxSize" class="pagination-sm" boundary-links="true"
+                                ng-change="getGroupByAuthor()" items-per-page="pageSize"></ul>
+                        </div>
                     </div>
                 </div>
             </div>

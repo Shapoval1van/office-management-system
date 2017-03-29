@@ -10,18 +10,17 @@ import com.netcracker.model.dto.RolesDTO;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.entity.Token;
+import com.netcracker.model.validation.AdminCreateValidationGroup;
 import com.netcracker.model.validation.CreateValidatorGroup;
-import com.netcracker.model.validation.*;
 import com.netcracker.model.view.View;
 import com.netcracker.service.registration.RegistrationService;
 import com.netcracker.util.enums.role.RoleEnum;
-import com.sun.org.apache.xpath.internal.SourceTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.netcracker.model.view.View;
+
 import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -54,7 +53,6 @@ public class RegistrationController {
         Person person = personDTO.toPerson();
         person.setPassword(buildRandomPassword());
         Token token = registrationService.registerPerson(person, this.buildRequestLink(request), person.getRole().getId());
-        System.out.println(token.getTokenValue());
         registrationService.confirmEmail(token.getTokenValue());
         return new RegistrationMessageDTO(person.getEmail(), token.getDateExpired());
     }

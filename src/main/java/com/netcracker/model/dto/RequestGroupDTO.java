@@ -20,6 +20,8 @@ public class RequestGroupDTO {
     @JsonView(View.Public.class)
     private Long author;
 
+    private Long requestCount;
+
     public RequestGroupDTO() {
     }
 
@@ -61,5 +63,13 @@ public class RequestGroupDTO {
 
     public void setAuthor(Long author) {
         this.author = author;
+    }
+
+    public Long getRequestCount() {
+        return requestCount;
+    }
+
+    public void setRequestCount(Long requestCount) {
+        this.requestCount = requestCount;
     }
 }
