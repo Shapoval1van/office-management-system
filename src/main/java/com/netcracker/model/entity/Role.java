@@ -28,6 +28,7 @@ public class Role implements Persistable<Integer>, GrantedAuthority {
     }
 
     public Role(Role role) {
+        if(role == null) return;
         id = role.id;
         name = role.name;
     }
