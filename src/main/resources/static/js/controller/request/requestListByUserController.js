@@ -9,7 +9,6 @@
                 $scope.users = [];
 
                 var requestDetails = "/secured/employee/request/";
-                var requestUpdate = "/secured/manager/request/";
 
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
@@ -133,7 +132,7 @@
                     $scope.pageChanged(1); // get first page
 
                     $scope.requestUpdate = function(requestId) {
-                        window.location = requestUpdate + requestId + '/update';
+                        window.location = requestDetails + requestId + '/update';
                     };
                 }
 
