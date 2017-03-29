@@ -25,7 +25,7 @@ public class CatchDeletedUser {
         this.messageSource = messageSource;
     }
 
-    @Around("execution(* com.netcracker.service.mail.impls.MailService.send(..))")
+    @Around("execution(void com.netcracker.service.mail.impls.MailService.send(..))")
     public void interceptMailSendingToDeletedUser(ProceedingJoinPoint joinPoint) throws Throwable {
         Locale locale = LocaleContextHolder.getLocale();
         Object[] args = joinPoint.getArgs();
