@@ -43,6 +43,7 @@
                             $scope.persons = [];
                             $scope.persons = response.data.data;
                             $scope.totalItems = response.data.totalElements;
+
                         }, function errorCallback(response) {
                         });
                     }
@@ -68,19 +69,21 @@
                     window.location = personDetails + personId + '/update';
                 };
                 $scope.personDelete = function(person) {
-                    if (person.email === $scope.currentUser.email)
-                        window.alert("You cannot delete yourself")
-                    else{
                         $scope.person = person;
                         $http.post("/api/person/deletePerson", person.email, $scope.currentUser).
                         then(function successCallback(response) {
-                            $scope.persons =$scope.persons.filter(function(person) {
-                                return person.email !== $scope.person.email;
-                            });
+                            if (response.data.deleted === true){
+                                $scope.persons =$scope.persons.filter(function(person) {
+                                    return person.email !== $scope.person.email;
+                                });
+                                swal(response.data.message);
+                            } else{
+                                swal(response.data.message);
+                            }
+
                         }, function errorCallback(response) {
                             console.log(response);
                         });
-                    }
 
                 };
 

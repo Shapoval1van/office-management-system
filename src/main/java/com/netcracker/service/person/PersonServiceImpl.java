@@ -4,6 +4,8 @@ import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.model.dto.DeleteUserDTO;
+import com.netcracker.model.dto.MessageDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
@@ -74,30 +76,35 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
+    public Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
         Locale locale = LocaleContextHolder.getLocale();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
                 new CannotDeleteUserException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
 
         if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())) {
             if (requestRepository.countAllRequestByManager(person.getId()) != 0L) {
-                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+                //throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+                return Optional.of(new DeleteUserDTO(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale), false));
             } else if (principal.getName().equals(person.getEmail())) {
-                throw new CannotDeleteUserException(messageSource.getMessage(ADMINISTRATOR_REMOVING_ERROR, null, locale));
+                return Optional.of(new DeleteUserDTO(messageSource.getMessage(ADMINISTRATOR_REMOVING_ERROR, null, locale), false));
             } else {
                 publishOnDeleteUserEvent(person);
-                return Optional.of(disablePerson(person));
+                disablePerson(person);
+                return Optional.of(new DeleteUserDTO(messageSource.getMessage(USER_SUCCESFULLY_DELETED, null, locale), true));
             }
         } else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())) {
             if (requestRepository.countAllRequestByManager(person.getId()) != 0L) {
-                throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+                //throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
+                return Optional.of(new DeleteUserDTO(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale), false));
             } else {
                 publishOnDeleteUserEvent(person);
-                return Optional.of(disablePerson(person));
+                disablePerson(person);
+                return Optional.of(new DeleteUserDTO(messageSource.getMessage(USER_SUCCESFULLY_DELETED, null, locale), true));
             }
         } else {
             publishOnDeleteUserEvent(person);
-            return Optional.of(disablePerson(person));
+            disablePerson(person);
+            return Optional.of(new DeleteUserDTO(messageSource.getMessage(USER_SUCCESFULLY_DELETED, null, locale), true));
         }
 
     }

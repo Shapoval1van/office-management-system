@@ -42,6 +42,7 @@
                             $scope.persons = [];
                             $scope.persons = response.data.data;
                             $scope.totalItems = response.data.totalElements;
+                            swal("User recovered!");
                         }, function errorCallback(response) {
                         });
                     }

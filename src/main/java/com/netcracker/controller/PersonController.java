@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.ResourceNotFoundException;
-import com.netcracker.model.dto.FullPersonDTO;
-import com.netcracker.model.dto.Page;
-import com.netcracker.model.dto.PersonDTO;
-import com.netcracker.model.dto.SubscribeDTO;
+import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.validation.DeleteUserValidatorGroup;
@@ -53,9 +50,10 @@ public class PersonController {
     }
 
     @PostMapping(value = "/deletePerson", produces = JSON_MEDIA_TYPE)
-    public ResponseEntity<?> deletePerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email, Principal principal,
-                                  HttpServletRequest request) throws Exception {
-        return new ResponseEntity<>(personService.deletePersonByEmail(email, principal), HttpStatus.OK);
+    public DeleteUserDTO deletePerson(@Validated(DeleteUserValidatorGroup.class) @RequestBody String email, Principal principal,
+                                   HttpServletRequest request) throws Exception {
+        DeleteUserDTO messageDTO = personService.deletePersonByEmail(email, principal).get();
+        return messageDTO;
     }
 
     @PostMapping(value = "/recoverPerson", produces = JSON_MEDIA_TYPE)

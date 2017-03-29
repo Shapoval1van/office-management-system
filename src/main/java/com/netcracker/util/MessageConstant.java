@@ -5,6 +5,7 @@ public class MessageConstant {
     public static final String USER_ERROR_NOT_PRESENT = "user.error.not.present";
     public static final String USER_WITH_ID_NOT_PRESENT = "user.error.not.present.with.id";
     public static final String USER_ALREADY_DELETED ="user.deleted.error";
+    public static final String USER_SUCCESFULLY_DELETED="admin.success.removing.message";
     public static final String USER_WITH_EMAIL_NOT_PRESENT = "user.error.email";
     public static final String USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE = "user.error.update.from.manager.to.employee";
     public static final String USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE = "user.error.update.from.admin.to.employee";
