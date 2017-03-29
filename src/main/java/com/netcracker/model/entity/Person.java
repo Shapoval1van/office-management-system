@@ -34,6 +34,18 @@ public class Person implements Persistable<Long>, UserDetails {
         this.lastName = lastName;
     }
 
+    public Person(Person person) {
+        if(person == null) return;
+        this.id = person.id;
+        this.firstName = person.firstName;
+        this.lastName = person.lastName;
+        this.email = person.email;
+        this.password = person.password;
+        this.role = new Role(person.role);
+        this.enabled = person.enabled;
+        this.deleted = person.deleted;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -118,8 +130,8 @@ public class Person implements Persistable<Long>, UserDetails {
         this.enabled = enabled;
     }
 
-    public String getFullName(){
-        return this.firstName +" "+this.getLastName();
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
     }
 
     public boolean isDeleted() {

@@ -3,6 +3,7 @@ package com.netcracker.service.request;
 import com.netcracker.exception.*;
 import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
+import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
@@ -371,7 +372,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException {
+    public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException, CannotUpdateStatusException {
         Locale locale = LocaleContextHolder.getLocale();
 
         Optional<Person> currentUser = personRepository.findPersonByEmail(principal.getName());
@@ -396,11 +397,16 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
-    public int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException {
+    public int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException, CannotUpdateStatusException {
+        Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
         Optional<Person> person = personRepository.findOne(requestDB.get().getEmployee().getId());
         Request newRequest = new Request(requestDB.get());
-
+        if(!StatusEnum.CANCELED.getId().equals(status.getId())){
+            if(newRequest.getRequestGroup()!=null){
+                throw new CannotUpdateStatusException(messageSource.getMessage(REQUEST_ERROR_UPDATE_STATUS, null, locale));
+            }
+        }
         newRequest.setStatus(status);
         eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
 
@@ -498,7 +504,7 @@ public class RequestServiceImpl implements RequestService {
         requestRepository.unassign(requestId);
 
         Optional<Request> newRequest = getRequestById(requestId);
-        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+        eventPublisher.publishEvent(new RequestUnassignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
     }
 
     @Override
@@ -516,7 +522,7 @@ public class RequestServiceImpl implements RequestService {
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
-            eventPublisher.publishEvent(new RequestAssignEvent(getRequestById(requestId).get()));
+            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
             return true;
         }
 
@@ -546,7 +552,7 @@ public class RequestServiceImpl implements RequestService {
             // Subscribe new manager to request
             personRepository.subscribe(requestId, person.get().getId());
 
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
             if(oldRequest.get().getManager() != null) {
                 personRepository.unsubscribe(requestId, oldRequest.get().getManager().getId()); // unsubscribe old manager

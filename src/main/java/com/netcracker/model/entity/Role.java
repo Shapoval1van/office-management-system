@@ -27,6 +27,12 @@ public class Role implements Persistable<Integer>, GrantedAuthority {
         this.name = name;
     }
 
+    public Role(Role role) {
+        if(role == null) return;
+        id = role.id;
+        name = role.name;
+    }
+
     @Override
     public Integer getId() {
         return id;

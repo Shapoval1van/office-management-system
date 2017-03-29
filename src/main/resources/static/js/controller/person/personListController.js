@@ -3,7 +3,8 @@
         .controller("PersonListController", ["$scope", "$http", "$rootScope",
             function ($scope, $http, $rootScope) {
 
-                var personDetails = "/secured/person/";
+                var personDetails = "/secured/employee/person/";
+                var personUpdate = "/secured/admin/person/";
                 $scope.pageSize = 10;
                 $scope.persons = {};
                 $scope.roles = [{roleId: 4, name: 'ALL'},
@@ -65,7 +66,7 @@
                 };
 
                 $scope.personUpdate = function(personId) {
-                    window.location = personDetails + personId + '/update';
+                    $scope.goToUrl(personUpdate + personId + '/update');
                 };
                 $scope.personDelete = function(person) {
                         $scope.person = person;
@@ -83,9 +84,9 @@
                         }, function errorCallback(response) {
                             console.log(response);
                         });
-                    }
+                    };
                 $scope.goToPersonDetailsPage = function (personId) {
-                    $scope.goToUrl("/secured/person/" + personId + "/details");
+                    $scope.goToUrl("/secured/employee/person/" + personId + "/details");
                 };
 
             }])

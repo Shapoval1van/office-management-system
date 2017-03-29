@@ -55,23 +55,23 @@
                                 <td class="text-center">
                                     {{(currentPage - 1) * pageSize + $index + 1}}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" ng-click="goToRequestDetailsPage(requestItem.id)">
                                     {{requestItem.name}}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" ng-click="goToRequestDetailsPage(requestItem.id)">
                                      <span ng-if="!!requestItem.estimate">{{requestItem.estimate | date: "dd.MM.yyyy HH:mm"}}</span>
                                     <span ng-if="!requestItem.estimate">Not specified</span>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" ng-click="goToRequestDetailsPage(requestItem.id)">
                                     {{requestItem.priority.name}}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" ng-click="goToRequestDetailsPage(requestItem.id)">
                                     <a href="#">
                                         {{requestItem.employee.firstName}}
                                         {{requestItem.employee.lastName}}
                                     </a>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" ng-click="goToRequestDetailsPage(requestItem.id)">
                                     {{requestItem.status.name}}
                                 </td>
                             </tbody>

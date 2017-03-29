@@ -57,10 +57,16 @@ public class ChangeTracker {
                 }
                 if (affectedObject.get() instanceof Person) {
                     changeItem.setField(fieldRepository.findFieldByName("MANAGER").get());
-                    changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).orElseGet(
-                            () -> new Person(" ", " ")
-                    ).getFullName());
-                    changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
+                    if(c.getLeft() != null) {
+                        changeItem.setOldVal(personRepository.findOne(Long.parseLong(c.getLeft().toString())).get().getFullName());
+                    } else {
+                        changeItem.setOldVal("");
+                    }
+                    if(c.getRight() != null) {
+                        changeItem.setNewVal(personRepository.findOne(Long.parseLong(c.getRight().toString())).get().getFullName());
+                    } else {
+                        changeItem.setNewVal("");
+                    }
                     changeItemSet.add(changeItem);
                 }
                 if (affectedObject.get() instanceof Priority) {
@@ -92,12 +98,12 @@ public class ChangeTracker {
                 if (oldRequest.getManager() != null) {
                     changeItem.setOldVal(personRepository.findOne(oldRequest.getManager().getId()).get().getFullName());
                 } else {
-                    changeItem.setOldVal(" ");
+                    changeItem.setOldVal("");
                 }
                 if (newRequest.getManager() != null) {
                     changeItem.setNewVal(personRepository.findOne(newRequest.getManager().getId()).get().getFullName());
                 } else {
-                    changeItem.setNewVal(" ");
+                    changeItem.setNewVal("No manager");
                 }
                 changeItemSet.add(changeItem);
             }

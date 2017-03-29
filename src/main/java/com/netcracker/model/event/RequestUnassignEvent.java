@@ -4,16 +4,16 @@ import com.netcracker.model.entity.Request;
 
 import java.util.Date;
 
-public class RequestAssignEvent {
+public class RequestUnassignEvent {
     private Request oldRequest;
     private Request newRequest;
     private Date changeTime;
     private String personName;
 
-    public RequestAssignEvent() {
+    public RequestUnassignEvent() {
     }
 
-    public RequestAssignEvent(Request oldRequest, Request newRequest, Date changeTime, String personName) {
+    public RequestUnassignEvent(Request oldRequest, Request newRequest, Date changeTime, String personName) {
         this.oldRequest = oldRequest;
         this.newRequest = newRequest;
         this.changeTime = changeTime;

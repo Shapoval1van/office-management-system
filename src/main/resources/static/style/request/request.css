@@ -99,3 +99,33 @@
 .user-table-stripped{
     margin-top: 10px;
 }
+.form-group.title-warning, .form-group.details-warning{
+    margin-top: 30px;
+    transition: 0.5s all ease;
+}
+.form-group.details-warning{
+    margin-top: 40px;
+}
+.input-title-wrapper.warning, .input-details-wrapper.warning{
+    position: relative;
+}
+.input-title-wrapper.warning::before, .input-details-wrapper.warning::before{
+    content: "This field must contain less than 120 character:";
+    position: absolute;
+    top: -30px;
+    left: 0;
+    color: #ff5252;
+}
+.input-details-wrapper.warning::before{
+    content: "This field must contain less than 500 character:";
+}
+.input-title-wrapper.warning .form-control, .input-details-wrapper.warning .form-control{
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(255, 82, 82, 0.6);
+    border: 1px solid #ff5252;
+    outline: 0;
+}
+.input-title-wrapper.warning .form-control:focus, .input-details-wrapper.warning .form-control:focus{
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(255, 82, 82, 0.6)!important;
+    border: 1px solid #ff5252!important;
+    outline: 0!important;
+}

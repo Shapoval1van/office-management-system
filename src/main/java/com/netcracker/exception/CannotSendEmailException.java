@@ -1,9 +1,10 @@
 package com.netcracker.exception;
 
-public class CannotSendEmailException extends RuntimeException {
-    private static final String MESSAGE = "Email sending error.";
+public class CannotSendEmailException extends BaseRuntimeException {
 
-    public CannotSendEmailException() {
-        super(MESSAGE);
+    private static final String MESSAGE = "Cannot send email exception";
+
+    public CannotSendEmailException(String description) {
+        super(MESSAGE, description);
     }
 }

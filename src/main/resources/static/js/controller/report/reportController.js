@@ -306,11 +306,11 @@
 
                 $scope.getPeriodData = function (periodItem) {
                     $scope.period=periodItem.toLowerCase();
-                    window.location = "/secured/report/"+ personId +"?period=" + periodItem.toLowerCase();
+                    window.location = "/secured/employee/report/"+ personId +"?period=" + periodItem.toLowerCase();
                 };
 
                 $scope.getUser = function (userInput) {
-                    window.location = "/secured/report/"+ userInput.id
+                    window.location = "/secured/employee/report/"+ userInput.id
                 };
 
                 $scope.updateUser = function() {
@@ -326,6 +326,10 @@
                         }, function errorCallback(response) {
                         });
                     }
+                };
+
+                $scope.goToRequestDetailsPage = function (requestId) {
+                    $scope.goToUrl("/secured/request/" + requestId + "/details");
                 };
 
 

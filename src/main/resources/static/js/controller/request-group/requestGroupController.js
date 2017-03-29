@@ -29,21 +29,30 @@
                 $scope.getGroupByAuthor();
 
                 $scope.searchByNamePattern = function () {
-                    return RequestGroupService.findGroupByNamePattern($scope.currentUser.id, $scope.requestGroupNamePattern)
-                        .then(function (callback) {
-                            $scope.groups = callback.data;
-                        }, function (callback) {
+                    if($scope.requestGroupNamePattern.length > 2 || $scope.requestGroupNamePattern.length == 0) {
+                        $(".request-group-input-wrapper").removeClass("warning");
+                        return RequestGroupService.findGroupByNamePattern($scope.currentUser.id, $scope.requestGroupNamePattern)
+                            .then(function (callback) {
+                                $scope.groups = callback.data;
+                            }, function (callback) {
 
-                        })
+                            })
+                    }
                 };
 
                 $scope.createGroup = function () {
-                    return RequestGroupService.createGroup($scope.requestGroupNamePattern)
-                        .then(function (callback) {
-                            $scope.searchByNamePattern();
-                        }, function (callback) {
-                            swal("Create Group Error", callback.data, "error");
-                        })
+                    if($scope.requestGroupNamePattern.length < 3){
+                        $(".request-group-input-wrapper").addClass("warning");
+                    }
+                    else{
+                        $(".request-group-input-wrapper").removeClass("warning");
+                        return RequestGroupService.createGroup($scope.requestGroupNamePattern)
+                            .then(function (callback) {
+                                $scope.searchByNamePattern();
+                            }, function (callback) {
+                                swal("Create Group Error", callback.data, "error");
+                            })
+                    }
                 };
 
                 $scope.deleteRequestGroup = function (groupId) {
@@ -72,7 +81,7 @@
                 };
 
                 $scope.goToRequestGroupPage = function (requestGroupId) {
-                    return $scope.goToUrl("/secured/request-group/" + requestGroupId + "/requests");
+                    return $scope.goToUrl("/secured/manager/request-group/" + requestGroupId + "/requests");
                 };
 
             }])

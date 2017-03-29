@@ -5,13 +5,13 @@
         <!--For employee (also for manager and admin)-->
         </li>
         <li ng-show="hasEmployeePermission()">
-            <li ng-class="{'sidebar-active': isActive('/secured/dashboard')}">
-                <a href="/secured/dashboard">Dashboard</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/employee/dashboard')}">
+                <a href="/secured/employee/dashboard">Dashboard</a>
             </li>
         </li>
         <li>
-            <li ng-class="{'sidebar-active': isActive('/secured/request/free')}">
-                <a href="/secured/request/free">Free requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/employee/request/free')}">
+                <a href="/secured/employee/request/free">Free requests</a>
             </li>
         </li>
         <li>
@@ -20,38 +20,38 @@
             </li>
         </li>
         <div ng-show="hasEmployeePermission()">
-            <li ng-class="{'sidebar-active': isActive('/secured/request/my')}">
-                <a href="/secured/request/my">My requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/employee/request/my')}">
+                <a href="/secured/employee/request/my">My requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/request/my/closed')}">
-                <a href="/secured/request/my/closed">Closed requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/employee/request/closed')}">
+                <a href="/secured/employee/request/closed">Closed requests</a>
             </li>
         </div>
         <!--For manager (also for admin)-->
         <div ng-show="hasManagerPermission()">
-            <li ng-class="{'sidebar-active': isActive('/secured/request/my/assigned')}">
-                <a href="/secured/request/my/assigned">Assigned requests</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/manager/request/my/assigned')}">
+                <a href="/secured/manager/request/my/assigned">Assigned requests</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/request-group')}">
-                <a ng-href="/secured/request-group">Request groups</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/manager/request-group')}">
+                <a ng-href="/secured/manager/request-group">Request groups</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/calendar')}">
-                <a href="/secured/calendar">Calendar</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/manager/calendar')}">
+                <a href="/secured/manager/calendar">Calendar</a>
             </li>
         </div>
         <!--For admin only-->
         <div ng-show="hasAdminPermission()">
-            <li ng-class="{'sidebar-active': isActive('/secured/request/user')}">
-                <a href="/secured/request/user">Requests by user</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/admin/request/user')}">
+                <a href="/secured/admin/request/user">Requests by user</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/request/assigned')}">
-                <a href="/secured/request/assigned">Assig. by manager</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/admin/request/assigned')}">
+                <a href="/secured/admin/request/assigned">Assig. by manager</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/users')}">
-                <a href="/secured/users">Users</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/admin/users')}">
+                <a href="/secured/admin/users">Users</a>
             </li>
-            <li ng-class="{'sidebar-active': isActive('/secured/deleted-users')}">
-                <a href="/secured/deleted-users">Deleted users</a>
+            <li ng-class="{'sidebar-active': isActive('/secured/admin/deleted-users')}">
+                <a href="/secured/admin/deleted-users">Deleted users</a>
             </li>
         </div>
     </ul>

@@ -8,7 +8,8 @@
                 $scope.managers = [];
                 $scope.users = [];
 
-                var requestDetails = "/secured/request/";
+                var requestDetails = "/secured/employee/request/";
+
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.personType = "";
                 $scope.pageSize = 10;
@@ -31,7 +32,7 @@
                 $scope.assigned = false;
                 var path = $location.path();
 
-                if (path=="/secured/request/assigned"){
+                if (path=="/secured/admin/request/assigned"){
                     $scope.assigned = true;
                     $scope.personType = "Employee";
                     $scope.placeholder = "Find assigned requests by manager name";
@@ -153,7 +154,7 @@
                 };
 
                 $scope.goToRequestDetailsPage = function (requestId) {
-                    $window.open("/secured/request/" + requestId + "/details", '_blank');
+                    $window.open("/secured/employee/request/" + requestId + "/details", '_blank');
                 };
 
                 $scope.notifyAboutExpiringEstimateTime = function() {
