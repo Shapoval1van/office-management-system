@@ -91,6 +91,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             person.setEnabled(true);
         else
             person.setEnabled(false);
+        person.setDeleted(false);
         person.setPassword(passwordEncoder.encode(person.getPassword()));
         Optional<Person> personOptional = this.personRepository.save(person);
 

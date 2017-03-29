@@ -3,6 +3,8 @@ package com.netcracker.service.person;
 import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.ResourceNotFoundException;
+import com.netcracker.model.dto.DeleteUserDTO;
+import com.netcracker.model.dto.MessageDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
@@ -20,7 +22,7 @@ public interface PersonService {
 
     //Long getCountPassivePersons(Integer priorityId);
 
-    Optional<Person> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException;
+    Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException;
 
     Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
 
