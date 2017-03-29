@@ -66,3 +66,20 @@ legend{
     font-size: 22px;
     font-weight: 400;
 }
+add-to-request-group-btn{
+    display: inline-block;
+}
+.request-btn{
+    float: left;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+.request-btn .btn{
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+.request-btn-wrapper{
+    padding-left: 13px;
+}

@@ -273,15 +273,6 @@
                             })
                 };
 
-                // $scope.removeFromRequestGroup = function () {
-                //     return RequestService.removeFromRequestGroup($scope.request.id)
-                //         .then(function () {
-                //             $scope.getRequest();
-                //         }, function () {
-                //
-                //         })
-                // };
-
                 $scope.removeFromRequestGroup = function () {
                     swal({
                             title: "Are you sure?",
