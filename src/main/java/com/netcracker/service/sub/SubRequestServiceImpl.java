@@ -210,11 +210,11 @@ public class SubRequestServiceImpl {
 
     private void verifyEstimate(Request subrequest, Request parentRequest) throws BadRequestException {
         if (subrequest.getEstimate() != null){
-            if (subrequest.getEstimate().before(subrequest.getCreationTime())){
+            if (new Date(subrequest.getEstimate().getTime()).before(new Date(subrequest.getCreationTime().getTime()))){
                 throw new BadRequestException(INVALID_ESTIMATE_MESSAGE);
             }
             if (parentRequest.getEstimate() != null){
-                if (parentRequest.getEstimate().before(subrequest.getEstimate()));{
+                if (new Date(parentRequest.getEstimate().getTime()).before(new Date(subrequest.getEstimate().getTime()))){
                     throw new BadRequestException(INVALID_ESTIMATE_MESSAGE);
                 }
             }
