@@ -365,7 +365,7 @@
                 };
 
                 $scope.showCancelButton = function () {
-                    return $scope.isAuthor() || $scope.isCurrentUserAdministrator();
+                    return $scope.isAuthor() && $scope.isFree() || $scope.isCurrentUserAdministrator();
                 };
 
                 $scope.showAddGroupBtn = function () {
