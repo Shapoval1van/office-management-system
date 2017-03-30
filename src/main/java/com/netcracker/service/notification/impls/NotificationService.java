@@ -298,6 +298,7 @@ public class NotificationService implements NotificationSender {
         return new StringBuilder()
                 .append(SERVER_SOURCE)
                 .append("secured/")
+                .append("employee/")
                 .append("request/")
                 .append(requestId)
                 .append("/details")
