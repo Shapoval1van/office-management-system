@@ -2,7 +2,9 @@
     angular.module("OfficeManagementSystem")
         .controller("NotifierNavController", ['$scope', '$location', '$http', 'NotificationWebSocketService',
             function ($scope, $location, $http, NotificationWebSocketService) {
+                console.log("Notifer.");
                 userId=JSON.parse(localStorage.getItem("currentUser")).id;
+
                 $scope.getNotification = function() {
                     $http({
                         method: 'GET',
@@ -41,9 +43,9 @@
                 $scope.toRequest = function(itemId) {
                     window.location = "/secured/employee/request/"+itemId+"/details";
                 };
-
-                $scope.getNotification();
-
+                if ($scope.Session.isUserLoggedIn()) {
+                    $scope.getNotification();
+                }
                 //Subscribe to topic /topic/request/{requestId}
                 NotificationWebSocketService.initialize();
                 //Receive message from web socket

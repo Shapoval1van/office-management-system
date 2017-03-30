@@ -6,7 +6,17 @@
                 $scope.Session = SessionService;
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-                SessionService.loadSession();
+
+                    $scope.Session.loadOldSession().then(function (callback) {
+                        if (callback.isOk == true){
+                            console.log("Session loaded.")
+                        } else {
+                            $location.path("/login");
+                        }
+                    });
+
+
+
                 var anonymOnlyPages = ["resetPassword", "reset"];
                 var redirectIfTokenExist = "/secured/employee/requestListByEmployee";
                 var loginPageUrl = "/login";
