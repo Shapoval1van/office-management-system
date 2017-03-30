@@ -7,7 +7,6 @@ import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.*;
 import com.netcracker.model.entity.Request;
-import com.netcracker.model.entity.RequestGroup;
 import com.netcracker.model.entity.Status;
 import com.netcracker.model.validation.CreateValidatorGroup;
 import com.netcracker.model.view.View;
@@ -22,10 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.netcracker.controller.RegistrationController.JSON_MEDIA_TYPE;
@@ -45,9 +43,9 @@ public class RequestController {
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
                                                @RequestParam(name = "period", defaultValue = "day") String period,
                                                @PathVariable(name = "requestId") Long id, Pageable pageable) {
-        Set<HistoryDTO> historySet = new HashSet<>();
-        requestService.getRequestHistory(id, period, pageable).forEach(changeGroup -> historySet.add(new HistoryDTO(changeGroup)));
-        return new ResponseEntity<>(historySet, HttpStatus.OK);
+        List<HistoryDTO> historyList = new ArrayList<>();
+        requestService.getRequestHistory(id, period, pageable).forEach(changeGroup -> historyList.add(new HistoryDTO(changeGroup)));
+        return new ResponseEntity<>(historyList, HttpStatus.OK);
     }
 
 

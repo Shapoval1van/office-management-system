@@ -14,7 +14,6 @@ import com.netcracker.repository.common.Pageable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
@@ -55,7 +54,7 @@ public interface RequestService {
 
     Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
-    Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
+    List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
