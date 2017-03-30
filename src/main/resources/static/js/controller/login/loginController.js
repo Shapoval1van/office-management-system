@@ -20,12 +20,7 @@
                     $scope._relocateUser();
                 }
 
-                $scope.$watch("Session.isUserLoggedIn()", function (newValue, oldValue, scope) {
-                    if(newValue == true){
-                        console.log("Watcher time!!!!!");
-                        $scope._relocateUser();
-                    }
-                });
+
 
                 $scope.person = {};
                 $scope.username = "";
@@ -34,6 +29,7 @@
 
 
                 if (!!$routeParams.registrationToken) {
+                    console.log("Activation!")
                     RegistrationService.activateUser($routeParams.registrationToken)
                         .then(function (response) {
                             $scope.person.username = response.data.email;
@@ -58,6 +54,13 @@
                         }
                     });
                 };
+
+                $scope.$watch("Session.isUserLoggedIn()", function (newValue, oldValue, scope) {
+                    if(newValue == true){
+                        console.log("Watcher time!!!!!");
+                        $scope._relocateUser();
+                    }
+                });
 
 
             }])
