@@ -9,35 +9,16 @@
 
                     $scope.Session.loadOldSession().then(function (callback) {
                         if (callback.isOk == true){
-                            console.log("Session loaded.")
+                            console.log("Session loaded.");
                         } else {
-                            $location.path("/login");
+                            console.log("Session not loaded.");
                         }
                     });
-
-
 
                 var anonymOnlyPages = ["resetPassword", "reset"];
                 var redirectIfTokenExist = "/secured/employee/requestListByEmployee";
                 var loginPageUrl = "/login";
 
-                //FIXME: Rewrite it. Check only URL.
-                var isCurrentPageAnonymOnly = function () {
-                    return anonymOnlyPages.some(function (anonymOnlyPage) {
-                        //FIXME: Change it !!!
-                        return (~window.location.href.indexOf(anonymOnlyPage) && !(~window.location.href.indexOf("/registrationAdmin")));
-                    });
-                };
-
-                if (isCurrentPageAnonymOnly()) {
-                    if (SessionService.isUserLoggedIn())
-                        window.location.href = redirectIfTokenExist;
-                } else {
-                    if (SessionService.isUserLoggedIn())
-                        $http.defaults.headers.common.Authorization =
-                            'Bearer ' + SessionService.getAccessToken();
-
-                }
 
                 $scope.logout = function () {
                     SessionService.destroySession();
