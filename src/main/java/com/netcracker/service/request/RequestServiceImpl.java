@@ -206,15 +206,6 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
-            if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
-                List<Request> subRequestList = getAllSubRequest(newRequest.getId());
-                if (!subRequestList.isEmpty()){
-                    subRequestList.forEach(sub -> {
-                        sub.setStatus(new Status(StatusEnum.CLOSED.getId()));
-                        requestRepository.updateRequest(sub);
-                    });
-                }
-            }
             return this.requestRepository.updateRequest(newRequest);
         }
     }

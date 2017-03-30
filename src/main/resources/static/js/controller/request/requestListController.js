@@ -58,8 +58,8 @@
                         return $scope.totalItems;
                     };
 
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
+                    $scope.getTotalPage();
+                    $scope.pageChanged();
 
                 } else {
                     $scope.personType = "Employee";
@@ -92,12 +92,12 @@
                         return $scope.totalItems;
                     };
 
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
+                    $scope.getTotalPage();
+                    $scope.pageChanged();
 
                     $scope.priorityChange = function (priorityId) {
-                        $scope.getTotalPage(); //
-                        $scope.pageChanged(1); // get first page
+                        $scope.getTotalPage();
+                        $scope.pageChanged();
                     };
 
                 }
