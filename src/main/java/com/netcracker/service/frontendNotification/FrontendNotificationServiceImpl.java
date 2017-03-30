@@ -125,7 +125,7 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
 
                         } else if (changeItem.getField().getId() == MANAGER_FIELD_ID) {
-                            if (newRequest.getManager() == null) {
+                            if (newRequest.getManager() == null || newRequest.getManager().getId()==null) {
                                 // manager was unassigned
                                 subject = messageSource.getMessage(CHANGE_MANGER_UNASSIGNED, new Object[]{requestName.toUpperCase()}, locale);
                             }else {
@@ -137,7 +137,7 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
                             notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
 
                         } else if (changeItem.getField().getId() == GROUP_FIELD_ID) {
-                            if(newRequest.getRequestGroup()==null){
+                            if(newRequest.getRequestGroup()==null || newRequest.getRequestGroup().getId()==null){
                                 //group was removed
                                 subject = messageSource.getMessage(CHANGE_GROUP_DELETED, new Object[]{requestName.toUpperCase()}, locale);
                             }else {

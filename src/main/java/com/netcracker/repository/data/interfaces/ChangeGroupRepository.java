@@ -6,8 +6,8 @@ import com.netcracker.model.entity.Period;
 import com.netcracker.repository.common.JdbcRepository;
 import com.netcracker.repository.common.Pageable;
 
-import java.util.Set;
+import java.util.List;
 
 public interface ChangeGroupRepository extends JdbcRepository<ChangeGroup, Long> {
-    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable);
+    List<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable);
 }

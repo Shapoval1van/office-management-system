@@ -206,15 +206,6 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
-            if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
-                List<Request> subRequestList = getAllSubRequest(newRequest.getId());
-                if (!subRequestList.isEmpty()){
-                    subRequestList.forEach(sub -> {
-                        sub.setStatus(new Status(StatusEnum.CLOSED.getId()));
-                        requestRepository.updateRequest(sub);
-                    });
-                }
-            }
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -426,14 +417,14 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    public Set<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
+    public List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
-            Set<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
+            List<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
                     Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
             return changeGroups;
         } catch (IllegalArgumentException e) {
-            return new HashSet<ChangeGroup>();
+            return new ArrayList<>();
         }
     }
 
@@ -683,7 +674,7 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    private void fill(Set<ChangeGroup> changeGroup) {
+    private void fill(List<ChangeGroup> changeGroup) {
         changeGroup.forEach(cg -> cg.getChangeItems().forEach(ci -> {
             ci.setField(fieldRepository.findOne(ci.getField().getId()).get());
         }));

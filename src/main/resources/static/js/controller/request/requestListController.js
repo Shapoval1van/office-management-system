@@ -58,8 +58,8 @@
                         return $scope.totalItems;
                     };
 
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
+                    $scope.getTotalPage();
+                    $scope.pageChanged();
 
                 } else {
                     $scope.personType = "Employee";
@@ -92,12 +92,12 @@
                         return $scope.totalItems;
                     };
 
-                    $scope.getTotalPage(); //
-                    $scope.pageChanged(1); // get first page
+                    $scope.getTotalPage();
+                    $scope.pageChanged();
 
                     $scope.priorityChange = function (priorityId) {
-                        $scope.getTotalPage(); //
-                        $scope.pageChanged(1); // get first page
+                        $scope.getTotalPage();
+                        $scope.pageChanged();
                     };
 
                 }
@@ -141,8 +141,8 @@
                         });
                 };
 
-                $scope.assignToSmb = function (requestId) {
-                    return PersonService.assign(requestId, $scope.selectedManager.id)
+                $scope.assignToSmb = function () {
+                    return PersonService.assign($scope.selectedRequest, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
                             $scope.pageChanged();
