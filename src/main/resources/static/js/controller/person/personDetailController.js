@@ -7,7 +7,6 @@
                 $scope.userName = '';
                 $scope.userRole = '';
                 $scope.email = '';
-                $scope.isManager = false;
                 $scope.isEmployee = false;
 
                 // for employee
@@ -30,17 +29,11 @@
                         $scope.userName = response.data.firstName + " " + response.data.lastName;
                         $scope.userRole = response.data.role.name.substr(5, response.data.role.name.length);
                         $scope.email = response.data.email;
-                        console.log($scope.userRole);
-                        $scope.testGetData();
                     }, function errorCallback(response) {
                     });
                 };
 
                 $scope.getUserInfo();
-
-
-                $scope.isEmployee = true;
-                $scope.isManager = false;
 
                 $scope.getData = function () {
                     $http({
@@ -56,6 +49,11 @@
                         $scope.freeAssignedRequestCount = response.data.freeAssignedRequestCount;
                         $scope.progressAssignedRequestCount = response.data.progressAssignedRequestCount;
                         $scope.closedAssignedRequestCount = response.data.closedAssignedRequestCount;
+
+                        if ($scope.freeAssignedRequestCount==null && $scope.progressAssignedRequestCount==null
+                        && $scope.closedAssignedRequestCount==null){
+                            $scope.isEmployee = true;
+                        }
 
                     }, function errorCallback(response) {
                     });
