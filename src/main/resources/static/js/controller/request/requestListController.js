@@ -141,8 +141,8 @@
                         });
                 };
 
-                $scope.assignToSmb = function (requestId) {
-                    return PersonService.assign(requestId, $scope.selectedManager.id)
+                $scope.assignToSmb = function () {
+                    return PersonService.assign($scope.selectedRequest, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
                             $scope.pageChanged();
