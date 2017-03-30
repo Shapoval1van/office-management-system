@@ -14,7 +14,7 @@
                 });
 
                 $scope.historyPageNumber = 1;
-                $scope.commentPageNumber = 1;
+                $scope.commentPageNumber = 0;
                 $scope.commentPageSize = 10;
                 $scope.commentMaxPageSize = 0;
 
