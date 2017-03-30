@@ -509,7 +509,6 @@ public class RequestServiceImpl implements RequestService {
         if (oldRequest.isPresent() && person.isPresent() && oldRequest.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
