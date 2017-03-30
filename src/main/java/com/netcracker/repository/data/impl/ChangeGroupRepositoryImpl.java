@@ -13,10 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup, Long> implements ChangeGroupRepository{
@@ -42,7 +39,7 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         super(ChangeGroup.TABLE_NAME, ChangeGroup.ID_COLUMN);
     }
 
-    public Set<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable){
+    public List<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable){
         switch (period){
             case DAY:
                 return super.getJdbcTemplate().query(FIND_BY_REQUEST_ID.concat(PERIOD_DAY).concat(pageable(pageable)), new Object[]{id}, resultSetExtractor());
@@ -80,11 +77,11 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         };
     }
 
-    private ResultSetExtractor<Set<ChangeGroup>> resultSetExtractor(){
-        return new ResultSetExtractor<Set<ChangeGroup>>() {
+    private ResultSetExtractor<List<ChangeGroup>> resultSetExtractor(){
+        return new ResultSetExtractor<List<ChangeGroup>>() {
             @Override
-            public Set<ChangeGroup> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                Map<Long, ChangeGroup>  changeGroupMap = new HashMap();
+            public List<ChangeGroup> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                Map<Long, ChangeGroup>  changeGroupMap = new LinkedHashMap<>();
                 while (resultSet.next()){
                     Long changeGroupId = resultSet.getLong(ChangeGroup.ID_COLUMN);
                     ChangeGroup changeGroup = changeGroupMap.get(changeGroupId);
@@ -101,14 +98,15 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
                     ChangeItem changeItem = changeItemRepository.mapRow().mapRow(resultSet, 0);
                     changeGroup.getChangeItems().add(changeItem);
                 }
-                return new HashSet<>(changeGroupMap.values());
+                return new ArrayList<>(changeGroupMap.values());
             }
         };
     }
 
     private String pageable (Pageable pageable){
         StringBuilder stringBuilder = new StringBuilder();
-        return stringBuilder.append(" LIMIT ")
+        return stringBuilder.append(" ORDER BY CG.created DESC ")
+                .append(" LIMIT ")
                 .append(pageable.getPageSize())
                 .append(" OFFSET ")
                 .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
