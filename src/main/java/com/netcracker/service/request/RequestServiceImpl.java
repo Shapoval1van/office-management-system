@@ -5,6 +5,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.*;
@@ -417,14 +418,17 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    public List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
+    public Page<HistoryDTO> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
             List<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
                     Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
-            return changeGroups;
+            List<HistoryDTO> historyList = new ArrayList<>();
+            changeGroups.forEach(changeGroup -> historyList.add(new HistoryDTO(changeGroup)));
+            Long count = changeGroupRepository.countChangeByRequestId(requestId, Period.valueOf(period.toUpperCase()));
+            return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, historyList);
         } catch (IllegalArgumentException e) {
-            return new ArrayList<>();
+            return new Page<>();
         }
     }
 

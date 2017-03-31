@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,9 +42,7 @@ public class RequestController {
     public ResponseEntity<?> getRequestHistory(@Pattern(regexp = "(day|all|month)")
                                                @RequestParam(name = "period", defaultValue = "day") String period,
                                                @PathVariable(name = "requestId") Long id, Pageable pageable) {
-        List<HistoryDTO> historyList = new ArrayList<>();
-        requestService.getRequestHistory(id, period, pageable).forEach(changeGroup -> historyList.add(new HistoryDTO(changeGroup)));
-        return new ResponseEntity<>(historyList, HttpStatus.OK);
+        return new ResponseEntity<>(requestService.getRequestHistory(id, period, pageable), HttpStatus.OK);
     }
 
 
