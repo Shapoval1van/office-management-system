@@ -21,15 +21,16 @@ public final class PageableHandlerMethodArgumentResolver implements HandlerMetho
 
         int pageNumber = 0;
         int pageSize = 0;
-
+        String sort = "";
         try {
             pageNumber = Integer.parseInt(nativeWebRequest.getParameter("page"));
             pageSize = Integer.parseInt(nativeWebRequest.getParameter("size"));
+            sort = nativeWebRequest.getParameter("sort");
         } catch (Exception e){
-            pageNumber = SimplePageable.DEFAULT_PAGE_NUMBER;
-            pageSize = SimplePageable.DEFAULT_PAGE_SIZE;
+            pageNumber = pageNumber==0?SimplePageable.DEFAULT_PAGE_NUMBER:pageNumber;
+            pageSize = pageSize==0?SimplePageable.DEFAULT_PAGE_SIZE:pageSize;
         }
 
-        return new SimplePageable(pageSize, pageNumber);
+        return new SimplePageable(pageSize, pageNumber, sort);
     }
 }

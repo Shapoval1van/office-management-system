@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class contains implementation of generic CRUD operations.
@@ -117,6 +119,12 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
     @Override
     public List<T> queryForList(String sql, Pageable pageable, Object... args) {
         if (pageable!=null){
+            if(pageable.getSort()!=null) {
+                ArrayList<String> sotField = getValidSortFields(pageable.getSort());
+                if (sotField.size() != 0) {
+                    return this.jdbcTemplate.query(this.buildPageableQueryWithSort(sql, pageable, sotField), args, this.mapRow());
+                }
+            }
             return this.jdbcTemplate.query(this.buildPageableQuery(sql, pageable), args, this.mapRow());
         } else {
             return this.queryForList(sql, args);
@@ -206,6 +214,65 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
                 .append(pageable.getPageSize())
                 .append(" OFFSET ")
                 .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
+    }
+
+    protected String buildPageableQueryWithSort(String sql, Pageable pageable, ArrayList<String> sortFields){
+        Objects.requireNonNull(pageable);
+        StringBuilder query = new StringBuilder(sql);
+        if (!sql.toLowerCase().contains("order by")){
+            query.append(" ORDER BY ");
+                for(int i = 0; i < sortFields.size(); i++){
+                    query.append(getSortField(sortFields.get(i)))
+                            .append(" ").append(getSortOrder(sortFields.get(i)));
+                        if(i==sortFields.size()-1)query.append(" ");
+                        else query.append(", ");
+                }
+        }
+        return query.append(" LIMIT ")
+                .append(pageable.getPageSize())
+                .append(" OFFSET ")
+                .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
+    }
+
+
+    private boolean isSortFieldValid(String sort){
+        if(!isSortStringValid(sort)) return false;
+        String fieldName = getSortField(sort);
+        String  query = "SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ? AND column_name = ?";
+        Object[] args = new Object[]{this.TABLE_NAME.toLowerCase(), fieldName.toLowerCase()};
+        Integer count = this.jdbcTemplate.queryForObject(query, args, Integer.class );
+        return count == 1;
+    }
+
+    private boolean isSortStringValid(String sort){
+        Pattern p = Pattern.compile("([-])?\\w+_?\\w+");
+        Matcher m = p.matcher(sort);
+        return m.matches();
+    }
+
+    private String getSortField(String sort){
+        if(sort.contains("-")){
+           return sort.substring(1,sort.length());
+        }else {
+           return sort;
+        }
+    }
+
+    private String getSortOrder(String sort){
+        if(sort.contains("-")){
+            return  "DESC";
+        }else {
+            return "ASC";
+        }
+    }
+
+    private  ArrayList getValidSortFields(String sort){
+        String[] sortFields = sort.split(",");
+        ArrayList<String> result =  new ArrayList();
+        for (int i = 0;  i < sortFields.length; i++){
+            if(isSortFieldValid(sortFields[i])) result.add(sortFields[i]);
+        }
+        return result;
     }
 
     public abstract  Map<String, Object> mapColumns(T entity);

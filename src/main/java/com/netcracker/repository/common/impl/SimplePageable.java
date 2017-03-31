@@ -10,6 +10,7 @@ public class SimplePageable implements Pageable {
 
     private int pageSize;
     private int pageNumber;
+    private String sort;
 
     public SimplePageable() {
     }
@@ -17,6 +18,12 @@ public class SimplePageable implements Pageable {
     public SimplePageable(int pageSize, int pageNumber) {
         this.pageSize = pageSize;
         this.pageNumber = pageNumber - 1;
+    }
+
+    public SimplePageable(int pageSize, int pageNumber, String sort) {
+        this.pageSize = pageSize;
+        this.pageNumber = pageNumber-1;
+        this.sort = sort;
     }
 
     public void setPageSize(int pageSize) {
@@ -35,5 +42,13 @@ public class SimplePageable implements Pageable {
     @Override
     public int getPageNumber() {
         return this.pageNumber;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 }
