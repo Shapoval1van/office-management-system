@@ -17,14 +17,11 @@ import java.util.Optional;
 public interface PersonService {
     Optional<Person> getPersonById(Long id);
 
-
     Long getCountDeletedPersonByRole(Integer roleId);
-
-    //Long getCountPassivePersons(Integer priorityId);
 
     Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException;
 
-    Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException;
+    Optional<Person> updatePerson(Person person, Long personId, Principal principal) throws CannotUpdatePersonException;
 
     List<Person> getManagers(Pageable pageable, String namePattern);
 
@@ -45,7 +42,10 @@ public interface PersonService {
     Page<Person> getDeletedPersonList(Pageable pageable);
 
     Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException;
+
     Page<Person> getPersonListByRole(Integer roleId, Pageable pageable);
+
     Page<Person> getDeletedPersonListByRole(Integer roleId, Pageable pageable);
+
     Page<Person> getPersonList(Pageable pageable);
 }

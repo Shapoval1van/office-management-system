@@ -23,12 +23,8 @@
                         .then(function (callback) {
                             window.location = "javascript:history.back()"
                         }, function (error) {
-                            console.log(error);
-                            swal("Update Failure!", "User role cannot update from manager to employee or from administrator to " +
-                                "employee", "error");
-                            //swal("Update Failure!", error.data.message, "error");
+                            swal("Update Failure!", error.data.errors[0].detail, "error");
                         })
                 };
-
             }])
 })();

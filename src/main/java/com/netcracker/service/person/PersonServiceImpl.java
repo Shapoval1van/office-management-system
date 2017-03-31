@@ -5,7 +5,6 @@ import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.DeleteUserDTO;
-import com.netcracker.model.dto.MessageDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
@@ -26,6 +25,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.List;
@@ -123,7 +123,7 @@ public class PersonServiceImpl implements PersonService {
     /**
      * Update person
      * The person role cannot be updated from manager to employee
-     * and from admin to employee
+     * and from admin to employee, also admin cannot update himself
      *
      * @param person
      * @param personId
@@ -132,12 +132,17 @@ public class PersonServiceImpl implements PersonService {
      */
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
-    public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
+    public Optional<Person> updatePerson(Person person, Long personId, Principal principal) throws CannotUpdatePersonException {
         Locale locale = LocaleContextHolder.getLocale();
 
+        Person currentAdmin = personRepository.findPersonByEmail(principal.getName()).get();
         Optional<Person> oldUser = getPersonById(personId);
         if (!oldUser.isPresent()) return Optional.empty();
-        if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
+
+        if (currentAdmin.getId().equals(oldUser.get().getId())){
+            throw new CannotUpdatePersonException(messageSource.getMessage(
+                    USER_ERROR_UPDATE_CURRENT_ADMIN, null, locale));
+        } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
             throw new CannotUpdatePersonException(messageSource.getMessage(
                     USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));

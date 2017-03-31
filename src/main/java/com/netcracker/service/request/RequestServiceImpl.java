@@ -150,7 +150,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    //@PreAuthorize("isAuthenticated()")
     public Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException {
         Locale locale = LocaleContextHolder.getLocale();
         String email = principal.getName();
@@ -188,7 +188,7 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public Optional<Request> updateRequest(Request newRequest, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -212,9 +212,8 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal) {
-        String authorName = principal.getName();
         Optional<Request> futureNewRequest = requestRepository.findOne(requestId);
         if (!futureNewRequest.isPresent()) return Optional.empty();
         Optional<Priority> p = priorityRepository.findPriorityByName(priority);
@@ -362,7 +361,7 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException, CannotUpdateStatusException {
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -387,7 +386,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException, CannotUpdateStatusException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Request> requestDB = requestRepository.findOne(request.getId());
@@ -554,7 +553,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public Page<Request> getAvailableRequestListByPriority(Integer priorityId, Pageable pageable) {
         Optional<Priority> priority = priorityRepository.findOne(priorityId);
         List<Request> requestList = requestRepository.getFreeRequestsWithPriority(priorityId, pageable, priority.get());
@@ -566,7 +565,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public Page<Request> getAvailableRequestList(Pageable pageable) {
         List<Request> requestList = requestRepository.getFreeRequests(pageable);
 
@@ -577,7 +576,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ROLE_EMPLOYEE', 'ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public Page<Request> getAllRequestByEmployee(Principal principal, Pageable pageable) {
         String employeeEmail = principal.getName();
         Person employee = personRepository.findPersonByEmail(employeeEmail).get();

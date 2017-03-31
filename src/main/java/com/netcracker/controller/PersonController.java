@@ -63,13 +63,13 @@ public class PersonController {
     }
 
     @PutMapping(produces = JSON_MEDIA_TYPE, value = "/{personId}")
-    public ResponseEntity<Person> updatePerson(@PathVariable Long personId,
+    public ResponseEntity<Person> updatePerson(@PathVariable Long personId, Principal principal,
                                                @Validated(CreateValidatorGroup.class)
                                                @RequestBody PersonDTO personDTO) throws ResourceNotFoundException,
                                                 IllegalAccessException, CannotUpdatePersonException {
         Person currentUser = personDTO.toPerson();
         currentUser.setId(personId);
-        Optional<Person> person = personService.updatePerson(currentUser, personId);
+        Optional<Person> person = personService.updatePerson(currentUser, personId, principal);
         if (!person.isPresent())
             new ResponseEntity<>(currentUser, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
