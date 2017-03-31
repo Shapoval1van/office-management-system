@@ -206,15 +206,6 @@ public class RequestServiceImpl implements RequestService {
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
             eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
-            if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
-                List<Request> subRequestList = getAllSubRequest(newRequest.getId());
-                if (!subRequestList.isEmpty()){
-                    subRequestList.forEach(sub -> {
-                        sub.setStatus(new Status(StatusEnum.CLOSED.getId()));
-                        requestRepository.updateRequest(sub);
-                    });
-                }
-            }
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -518,7 +509,6 @@ public class RequestServiceImpl implements RequestService {
         if (oldRequest.isPresent() && person.isPresent() && oldRequest.get().getManager() == null){
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
 
 //            Automatically subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());

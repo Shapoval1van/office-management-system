@@ -85,8 +85,7 @@
                         return $scope.commentPageSize;
                     }
                     else {
-                        $scope.commentPageSize = $scope.commentMaxPageSize - $scope.comments.length;
-                        return $scope.commentPageSize;
+                        return $scope.commentMaxPageSize - $scope.comments.length;
                     }
                 };
 
@@ -365,7 +364,7 @@
                 };
 
                 $scope.showCancelButton = function () {
-                    return $scope.isAuthor() || $scope.isCurrentUserAdministrator();
+                    return $scope.isAuthor() && $scope.isFree() || $scope.isCurrentUserAdministrator();
                 };
 
                 $scope.showAddGroupBtn = function () {
