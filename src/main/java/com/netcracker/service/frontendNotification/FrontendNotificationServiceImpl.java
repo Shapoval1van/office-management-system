@@ -3,11 +3,15 @@ package com.netcracker.service.frontendNotification;
 
 import com.netcracker.exception.CannotDeleteNotificationException;
 import com.netcracker.model.dto.FrontendNotificationDTO;
-import com.netcracker.model.entity.*;
+import com.netcracker.model.entity.ChangeItem;
+import com.netcracker.model.entity.FrontendNotification;
+import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.repository.data.interfaces.FrontendNotificationRepository;
 import com.netcracker.repository.data.interfaces.PersonRepository;
-import com.netcracker.repository.data.interfaces.RequestGroupRepository;
-import com.netcracker.repository.data.interfaces.StatusRepository;
+import com.netcracker.service.frontendNotification.notificationCreator.NotificationSubjectCreator;
+import com.netcracker.service.frontendNotification.notificationCreator.NotificationSubjectCreatorFactory;
+import com.netcracker.service.frontendNotification.notificationCreator.subjectCreatorImpl.SimpleUpdateSubjectCreator;
 import com.netcracker.util.ChangeTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -24,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static com.netcracker.util.MessageConstant.*;
+import static com.netcracker.util.MessageConstant.DELETE_NOTIFICATION_EXCEPTION;
 
 
 @Service
@@ -43,13 +47,10 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
     private PersonRepository personRepository;
 
     @Autowired
-    private StatusRepository statusRepository;
-
-    @Autowired
     private MessageSource messageSource;
 
     @Autowired
-    private RequestGroupRepository requestGroupRepository;
+    private NotificationSubjectCreatorFactory notificationSubjectFactory;
 
     @Autowired
     private ChangeTracker changeTracker;
@@ -88,72 +89,29 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
     @Transactional
     @PreAuthorize("isAuthenticated()")
     public void sendNotificationToAllSubscribed(Request oldRequest, Request newRequest) {
-        int STATUS_FIELD_ID = 3;
-        int MANAGER_FIELD_ID = 4;
-        int GROUP_FIELD_ID = 7;
-        int STATUS_CLOSED_ID = 3;
-        int STATUS_FREE_ID = 1;
+
+
 
         List<Person> people = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
         ArrayList<ChangeItem> changeItemSet = new ArrayList<>(changeTracker.findMismatching(oldRequest, newRequest));
         if (people.size() == 0) return;
         if (changeItemSet.size() == 0) return;
 
-        String requestName = capitalizeFirstLetter(newRequest.getName());
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         List<FrontendNotification> notifications = new ArrayList<>();
         people.forEach(person -> {
             final boolean[] isSimpleUpdateNotificationAlreadyExist = {false};
-            changeItemSet.forEach(
-                    changeItem -> {
-                        String subject;
-                        if (changeItem.getField().getId() == STATUS_FIELD_ID) {
-                            //create subject depended on change
-                            Status status = statusRepository.findOne(newRequest.getStatus().getId()).get();
-                            String statusName = status.getName().toLowerCase().replace("_", " ").toUpperCase();
-                            if (status.getId() == STATUS_FREE_ID) {
-                                subject = messageSource.getMessage(CHANGE_STATUS_TO_FREE,
-                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
-                            } else if (status.getId() == STATUS_CLOSED_ID) {
-                                subject = messageSource.getMessage(CHANGE_STATUS_TO_CLOSED,
-                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
-                            } else {
-                                subject = messageSource.getMessage(CHANGE_STATUS_SUBJECT,
-                                        new Object[]{requestName.toUpperCase(), statusName}, locale);
-                            }
-                            notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
-
-                        } else if (changeItem.getField().getId() == MANAGER_FIELD_ID) {
-                            if (newRequest.getManager() == null || newRequest.getManager().getId()==null) {
-                                // manager was unassigned
-                                subject = messageSource.getMessage(CHANGE_MANGER_UNASSIGNED, new Object[]{requestName.toUpperCase()}, locale);
-                            }else {
-                                Person manager = personRepository.findOne(newRequest.getManager().getId()).get();
-                                subject = messageSource.getMessage(CHANGE_MANGER_SUBJECT, new Object[]{requestName.toUpperCase(),
-                                        manager.getLastName()}, locale);
-                            }
-
-                            notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
-
-                        } else if (changeItem.getField().getId() == GROUP_FIELD_ID) {
-                            if(newRequest.getRequestGroup()==null || newRequest.getRequestGroup().getId()==null){
-                                //group was removed
-                                subject = messageSource.getMessage(CHANGE_GROUP_DELETED, new Object[]{requestName.toUpperCase()}, locale);
-                            }else {
-                                RequestGroup group = requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get();
-                                subject = messageSource.getMessage(CHANGE_GROUP, new Object[]{requestName.toUpperCase(), group.getName()}, locale);
-                            }
-
-                            notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
-                        } else {
-                            if (!isSimpleUpdateNotificationAlreadyExist[0]) {
-                                subject = messageSource.getMessage(CHANGE_REQUEST, new Object[]{requestName.toUpperCase()}, locale);
-                                notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
-                                isSimpleUpdateNotificationAlreadyExist[0] = true;
-                            }
-                        }
-                    }
+            changeItemSet.forEach(changeItem -> {
+                NotificationSubjectCreator subjectCreator = notificationSubjectFactory.getNotificationSubjectCreator(changeItem.getField().getId());
+                if(!(subjectCreator instanceof SimpleUpdateSubjectCreator)){
+                    String subject = subjectCreator.createNotificationSubject(newRequest, locale);
+                    notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
+                }else if(!isSimpleUpdateNotificationAlreadyExist[0]){
+                    String subject = subjectCreator.createNotificationSubject(newRequest, locale);
+                    notifications.add(new FrontendNotification(person, subject, timestamp, new Request(newRequest.getId())));
+                    isSimpleUpdateNotificationAlreadyExist[0] = true;
+                }}
             );
         });
 
@@ -163,9 +121,5 @@ public class FrontendNotificationServiceImpl implements FrontendNotificationServ
         //send notification
         savedNotification.forEach(n -> simpMessagingTemplate.convertAndSendToUser(n.getPerson().getEmail(),
                 NOTIFICATION_DESTINATION, new FrontendNotificationDTO(n)));
-    }
-
-    private String capitalizeFirstLetter(String requestName){
-        return  Character.toUpperCase(requestName.charAt(0)) + requestName.substring(1);
     }
 }
