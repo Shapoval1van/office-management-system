@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @Sql(scripts = "classpath:/sql/test/repository-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest
