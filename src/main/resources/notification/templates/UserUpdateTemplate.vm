@@ -116,8 +116,8 @@
                     <td class="content">
                         <h2>Hello $name,</h2>
                         <p>
-                            your user information was updated.<br>
-                            Check more on the site.
+                            your user information was updated, <br>
+                            please relogin in system to see details.<br>
                         </p>
                         <table>
                             <tr>
