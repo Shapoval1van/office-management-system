@@ -37,7 +37,7 @@
                             <div width="100%"  fusioncharts type="pie2d" dataSource="{{pieChart}}"> </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row"  ng-if="requestList.length!=0">
                         <table st-table="displayedList" st-safe-src="requestList"
                                class="table table-stripped">
                             <thead>

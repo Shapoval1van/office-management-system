@@ -120,7 +120,7 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
     public List<T> queryForList(String sql, Pageable pageable, Object... args) {
         if (pageable!=null){
             if(pageable.getSort()!=null) {
-                ArrayList<String> sotField = getValidSortFields(pageable.getSort());
+                ArrayList<String> sotField = getValidSortStrings(pageable.getSort());
                 if (sotField.size() != 0) {
                     return this.jdbcTemplate.query(this.buildPageableQueryWithSort(sql, pageable, sotField), args, this.mapRow());
                 }
@@ -216,17 +216,17 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
                 .append(pageable.getPageSize()*pageable.getPageNumber()).toString();
     }
 
-    protected String buildPageableQueryWithSort(String sql, Pageable pageable, ArrayList<String> sortFields){
+    private String buildPageableQueryWithSort(String sql, Pageable pageable, ArrayList<String> sortFields){
         Objects.requireNonNull(pageable);
         StringBuilder query = new StringBuilder(sql);
         if (!sql.toLowerCase().contains("order by")){
             query.append(" ORDER BY ");
-                for(int i = 0; i < sortFields.size(); i++){
-                    query.append(getSortField(sortFields.get(i)))
-                            .append(" ").append(getSortOrder(sortFields.get(i)));
-                        if(i==sortFields.size()-1)query.append(" ");
-                        else query.append(", ");
-                }
+            sortFields.forEach(field->
+                query.append(getSortField(field))
+                        .append(" ")
+                        .append(getSortOrder(field))
+                        .append(", "));
+            query.deleteCharAt(query.lastIndexOf(","));
         }
         return query.append(" LIMIT ")
                 .append(pageable.getPageSize())
@@ -236,15 +236,15 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
 
 
     private boolean isSortFieldValid(String sort){
-        if(!isSortStringValid(sort)) return false;
+        String  query = "SELECT count(*) FROM  INFORMATION_SCHEMA.COLUMNS WHERE table_name = ? AND column_name = ?";
+        if(!isSortSubStringValid(sort)) return false;
         String fieldName = getSortField(sort);
-        String  query = "SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ? AND column_name = ?";
         Object[] args = new Object[]{this.TABLE_NAME.toLowerCase(), fieldName.toLowerCase()};
         Integer count = this.jdbcTemplate.queryForObject(query, args, Integer.class );
         return count == 1;
     }
 
-    private boolean isSortStringValid(String sort){
+    private boolean isSortSubStringValid(String sort){
         Pattern p = Pattern.compile("([-])?\\w+_?\\w+");
         Matcher m = p.matcher(sort);
         return m.matches();
@@ -266,11 +266,11 @@ public abstract class GenericJdbcRepository<T extends Persistable<ID>, ID extend
         }
     }
 
-    private  ArrayList getValidSortFields(String sort){
+    private  ArrayList<String> getValidSortStrings(String sort){
         String[] sortFields = sort.split(",");
-        ArrayList<String> result =  new ArrayList();
-        for (int i = 0;  i < sortFields.length; i++){
-            if(isSortFieldValid(sortFields[i])) result.add(sortFields[i]);
+        ArrayList<String> result =  new ArrayList<>();
+        for (String sortField : sortFields) {
+            if (isSortFieldValid(sortField)) result.add(sortField);
         }
         return result;
     }
