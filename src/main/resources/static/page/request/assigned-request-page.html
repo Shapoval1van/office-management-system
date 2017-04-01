@@ -13,12 +13,12 @@
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
-                            <th st-sort="name">Name</th>
+                            <th ng-click="orderRequestsByName()">Name</th>
                             <th>Employee</th>
-                            <th st-sort="estimate">Estimate</th>
-                            <th st-sort="priority.name">Priority</th>
-                            <th st-sort="creationTime">Created</th>
-                            <th>Status</th>
+                            <th ng-click="sortRequestsByEstimate()">Estimate</th>
+                            <th ng-click="sortRequestsByPriority()">Priority</th>
+                            <th ng-click="sortRequestsByCreatingTime()">Created</th>
+                            <th ng-click="sortRequestsByStatus()">Status</th>
                             <th></th>
                             </thead>
                             <tbody>

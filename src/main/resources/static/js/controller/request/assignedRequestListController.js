@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("AssignedRequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService",
-            function ($scope, $location, $rootScope, PersonService, RequestService) {
+        .controller("AssignedRequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService", "FieldFactory",
+            function ($scope, $location, $rootScope, PersonService, RequestService, FieldFactory) {
 
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -14,11 +14,12 @@
                 $scope.requestListVisibility = true;
 
                 $scope.request = {};
+                $scope.order = FieldFactory.request.CREATE_TIME;
 
                 $rootScope.sideBarActiveElem = "my-requests";
 
                 $scope.pageChanged = function () {
-                    RequestService.getAssignedRequestList($scope.currentPage, $scope.pageSize)
+                    RequestService.getAssignedRequestList($scope.currentPage, $scope.pageSize, $scope.order)
                         .then(function (response) {
                             $scope.requests = [];
                             $scope.requests = response.data.data;
@@ -28,6 +29,31 @@
                             }
                         }, function errorCallback(response) {
                         });
+                };
+
+                $scope.orderRequests = function (order) {
+                    $scope.order = ($scope.order === order) ? FieldFactory.desc($scope.order) : order;
+                    return $scope.pageChanged();
+                };
+
+                $scope.orderRequestsByName = function () {
+                    return $scope.orderRequests(FieldFactory.request.NAME);
+                };
+
+                $scope.sortRequestsByEstimate = function () {
+                    return $scope.orderRequests(FieldFactory.request.ESTIMATE);
+                };
+
+                $scope.sortRequestsByPriority = function () {
+                    return $scope.orderRequests(FieldFactory.request.PRIORITY);
+                };
+
+                $scope.sortRequestsByCreatingTime = function () {
+                    return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
+                };
+
+                $scope.sortRequestsByStatus = function () {
+                    return $scope.orderRequests(FieldFactory.request.STATUS);
                 };
 
                 $scope.getTotalPage = function () {
