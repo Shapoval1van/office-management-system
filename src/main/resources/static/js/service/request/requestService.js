@@ -105,7 +105,7 @@
                 };
 
                 requestService.updateRequestStatus = function (requestId, statusId, request) {
-                    return $http.put("/api/request/" + requestId + "/update/" + statusId, request)
+                    return $http.put("/api/request/" + requestId + "/status/" + statusId, request)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

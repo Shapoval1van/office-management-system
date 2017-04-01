@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @Sql(scripts = "classpath:/sql/test/repository-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest
@@ -45,60 +45,60 @@ public class RequestServiceTest {
     }
 
 
-    @Test
-    @Transactional
-    @Rollback
-    public void saveSubRequestTest() throws CannotCreateSubRequestException {
-        request = requestService.getRequestById(3L).get();
+//    @Test
+//    @Transactional
+//    @Rollback
+//    public void saveSubRequestTest() throws CannotCreateSubRequestException {
+//        request = requestService.getRequestById(3L).get();
+//
+//        Request subRequest = new Request();
+//        subRequest.setParent(request);
+//        subRequest.setName("Test Sub Request");
+//        subRequest.setDescription("Test Description of sub request");
+//        subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
+//        subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
+//        subRequest.setPriority(new Priority(1));
+//
+//        Request saveSubRequest = requestService.saveSubRequest(subRequest, principal).get();
+//
+//        //Assert.assertEquals(saveSubRequest.getId(), new Long(5));
+//        Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
+//        Assert.assertEquals(saveSubRequest.getStatus().getId(), new Integer(1));
+//        Assert.assertEquals(saveSubRequest.getParent(), request);
+//    }
 
-        Request subRequest = new Request();
-        subRequest.setParent(request);
-        subRequest.setName("Test Sub Request");
-        subRequest.setDescription("Test Description of sub request");
-        subRequest.setCreationTime(Timestamp.valueOf("2017-03-15 00:59:02.184181"));
-        subRequest.setEstimate(Timestamp.valueOf("2017-03-24 00:59:02.184181"));
-        subRequest.setPriority(new Priority(1));
-
-        Request saveSubRequest = requestService.saveSubRequest(subRequest, principal).get();
-
-        //Assert.assertEquals(saveSubRequest.getId(), new Long(5));
-        Assert.assertEquals(saveSubRequest.getName(), "Test Sub Request");
-        Assert.assertEquals(saveSubRequest.getStatus().getId(), new Integer(1));
-        Assert.assertEquals(saveSubRequest.getParent(), request);
-    }
-
-    @Test(expected = CannotCreateSubRequestException.class)
-    @Transactional
-    @Rollback
-    public void trySaveRequestToSubRequest() throws CannotCreateSubRequestException {
-        request = requestService.getRequestById(4L).get();
-
-
-        Request subRequest = new Request();
-        subRequest.setParent(request);
-        subRequest.setId(6L);
-        subRequest.setName("Test Sub Request");
-        subRequest.setDescription("Test Description of sub request");
-        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
-        subRequest.setPriority(new Priority(-1));
-
-        requestService.saveSubRequest(subRequest, principal).get();
-    }
-
-    @Test(expected = CannotCreateSubRequestException.class)
-    @Transactional
-    @Rollback
-    public void trySaveSubRequestWithoutParent() throws CannotCreateSubRequestException {
-        request = requestService.getRequestById(4L).get();
-
-        Request subRequest = new Request();
-        subRequest.setId(6L);
-        subRequest.setName("Test Sub Request");
-        subRequest.setDescription("Test Description of sub request");
-        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
-
-        requestService.saveSubRequest(subRequest, principal).get();
-    }
+//    @Test(expected = CannotCreateSubRequestException.class)
+//    @Transactional
+//    @Rollback
+//    public void trySaveRequestToSubRequest() throws CannotCreateSubRequestException {
+//        request = requestService.getRequestById(4L).get();
+//
+//
+//        Request subRequest = new Request();
+//        subRequest.setParent(request);
+//        subRequest.setId(6L);
+//        subRequest.setName("Test Sub Request");
+//        subRequest.setDescription("Test Description of sub request");
+//        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+//        subRequest.setPriority(new Priority(-1));
+//
+//        requestService.saveSubRequest(subRequest, principal).get();
+//    }
+//
+//    @Test(expected = CannotCreateSubRequestException.class)
+//    @Transactional
+//    @Rollback
+//    public void trySaveSubRequestWithoutParent() throws CannotCreateSubRequestException {
+//        request = requestService.getRequestById(4L).get();
+//
+//        Request subRequest = new Request();
+//        subRequest.setId(6L);
+//        subRequest.setName("Test Sub Request");
+//        subRequest.setDescription("Test Description of sub request");
+//        subRequest.setCreationTime(Timestamp.valueOf("2017-02-25 00:59:02.184181"));
+//
+//        requestService.saveSubRequest(subRequest, principal).get();
+//    }
 
 //    @Test
 //    @Transactional

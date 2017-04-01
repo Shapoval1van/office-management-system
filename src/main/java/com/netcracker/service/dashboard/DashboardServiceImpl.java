@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,134 +32,103 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public Dashboard getData(Principal principal) {
         Person person = personRepository.findPersonByEmail(principal.getName()).get();
-
         List<Request> requestList = requestRepository.getAllRequestByUser(person.getId());
-        int freeRequestCount = 0;
-        int progressRequestCount = 0;
-        int closedRequestCount = 0;
-        int canceledRequestCount = 0;
+        List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
+        List<Integer> employeeData = getEmployeeData(requestList);
 
-        for (Request r: requestList){
-            if (r.getStatus().getId().equals(StatusEnum.FREE.getId()))
-                freeRequestCount++;
-            else if (r.getStatus().getId().equals(StatusEnum.IN_PROGRESS.getId()))
-                progressRequestCount++;
-            else if (r.getStatus().getId().equals(StatusEnum.CLOSED.getId()))
-                closedRequestCount++;
-            else canceledRequestCount++;
-        }
-        if (person.getRole().getId().equals(RoleEnum.EMPLOYEE.getId()))
-            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount, canceledRequestCount);
-        else if (person.getRole().getId().equals(RoleEnum.PROJECT_MANAGER.getId())){ // manager data
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
-            int freeAssignedCount = 0;
-            int progressAssignedCount = 0;
-            int closedAssignedCount = 0;
+        if (RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
+            return new Dashboard(employeeData.get(0), employeeData.get(1), employeeData.get(2),
+                    employeeData.get(3), employeeData.get(4));
 
-            for (Request assigned: assignedRequest){
-                if (assigned.getStatus().getId().equals(StatusEnum.FREE.getId()))
-                    freeAssignedCount++;
-                else if (assigned.getStatus().getId().equals(StatusEnum.IN_PROGRESS.getId()))
-                    progressAssignedCount++;
-                else if (assigned.getStatus().getId().equals(StatusEnum.CLOSED.getId()))
-                    closedAssignedCount++;
-            }
+        else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId())){
+            List<Integer> managerData = getManagerData(assignedRequest);
 
-            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount,
-                    canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount);
-        } else { // administrator data
-
-            List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
-            int freeAssignedCount = 0;
-            int progressAssignedCount = 0;
-            int closedAssignedCount = 0;
-
-            for (Request assigned: assignedRequest){
-                if (assigned.getStatus().getId().equals(StatusEnum.FREE.getId()))
-                    freeAssignedCount++;
-                else if (assigned.getStatus().getId().equals(StatusEnum.IN_PROGRESS.getId()))
-                    progressAssignedCount++;
-                else if (assigned.getStatus().getId().equals(StatusEnum.CLOSED.getId()))
-                    closedAssignedCount++;
-            }
-
+            return new Dashboard(employeeData.get(0), employeeData.get(1), employeeData.get(2), employeeData.get(3),
+                    employeeData.get(4), managerData.get(0), managerData.get(1), managerData.get(2));
+        } else {
             List<Person> personList = personRepository.getPersonList();
             List<Request> freeRequestList = requestRepository.getFreeRequests();
             List<Request> allRequestList = requestRepository.getAllRequests();
+            List<Integer> managerData = getManagerData(assignedRequest);
+            List<Integer> adminData = getAdminData(personList, freeRequestList, allRequestList);
 
-            int allFreeRequestCount = 0;
-            int allProgressRequestCount = 0;
-            int allClosedRequestCount = 0;
-            int allCanceledRequestCount = 0;
-
-            for (Request all: allRequestList){
-                if (all.getStatus().getId().equals(StatusEnum.FREE.getId()))
-                    allFreeRequestCount++;
-                else if (all.getStatus().getId().equals(StatusEnum.IN_PROGRESS.getId()))
-                    allProgressRequestCount++;
-                else if (all.getStatus().getId().equals(StatusEnum.CLOSED.getId()))
-                    allClosedRequestCount++;
-                else allCanceledRequestCount++;
-            }
-
-            int administratorCount = 0;
-            int managerCount = 0;
-            int employeeCount = 0;
-
-            for (Person p: personList){
-                if (p.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId()))
-                    administratorCount++;
-                else if (p.getRole().getId().equals(RoleEnum.PROJECT_MANAGER.getId()))
-                    managerCount++;
-                else employeeCount++;
-            }
-
-            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount,
-                    canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount,
-                    freeRequestList.size(), allRequestList.size(), allFreeRequestCount, allProgressRequestCount,
-                    allClosedRequestCount, allCanceledRequestCount, personList.size(), administratorCount, managerCount,
-                    employeeCount);
+            return new Dashboard(employeeData.get(0), employeeData.get(1), employeeData.get(2), employeeData.get(3),
+                    employeeData.get(4), managerData.get(0), managerData.get(1), managerData.get(2),
+                    adminData.get(0), adminData.get(1), adminData.get(2), adminData.get(3), adminData.get(4),
+                    adminData.get(5), adminData.get(6), adminData.get(7), adminData.get(8), adminData.get(9));
         }
     }
 
     @Override
     public Dashboard getDataByUser(Long userId) {
         Person person = personRepository.findOne(userId).get();
-
         List<Request> requestList = requestRepository.getAllRequestByUser(person.getId());
-        int freeRequestCount = 0;
-        int progressRequestCount = 0;
-        int closedRequestCount = 0;
-        int canceledRequestCount = 0;
+        List<Integer> employeeData = getEmployeeData(requestList);
 
-        for (Request r: requestList){
-            if (StatusEnum.FREE.getId().equals(r.getStatus().getId()))
-                freeRequestCount++;
-            else if (StatusEnum.IN_PROGRESS.getId().equals(r.getStatus().getId()))
-                progressRequestCount++;
-            else if (StatusEnum.CLOSED.getId().equals(r.getStatus().getId()))
-                closedRequestCount++;
-            else canceledRequestCount++;
-        }
         if (RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
-            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount, canceledRequestCount);
-        else {
+            return new Dashboard(employeeData.get(0), employeeData.get(1), employeeData.get(2),
+                    employeeData.get(3), employeeData.get(4));
+        else{
             List<Request> assignedRequest = requestRepository.getAllAssignedRequestByManager(person.getId());
-            int freeAssignedCount = 0;
-            int progressAssignedCount = 0;
-            int closedAssignedCount = 0;
+            List<Integer> managerData = getManagerData(assignedRequest);
 
-            for (Request assigned : assignedRequest) {
-                if (StatusEnum.FREE.getId().equals(assigned.getStatus().getId()))
-                    freeAssignedCount++;
-                else if (StatusEnum.IN_PROGRESS.getId().equals(assigned.getStatus().getId()))
-                    progressAssignedCount++;
-                else if (StatusEnum.CLOSED.getId().equals(assigned.getStatus().getId()))
-                    closedAssignedCount++;
-            }
-
-            return new Dashboard(requestList.size(), freeRequestCount, progressRequestCount, closedRequestCount,
-                    canceledRequestCount, freeAssignedCount, progressAssignedCount, closedAssignedCount);
+            return new Dashboard(employeeData.get(0), employeeData.get(1), employeeData.get(2), employeeData.get(3),
+                    employeeData.get(4), managerData.get(0), managerData.get(1), managerData.get(2));
         }
+    }
+
+    private List<Integer> getEmployeeData(List<Request> requestList){
+        ArrayList<Integer> employeeData = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
+
+        employeeData.set(0, requestList.size());
+        for (Request request: requestList){
+            if (StatusEnum.FREE.getId().equals(request.getStatus().getId()))
+                employeeData.set(1, employeeData.get(1)+1);
+            else if (StatusEnum.IN_PROGRESS.getId().equals(request.getStatus().getId()))
+                employeeData.set(2, employeeData.get(2)+1);
+            else if (StatusEnum.CLOSED.getId().equals(request.getStatus().getId()))
+                employeeData.set(3, employeeData.get(3)+1);
+            else  employeeData.set(4, employeeData.get(4)+1);
+        }
+        return employeeData;
+    }
+
+    private List<Integer> getManagerData(List<Request> assignedRequest){
+        ArrayList<Integer> managerData = new ArrayList<>(Arrays.asList(0, 0, 0));
+
+        for (Request assigned : assignedRequest) {
+            if (StatusEnum.FREE.getId().equals(assigned.getStatus().getId()))
+                managerData.set(0, managerData.get(0)+1);
+            else if (StatusEnum.IN_PROGRESS.getId().equals(assigned.getStatus().getId()))
+                managerData.set(1, managerData.get(1)+1);
+            else if (StatusEnum.CLOSED.getId().equals(assigned.getStatus().getId()))
+                managerData.set(2, managerData.get(2)+1);
+        }
+        return managerData;
+    }
+
+    private List<Integer> getAdminData(List<Person> personList, List<Request> freeRequestList, List<Request> allRequestList){
+        ArrayList<Integer> adminData = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+        adminData.set(0, freeRequestList.size());
+        adminData.set(1, allRequestList.size());
+        for (Request all : allRequestList) {
+            if (StatusEnum.FREE.getId().equals(all.getStatus().getId()))
+                adminData.set(2, adminData.get(2)+1);
+            else if (StatusEnum.IN_PROGRESS.getId().equals(all.getStatus().getId()))
+                adminData.set(3, adminData.get(3)+1);
+            else if (StatusEnum.CLOSED.getId().equals(all.getStatus().getId()))
+                adminData.set(4, adminData.get(4)+1);
+            else adminData.set(5, adminData.get(5)+1);
+        }
+        adminData.set(6, personList.size());
+        for (Person person: personList){
+            if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId()))
+                adminData.set(7, adminData.get(7)+1);
+            else if (RoleEnum.PROJECT_MANAGER.getId().equals(person.getRole().getId()))
+                adminData.set(8, adminData.get(8)+1);
+            else adminData.set(9, adminData.get(9)+1);
+        }
+        return adminData;
     }
 }

@@ -5,10 +5,10 @@ import com.netcracker.exception.CannotUpdatePersonException;
 import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.DeleteUserDTO;
-import com.netcracker.model.dto.MessageDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.dto.PersonDTO;
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Role;
 import com.netcracker.model.event.DeleteUserEvent;
 import com.netcracker.model.event.NotificationPersonUpdateEvent;
@@ -18,8 +18,6 @@ import com.netcracker.repository.data.interfaces.PersonRepository;
 import com.netcracker.repository.data.interfaces.RequestRepository;
 import com.netcracker.repository.data.interfaces.RoleRepository;
 import com.netcracker.util.enums.role.RoleEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -39,8 +37,6 @@ import static com.netcracker.util.MessageConstant.*;
 public class PersonServiceImpl implements PersonService {
 
     private ApplicationEventPublisher eventPublisher;
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(PersonServiceImpl.class);
 
     private final MessageSource messageSource;
 
@@ -63,24 +59,22 @@ public class PersonServiceImpl implements PersonService {
         this.eventPublisher = eventPublisher;
     }
 
-    public Optional<Person> getPersonById(Long id) {
-        Optional<Person> person = this.personRepository.findOne(id);
+    public Optional<Person> getPersonById(Long id) throws CurrentUserNotPresentException {
+        Optional<Person> person = checkPersonPresent(this.personRepository.findOne(id));
         person.ifPresent(this::fillPerson);
         return person;
     }
 
-
+    //TODO wtf?
     @Override
     public Long getCountDeletedPersonByRole(Integer roleId) {
         return 1l;//personRepository.getCountDeletedPersonByRole(roleId);
     }
 
     @Override
-    public Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException {
+    public Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException, CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
-        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
-                new CannotDeleteUserException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
-
+        Person person = checkPersonPresent(personRepository.findPersonByEmail(email)).get();
         if (RoleEnum.ADMINISTRATOR.getId().equals(person.getRole().getId())) {
             if (requestRepository.countAllRequestByManager(person.getId()) != 0L) {
                 //throw new CannotDeleteUserException(messageSource.getMessage(MANAGER_HAS_REQUESTS_ERROR, null, locale));
@@ -123,7 +117,7 @@ public class PersonServiceImpl implements PersonService {
     /**
      * Update person
      * The person role cannot be updated from manager to employee
-     * and from admin to employee
+     * and from admin to employee, also admin cannot update himself
      *
      * @param person
      * @param personId
@@ -132,12 +126,17 @@ public class PersonServiceImpl implements PersonService {
      */
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
-    public Optional<Person> updatePerson(Person person, Long personId) throws CannotUpdatePersonException {
+    public Optional<Person> updatePerson(Person person, Long personId, Principal principal) throws CannotUpdatePersonException, CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
 
+        Person currentAdmin = checkPersonPresent(personRepository.findPersonByEmail(principal.getName())).get();
         Optional<Person> oldUser = getPersonById(personId);
         if (!oldUser.isPresent()) return Optional.empty();
-        if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
+
+        if (currentAdmin.getId().equals(oldUser.get().getId())){
+            throw new CannotUpdatePersonException(messageSource.getMessage(
+                    USER_ERROR_UPDATE_CURRENT_ADMIN, null, locale));
+        } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
             throw new CannotUpdatePersonException(messageSource.getMessage(
                     USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));
@@ -185,9 +184,7 @@ public class PersonServiceImpl implements PersonService {
     public List<Person> getAvailablePersonList(Integer roleId, Pageable pageable) {
         Optional<Role> role = roleRepository.findOne(roleId);
         List<Person> personList = personRepository.getPersons(roleId, pageable, role);
-
         personList.forEach(this::fillPerson);
-
         return personList;
     }
 
@@ -197,9 +194,7 @@ public class PersonServiceImpl implements PersonService {
         Optional<Role> role = roleRepository.findOne(roleId);
         List<Person> personList = personRepository.getPersonListByRole(roleId, pageable, role);
         Long count = personRepository.getCountActivePersonByRole(roleId);
-
         personList.forEach(this::fillPerson);
-
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
@@ -208,9 +203,7 @@ public class PersonServiceImpl implements PersonService {
         Optional<Role> role = roleRepository.findOne(roleId);
         List<Person> personList = personRepository.getDeletedPersonListByRole(roleId, pageable, role);
         Long count = personRepository.getCountDeletedPersonByRole(roleId);
-
         personList.forEach(this::fillPerson);
-
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
@@ -219,27 +212,23 @@ public class PersonServiceImpl implements PersonService {
     public Page<Person> getPersonList(Pageable pageable) {
         List<Person> personList = personRepository.getPersonList(pageable);
         Long count = personRepository.getCountActivePerson();
-
         personList.forEach(this::fillPerson);
-
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public Page<Person> getDeletedPersonList(Pageable pageable) {
         List<Person> personList = personRepository.getDeletedPersonList(pageable);
         Long count = personRepository.getCountDeletedPerson();
-
         personList.forEach(this::fillPerson);
-
         return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, personList);
     }
 
     @Override
-    public Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException {
-        Locale locale = LocaleContextHolder.getLocale();
-        Person person = personRepository.findPersonByEmail(email).orElseThrow(() ->
-                new CannotUpdatePersonException(messageSource.getMessage(USER_WITH_EMAIL_NOT_PRESENT, null, locale)));
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
+    public Optional<Person> recoverDeletedPerson(String email) throws CurrentUserNotPresentException {
+        Person person = checkPersonPresent(personRepository.findPersonByEmail(email)).get();
         person.setEnabled(true);
         person.setDeleted(false);
         publishOnRecoverUserEvent(person);
@@ -247,6 +236,7 @@ public class PersonServiceImpl implements PersonService {
         return Optional.of(person);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     private Person disablePerson(Person person) {
         person.setEnabled(false);
         person.setDeleted(true);
@@ -256,44 +246,21 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public int subscribe(Long requestId, Principal principal) throws ResourceNotFoundException {
-        Locale locale = LocaleContextHolder.getLocale();
-
         Person currentUser = getCurrentUser(principal);
-
-        if (!requestRepository.findOne(requestId).isPresent()) {
-            LOGGER.error(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-            throw new ResourceNotFoundException(
-                    messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-        }
-
+        checkRequestPresent(requestRepository.findOne(requestId));
         return personRepository.subscribe(requestId, currentUser.getId());
     }
 
     @Override
     public int unsubscribe(Long requestId, Principal principal) throws ResourceNotFoundException {
-        Locale locale = LocaleContextHolder.getLocale();
-
         Person currentUser = getCurrentUser(principal);
-
-        if (!requestRepository.findOne(requestId).isPresent()) {
-            LOGGER.error(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-            throw new ResourceNotFoundException(
-                    messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-        }
-
+        checkRequestPresent(requestRepository.findOne(requestId));
         return personRepository.unsubscribe(requestId, currentUser.getId());
     }
 
     @Override
     public List<PersonDTO> getPersonsBySubscribingRequest(Long requestId) throws ResourceNotFoundException {
-        Locale locale = LocaleContextHolder.getLocale();
-
-        if (!requestRepository.findOne(requestId).isPresent()) {
-            LOGGER.error(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-            throw new ResourceNotFoundException(
-                    messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, new Object[]{requestId}, locale));
-        }
-
+        checkRequestPresent(requestRepository.findOne(requestId));
         return personRepository.findPersonsBySubscribingRequest(requestId)
                 .stream()
                 .map(PersonDTO::new)
@@ -302,25 +269,28 @@ public class PersonServiceImpl implements PersonService {
 
     public void fillPerson(Person person) {
         Role role = roleRepository.findRoleById(person.getRole().getId()).orElseGet(null);
-
         person.setRole(role);
     }
 
     public Person getCurrentUser(Principal principal) throws CurrentUserNotPresentException {
+        Optional<Person> personOptional = checkPersonPresent(findPersonByEmail(principal.getName()));
+        return personOptional.get();
+    }
+
+    private Optional<Person> checkPersonPresent(Optional<Person> person) throws CurrentUserNotPresentException{
         Locale locale = LocaleContextHolder.getLocale();
-
-        if (principal == null) {
-            LOGGER.error(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
+        if (!person.isPresent())
             throw new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
-        }
+        else
+            return person;
+    }
 
-        Optional<Person> personOptional = findPersonByEmail(principal.getName());
-
-        if (!personOptional.isPresent()) {
-            LOGGER.error(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
-            throw new CurrentUserNotPresentException(messageSource.getMessage(USER_ERROR_NOT_PRESENT, null, locale));
-        } else
-            return personOptional.get();
+    private Optional<Request> checkRequestPresent(Optional<Request> request) throws ResourceNotFoundException{
+        Locale locale = LocaleContextHolder.getLocale();
+        if (!request.isPresent())
+            throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, null, locale));
+        else
+            return request;
     }
 
 }

@@ -108,7 +108,7 @@ public class GlobalExceptionHandlerController {
         return new ErrorsDTO(Collections.singletonList(errorDTO));
     }
 
-    @ExceptionHandler({RequestGroupAlreadyExist.class, RequestNotAssignedException.class})
+    @ExceptionHandler({RequestGroupAlreadyExist.class, RequestNotAssignedException.class, CannotUpdatePersonException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorsDTO requestGroupExceptionsHandler(HttpServletRequest request, BaseException e) {
         int errorStatus = HttpStatus.BAD_REQUEST.value();

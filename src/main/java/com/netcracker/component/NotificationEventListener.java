@@ -1,5 +1,6 @@
 package com.netcracker.component;
 
+import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.event.*;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
@@ -67,7 +68,7 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) {
+    public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) throws CurrentUserNotPresentException {
         Request oldRequest = updateRequestEvent.getOldRequest();
         Request newRequest = updateRequestEvent.getNewRequest();
         frontendNotificationService.sendNotificationToAllSubscribed(new Request(oldRequest), new Request(newRequest));
@@ -76,7 +77,7 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleAssignRequest(RequestAssignEvent requestAssignEvent){
+    public void handleAssignRequest(RequestAssignEvent requestAssignEvent) throws CurrentUserNotPresentException {
         Request oldRequest = requestAssignEvent.getOldRequest();
         Request newRequest = requestAssignEvent.getNewRequest();
         requestService.updateRequestHistory(new Request(newRequest), new Request(oldRequest),  requestAssignEvent.getPersonName()) ;
@@ -85,7 +86,7 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleUnassignRequest(RequestUnassignEvent requestUnassignEvent){
+    public void handleUnassignRequest(RequestUnassignEvent requestUnassignEvent) throws CurrentUserNotPresentException {
         Request oldRequest = requestUnassignEvent.getOldRequest();
         Request newRequest = requestUnassignEvent.getNewRequest();
         requestService.updateRequestHistory(new Request(newRequest), new Request(oldRequest),  requestUnassignEvent.getPersonName()) ;

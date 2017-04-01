@@ -60,7 +60,11 @@
                             console.log(callback);
                             console.log("Login Success!")
                         }, function (callback) {
-                            //    Failure
+                            if(callback.status===500){
+                                window.alert("Bad credentials");
+                            }else {
+                                window.alert(callback.data.message);
+                            }
                             console.log(callback);
                             console.log("Login Failure!")
                         })
