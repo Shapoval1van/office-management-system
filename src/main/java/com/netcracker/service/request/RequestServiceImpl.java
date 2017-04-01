@@ -381,7 +381,7 @@ public class RequestServiceImpl implements RequestService {
         else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getFullName());
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getEmail());
         }
     }
 

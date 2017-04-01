@@ -35,8 +35,8 @@ public class Request implements Persistable<Long> {
         this.creationTime = other.creationTime;
         this.estimate = other.estimate;
         this.status = other.status;
-        this.employee = new Person(other.employee);
-        this.manager = new Person(other.manager);
+        this.employee = other.employee==null?null:new Person(other.employee);
+        this.manager = other.manager==null?null:new Person(other.manager);
         this.parent = other.parent;
         this.priority = other.priority;
         this.requestGroup = other.requestGroup;
