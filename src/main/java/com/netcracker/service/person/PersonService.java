@@ -2,6 +2,7 @@ package com.netcracker.service.person;
 
 import com.netcracker.exception.CannotDeleteUserException;
 import com.netcracker.exception.CannotUpdatePersonException;
+import com.netcracker.exception.CurrentUserNotPresentException;
 import com.netcracker.exception.ResourceNotFoundException;
 import com.netcracker.model.dto.DeleteUserDTO;
 import com.netcracker.model.dto.MessageDTO;
@@ -15,13 +16,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PersonService {
-    Optional<Person> getPersonById(Long id);
+    Optional<Person> getPersonById(Long id) throws CurrentUserNotPresentException;
 
     Long getCountDeletedPersonByRole(Integer roleId);
 
-    Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException;
+    Optional<DeleteUserDTO> deletePersonByEmail(String email, Principal principal) throws CannotDeleteUserException, CurrentUserNotPresentException;
 
-    Optional<Person> updatePerson(Person person, Long personId, Principal principal) throws CannotUpdatePersonException;
+    Optional<Person> updatePerson(Person person, Long personId, Principal principal) throws CannotUpdatePersonException, CurrentUserNotPresentException;
 
     List<Person> getManagers(Pageable pageable, String namePattern);
 
@@ -41,7 +42,7 @@ public interface PersonService {
 
     Page<Person> getDeletedPersonList(Pageable pageable);
 
-    Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException;
+    Optional<Person> recoverDeletedPerson(String email) throws CannotUpdatePersonException, CurrentUserNotPresentException;
 
     Page<Person> getPersonListByRole(Integer roleId, Pageable pageable);
 

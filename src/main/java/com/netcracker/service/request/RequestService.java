@@ -18,17 +18,13 @@ import java.util.Optional;
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
 
-    Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException;
-
-    Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CannotCreateSubRequestException;
+    Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CannotCreateSubRequestException, CurrentUserNotPresentException;
 
     int addToRequestGroup(Long requestId, Integer groupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException, RequestNotAssignedException;
 
     int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
 
     Optional<Request> updateRequest(Request request, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException;
-
-    Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal);
 
     List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException;
 
@@ -62,7 +58,7 @@ public interface RequestService {
 
     Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable);
 
-    Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName);
+    Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException;
 
     void fill(Request request);
 
