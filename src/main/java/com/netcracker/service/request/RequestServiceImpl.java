@@ -416,14 +416,18 @@ public class RequestServiceImpl implements RequestService {
                 requestsByRequestGroup.getTotalElements(), fullRequestDTOList);
     }
 
+    /**
+     * This method executes each time specified in property with 'cron' pattern.
+     * It is notify manager about request that estimate time will end in 24-48 hours.
+     */
     @Scheduled(cron = "${request.expiry.remind.time}")
     @Override
     public void checkRequestsForExpiry() {
         Long currentTime = System.currentTimeMillis();
 
         List<Request> requests = requestRepository.findAll().stream()
-                .filter(r -> r.getEstimate() != null &&
-                        (r.getStatus().getId() == 1 || r.getStatus().getId() == 2)) // avoid requests without manager and closed/canceled
+                .filter(r -> r.getEstimate() != null && (r.getStatus().getId() == 1 || r.getStatus().getId() == 2)
+                ) // avoid requests without manager and with status closed/canceled
                 .filter(r ->
                         {
                             Long difference = r.getEstimate().getTime() - currentTime;
@@ -434,7 +438,6 @@ public class RequestServiceImpl implements RequestService {
                 )
                 .collect(Collectors.toList());
         requests.forEach(this::fill);
-
         eventPublisher.publishEvent(new RequestExpiringEvent(requests));
     }
 
@@ -464,12 +467,14 @@ public class RequestServiceImpl implements RequestService {
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
 
-//            Automatically subscribe manager to request
+            // Subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
-            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+            eventPublisher.publishEvent(
+                    new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
             return true;
         }
-        throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
+        throw new CannotAssignRequestException(
+                messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
     }
 
     /**
@@ -478,7 +483,7 @@ public class RequestServiceImpl implements RequestService {
      * @param requestId
      * @param personId
      * @return true in case success operation
-     * @throws CannotAssignRequestException
+     * @throws CannotAssignRequestException when person or request does not exist
      */
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
@@ -491,6 +496,7 @@ public class RequestServiceImpl implements RequestService {
         if (oldRequest.isPresent() && person.isPresent()){
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
+
             // Subscribe new manager to request
             personRepository.subscribe(requestId, person.get().getId());
             eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
