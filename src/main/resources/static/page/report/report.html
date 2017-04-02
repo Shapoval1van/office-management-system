@@ -43,11 +43,15 @@
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th st-sort="name">Name</th>
-                                <th st-sort="estimate">Estimate</th>
-                                <th st-sort="priority.id">Priority</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.NAME),
+                            'sort-descent': isDescOrder(requestFields.NAME)}" ng-click="orderRequestsByName()">Name</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.ESTIMATE),
+                            'sort-descent': isDescOrder(requestFields.ESTIMATE)}" ng-click="sortRequestsByEstimate()">Estimate</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.PRIORITY),
+                            'sort-descent': isDescOrder(requestFields.PRIORITY)}" ng-click="sortRequestsByPriority()">Priority</th>
                                 <th>Author</th>
-                                <th st-sort="status.id">Status</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.STATUS),
+                             'sort-descent': isDescOrder(requestFields.STATUS)}" ng-click="sortRequestsByStatus()">Status</th>
                             </tr>
                             </thead>
                             <tbody>
