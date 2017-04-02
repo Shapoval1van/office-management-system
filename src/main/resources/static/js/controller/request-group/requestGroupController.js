@@ -16,6 +16,8 @@
 
                 $scope.currentRequestGroup = {};
 
+                $scope.requestGroupFields = FieldFactory.requestGroup;
+
                 $scope.getGroupByAuthor = function () {
                     return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage,
                         $scope.pageSize, $scope.order)
@@ -29,16 +31,25 @@
                         });
                 };
 
-                $scope.sortGroups = function (order) {
-                    if(!$scope.order.includes(FieldFactory.desc(order))){
-                        var contain = $scope.order.includes(order);
-                        $scope.order = contain ? $scope.order.replace(order,FieldFactory.desc(order)): order+','+$scope.order;
-                    }
-                    return $scope.pageChanged();
+                $scope.orderRequestGroups = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.getGroupByAuthor();
                 };
 
-                $scope.sortGroupsByName = function () {
-                    return $scope.sortGroups(FieldFactory.requestGroup.NAME);
+
+                $scope.orderGroupsByName = function () {
+                    return $scope.orderRequestGroups(FieldFactory.requestGroup.NAME);
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
                 };
 
                 $scope.getGroupByAuthor();
