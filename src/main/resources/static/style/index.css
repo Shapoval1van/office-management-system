@@ -88,3 +88,6 @@ textarea{
 #wrapper{
  	min-height: 100vh;
  }
+.person-list-attribute{
+	cursor: pointer;
+}

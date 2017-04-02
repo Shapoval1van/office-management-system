@@ -5,8 +5,8 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.Page;
-import com.netcracker.model.entity.ChangeGroup;
 import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
@@ -52,7 +52,7 @@ public interface RequestService {
 
     Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
-    List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
+    Page<HistoryDTO> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 

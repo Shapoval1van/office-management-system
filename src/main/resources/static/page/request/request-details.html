@@ -39,7 +39,8 @@
                                                 <add-to-request-group-btn class="request-btn"
                                                                           ng-show="showAddGroupBtn()">
                                                 </add-to-request-group-btn>
-                                                <button class="btn btn-danger request-btn" ng-show="showRemoveFromGroupBtn()"
+                                                <button class="btn btn-danger request-btn"
+                                                        ng-show="showRemoveFromGroupBtn()"
                                                         ng-click="removeFromRequestGroup()">
                                                     Remove from group
                                                 </button>
@@ -452,7 +453,7 @@
                                         </div>
                                     </div>
                                 </uib-tab>
-                                <uib-tab index="1" heading="History">
+                                <uib-tab index="1" heading="History" ng-show="historyList.length > 0">
                                     <select ng-model="$parent.$parent.chosenPeriod"
                                             ng-change="changeHistoryPeriod()" class="input-sm">
                                         <option ng-repeat="period in periodList" ng-value="period"
@@ -473,7 +474,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr class="history-row" ng-repeat="historyItem in displayedHistory">
+                                        <tr class="history-row" ng-repeat="historyItem in displayedHistory | orderBy: 'createDate': true">
                                             <td>
                                                 {{$index + 1}}
                                             </td>
@@ -497,8 +498,9 @@
                                             </td>
                                         </tbody>
                                     </table>
-                                    <div ng-click="getNextHistoryPage('month')" class="show-more-wrapper">
-                                        <p class="show-more-text">Show {{getPageSize()}} more</p>
+                                    <div ng-click="getNextHistoryPage('month')" class="show-more-wrapper"
+                                         ng-show="getHistoryPageSize() > 0">
+                                        <p class="show-more-text">Show {{getHistoryPageSize()}} more</p>
                                     </div>
                                 </uib-tab>
                             </uib-tabset>

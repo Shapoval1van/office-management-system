@@ -5,6 +5,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.*;
@@ -98,60 +99,9 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    //TODO deprecated
-//    @Override
-//    public Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException {
-//        Locale locale = LocaleContextHolder.getLocale();
-//        String email = principal.getName();
-//
-//        if (subRequest.getParent() == null) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{"null"}, locale));
-//        }
-//
-//        Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(MANAGER_ERROR_MAIL, new Object[]{email}, locale)));
-//
-//        priorityRepository.findOne(subRequest.getPriority().getId()).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(PRIORITY_ERROR_ID, new Object[]{subRequest.getPriority().getId()}, locale)));
-//
-//        subRequest.setManager(manager);
-//
-//        long parentId = subRequest.getParent().getId();
-//        Request parentRequest = requestRepository.findOne(parentId).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{parentId}, locale)));
-//
-//        if (parentRequest.getParent() != null) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT_IS_SUB_REQUEST, null, locale));
-//        }
-//
-//        if ((parentRequest.getManager() == null || !Objects.equals(parentRequest.getManager().getId(), manager.getId()))
-//                && manager.getRole().getId() != 1) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_ILLEGAL_ACCESS, null, locale));
-//        }
-//
-//        String parentStatus = parentRequest.getStatus().getName();
-//        if (StatusEnum.CANCELED.getName().equals(parentStatus) || StatusEnum.CLOSED.getName().equals(parentStatus)) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT_CLOSED, null, locale));
-//        }
-//
-//        subRequest.setCreationTime(new Timestamp(System.currentTimeMillis()));
-//        subRequest.setEmployee(parentRequest.getEmployee());
-//        subRequest.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.getName()).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))));
-//        return requestRepository.save(subRequest);
-//    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     public Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
         String email = principal.getName();
@@ -206,21 +156,6 @@ public class RequestServiceImpl implements RequestService {
             return this.requestRepository.updateRequest(newRequest);
         }
     }
-
-
-    //TODO deprecated
-//    @Override
-//    @PreAuthorize("isAuthenticated()")
-//    public Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal) throws ResourceNotFoundException {
-//        Optional<Request> futureNewRequest = checkRequestPresent(requestRepository.findOne(requestId));
-//        Optional<Priority> p = priorityRepository.findPriorityByName(priority);
-//        if (!p.isPresent()) return Optional.empty();
-//        Request oldRequest = new Request(futureNewRequest.get());
-//        futureNewRequest.get().setPriority(p.get());
-//        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date(),principal.getName()));
-//        this.requestRepository.updateRequestPriority(futureNewRequest.get());
-//        return futureNewRequest;
-//    }
 
     @Override
     public Set<ChangeItem> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException {
@@ -378,14 +313,17 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    public List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
+    public Page<HistoryDTO> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
             List<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
                     Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
-            return changeGroups;
+            List<HistoryDTO> historyList = new ArrayList<>();
+            changeGroups.forEach(changeGroup -> historyList.add(new HistoryDTO(changeGroup)));
+            Long count = changeGroupRepository.countChangeByRequestId(requestId, Period.valueOf(period.toUpperCase()));
+            return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, historyList);
         } catch (IllegalArgumentException e) {
-            return new ArrayList<>();
+            return new Page<>();
         }
     }
 
