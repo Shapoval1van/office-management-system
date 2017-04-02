@@ -83,4 +83,7 @@ public class MessageConstant {
     //MAIL
     public static final String MAIL_SENDING_ERROR = "mail.sending.error";
     public static final String SENDING_TO_DELETED_USER = "user.account.deleted";
+
+    //SORT
+    public static final String IS_COLUMN_EXIST = "is.column.exist";
 }

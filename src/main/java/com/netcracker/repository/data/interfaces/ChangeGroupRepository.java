@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface ChangeGroupRepository extends JdbcRepository<ChangeGroup, Long> {
     List<ChangeGroup> findByRequestIdWithDetails(Long id, Period period, Pageable pageable);
+    Long countChangeByRequestId(Long id, Period period);
 }

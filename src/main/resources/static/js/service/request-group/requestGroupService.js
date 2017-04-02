@@ -14,8 +14,13 @@
                             })
                 };
 
-                requestGroupService.getGroupByAuthor = function (authorId, pageNumber, pageSize) {
-                    return $http.get("/api/request-group/author/" + authorId + "?page=" + pageNumber + "&size=" + pageSize)
+                requestGroupService.getGroupByAuthor = function (authorId, pageNumber, pageSize, order) {
+                    var requestUrl = "/api/request-group/author/" + authorId + "?page=" + pageNumber +
+                        "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

@@ -12,12 +12,11 @@
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
-                            <th st-sort="name">Name</th>
-                            <th st-sort="estimate">Estimate</th>
-                            <th st-sort="priority.name">Priority</th>
-                            <th st-sort="creationTime">Created</th>
-                            <th>Manager</th>
-                            <th ng-show="my">Status</th>
+                            <th ng-click="orderRequestsByName()">Name</th>
+                            <th ng-click="sortRequestsByEstimate()">Estimate</th>
+                            <th ng-click="sortRequestsByPriority()">Priority</th>
+                            <th ng-click="sortRequestsByCreatingTime()">Created</th>
+                            <th ng-click="sortRequestsByManager()">Manager</th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="request in requestList" class="task-row">
@@ -27,8 +26,6 @@
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
                                 <td>{{request.manager.firstName}} {{request.manager.lastName}}</td>
-                                <td ng-show="my" ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
-
                             </tr>
                             </tbody>
                         </table>

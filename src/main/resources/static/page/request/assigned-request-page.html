@@ -13,22 +13,43 @@
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped">
                             <thead>
                             <th>#</th>
-                            <th st-sort="name">Name</th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.NAME),
+                            'sort-descent': isDescOrder(requestFields.NAME)}" ng-click="orderRequestsByName()">Name
+                            </th>
                             <th>Employee</th>
-                            <th st-sort="estimate">Estimate</th>
-                            <th st-sort="priority.name">Priority</th>
-                            <th st-sort="creationTime">Created</th>
-                            <th>Status</th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.ESTIMATE),
+                            'sort-descent': isDescOrder(requestFields.ESTIMATE)}" ng-click="sortRequestsByEstimate()">
+                                Estimate
+                            </th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.PRIORITY),
+                            'sort-descent': isDescOrder(requestFields.PRIORITY)}" ng-click="sortRequestsByPriority()">
+                                Priority
+                            </th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.CREATE_TIME),
+                            'sort-descent': isDescOrder(requestFields.CREATE_TIME)}"
+                                ng-click="sortRequestsByCreatingTime()">
+                                Created
+                            </th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.STATUS),
+                             'sort-descent': isDescOrder(requestFields.STATUS)}" ng-click="sortRequestsByStatus()">
+                                Status
+                            </th>
                             <th></th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="request in requestList" class="task-row">
                                 <td>{{(currentPage - 1) * pageSize + $index + 1}}</td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.name}}</td>
-                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.employee.firstName}} {{request.employee.lastName}}</td>
-                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.employee.firstName}}
+                                    {{request.employee.lastName}}
+                                </td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.estimate | date: "dd.MM.yyyy
+                                    HH:mm"}}
+                                </td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.priority.name}}</td>
-                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date: "dd.MM.yyyy HH:mm"}}</td>
+                                <td ng-click="goToRequestDetailsPage(request.id)">{{request.creationTime | date:
+                                    "dd.MM.yyyy HH:mm"}}
+                                </td>
                                 <td ng-click="goToRequestDetailsPage(request.id)">{{request.status.name}}</td>
                                 <td>
                                     <button class="btn btn-info" ng-show="isFree(request.status.name)"

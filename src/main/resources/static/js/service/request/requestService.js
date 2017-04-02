@@ -43,8 +43,12 @@
                 };
 
 
-                requestService.getAssignedRequestList = function (pageNumber, pageSize) {
-                    return $http.get("/api/request/list/assigned?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAssignedRequestList = function (pageNumber, pageSize, order) {
+                    var requestUrl = "/api/request/list/assigned?page=" + pageNumber + "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
@@ -69,8 +73,12 @@
                         })
                 };
 
-                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize) {
-                    return $http.get("/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize, sort) {
+                    var url = "/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize;
+                    if(!!sort){
+                        url= url + "&sort="+sort;
+                    }
+                    return $http.get(url)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
