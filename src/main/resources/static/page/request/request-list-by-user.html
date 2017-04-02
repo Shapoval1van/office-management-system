@@ -2,7 +2,6 @@
     <side-bar></side-bar>
     <div id="page-content-wrapper" ng-cloak="">
         <div class="container-fluid">
-            <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
                     <div class="col-md-8" ng-show="assigned">
@@ -26,12 +25,26 @@
                         <table st-table="requestList" st-safe-src="requests" class="table table-stripped user-table-stripped">
                             <thead>
                             <th>#</th>
-                            <th st-sort="name">Name</th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.NAME),
+                            'sort-descent': isDescOrder(requestFields.NAME)}" ng-click="orderRequestsByName()">Name</th>
                             <th>{{personType}}</th>
-                            <th st-sort="estimate">Estimate</th>
-                            <th st-sort="priority.name">Priority</th>
-                            <th st-sort="creationTime">Created</th>
-                            <th>Status</th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.ESTIMATE),
+                            'sort-descent': isDescOrder(requestFields.ESTIMATE)}" ng-click="sortRequestsByEstimate()">
+                                Estimate
+                            </th>
+                            <th  ng-class="{'sort-ascent': isAscOrder(requestFields.PRIORITY),
+                            'sort-descent': isDescOrder(requestFields.PRIORITY)}" ng-click="sortRequestsByPriority()">
+                                Priority
+                            </th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.CREATE_TIME),
+                            'sort-descent': isDescOrder(requestFields.CREATE_TIME)}"
+                                ng-click="sortRequestsByCreatingTime()">
+                                Created
+                            </th>
+                            <th ng-class="{'sort-ascent': isAscOrder(requestFields.STATUS),
+                             'sort-descent': isDescOrder(requestFields.STATUS)}" ng-click="sortRequestsByStatus()">
+                                Status
+                            </th>
                             <!--<th></th>-->
                             </thead>
                             <tbody>
