@@ -14,6 +14,7 @@
                 $scope.requestListVisibility = true;
 
                 $scope.order = FieldFactory.requestGroup.NAME;
+                $scope.requestFields = FieldFactory.request;
 
                 $scope.pageChanged = function () {
                     RequestService.getAllClosedRequestByEmployee($scope.currentPage, $scope.pageSize, $scope.order)
@@ -39,12 +40,20 @@
                     $scope.goToUrl("/secured/employee/request/" + requestId + "/details");
                 };
 
-                $scope.orderRequests = function (order) {
-                    if(!$scope.order.includes(FieldFactory.desc(order))){
-                        var contain = $scope.order.includes(order);
-                        $scope.order = contain ? $scope.order.replace(order,FieldFactory.desc(order)): order+','+$scope.order;
-                    }
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
                     return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
                 };
 
                 $scope.orderRequestsByName = function () {
@@ -63,12 +72,13 @@
                     return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
                 };
 
-                $scope.sortRequestsByManager = function () {
+                $scope.sortRequestsByManager= function () {
                     return $scope.orderRequests(FieldFactory.request.MANAGER);
                 };
 
-                $scope.sortRequestsByStatus = function () {
-                    return $scope.orderRequests(FieldFactory.request.STATUS);
+                $scope.getTotalPage = function () {
+                    return $scope.totalItems;
                 };
+
             }])
 })();
