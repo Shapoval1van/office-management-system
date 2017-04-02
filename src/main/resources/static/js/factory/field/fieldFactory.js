@@ -29,6 +29,33 @@
                     return "-" + fieldName;
                 };
 
+                fieldFactory.isDescOrder = function (requestString, fieldName) {
+                    var nameIndex = requestString.indexOf(fieldName);
+                    return ~nameIndex && requestString.charAt(nameIndex - 1) === "-";
+                };
+
+                fieldFactory.isAscOrder = function (requestString, fieldName) {
+                    var nameIndex = requestString.indexOf(fieldName);
+                    return ~nameIndex && requestString.charAt(nameIndex - 1) !== "-";
+                };
+
+                fieldFactory.removeSortField = function (requestString, fieldName) {
+                    return  (fieldFactory.isDescOrder(requestString, fieldName)) ?
+                        requestString.replace("-" + fieldName, "").replace(",,", ",") :
+                        requestString.replace(fieldName, "").replace(",,", ",");
+                };
+
+                fieldFactory.toggleOrder = function (requestString, fieldName) {
+                    if (fieldFactory.isDescOrder(requestString, fieldName))
+                        return requestString.replace("-" + fieldName, fieldName);
+                    else if (fieldFactory.isAscOrder(requestString, fieldName))
+                        return requestString.replace(fieldName, "-" + fieldName);
+                    else {
+                        return (requestString.length > 0) ? (requestString + "," + fieldName).replace(",,", ",") :
+                            requestString + fieldName;
+                    }
+                };
+
                 return fieldFactory;
             }])
 })();

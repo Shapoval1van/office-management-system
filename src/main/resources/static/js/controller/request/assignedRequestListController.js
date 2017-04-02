@@ -16,6 +16,8 @@
                 $scope.request = {};
                 $scope.order = FieldFactory.request.CREATE_TIME;
 
+                $scope.requestFields = FieldFactory.request;
+
                 $rootScope.sideBarActiveElem = "my-requests";
 
                 $scope.pageChanged = function () {
@@ -31,12 +33,20 @@
                         });
                 };
 
-                $scope.orderRequests = function (order) {
-                    if(!$scope.order.includes(FieldFactory.desc(order))){
-                        var contain = $scope.order.includes(order);
-                        $scope.order = contain ? $scope.order.replace(order,FieldFactory.desc(order)): order+','+$scope.order;
-                    }
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
                     return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
                 };
 
                 $scope.orderRequestsByName = function () {
