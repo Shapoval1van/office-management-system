@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("DeletedPersonListController", ["$scope", "$http", "$rootScope",
-            function ($scope, $http, $rootScope) {
+        .controller("DeletedPersonListController", ["$scope", "$http", "$rootScope", "FieldFactory",
+            function ($scope, $http, $rootScope, FieldFactory) {
 
                 $scope.pageSize = 10;
                 $scope.persons = {};
@@ -17,16 +17,51 @@
 
                 $rootScope.sideBarActiveElem = "users";
 
+                $scope.order = FieldFactory.person.FIRST_NAME;
+                $scope.personFields = FieldFactory.person;
+
+                $scope.orderPersons = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
+                $scope.orderPersonsByFirstName = function () {
+                    return $scope.orderPersons(FieldFactory.person.FIRST_NAME);
+                };
+
+                $scope.orderPersonsByLastName = function () {
+                    return $scope.orderPersons(FieldFactory.person.LAST_NAME);
+                };
+
+                $scope.orderPersonsByEmail = function () {
+                    return $scope.orderPersons(FieldFactory.person.EMAIL);
+                };
+
+                $scope.orderPersonsByRole = function () {
+                    return $scope.orderPersons(FieldFactory.person.ROLE);
+                };
+
                 $scope.isUndefined = function (thing) {
                     return (typeof thing === "undefined");
                 };
 
                 $scope.pageChanged = function () {
-                    if ($scope.selectedRole.roleId==4){
+                    if ($scope.selectedRole.roleId == 4) {
                         $http({
                             method: 'GET',
                             url: '/api/person/deleted-list' +
-                            '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize + "&sort=" + $scope.order
                         }).then(function successCallback(response) {
                             $scope.persons = [];
                             $scope.persons = response.data.data;
@@ -37,7 +72,7 @@
                         $http({
                             method: 'GET',
                             url: '/api/person/deleted-list/' + $scope.selectedRole.roleId +
-                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize
+                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize + "&sort=" + $scope.order
                         }).then(function successCallback(response) {
                             $scope.persons = [];
                             $scope.persons = response.data.data;
@@ -54,22 +89,21 @@
                 $scope.getTotalPage();
                 $scope.pageChanged(1);
 
-                $scope.roleChange = function(roleId) {
+                $scope.roleChange = function (roleId) {
                     $scope.getTotalPage();
                     $scope.pageChanged(1);
                 };
 
 
-                $scope.isSelected = function(roleId) {
+                $scope.isSelected = function (roleId) {
                     return roleId === $scope.selectedRole.roleId;
                 };
 
 
-                $scope.personRecover = function(person) {
+                $scope.personRecover = function (person) {
                     $scope.person = person;
-                    $http.post("/api/person/recoverPerson", person.email, $scope.currentUser).
-                    then(function successCallback(response) {
-                        $scope.persons =$scope.persons.filter(function(person) {
+                    $http.post("/api/person/recoverPerson", person.email, $scope.currentUser).then(function successCallback(response) {
+                        $scope.persons = $scope.persons.filter(function (person) {
                             return person.email !== $scope.person.email;
                         });
                     }, function errorCallback(response) {
