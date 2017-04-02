@@ -33,8 +33,12 @@
                         })
                 };
 
-                requestService.getAvailableRequest = function (pageNumber, pageSize) {
-                    return $http.get("/api/request/available?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAvailableRequest = function (pageNumber, pageSize, order) {
+                    var requestUrl = "/api/request/available?page=" + pageNumber + "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
@@ -55,8 +59,12 @@
                             return callback;
                         })
                 };
-                requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize) {
-                    return $http.get("/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAvailableRequestByPriority = function (priority, pageNumber, pageSize, order) {
+                    var requestUrl = "/api/request/available/" + priority + "?page=" + pageNumber + "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
@@ -64,8 +72,12 @@
                         })
                 };
 
-                requestService.getAllRequestByEmployee = function (pageNumber, pageSize) {
-                    return $http.get("/api/request/list/my?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAllRequestByEmployee = function (pageNumber, pageSize, order) {
+                    var requestUrl = "/api/request/list/my?page=" + pageNumber + "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

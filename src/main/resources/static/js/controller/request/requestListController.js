@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService",
-            function ($scope, $location, $rootScope, PersonService, RequestService) {
+        .controller("RequestListController", ["$scope", "$location", "PersonService", "RequestService", "FieldFactory",
+            function ($scope, $location, PersonService, RequestService, FieldFactory) {
 
                 $scope.selectedManager;
                 $scope.managers = [];
@@ -24,17 +24,54 @@
                 $scope.selectedRequest = -1;
                 $scope.requestListVisibility = true;
 
+                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.requestFields = FieldFactory.request;
+
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
+                $scope.orderRequestsByName = function () {
+                    return $scope.orderRequests(FieldFactory.request.NAME);
+                };
+
+                $scope.sortRequestsByEstimate = function () {
+                    return $scope.orderRequests(FieldFactory.request.ESTIMATE);
+                };
+
+                $scope.sortRequestsByPriority = function () {
+                    return $scope.orderRequests(FieldFactory.request.PRIORITY);
+                };
+
+                $scope.sortRequestsByCreatingTime = function () {
+                    return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
+                };
+
+                $scope.sortRequestsByStatus = function () {
+                    return $scope.orderRequests(FieldFactory.request.STATUS);
+                };
+
                 $scope.my = false;
                 var path = $location.path();
                 if (path.toString()==="/secured/employee/request/my"){
-
-                    $rootScope.sideBarActiveElem = "my-requests";
 
                     $scope.my = true;
                     $scope.personType = "Manager";
 
                     $scope.pageChanged = function() {
-                        RequestService.getAllRequestByEmployee($scope.currentPage, $scope.pageSize)
+                        RequestService.getAllRequestByEmployee($scope.currentPage, $scope.pageSize, $scope.order)
                             .then(function (response) {
                                 $scope.requests = [];
                                 $scope.requests = response.data.data;
@@ -64,11 +101,9 @@
                 } else {
                     $scope.personType = "Employee";
 
-                    $rootScope.sideBarActiveElem = "free-requests";
-
                     $scope.pageChanged = function() {
                         if($scope.selectedPriority.priorityId==4){
-                            RequestService.getAvailableRequest($scope.currentPage, $scope.pageSize)
+                            RequestService.getAvailableRequest($scope.currentPage, $scope.pageSize, $scope.order)
                                 .then(function (response) {
                                     $scope.requests = [];
                                     $scope.requests = response.data.data;
@@ -78,7 +113,7 @@
                         }
                         else {
                             RequestService.getAvailableRequestByPriority($scope.selectedPriority.priorityId,
-                                $scope.currentPage, $scope.pageSize)
+                                $scope.currentPage, $scope.pageSize, $scope.order)
                                 .then(function (response) {
                                     $scope.requests = [];
                                     $scope.requests = response.data.data;
@@ -99,7 +134,6 @@
                         $scope.getTotalPage();
                         $scope.pageChanged();
                     };
-
                 }
 
 
