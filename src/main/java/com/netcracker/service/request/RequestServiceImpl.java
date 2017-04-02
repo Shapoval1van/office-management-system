@@ -222,8 +222,8 @@ public class RequestServiceImpl implements RequestService {
 //        return futureNewRequest;
 //    }
 
-
-    public Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException {
+    @Override
+    public Set<ChangeItem> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException {
         Optional<Person> author = checkPersonPresent(personRepository.findPersonByEmail(authorName));
         ChangeGroup changeGroup = new ChangeGroup();
         changeGroup.setRequest(new Request(oldRequest.getId()));
@@ -231,12 +231,12 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.setCreateDate(new Timestamp(System.currentTimeMillis()));
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
         if (changeItemSet.size() == 0) {
-            return Optional.empty();
+            return null;
         }
         ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
         changeItemSet.forEach(ci -> ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
         changeItemSet.forEach(changeItemRepository::save);
-        return Optional.of(newRequest);
+        return changeItemSet;
     }
 
     /**

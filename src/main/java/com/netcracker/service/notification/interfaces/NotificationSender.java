@@ -1,11 +1,12 @@
 package com.netcracker.service.notification.interfaces;
 
+import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
 import com.netcracker.model.entity.Request;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface NotificationSender {
     void sendPasswordReminder(Person person, String link);
@@ -28,7 +29,7 @@ public interface NotificationSender {
 
     void sendRequestExpiryReminder(List<Request> expiringRequests);
 
-    void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime);
+    void sendRequestUpdateNotification(Request request, Set<ChangeItem> changes);
 
     void requestAssignToGroup(Request request);
 
