@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestGroupDetailsController", ["$scope", "$routeParams", "RequestGroupService", "RequestService",
-            function ($scope, $routeParams, RequestGroupService, RequestService) {
+        .controller("RequestGroupDetailsController", ["$scope", "$routeParams", "RequestGroupService", "RequestService", "FieldFactory",
+            function ($scope, $routeParams, RequestGroupService, RequestService, FieldFactory) {
                 var requestGroupId = $routeParams.requestGroupId;
 
                 $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -12,6 +12,9 @@
                 $scope.maxPageSize = 20;
                 $scope.request = {};
 
+                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.requestFields = FieldFactory.request;
+
                 var inProgressStatusId = 2;
                 var closedStatusId = 3;
 
@@ -20,7 +23,8 @@
                 };
 
                 $scope.getRequestByGroup = function () {
-                    return RequestService.getRequestsByRequestGroup(requestGroupId, $scope.currentPage, $scope.pageSize)
+                    return RequestService.getRequestsByRequestGroup(requestGroupId, $scope.currentPage,
+                        $scope.pageSize, $scope.order)
                         .then(function (callback) {
                             $scope.requests = callback.data.data;
                             $scope.maxPageSize = callback.data.totalElements;
@@ -29,6 +33,42 @@
                         }, function () {
 
                         })
+                };
+
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.getRequestByGroup();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
+                $scope.orderRequestsByName = function () {
+                    return $scope.orderRequests(FieldFactory.request.NAME);
+                };
+
+                $scope.sortRequestsByEstimate = function () {
+                    return $scope.orderRequests(FieldFactory.request.ESTIMATE);
+                };
+
+                $scope.sortRequestsByPriority = function () {
+                    return $scope.orderRequests(FieldFactory.request.PRIORITY);
+                };
+
+                $scope.sortRequestsByCreatingTime = function () {
+                    return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
+                };
+
+                $scope.sortRequestsByStatus = function () {
+                    return $scope.orderRequests(FieldFactory.request.STATUS);
                 };
 
                 $scope.getRequestByGroup();
