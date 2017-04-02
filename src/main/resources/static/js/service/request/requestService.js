@@ -73,8 +73,12 @@
                         })
                 };
 
-                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize) {
-                    return $http.get("/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getAllClosedRequestByEmployee = function (pageNumber, pageSize, sort) {
+                    var url = "/api/request/list/my/closed?page=" + pageNumber + "&size=" + pageSize;
+                    if(!!sort){
+                        url= url + "&sort="+sort;
+                    }
+                    return $http.get(url)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {

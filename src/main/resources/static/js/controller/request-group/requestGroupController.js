@@ -30,8 +30,11 @@
                 };
 
                 $scope.sortGroups = function (order) {
-                    $scope.order = ($scope.order === order) ? FieldFactory.desc($scope.order) : order;
-                    $scope.getGroupByAuthor()
+                    if(!$scope.order.includes(FieldFactory.desc(order))){
+                        var contain = $scope.order.includes(order);
+                        $scope.order = contain ? $scope.order.replace(order,FieldFactory.desc(order)): order+','+$scope.order;
+                    }
+                    return $scope.pageChanged();
                 };
 
                 $scope.sortGroupsByName = function () {
