@@ -23,10 +23,22 @@
                         <table st-table="personList" st-safe-src="persons" class="table table-stripped">
                             <thead>
                             <th>#</th>
-                            <th>First name</th>
-                            <th>Last name</th>
-                            <th>Email</th>
-                            <th>Role</th>
+                            <th class="person-list-attribute" ng-class="{'sort-ascent': isAscOrder(personFields.FIRST_NAME),
+                            'sort-descent': isDescOrder(personFields.FIRST_NAME)}" ng-click="orderPersonsByFirstName()">
+                                First name
+                            </th>
+                            <th class="person-list-attribute" ng-class="{'sort-ascent': isAscOrder(personFields.LAST_NAME),
+                            'sort-descent': isDescOrder(personFields.LAST_NAME)}" ng-click="orderPersonsByLastName()">
+                                Last name
+                            </th>
+                            <th class="person-list-attribute" ng-class="{'sort-ascent': isAscOrder(personFields.EMAIL),
+                            'sort-descent': isDescOrder(personFields.EMAIL)}" ng-click="orderPersonsByEmail()">
+                                Email
+                            </th>
+                            <th class="person-list-attribute" ng-class="{'sort-ascent': isAscOrder(personFields.ROLE),
+                            'sort-descent': isDescOrder(personFields.ROLE)}" ng-click="orderPersonsByRole()">
+                                Role
+                            </th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="person in personList" class="task-row">

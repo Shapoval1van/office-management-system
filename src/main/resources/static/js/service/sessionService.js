@@ -62,13 +62,15 @@
 
         service.__createSession = function (sessionInfo) {
 
-            currentUser = {
-                firstName: sessionInfo.data.firstName,
-                lastName: sessionInfo.data.lastName,
-                id: sessionInfo.data.id,
-                role: sessionInfo.data.type,
-                email: sessionInfo.data.email
-            };
+            if (!currentUser){
+                currentUser = {
+                    firstName: sessionInfo.data.firstName,
+                    lastName: sessionInfo.data.lastName,
+                    id: sessionInfo.data.id,
+                    role: sessionInfo.data.type,
+                    email: sessionInfo.data.email
+                };
+            }
 
             currentSession = {
                 accessTokenExpiresIn: new Date().getTime() + sessionInfo.data.expires_in * 1000,
@@ -77,6 +79,7 @@
                 refreshTokenExpiresIn: new Date().getTime() + 1209600 * 1000,
                 reloadTime: sessionInfo.data.expires_in*0.8*1000
             };
+
             service.__setSession();
 
         };

@@ -94,6 +94,7 @@ public class RequestControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMINISTRATOR", password = "test2", username = "test2@test.com")
     public void addRequest() throws Exception {
         requestDTO = new RequestDTO();
         requestDTO.setName("New request");
@@ -127,21 +128,6 @@ public class RequestControllerTest {
                 o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();
     }
-
-
-//    @Test
-//    public void tryDeleteClosedRequest() throws Exception {
-//        mockMvc.perform(post("/api/request/2/delete")
-//                .contentType(contentType))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//    @Test
-//    public void deleteRequest() throws Exception {
-//        mockMvc.perform(post("/api/request/3/delete")
-//                .contentType(contentType))
-//                .andExpect(status().isOk());
-//    }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR", password = "test2", username = "test2@test.com")

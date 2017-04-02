@@ -55,7 +55,6 @@ public class PasswordResetController {
 
     private String buildLink(HttpServletRequest request){
         String SITE_LINK = "https://management-office.herokuapp.com";
-        //TODO add link
         return SITE_LINK;
     }
 }

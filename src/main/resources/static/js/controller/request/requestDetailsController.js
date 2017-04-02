@@ -14,6 +14,9 @@
                 });
 
                 $scope.historyPageNumber = 1;
+                $scope.historyPageSize = 10;
+                $scope.historyMaxPageSize = 0;
+
                 $scope.commentPageNumber = 1;
                 $scope.commentPageSize = 10;
                 $scope.commentMaxPageSize = 0;
@@ -48,7 +51,10 @@
                 $scope.getHistoryPage = function (period, pageNumber, pageSize) {
                     return RequestService.getRequestHistory(requestId, period, pageSize, pageNumber)
                         .then(function (callback) {
-                            callback.data.forEach(function (historyItem) {
+                            $scope.historyPageSize = callback.data.pageSize;
+                            $scope.historyMaxPageSize = callback.data.totalElements;
+
+                            callback.data.data.forEach(function (historyItem) {
                                 historyItem.changeItems.forEach(function (changeItem) {
                                     changeItem.author = historyItem.author;
                                     changeItem.createDate = historyItem.createDate;
@@ -61,23 +67,21 @@
                         });
                 };
 
-                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
+                $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, $scope.historyPageSize);
+
+                $scope.getLastHistoryItem = function () {
+                    $scope.getHistoryPage($scope.chosenPeriod, 1, 1);
+                }
 
                 $scope.changeHistoryPeriod = function () {
                     $scope.historyPageNumber = 1;
                     $scope.historyList = [];
-                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, PAGE_SIZE);
-                    console.log($scope.chosenPeriod);
-                    console.log($scope.historyPageNumber);
+                    $scope.getHistoryPage($scope.chosenPeriod, $scope.historyPageNumber, $scope.historyPageSize);
                 };
 
                 $scope.getNextHistoryPage = function (period) {
                     $scope.historyPageNumber++;
                     $scope.getHistoryPage(period, $scope.historyPageNumber, PAGE_SIZE);
-                };
-
-                $scope.getPageSize = function () {
-                    return PAGE_SIZE;
                 };
 
                 $scope.getCommentPageSize = function () {
@@ -86,6 +90,16 @@
                     }
                     else {
                         return $scope.commentMaxPageSize - $scope.comments.length;
+                    }
+                };
+
+                $scope.getHistoryPageSize = function () {
+                    console.log($scope.historyMaxPageSize - $scope.historyList.length);
+                    if ($scope.historyMaxPageSize - $scope.historyList.length >= $scope.historyPageSize) {
+                        return $scope.historyPageSize;
+                    }
+                    else {
+                        return $scope.historyMaxPageSize - $scope.historyList.length;
                     }
                 };
 
@@ -193,6 +207,7 @@
                                     $scope.requests = callback.data;
                                     swal("Request unassigned!", "Request successful unassigned", "success");
                                     $scope.getRequest();
+                                    $scope.getLastHistoryItem();
                                 }, function (error) {
                                     swal("Unassigning Failure!", error.data.errors, "error");
                                 });
@@ -225,6 +240,7 @@
                                     $scope.requests = response.data;
                                     swal("Request assigned!", "Request successful assigned", "success");
                                     $scope.getRequest();
+                                    $scope.getLastHistoryItem();
                                 }, function (response) {
                                     swal("Assigning Failure!", response.data.errors, "error");
                                 });
@@ -236,6 +252,7 @@
                         .then(function (response) {
                             swal("Request assigned!", "Request successful assigned", "success");
                             $scope.getRequest();
+                            $scope.getLastHistoryItem();
                         }, function (response) {
                             swal("Assigning Failure!", response.data.errors, "error");
                         });
@@ -256,7 +273,6 @@
                     return RequestService.updateRequestStatus($scope.request.id, statusId, $scope.request)
                         .then(function (callback) {
                             $scope.getRequest();
-                            // $scope.getHistoryPage($scope.chosenPeriod, 1, 1);
                         }, function () {
 
                         })
@@ -297,6 +313,7 @@
                     return $scope.updateRequestStatus(2)
                         .then(function (callback) {
                             swal("Request start", "Request successful start!", "success");
+                            $scope.getLastHistoryItem();
                         }, function (callback) {
                             swal("Request start", "Can't start request! " + callback.data.errors, "error");
                         });
@@ -306,6 +323,7 @@
                     return $scope.updateRequestStatus(3)
                         .then(function (callback) {
                             swal("Request finished", "Request successful finished!", "success");
+                            $scope.getLastHistoryItem();
                         }, function (callback) {
                             swal("Request finish", "Can't finish request! " + callback.data.errors, "error");
                         });
@@ -315,6 +333,7 @@
                     return $scope.updateRequestStatus(1)
                         .then(function (callback) {
                             swal("Request reopen", "Request successful reopen!", "success");
+                            $scope.getLastHistoryItem();
                         }, function (callback) {
                             swal("Request reopen", "Can't reopen request! " + callback.data.errors, "error");
                         });

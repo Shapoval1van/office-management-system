@@ -1,6 +1,7 @@
 package com.netcracker.component;
 
 import com.netcracker.exception.CurrentUserNotPresentException;
+import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.event.*;
 import com.netcracker.service.frontendNotification.FrontendNotificationService;
@@ -9,6 +10,8 @@ import com.netcracker.service.request.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 public class NotificationEventListener {
@@ -71,9 +74,9 @@ public class NotificationEventListener {
     public void handleUpdateRequest(UpdateRequestEvent updateRequestEvent) throws CurrentUserNotPresentException {
         Request oldRequest = updateRequestEvent.getOldRequest();
         Request newRequest = updateRequestEvent.getNewRequest();
+        Set<ChangeItem> changes = requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName());
         frontendNotificationService.sendNotificationToAllSubscribed(new Request(oldRequest), new Request(newRequest));
-        notificationService.sendRequestUpdateNotification(oldRequest, newRequest, updateRequestEvent.getChangeTime());
-        requestService.updateRequestHistory(newRequest, oldRequest,  updateRequestEvent.getPersonName()) ;
+        notificationService.sendRequestUpdateNotification(updateRequestEvent.getOldRequest(), changes);
     }
 
     @EventListener

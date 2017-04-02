@@ -5,8 +5,9 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.Page;
-import com.netcracker.model.entity.ChangeGroup;
+import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Request;
 import com.netcracker.model.entity.Status;
 import com.netcracker.repository.common.Pageable;
@@ -14,6 +15,7 @@ import com.netcracker.repository.common.Pageable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface RequestService {
     Optional<Request> getRequestById(Long id);
@@ -50,7 +52,7 @@ public interface RequestService {
 
     Page<Request> getAllAssignedRequestByManager(Long managerId, Pageable pageable);
 
-    List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable);
+    Page<HistoryDTO> getRequestHistory(Long requestId, String period, Pageable pageable);
 
     List<Request> getRequestsByRequestGroup(Integer requestGroupId);
 
@@ -58,7 +60,7 @@ public interface RequestService {
 
     Page<FullRequestDTO> getFullRequestDTOByRequestGroup(Integer requestGroupId, Pageable pageable);
 
-    Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException;
+    Set<ChangeItem> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException;
 
     void fill(Request request);
 

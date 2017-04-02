@@ -1,7 +1,9 @@
 package com.netcracker.repository.data.impl;
 
+import com.netcracker.model.entity.ChangeItem;
 import com.netcracker.model.entity.Notification;
 import com.netcracker.model.entity.Person;
+import com.netcracker.model.entity.Request;
 import com.netcracker.repository.common.GenericJdbcRepository;
 import com.netcracker.repository.data.interfaces.NotificationRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,9 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
     public static final String SUBJECT_COLUMN = "subject";
     public static final String TEXT_COLUMN = "notification_text";
     public static final String LINK_COLUMN = "link";
+    public static final String REQUEST_ID_COLUMN = "request_id";
+    public static final String TEMPLATE_COLUMN = "template";
+    public static final String CHANGE_ITEM_ID_COLUMN = "change_item_id";
 
     @Value("${notification.find.all.sort.by.date}")
     public String GET_ALL_NOTIFICATION_SORTED_BY_DATE;
@@ -34,20 +39,26 @@ public class NotificationRepositoryImpl extends GenericJdbcRepository<Notificati
         columns.put(ID_COLUMN, entity.getId());
         columns.put(PERSON_ID_COLUMN, entity.getPerson().getId());
         columns.put(SUBJECT_COLUMN, entity.getSubject());
-        columns.put(TEXT_COLUMN, entity.getTemplate());
+        columns.put(TEXT_COLUMN, entity.getText());
         columns.put(LINK_COLUMN, entity.getLink());
+        columns.put(REQUEST_ID_COLUMN, entity.getRequest().getId());
+        columns.put(TEMPLATE_COLUMN, entity.getTemplate());
+        columns.put(CHANGE_ITEM_ID_COLUMN, entity.getChangeItem().getId());
         return columns;
     }
 
     @Override
     public RowMapper<Notification> mapRow() {
         return ((resultSet, i) -> {
-            Notification notification = new Notification();
-            notification.setId(resultSet.getLong(ID_COLUMN));
-            notification.setPerson(new Person(resultSet.getLong(PERSON_ID_COLUMN)));
-            notification.setSubject(resultSet.getString(SUBJECT_COLUMN));
-            notification.setTemplate(resultSet.getString(TEXT_COLUMN));
-            notification.setLink(resultSet.getString(LINK_COLUMN));
+            Notification notification = new Notification.NotificationBuilder(
+                    new Person(resultSet.getLong(PERSON_ID_COLUMN)), resultSet.getString(SUBJECT_COLUMN))
+                    .id(resultSet.getLong(ID_COLUMN))
+                    .template(resultSet.getString(TEMPLATE_COLUMN))
+                    .text(resultSet.getString(TEXT_COLUMN))
+                    .link(resultSet.getString(LINK_COLUMN))
+                    .request(new Request(resultSet.getLong(REQUEST_ID_COLUMN)))
+                    .changeItem(new ChangeItem(resultSet.getLong(CHANGE_ITEM_ID_COLUMN)))
+                    .build();
 
             return notification;
         });

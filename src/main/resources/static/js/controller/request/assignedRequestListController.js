@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("AssignedRequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService",
-            function ($scope, $location, $rootScope, PersonService, RequestService) {
+        .controller("AssignedRequestListController", ["$scope", "$location", "$rootScope", "PersonService", "RequestService", "FieldFactory",
+            function ($scope, $location, $rootScope, PersonService, RequestService, FieldFactory) {
 
                 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -14,11 +14,14 @@
                 $scope.requestListVisibility = true;
 
                 $scope.request = {};
+                $scope.order = FieldFactory.request.CREATE_TIME;
+
+                $scope.requestFields = FieldFactory.request;
 
                 $rootScope.sideBarActiveElem = "my-requests";
 
                 $scope.pageChanged = function () {
-                    RequestService.getAssignedRequestList($scope.currentPage, $scope.pageSize)
+                    RequestService.getAssignedRequestList($scope.currentPage, $scope.pageSize, $scope.order)
                         .then(function (response) {
                             $scope.requests = [];
                             $scope.requests = response.data.data;
@@ -28,6 +31,42 @@
                             }
                         }, function errorCallback(response) {
                         });
+                };
+
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
+                $scope.orderRequestsByName = function () {
+                    return $scope.orderRequests(FieldFactory.request.NAME);
+                };
+
+                $scope.sortRequestsByEstimate = function () {
+                    return $scope.orderRequests(FieldFactory.request.ESTIMATE);
+                };
+
+                $scope.sortRequestsByPriority = function () {
+                    return $scope.orderRequests(FieldFactory.request.PRIORITY);
+                };
+
+                $scope.sortRequestsByCreatingTime = function () {
+                    return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
+                };
+
+                $scope.sortRequestsByStatus = function () {
+                    return $scope.orderRequests(FieldFactory.request.STATUS);
                 };
 
                 $scope.getTotalPage = function () {

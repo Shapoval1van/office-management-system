@@ -81,8 +81,8 @@ public class ChangeTracker {
             ChangeItem changeItem = new ChangeItem();
             if ("requestGroup".equals(fieldName)) {
                 changeItem.setField(fieldRepository.findFieldByName("GROUP").get());
-                changeItem.setOldVal(" ");
-                changeItem.setNewVal(requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get().getName());
+                changeItem.setOldVal(oldRequest.getRequestGroup()!=null?requestGroupRepository.findOne(oldRequest.getRequestGroup().getId()).get().getName():"");
+                changeItem.setNewVal(newRequest.getRequestGroup()!=null?requestGroupRepository.findOne(newRequest.getRequestGroup().getId()).get().getName():"");
                 changeItemSet.add(changeItem);
             }
             if ("manager".equals(fieldName)) {
