@@ -98,8 +98,14 @@
                         })
                 };
 
-                requestService.getRequestsByRequestGroup = function (requestGroupId, pageNumber, pageSize) {
-                    return $http.get("/api/request/request-group/" + requestGroupId + "?page=" + pageNumber + "&size=" + pageSize)
+                requestService.getRequestsByRequestGroup = function (requestGroupId, pageNumber, pageSize, order) {
+                   var requestUrl = "/api/request/request-group/" + requestGroupId + "?page=" + pageNumber
+                       + "&size=" + pageSize;
+
+                   if (!!order)
+                       requestUrl += "&sort=" + order;
+
+                    return $http.get(requestUrl)
                         .then(function (callback) {
                             return callback;
                         }, function (callback) {
