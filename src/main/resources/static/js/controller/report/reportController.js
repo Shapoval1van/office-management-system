@@ -25,7 +25,7 @@
                 $scope.isManager = false;
                 $scope.isEmployee = false;
 
-                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.order = FieldFactory.request.NAME;
 
                 $scope.requestFields = FieldFactory.request;
 
@@ -215,20 +215,24 @@
                 };
 
                 $scope.pageChanged = function(currentPage) {
+                    if(currentPage!=undefined){
+                        $scope.currentPage = currentPage;
+                    }
+
                     if($scope.userToShow.role.id == 1){
                         if(functionalityOfManager){
                             var functionality = ManagerFunctionality;
                         }else {
                             var functionality = UserFunctionality;
                         }
-                        return ReportService.pageChangedAdmin(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize, functionality, $scope.order)
+                        return ReportService.pageChangedAdmin(personId , $scope.currentPage ,$scope.period.toLowerCase(), $scope.pageSize, functionality, $scope.order)
                             .then(function successCallback(response) {
                                 $scope.requestList =  response.data;
                             }, function (response) {
                                 $scope.requestList = [];
                             })
                     } else {
-                        return ReportService.pageChanged(personId , currentPage ,$scope.period.toLowerCase(), $scope.pageSize, $scope.order)
+                        return ReportService.pageChanged(personId , $scope.currentPage ,$scope.period.toLowerCase(), $scope.pageSize, $scope.order)
                             .then(function successCallback(response) {
                                 $scope.requestList =  response.data;
                             }, function (response) {
