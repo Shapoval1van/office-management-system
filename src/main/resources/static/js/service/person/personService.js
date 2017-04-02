@@ -13,6 +13,32 @@
                         })
                 };
 
+                personService.getAllActivePerson = function (currentPage, pageSize, order) {
+                    var personUrl = "/api/person/list?page=" +  currentPage + "&size=" + pageSize;
+                    if (!!order)
+                        personUrl += "&sort=" + order;
+
+                    return $http.get(personUrl)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
+                personService.getActivePersonByRole = function (roleId, currentPage, pageSize, order) {
+                    var personUrl = "/api/person/list/" + roleId + "?page=" + currentPage + "&size=" + pageSize;
+                    if (!!order)
+                        personUrl += "&sort=" + order;
+
+                    return $http.get(personUrl)
+                        .then(function (callback) {
+                            return callback;
+                        }, function (callback) {
+                            return callback;
+                        })
+                };
+
                 personService.searchManagerByName = function (namePattern, pageNumber, pageSize) {
                     if (namePattern.length > 2)
                         return $http.get("/api/person/managers/" + namePattern + "?page=" + pageNumber + "&size=" + pageSize)

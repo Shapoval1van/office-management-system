@@ -1,14 +1,9 @@
 package com.netcracker.service.notification.impls;
 
-import com.netcracker.model.entity.ChangeItem;
-import com.netcracker.model.entity.Notification;
-import com.netcracker.model.entity.Person;
-import com.netcracker.model.entity.Request;
-import com.netcracker.repository.data.interfaces.NotificationRepository;
-import com.netcracker.repository.data.interfaces.PersonRepository;
+import com.netcracker.model.entity.*;
+import com.netcracker.repository.data.interfaces.*;
 import com.netcracker.service.mail.impls.MailService;
 import com.netcracker.service.notification.interfaces.NotificationSender;
-import com.netcracker.util.ChangeTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -16,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -88,26 +82,23 @@ public class NotificationService implements NotificationSender {
     @Value("${server.source}")
     private String SERVER_SOURCE;
 
-    private ChangeTracker changeTracker;
     private MailService mailService;
     private PersonRepository personRepository;
     private NotificationRepository notificationRepository;
+    private RequestRepository requestRepository;
+    private ChangeItemRepository changeItemRepository;
+    private FieldRepository fieldRepository;
 
     @Autowired
-    public void setMailService(MailService mailService) {
+    public NotificationService(MailService mailService, PersonRepository personRepository,
+                               NotificationRepository notificationRepository, RequestRepository requestRepository,
+                               ChangeItemRepository changeItemRepository, FieldRepository fieldRepository) {
         this.mailService = mailService;
-    }
-    @Autowired
-    public void setPersonRepository(PersonRepository personRepository) {
         this.personRepository = personRepository;
-    }
-    @Autowired
-    public void setNotificationRepository(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
-    }
-    @Autowired
-    public void setChangeTracker(ChangeTracker changeTracker){
-        this.changeTracker = changeTracker;
+        this.requestRepository = requestRepository;
+        this.changeItemRepository = changeItemRepository;
+        this.fieldRepository = fieldRepository;
     }
 
     @Override
@@ -203,17 +194,16 @@ public class NotificationService implements NotificationSender {
     }
 
     @Override
-    public void sendRequestUpdateNotification(Request oldRequest, Request newRequest, Date changeTime) {
-        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(oldRequest.getId());
-        Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
+    public void sendRequestUpdateNotification(Request request, Set<ChangeItem> changes) {
+        List<Person> subscribers = personRepository.findPersonsBySubscribingRequest(request.getId());
         subscribers.forEach(person -> {
-            changeItemSet.forEach(changeItem -> {
+            changes.forEach(changeItem -> {
                 Notification notification = new Notification.NotificationBuilder(person,
-                                REQUEST_UPDATE_SUBJECT.concat(oldRequest.getName()))
+                                REQUEST_UPDATE_SUBJECT.concat(request.getName()))
                         .template(REQUEST_UPDATE_MESSAGE_TEMPLATE)
-                        .link(detailsLink(oldRequest.getId()))
-                        .request(oldRequest)
-                        .changeItem(new ChangeItem(changeItem.getOldVal(), changeItem.getNewVal(), changeItem.getField()))
+                        .link(detailsLink(request.getId()))
+                        .request(request)
+                        .changeItem(changeItem)
                         .build();
                 mailService.send(notification);
             });
@@ -283,12 +273,21 @@ public class NotificationService implements NotificationSender {
     @Transactional
     public void resendNotification() {
         List<Notification> notifications = notificationRepository.findAllNotificationsSortedByDate();
-        notifications.forEach(notification -> {
+        notifications.forEach((Notification notification) -> {
             notificationRepository.delete(notification.getId());
             Optional<Person> personOptional = personRepository.findOne(notification.getPerson().getId());
-            if (personOptional.isPresent()) {
+            Optional<Request> request = requestRepository.findOne(notification.getRequest().getId());
+            Optional<ChangeItem> changeItem = changeItemRepository.findOne(notification.getChangeItem().getId());
+            if (personOptional.isPresent()) { // If person does not exist than miss sending
                 notification.setPerson(personOptional.get());
                 notification.setId(null);
+                request.ifPresent(notification::setRequest);
+                if (changeItem.isPresent()){
+                    notification.setChangeItem(changeItem.get());
+                    Optional<Field> fieldOptional = fieldRepository.findOne(notification.getChangeItem().getField().getId());
+                    fieldOptional.ifPresent(field -> notification.getChangeItem().setField(field));
+                }
+                changeItem.ifPresent(notification::setChangeItem);
                 mailService.send(notification);
             }
         });

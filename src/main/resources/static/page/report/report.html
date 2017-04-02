@@ -1,6 +1,5 @@
 <div id="wrapper" class="toggled">
     <side-bar></side-bar>
-    <!--TODO add pageable-->
     <div id="page-content-wrapper">
         <div class="container-fluid">
             <div class="jumbotron bordered">
@@ -37,17 +36,21 @@
                             <div width="100%"  fusioncharts type="pie2d" dataSource="{{pieChart}}"> </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row"  ng-if="requestList.length!=0">
                         <table st-table="displayedList" st-safe-src="requestList"
                                class="table table-stripped">
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th st-sort="name">Name</th>
-                                <th st-sort="estimate">Estimate</th>
-                                <th st-sort="priority.id">Priority</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.NAME),
+                            'sort-descent': isDescOrder(requestFields.NAME)}" ng-click="orderRequestsByName()">Name</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.ESTIMATE),
+                            'sort-descent': isDescOrder(requestFields.ESTIMATE)}" ng-click="sortRequestsByEstimate()">Estimate</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.PRIORITY),
+                            'sort-descent': isDescOrder(requestFields.PRIORITY)}" ng-click="sortRequestsByPriority()">Priority</th>
                                 <th>Author</th>
-                                <th st-sort="status.id">Status</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestFields.STATUS),
+                             'sort-descent': isDescOrder(requestFields.STATUS)}" ng-click="sortRequestsByStatus()">Status</th>
                             </tr>
                             </thead>
                             <tbody>

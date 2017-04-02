@@ -2,7 +2,6 @@
     <side-bar></side-bar>
     <div id="page-content-wrapper" ng-cloak="">
         <div class="container-fluid">
-            <!-- Отута весь контент -->
             <div class="jumbotron bordered">
                 <div class="row">
                     <div class="col-md-12">
@@ -32,7 +31,10 @@
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th st-sort="name">Name</th>
+                                <th ng-class="{'sort-ascent': isAscOrder(requestGroupFields.NAME),
+                                 'sort-descent': isDescOrder(requestGroupFields.NAME)}" ng-click="orderGroupsByName()">
+                                    Name
+                                </th>
                                 <th>Request count</th>
                                 <th></th>
                             </tr>
@@ -50,14 +52,6 @@
                                             Delete request group
                                         </button>
                                     </div>
-                                    <!--<delete-request-group-modal></delete-request-group-modal>-->
-                                    <!--<div data-dismiss="modal" data-toggle="modal"-->
-                                         <!--data-target="#deleteRequestGroupModal">-->
-                                        <!--<button class="btn btn-danger delete-request-group-btn"-->
-                                                <!--ng-click="setCurrentRequestGroup(group)">-->
-                                            <!--Delete request group-->
-                                        <!--</button>-->
-                                    <!--</div>-->
                                 </td>
                             </tr>
                             </tbody>

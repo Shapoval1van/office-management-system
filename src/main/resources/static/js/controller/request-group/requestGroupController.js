@@ -1,7 +1,7 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestGroupController", ['$scope', '$routeParams', "$rootScope", 'RequestGroupService',
-            function ($scope, $routeParams, $rootScope, RequestGroupService) {
+        .controller("RequestGroupController", ['$scope', '$routeParams', "$rootScope", 'RequestGroupService', "FieldFactory",
+            function ($scope, $routeParams, $rootScope, RequestGroupService, FieldFactory) {
 
                 $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 $scope.groups = [];
@@ -10,12 +10,17 @@
                 $scope.requestGroupNamePattern = "";
                 $scope.maxPageSize = 20;
 
+                $scope.order = FieldFactory.requestGroup.NAME;
+
                 $rootScope.sideBarActiveElem = "request-group";
 
                 $scope.currentRequestGroup = {};
 
+                $scope.requestGroupFields = FieldFactory.requestGroup;
+
                 $scope.getGroupByAuthor = function () {
-                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage, $scope.pageSize)
+                    return RequestGroupService.getGroupByAuthor($scope.currentUser.id, $scope.currentPage,
+                        $scope.pageSize, $scope.order)
                         .then(function (callback) {
                             $scope.groups = callback.data.data;
                             $scope.maxPageSize = callback.data.totalElements;
@@ -26,10 +31,31 @@
                         });
                 };
 
+                $scope.orderRequestGroups = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.getGroupByAuthor();
+                };
+
+
+                $scope.orderGroupsByName = function () {
+                    return $scope.orderRequestGroups(FieldFactory.requestGroup.NAME);
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
                 $scope.getGroupByAuthor();
 
                 $scope.searchByNamePattern = function () {
-                    if($scope.requestGroupNamePattern.length > 2 || $scope.requestGroupNamePattern.length == 0) {
+                    if ($scope.requestGroupNamePattern.length > 2 || $scope.requestGroupNamePattern.length == 0) {
                         $(".request-group-input-wrapper").removeClass("warning");
                         return RequestGroupService.findGroupByNamePattern($scope.currentUser.id, $scope.requestGroupNamePattern)
                             .then(function (callback) {
@@ -41,10 +67,10 @@
                 };
 
                 $scope.createGroup = function () {
-                    if($scope.requestGroupNamePattern.length < 3){
+                    if ($scope.requestGroupNamePattern.length < 3) {
                         $(".request-group-input-wrapper").addClass("warning");
                     }
-                    else{
+                    else {
                         $(".request-group-input-wrapper").removeClass("warning");
                         return RequestGroupService.createGroup($scope.requestGroupNamePattern)
                             .then(function (callback) {

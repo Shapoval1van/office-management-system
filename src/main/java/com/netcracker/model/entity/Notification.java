@@ -116,11 +116,6 @@ public class Notification implements Persistable<Long> {
             return this;
         }
 
-        public NotificationBuilder person(Person person) {
-            this.person = person;
-            return this;
-        }
-
         public NotificationBuilder link(String link) {
             this.link = link;
             return this;
@@ -133,11 +128,6 @@ public class Notification implements Persistable<Long> {
 
         public NotificationBuilder text(String text) {
             this.text = text;
-            return this;
-        }
-
-        public NotificationBuilder subject(String subject) {
-            this.subject = subject;
             return this;
         }
 

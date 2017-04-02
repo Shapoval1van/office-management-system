@@ -15,11 +15,15 @@
                 };
 
 
-                reportService.pageChanged = function(personId, currentPage, period, pageSize) {
+                reportService.pageChanged = function(personId, currentPage, period, pageSize, order) {
+                    var requestUrl = "api/report/allRequest/"+personId+"?period="+ period
+                        +"&page=" +  currentPage + "&size=" + pageSize;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
                     return $http({
                         method: 'GET',
-                        url: 'api/report/allRequest/'+personId+'?period='+ period
-                        +'&page=' +  currentPage + '&size=' + pageSize
+                        url: requestUrl
                     }).then(function successCallback(response) {
                         return response;
                     }, function errorCallback(response) {
@@ -37,11 +41,15 @@
                 };
 
 
-                reportService.pageChangedAdmin = function(personId, currentPage, period, pageSize, functionality) {
+                reportService.pageChangedAdmin = function(personId, currentPage, period, pageSize, functionality, order) {
+                    var requestUrl = "api/report/admin/allRequest/"+personId+"?period="+ period
+                        +"&page=" +  currentPage + "&size=" + pageSize + "&role=" + functionality;
+                    if (!!order)
+                        requestUrl += "&sort=" + order;
+
                     return $http({
                         method: 'GET',
-                        url: 'api/report/admin/allRequest/'+personId+'?period='+ period
-                        +'&page=' +  currentPage + '&size=' + pageSize + '&role=' + functionality
+                        url: requestUrl
                     }).then(function successCallback(response) {
                         return response;
                     }, function errorCallback(response) {

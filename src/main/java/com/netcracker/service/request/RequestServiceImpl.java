@@ -5,6 +5,7 @@ import com.netcracker.exception.IllegalAccessException;
 import com.netcracker.exception.request.RequestNotAssignedException;
 import com.netcracker.exception.requestGroup.CannotUpdateStatusException;
 import com.netcracker.model.dto.FullRequestDTO;
+import com.netcracker.model.dto.HistoryDTO;
 import com.netcracker.model.dto.Page;
 import com.netcracker.model.entity.*;
 import com.netcracker.model.event.*;
@@ -98,60 +99,9 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    //TODO deprecated
-//    @Override
-//    public Optional<Request> saveSubRequest(Request subRequest, Principal principal) throws CannotCreateSubRequestException {
-//        Locale locale = LocaleContextHolder.getLocale();
-//        String email = principal.getName();
-//
-//        if (subRequest.getParent() == null) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{"null"}, locale));
-//        }
-//
-//        Person manager = personRepository.findPersonByEmail(email).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(MANAGER_ERROR_MAIL, new Object[]{email}, locale)));
-//
-//        priorityRepository.findOne(subRequest.getPriority().getId()).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(PRIORITY_ERROR_ID, new Object[]{subRequest.getPriority().getId()}, locale)));
-//
-//        subRequest.setManager(manager);
-//
-//        long parentId = subRequest.getParent().getId();
-//        Request parentRequest = requestRepository.findOne(parentId).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(SUB_REQUEST_ERROR_PARENT, new Object[]{parentId}, locale)));
-//
-//        if (parentRequest.getParent() != null) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT_IS_SUB_REQUEST, null, locale));
-//        }
-//
-//        if ((parentRequest.getManager() == null || !Objects.equals(parentRequest.getManager().getId(), manager.getId()))
-//                && manager.getRole().getId() != 1) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_ILLEGAL_ACCESS, null, locale));
-//        }
-//
-//        String parentStatus = parentRequest.getStatus().getName();
-//        if (StatusEnum.CANCELED.getName().equals(parentStatus) || StatusEnum.CLOSED.getName().equals(parentStatus)) {
-//            throw new CannotCreateSubRequestException(messageSource
-//                    .getMessage(SUB_REQUEST_ERROR_PARENT_CLOSED, null, locale));
-//        }
-//
-//        subRequest.setCreationTime(new Timestamp(System.currentTimeMillis()));
-//        subRequest.setEmployee(parentRequest.getEmployee());
-//        subRequest.setStatus(statusRepository.findStatusByName(StatusEnum.FREE.getName()).orElseThrow(() ->
-//                new CannotCreateSubRequestException(messageSource
-//                        .getMessage(STATUS_ERROR, new Object[]{StatusEnum.FREE.getName()}, locale))));
-//        return requestRepository.save(subRequest);
-//    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     public Optional<Request> saveRequest(Request request, Principal principal) throws CannotCreateRequestException, CurrentUserNotPresentException {
         Locale locale = LocaleContextHolder.getLocale();
         String email = principal.getName();
@@ -207,23 +157,8 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-
-    //TODO deprecated
-//    @Override
-//    @PreAuthorize("isAuthenticated()")
-//    public Optional<Request> updateRequestPriority(Long requestId, String priority, Principal principal) throws ResourceNotFoundException {
-//        Optional<Request> futureNewRequest = checkRequestPresent(requestRepository.findOne(requestId));
-//        Optional<Priority> p = priorityRepository.findPriorityByName(priority);
-//        if (!p.isPresent()) return Optional.empty();
-//        Request oldRequest = new Request(futureNewRequest.get());
-//        futureNewRequest.get().setPriority(p.get());
-//        eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, futureNewRequest.get(), new Date(),principal.getName()));
-//        this.requestRepository.updateRequestPriority(futureNewRequest.get());
-//        return futureNewRequest;
-//    }
-
-
-    public Optional<Request> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException {
+    @Override
+    public Set<ChangeItem> updateRequestHistory(Request newRequest, Request oldRequest, String authorName) throws CurrentUserNotPresentException {
         Optional<Person> author = checkPersonPresent(personRepository.findPersonByEmail(authorName));
         ChangeGroup changeGroup = new ChangeGroup();
         changeGroup.setRequest(new Request(oldRequest.getId()));
@@ -231,12 +166,12 @@ public class RequestServiceImpl implements RequestService {
         changeGroup.setCreateDate(new Timestamp(System.currentTimeMillis()));
         Set<ChangeItem> changeItemSet = changeTracker.findMismatching(oldRequest, newRequest);
         if (changeItemSet.size() == 0) {
-            return Optional.empty();
+            return null;
         }
         ChangeGroup newChangeGroup = changeGroupRepository.save(changeGroup).get();
         changeItemSet.forEach(ci -> ci.setChangeGroup(new ChangeGroup(newChangeGroup.getId())));
         changeItemSet.forEach(changeItemRepository::save);
-        return Optional.of(newRequest);
+        return changeItemSet;
     }
 
     /**
@@ -378,14 +313,17 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    public List<ChangeGroup> getRequestHistory(Long requestId, String period, Pageable pageable) {
+    public Page<HistoryDTO> getRequestHistory(Long requestId, String period, Pageable pageable) {
         try {
             List<ChangeGroup> changeGroups = changeGroupRepository.findByRequestIdWithDetails(requestId,
                     Period.valueOf(period.toUpperCase()), pageable);
             fill(changeGroups);
-            return changeGroups;
+            List<HistoryDTO> historyList = new ArrayList<>();
+            changeGroups.forEach(changeGroup -> historyList.add(new HistoryDTO(changeGroup)));
+            Long count = changeGroupRepository.countChangeByRequestId(requestId, Period.valueOf(period.toUpperCase()));
+            return new Page<>(pageable.getPageSize(), pageable.getPageNumber(), count, historyList);
         } catch (IllegalArgumentException e) {
-            return new ArrayList<>();
+            return new Page<>();
         }
     }
 
@@ -416,14 +354,18 @@ public class RequestServiceImpl implements RequestService {
                 requestsByRequestGroup.getTotalElements(), fullRequestDTOList);
     }
 
+    /**
+     * This method executes each time specified in property with 'cron' pattern.
+     * It is notify manager about request that estimate time will end in 24-48 hours.
+     */
     @Scheduled(cron = "${request.expiry.remind.time}")
     @Override
     public void checkRequestsForExpiry() {
         Long currentTime = System.currentTimeMillis();
 
         List<Request> requests = requestRepository.findAll().stream()
-                .filter(r -> r.getEstimate() != null &&
-                        (r.getStatus().getId() == 1 || r.getStatus().getId() == 2)) // avoid requests without manager and closed/canceled
+                .filter(r -> r.getEstimate() != null && (r.getStatus().getId() == 1 || r.getStatus().getId() == 2)
+                ) // avoid requests without manager and with status closed/canceled
                 .filter(r ->
                         {
                             Long difference = r.getEstimate().getTime() - currentTime;
@@ -434,7 +376,6 @@ public class RequestServiceImpl implements RequestService {
                 )
                 .collect(Collectors.toList());
         requests.forEach(this::fill);
-
         eventPublisher.publishEvent(new RequestExpiringEvent(requests));
     }
 
@@ -464,12 +405,14 @@ public class RequestServiceImpl implements RequestService {
             requestRepository.assignRequest(requestId, person.get().getId(), new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
 
-//            Automatically subscribe manager to request
+            // Subscribe manager to request
             personRepository.subscribe(requestId, person.get().getId());
-            eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+            eventPublisher.publishEvent(
+                    new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
             return true;
         }
-        throw new CannotAssignRequestException(messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
+        throw new CannotAssignRequestException(
+                messageSource.getMessage(REQUEST_ERROR_ALREADY_ASSIGNED, null, locale));
     }
 
     /**
@@ -478,7 +421,7 @@ public class RequestServiceImpl implements RequestService {
      * @param requestId
      * @param personId
      * @return true in case success operation
-     * @throws CannotAssignRequestException
+     * @throws CannotAssignRequestException when person or request does not exist
      */
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
@@ -491,6 +434,7 @@ public class RequestServiceImpl implements RequestService {
         if (oldRequest.isPresent() && person.isPresent()){
             requestRepository.assignRequest(requestId, personId, new Status(1)); // Send status 'FREE', because Office Manager doesn't start do task right now.
             Optional<Request> newRequest = getRequestById(requestId);
+
             // Subscribe new manager to request
             personRepository.subscribe(requestId, person.get().getId());
             eventPublisher.publishEvent(new RequestAssignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));

@@ -1,12 +1,15 @@
 (function () {
     angular.module("OfficeManagementSystem")
-        .controller("RequestListByUserController", ["$scope", "$location", "$rootScope", "$window", "$http", "PersonService", "RequestService",
-            function ($scope, $location, $rootScope, $window,  $http, PersonService, RequestService) {
+        .controller("RequestListByUserController", ["$scope", "$location", "$rootScope", "$window", "$http", "PersonService", "RequestService", "FieldFactory",
+            function ($scope, $location, $rootScope, $window,  $http, PersonService, RequestService, FieldFactory) {
 
                 $scope.selectedCurrentManager = undefined;
                 $scope.selectedUser = undefined;
                 $scope.managers = [];
                 $scope.users = [];
+
+                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.requestFields = FieldFactory.request;
 
                 var requestDetails = "/secured/employee/request/";
 
@@ -60,7 +63,7 @@
                             $http({
                                 method: 'GET',
                                 url: '/api/request/list/assigned/' +  $scope.selectedCurrentManager.id +
-                                '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize
+                                '?page=' +  $scope.currentPage + '&size=' + $scope.pageSize + "&sort=" + $scope.order
                             }).then(function (response) {
                                 $scope.requests = [];
                                 $scope.requests = response.data.data;
@@ -108,7 +111,7 @@
                         $http({
                             method: 'GET',
                             url: '/api/request/list/user/' + $scope.selectedUser.id +
-                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize
+                            '?page=' + $scope.currentPage + '&size=' + $scope.pageSize + "&sort=" + $scope.order
                         }).then(function (response) {
                             $scope.requests = [];
                             $scope.requests = response.data.data;
@@ -136,6 +139,42 @@
                     };
                 }
 
+
+                $scope.orderRequests = function (fieldName) {
+                    if (FieldFactory.isDescOrder($scope.order, fieldName))
+                        $scope.order = FieldFactory.removeSortField($scope.order, fieldName);
+                    else
+                        $scope.order = FieldFactory.toggleOrder($scope.order, fieldName);
+                    return $scope.pageChanged();
+                };
+
+                $scope.isDescOrder = function (fieldName) {
+                    return FieldFactory.isDescOrder($scope.order, fieldName);
+                };
+
+                $scope.isAscOrder = function (fieldName) {
+                    return FieldFactory.isAscOrder($scope.order, fieldName);
+                };
+
+                $scope.orderRequestsByName = function () {
+                    return $scope.orderRequests(FieldFactory.request.NAME);
+                };
+
+                $scope.sortRequestsByEstimate = function () {
+                    return $scope.orderRequests(FieldFactory.request.ESTIMATE);
+                };
+
+                $scope.sortRequestsByPriority = function () {
+                    return $scope.orderRequests(FieldFactory.request.PRIORITY);
+                };
+
+                $scope.sortRequestsByCreatingTime = function () {
+                    return $scope.orderRequests(FieldFactory.request.CREATE_TIME);
+                };
+
+                $scope.sortRequestsByStatus = function () {
+                    return $scope.orderRequests(FieldFactory.request.STATUS);
+                };
 
                 $scope.requestDetails = function (requestId) {
                     window.location = requestDetails + requestId;

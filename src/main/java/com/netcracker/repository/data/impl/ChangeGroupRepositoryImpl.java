@@ -32,6 +32,9 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
     @Value("${change.group.period.month}")
     private String PERIOD_MONTH;
 
+    @Value("${count.change.group.by.request.id}")
+    private String COUNT_BY_REQUEST_ID;
+
     @Autowired
     private ChangeItemRepositoryImpl changeItemRepository;
 
@@ -50,6 +53,17 @@ public class ChangeGroupRepositoryImpl extends GenericJdbcRepository<ChangeGroup
         }
     }
 
+    @Override
+    public Long countChangeByRequestId(Long id, Period period) {
+        switch (period){
+            case DAY:
+                return super.getJdbcTemplate().queryForObject(COUNT_BY_REQUEST_ID.concat(PERIOD_DAY), new Object[]{id},Long.class);
+            case MONTH:
+                return super.getJdbcTemplate().queryForObject(COUNT_BY_REQUEST_ID.concat(PERIOD_MONTH), new Object[]{id},Long.class);
+            default:
+                return super.getJdbcTemplate().queryForObject(COUNT_BY_REQUEST_ID,new Object[]{id},Long.class);
+        }
+    }
 
 
     @Override

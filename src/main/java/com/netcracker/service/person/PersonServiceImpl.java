@@ -134,16 +134,13 @@ public class PersonServiceImpl implements PersonService {
         if (!oldUser.isPresent()) return Optional.empty();
 
         if (currentAdmin.getId().equals(oldUser.get().getId())){
-            throw new CannotUpdatePersonException(messageSource.getMessage(
-                    USER_ERROR_UPDATE_CURRENT_ADMIN, null, locale));
+            throw new CannotUpdatePersonException(messageSource.getMessage(USER_ERROR_UPDATE_CURRENT_ADMIN, null, locale));
         } else if (RoleEnum.PROJECT_MANAGER.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
-            throw new CannotUpdatePersonException(messageSource.getMessage(
-                    USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));
+            throw new CannotUpdatePersonException(messageSource.getMessage(USER_ERROR_UPDATE_FROM_MANAGER_TO_EMPLOYEE, null, locale));
         else if (RoleEnum.ADMINISTRATOR.getId().equals(oldUser.get().getRole().getId())
                 && RoleEnum.EMPLOYEE.getId().equals(person.getRole().getId()))
-            throw new CannotUpdatePersonException(messageSource.getMessage(
-                    USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE, null, locale));
+            throw new CannotUpdatePersonException(messageSource.getMessage(USER_ERROR_UPDATE_FROM_ADMIN_TO_EMPLOYEE, null, locale));
         else {
             eventPublisher.publishEvent(new NotificationPersonUpdateEvent(person));
             this.personRepository.updatePerson(person);
@@ -154,18 +151,16 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getManagers(Pageable pageable, String namePattern) {
-        if (namePattern == null) {
+        if (namePattern == null)
             return this.personRepository.getManagers(pageable);
-        }
         return this.personRepository.getManagers(pageable, namePattern);
     }
 
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public List<Person> getUsersByNamePattern(Pageable pageable, String namePattern) {
-        if (namePattern == null) {
+        if (namePattern == null)
             return this.personRepository.getPersonList(pageable);
-        }
         return this.personRepository.getUsersByNamePattern(pageable, namePattern);
 
     }
