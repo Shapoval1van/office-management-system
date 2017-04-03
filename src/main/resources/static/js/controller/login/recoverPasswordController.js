@@ -12,6 +12,16 @@
                 $scope.recoverEmail = "";
                 $scope.hasError = false;
 
+
+                var showErrorMessage = function (text) {
+                    text = text ? text : "";
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error",
+                        confirmButtonText: "Close"
+                    });
+                };
                 $scope.sendRecoverRequest = function () {
                     if ($scope.recoverEmail==""){
                         $scope.hasError = true;
@@ -37,11 +47,11 @@
                     })
                         .then(function (callback) {
                             //    Success
-                            window.alert("Recover message sent to your email "+$scope.recoverEmail);
+                            showErrorMessage("Recover message sent to your email "+$scope.recoverEmail);
                             console.log("Login Success!");
                         }, function (callback) {
                             //    Failure
-                            window.alert("This email is not registered in our service");
+                            showErrorMessage("This email is not registered in our service");
                             console.log("Login Failure!");
                         })
                 };
@@ -61,9 +71,9 @@
                             console.log("Login Success!")
                         }, function (callback) {
                             if(callback.status===500){
-                                window.alert("Bad credentials");
+                                showErrorMessage("Bad credentials");
                             }else {
-                                window.alert(callback.data.message);
+                                showErrorMessage(callback.data.message);
                             }
                             console.log(callback);
                             console.log("Login Failure!")

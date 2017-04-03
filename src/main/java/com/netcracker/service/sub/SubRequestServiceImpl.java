@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class SubRequestServiceImpl {
+public class SubRequestServiceImpl implements SubRequestService {
 
     private static final String INTERNAL_ERROR_MESSAGE = "Internal error.";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "Resource not found.";

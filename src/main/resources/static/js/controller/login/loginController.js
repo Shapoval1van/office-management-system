@@ -27,6 +27,16 @@
                 $scope.password = "";
                 $scope.hasError = false;
 
+                var showErrorMessage = function (text) {
+                    text = text?text:"";
+                    swal({
+                        title: "Error",
+                        text: text,
+                        type: "error",
+                        confirmButtonText: "Close"
+                    });
+                };
+
 
                 if (!!$routeParams.registrationToken) {
                     console.log("Activation!")
@@ -35,7 +45,7 @@
                             $scope.person.username = response.data.email;
                             $scope.username = response.data.email;
                         }, function (response) {
-                            window.alert("Activation error.");
+                            showErrorMessage("Activation error.");
                         })
                 }
 
@@ -48,7 +58,7 @@
                     }
                     $scope.Session.performLogin($scope.username, $scope.password).then(function (response) {
                         if(response.isError){
-                            window.alert(response.data.error_description);
+                            showErrorMessage(response.data.error_description);
                         } else {
                             $scope._relocateUser();
                         }
