@@ -48,7 +48,6 @@ public class PasswordResetController {
             }
             return new ResponseEntity<>(new PersonDTO(person), HttpStatus.OK);
         } catch (OutdatedTokenException outdatedTokenException) {
-            outdatedTokenException.printStackTrace();
             return new ResponseEntity<>(new MessageDTO("Token expired"), HttpStatus.BAD_REQUEST);
         }
     }
