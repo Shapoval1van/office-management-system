@@ -165,7 +165,7 @@ public class PersonRepositoryImpl extends GenericJdbcRepository<Person, Long> im
 
     @Override
     public List<Person> getManagers(Pageable pageable, String namePattern) {
-        return super.queryForList(FIND_MANAGER_NAME_PATTERN, pageable, namePattern);
+        return super.queryForList(FIND_MANAGER_NAME_PATTERN, pageable, namePattern, namePattern);
     }
 
     @Override

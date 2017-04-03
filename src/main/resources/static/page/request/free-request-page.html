@@ -71,7 +71,7 @@
                                     </div>
                                     <a ng-click="requestUpdate(request.id)" class="btn btn-info" ng-show="my">Edit</a>
                                     <assign-to-smb-btn ng-show="!my && isAdmin() && !isAssigned(request)"></assign-to-smb-btn>
-                                    <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my">Cancel</a>
+                                    <a ng-click="requestDelete(request.id)" class="btn btn-danger" ng-show="my && isFree(request)">Cancel</a>
                                     <a ng-click="unassign(request.id)" class="btn btn-danger" ng-show="isAssigned(request) && !my">Unassign</a>
                                 </td>
                             </tr>
