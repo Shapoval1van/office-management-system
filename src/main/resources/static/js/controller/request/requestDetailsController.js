@@ -94,7 +94,6 @@
                 };
 
                 $scope.getHistoryPageSize = function () {
-                    console.log($scope.historyMaxPageSize - $scope.historyList.length);
                     if ($scope.historyMaxPageSize - $scope.historyList.length >= $scope.historyPageSize) {
                         return $scope.historyPageSize;
                     }

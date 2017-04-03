@@ -13,7 +13,7 @@
                 $scope.selectedRequest = -1;
                 $scope.requestListVisibility = true;
 
-                $scope.order = FieldFactory.requestGroup.NAME;
+                $scope.order = FieldFactory.desc(FieldFactory.request.CREATE_TIME);
                 $scope.requestFields = FieldFactory.request;
 
                 $scope.pageChanged = function () {
