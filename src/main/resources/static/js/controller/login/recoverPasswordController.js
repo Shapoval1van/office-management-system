@@ -5,13 +5,16 @@
             function ($scope, $http, $routeParams) {
 
                 $scope.passErrorMessage="The password must contain at least 8 characters, 1 capital letter and 1 number!";
-                $scope.confirmPassErrorMessage="Does not matches with the password!"
+                $scope.confirmPassErrorMessage="Does not matches with the password!";
 
                 $scope.password = "";
                 $scope.confirmPassword = "";
                 $scope.recoverEmail = "";
                 $scope.hasError = false;
 
+                if ($scope.Session.isUserLoggedIn()){
+                    window.location.href = "/secured/employee/dashboard"
+                }
 
                 var showErrorMessage = function (text) {
                     text = text ? text : "";

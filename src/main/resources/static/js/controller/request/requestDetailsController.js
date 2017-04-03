@@ -94,7 +94,6 @@
                 };
 
                 $scope.getHistoryPageSize = function () {
-                    console.log($scope.historyMaxPageSize - $scope.historyList.length);
                     if ($scope.historyMaxPageSize - $scope.historyList.length >= $scope.historyPageSize) {
                         return $scope.historyPageSize;
                     }
@@ -192,9 +191,13 @@
                 };
 
                 $scope.unassign = function (requestId) {
+                    var text = "Do you really want to unassign manager from this request?\n";
+                    if($scope.isGrouped()) {
+                        text += "Request will be deleted from group " + $scope.request.requestGroup.name;
+                    }
                     swal({
                             title: "Are you sure?",
-                            text: "Do you really want to unassign manager from this request",
+                            text: text,
                             type: "warning",
                             showCancelButton: true,
                             confirmButtonColor: "#DD6B55",
@@ -420,7 +423,8 @@
                 };
 
                 $scope.showUnassignBtn = function () {
-                    return $scope.isCurrentUserAdministrator() && $scope.isAssigned() && !$scope.isClosed() && !$scope.isCanceled();
+                    return $scope.isCurrentUserAdministrator() && $scope.isAssigned() && !$scope.isClosed()
+                        && !$scope.isCanceled();
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {

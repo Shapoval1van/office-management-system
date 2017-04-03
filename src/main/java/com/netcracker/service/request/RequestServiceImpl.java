@@ -140,19 +140,19 @@ public class RequestServiceImpl implements RequestService {
     public Optional<Request> updateRequest(Request newRequest, Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Optional<Request> oldRequest = checkRequestPresent(requestRepository.findOne(requestId));
+        Request oldRequest = checkRequestPresent(requestRepository.findOne(requestId));
         Optional<Person> employee = checkPersonPresent(personRepository.findOne(newRequest.getEmployee().getId()));
         Optional<Person> currentUser = checkPersonPresent(personRepository.findPersonByEmail(principal.getName()));
-        if (StatusEnum.CANCELED.getId().equals(oldRequest.get().getStatus().getId())){
+        if (StatusEnum.CANCELED.getId().equals(oldRequest.getStatus().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CANCELED, null, locale));
-        } else if (StatusEnum.CLOSED.getId().equals(oldRequest.get().getStatus().getId())){
+        } else if (StatusEnum.CLOSED.getId().equals(oldRequest.getStatus().getId())){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_CLOSED, null, locale));
         } else if (!employee.get().getId().equals(currentUser.get().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NOT_PERMISSION, null, locale));
-        } else if (!StatusEnum.FREE.getId().equals(oldRequest.get().getStatus().getId()) && !isCurrentUserAdmin(principal)){
+        } else if (!StatusEnum.FREE.getId().equals(oldRequest.getStatus().getId()) && !isCurrentUserAdmin(principal)){
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_ERROR_UPDATE_NON_FREE, null, locale));
         } else {
-            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest.get(), newRequest, new Date(), principal.getName()));
+            eventPublisher.publishEvent(new UpdateRequestEvent(oldRequest, newRequest, new Date(), principal.getName()));
             return this.requestRepository.updateRequest(newRequest);
         }
     }
@@ -191,7 +191,7 @@ public class RequestServiceImpl implements RequestService {
     public int addToRequestGroup(Long requestId, Integer requestGroupId, Principal principal) throws ResourceNotFoundException, IncorrectStatusException, IllegalAccessException, RequestNotAssignedException {
         Locale locale = LocaleContextHolder.getLocale();
 
-        Optional<Request> request = checkRequestPresent(requestRepository.findOne(requestId));
+        Request request = checkRequestPresent(requestRepository.findOne(requestId));
         Optional<RequestGroup> requestGroupOptional = requestGroupRepository.findOne(requestGroupId);
 
         if (!requestGroupOptional.isPresent()) {
@@ -199,13 +199,13 @@ public class RequestServiceImpl implements RequestService {
             throw new ResourceNotFoundException(messageSource
                     .getMessage(REQUEST_GROUP_NOT_EXIST, new Object[]{requestGroupId}, locale));
         }
-        if (request.get().getManager() == null) {
+        if (request.getManager() == null) {
             LOGGER.error(messageSource
                     .getMessage(REQUEST_NOT_ASSIGNED, new Object[]{}, locale));
             throw new RequestNotAssignedException(messageSource
                     .getMessage(REQUEST_NOT_ASSIGNED, new Object[]{}, locale));
         }
-        Status status = statusRepository.findOne(request.get().getStatus().getId()).get();
+        Status status = statusRepository.findOne(request.getStatus().getId()).get();
 
         if (!status.getName().equalsIgnoreCase(StatusEnum.FREE.getName())) {
             LOGGER.error("Request should be in FREE status for grouping. Current status is {}", status.getName());
@@ -215,9 +215,9 @@ public class RequestServiceImpl implements RequestService {
         if (!isAccessLegal(requestGroupOptional.get(), principal))
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
 
-        request.get().setRequestGroup(new RequestGroup(requestGroupId));
+        request.setRequestGroup(new RequestGroup(requestGroupId));
         int rowsUpdated = requestRepository.updateRequestGroup(requestId, requestGroupId);
-        eventPublisher.publishEvent(new RequestAddToGroupEvent(getRequestById(request.get().getId()).get()));
+        eventPublisher.publishEvent(new RequestAddToGroupEvent(getRequestById(request.getId()).get()));
         return rowsUpdated;
     }
 
@@ -234,17 +234,17 @@ public class RequestServiceImpl implements RequestService {
     @PreAuthorize("hasAnyAuthority('ROLE_OFFICE MANAGER', 'ROLE_ADMINISTRATOR')")
     public int removeFromRequestGroup(Long requestId, Principal principal) throws ResourceNotFoundException, IllegalAccessException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> request = checkRequestPresent(requestRepository.findOne(requestId));
-        RequestGroup requestGroup = requestGroupRepository.findOne(request.get().getRequestGroup().getId()).get();
+        Request request = checkRequestPresent(requestRepository.findOne(requestId));
+        RequestGroup requestGroup = requestGroupRepository.findOne(request.getRequestGroup().getId()).get();
 
         if (!isAccessLegal(requestGroup, principal))
             throw new IllegalAccessException(messageSource.getMessage(REQUEST_GROUP_ILLEGAL_ACCESS, null, locale));
-        return requestRepository.removeRequestFromRequestGroup(request.get().getId());
+        return requestRepository.removeRequestFromRequestGroup(request.getId());
     }
 
     @Override
     public List<Request> getAllSubRequest(Long parentId) throws ResourceNotFoundException {
-        Request parent = checkRequestPresent(requestRepository.findOne(parentId)).get();
+        Request parent = checkRequestPresent(requestRepository.findOne(parentId));
         List<Request> requests = requestRepository.getAllSubRequest(parentId);
         requests.forEach(e -> fillRequest(e, parent));
         return requests;
@@ -268,18 +268,18 @@ public class RequestServiceImpl implements RequestService {
     public void deleteRequestById(Long id, Principal principal) throws CannotDeleteRequestException, ResourceNotFoundException, CannotUpdateStatusException {
         Locale locale = LocaleContextHolder.getLocale();
         Optional<Person> currentUser = checkPersonPresent(personRepository.findPersonByEmail(principal.getName()));
-        Optional<Request> request = checkRequestPresent(requestRepository.findOne(id));
+        Request request = checkRequestPresent(requestRepository.findOne(id));
 
-        if (StatusEnum.CANCELED.getId().equals(request.get().getStatus().getId()))
+        if (StatusEnum.CANCELED.getId().equals(request.getStatus().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CANCELED, null, locale));
-        else if (StatusEnum.CLOSED.getId().equals(request.get().getStatus().getId()))
+        else if (StatusEnum.CLOSED.getId().equals(request.getStatus().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_CLOSED, null, locale));
-        else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.get().getEmployee().getId()))
+        else if (!isCurrentUserAdmin(principal) && !currentUser.get().getId().equals(request.getEmployee().getId()))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_PERMISSION, null, locale));
-        else if (!StatusEnum.FREE.getId().equals(request.get().getStatus().getId()) && !isCurrentUserAdmin(principal))
+        else if (!StatusEnum.FREE.getId().equals(request.getStatus().getId()) && !isCurrentUserAdmin(principal))
             throw new CannotDeleteRequestException(messageSource.getMessage(REQUEST_ERROR_DELETE_NOT_FREE, null, locale));
         else {
-            changeRequestStatus(request.get(), new Status(StatusEnum.CANCELED.getId()), currentUser.get().getEmail());
+            changeRequestStatus(request, new Status(StatusEnum.CANCELED.getId()), currentUser.get().getEmail());
         }
     }
 
@@ -288,15 +288,15 @@ public class RequestServiceImpl implements RequestService {
     @PreAuthorize("isAuthenticated()")
     public int changeRequestStatus(Request request, Status status, String authorName) throws ResourceNotFoundException, CannotUpdateStatusException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> requestDB = checkRequestPresent(requestRepository.findOne(request.getId()));
-        Request newRequest = new Request(requestDB.get());
+        Request requestDB = checkRequestPresent(requestRepository.findOne(request.getId()));
+        Request newRequest = new Request(requestDB);
         if(!StatusEnum.CANCELED.getId().equals(status.getId())){
             if(newRequest.getRequestGroup()!=null){
                 throw new CannotUpdateStatusException(messageSource.getMessage(REQUEST_ERROR_UPDATE_STATUS, null, locale));
             }
         }
         newRequest.setStatus(status);
-        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB.get(), newRequest, new Date(), authorName));
+        eventPublisher.publishEvent(new UpdateRequestEvent(requestDB, newRequest, new Date(), authorName));
 
         if (newRequest.getStatus().getId().equals(StatusEnum.CLOSED.getId())){
             List<Request> subRequestList = getAllSubRequest(newRequest.getId());
@@ -383,14 +383,19 @@ public class RequestServiceImpl implements RequestService {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRATOR')")
     public void unassign(Long requestId, Principal principal) throws CannotUnassignRequestException, ResourceNotFoundException {
         Locale locale = LocaleContextHolder.getLocale();
-        Optional<Request> oldRequest = checkRequestPresent(getRequestById(requestId));
+        Request oldRequest = checkRequestPresent(getRequestById(requestId));
 
-        if(oldRequest.get().getManager() == null) {
+        if(oldRequest.getManager() == null) {
             throw new CannotUnassignRequestException(messageSource.getMessage(REQUEST_NOT_ASSIGNED, null, locale));
         }
+
+        if(oldRequest.getRequestGroup() != null) {
+            requestRepository.removeRequestFromRequestGroup(oldRequest.getId());
+        }
+
         requestRepository.unassign(requestId);
         Optional<Request> newRequest = getRequestById(requestId);
-        eventPublisher.publishEvent(new RequestUnassignEvent(oldRequest.get(), newRequest.get(), new Date(), principal.getName()));
+        eventPublisher.publishEvent(new RequestUnassignEvent(oldRequest, newRequest.get(), new Date(), principal.getName()));
     }
 
     @Override
@@ -597,11 +602,11 @@ public class RequestServiceImpl implements RequestService {
             return person;
     }
 
-    private Optional<Request> checkRequestPresent(Optional<Request> request) throws ResourceNotFoundException{
+    private Request checkRequestPresent(Optional<Request> request) throws ResourceNotFoundException{
         Locale locale = LocaleContextHolder.getLocale();
         if (!request.isPresent())
             throw new ResourceNotFoundException(messageSource.getMessage(REQUEST_ERROR_NOT_EXIST, null, locale));
         else
-            return request;
+            return request.get();
     }
 }

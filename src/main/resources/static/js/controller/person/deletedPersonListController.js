@@ -77,7 +77,6 @@
                             $scope.persons = [];
                             $scope.persons = response.data.data;
                             $scope.totalItems = response.data.totalElements;
-                            swal("User recovered!");
                         }, function errorCallback(response) {
                         });
                     }
@@ -103,6 +102,7 @@
                 $scope.personRecover = function (person) {
                     $scope.person = person;
                     $http.post("/api/person/recoverPerson", person.email, $scope.currentUser).then(function successCallback(response) {
+                        swal("User recovered!");
                         $scope.persons = $scope.persons.filter(function (person) {
                             return person.email !== $scope.person.email;
                         });

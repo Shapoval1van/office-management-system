@@ -8,7 +8,7 @@
                 $scope.managers = [];
                 $scope.users = [];
 
-                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.order = FieldFactory.desc(FieldFactory.request.CREATE_TIME);
                 $scope.requestFields = FieldFactory.request;
 
                 var requestDetails = "/secured/employee/request/";

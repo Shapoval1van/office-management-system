@@ -29,6 +29,6 @@
                 </div>
         </li>
         <li><a ng-show="Session.isUserLoggedIn()" href="/secured/employee/dashboard" ng-bind="Session.getUserName()"></a></li>
-        <li><a ng-show="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
+        <li><a ng-if="Session.isUserLoggedIn()" href="#" ng-click="logout()">Logout</a></li>
     </ul>
 </div>

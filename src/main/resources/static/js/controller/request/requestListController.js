@@ -24,7 +24,7 @@
                 $scope.selectedRequest = -1;
                 $scope.requestListVisibility = true;
 
-                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.order = FieldFactory.desc(FieldFactory.request.CREATE_TIME);
                 $scope.requestFields = FieldFactory.request;
 
                 $scope.orderRequests = function (fieldName) {
@@ -183,13 +183,11 @@
                     return PersonService.assign($scope.selectedRequest, $scope.selectedManager.id)
                         .then(function (response) {
                             $scope.assignedMessage = response.data.message;
+                            swal("Request assigned!", "Request successful assigned", "success");
                             $scope.pageChanged();
                         }, function (response) {
-                            $scope.assignedMessage = response.data.errors
-                                .map(function (e) {
-                                    return e.detail
-                                })
-                                .join('. ');
+                            $scope.assignedMessage = response.data.errors;
+                            swal("Assigning Failure!", response.data.errors, "error");
                         });
                 };
 
