@@ -15,9 +15,6 @@
                         data.data.forEach(function(element) {
                             var tzoffset = (new Date()).getTimezoneOffset() * 60000;
 
-                            // element.start = new Date(element.end).toISOString();
-                            // element.end = new Date(element.end).toISOString();
-
                             element.start = (new Date(element.end - tzoffset)).toISOString();
                             element.end = (new Date(element.end - tzoffset)).toISOString();
                             switch (element.priority.id) {
@@ -31,7 +28,7 @@
                                     element.color = "rgba(0, 182, 44, 0.9)";
                                     break;
                             }
-                            if (element.status.id == 4){
+                            if (element.status.id === 3 || element.status.id === 4){
                                 element.color = "rgba(0, 0, 0, 0.3)";
                             }
                         });
