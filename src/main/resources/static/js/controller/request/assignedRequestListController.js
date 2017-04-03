@@ -14,7 +14,7 @@
                 $scope.requestListVisibility = true;
 
                 $scope.request = {};
-                $scope.order = FieldFactory.request.CREATE_TIME;
+                $scope.order = FieldFactory.desc(FieldFactory.request.CREATE_TIME);
 
                 $scope.requestFields = FieldFactory.request;
 

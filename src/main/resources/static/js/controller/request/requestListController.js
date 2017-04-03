@@ -87,6 +87,10 @@
                         window.location = requestDetails + requestId + '/update';
                     };
 
+                    $scope.isFree = function(request) {
+                        return request.status.name === "FREE";
+                    };
+
                     $scope.requestDetails = function (requestId) {
                         window.location = requestDetails + requestId;
                     };

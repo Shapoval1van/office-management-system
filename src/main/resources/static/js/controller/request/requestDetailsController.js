@@ -383,12 +383,12 @@
                 };
 
                 $scope.showCancelButton = function () {
-                    return $scope.isAuthor() && $scope.isFree() || $scope.isCurrentUserAdministrator();
+                    return ($scope.isAuthor() || $scope.isCurrentUserAdministrator()) && $scope.isFree();
                 };
 
                 $scope.showAddGroupBtn = function () {
                     return ($scope.isAssignedManager() || $scope.isCurrentUserAdministrator()) && !$scope.isGrouped()
-                        && $scope.isAssigned();
+                        && !$scope.isClosed() && !$scope.isCanceled() && $scope.isAssigned();
                 };
 
                 $scope.showRemoveFromGroupBtn = function () {
@@ -420,7 +420,7 @@
                 };
 
                 $scope.showUnassignBtn = function () {
-                    return $scope.isCurrentUserAdministrator() && $scope.isAssigned();
+                    return $scope.isCurrentUserAdministrator() && $scope.isAssigned() && !$scope.isClosed() && !$scope.isCanceled();
                 };
                 //FIXME: Move to service
                 $scope.isCurrentUserManager = function () {
